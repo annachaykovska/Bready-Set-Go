@@ -57,6 +57,7 @@
     <IntDir>$(SolutionDir)\bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)dependencies\physx\libs_release;$(LibraryPath)</LibraryPath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)dependencies\physx\include;$(IncludePath)</IncludePath>
+    <TargetName>Bready Set Go!!!</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -815,6 +816,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\Users\travi\Desktop\rat.ico" />
+    <Image Include="resources\rat.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

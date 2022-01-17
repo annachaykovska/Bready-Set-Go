@@ -2051,5 +2051,8 @@
     <Image Include="..\..\..\Users\travi\Desktop\rat.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\rat.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
