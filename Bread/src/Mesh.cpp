@@ -16,6 +16,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	setupMesh();
 }
 
+Mesh::Mesh() {}
+
 /// <summary>
 /// Initializes the vertex array object, vertex buffer object, and element buffer object needed
 /// to render this mesh. Then, loads the appropriate vertices, indices, and texture coordinates

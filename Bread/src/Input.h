@@ -1,6 +1,7 @@
 #pragma once
 
-class Input {
+class Input 
+{
 public:
 	void processInput(GLFWwindow* window);
 private:

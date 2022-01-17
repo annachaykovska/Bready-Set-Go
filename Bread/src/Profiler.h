@@ -66,7 +66,7 @@ public:
 		ImGui::Text("framesPerSecond = %lf", framesPerSecond);
 	}
 
-	void run()
+	void update()
 	{
 		newFrame();
 		begin();

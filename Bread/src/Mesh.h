@@ -28,12 +28,14 @@ public:
 	std::vector<unsigned int> indices; // List of indices of faces in the mesh
 	std::vector<Texture> textures;	   // List of textures used by the mesh
 
+	Mesh();
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+	void setupMesh();		   // Initialization
 	void draw(Shader& shader); // Render mesh
 
 private:
 
 	unsigned int VAO, VBO, EBO; // Rendering data
-	void setupMesh();			// Initialization
+	//void setupMesh();			// Initialization
 
 };
