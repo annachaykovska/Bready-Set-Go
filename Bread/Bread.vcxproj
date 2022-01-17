@@ -668,6 +668,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="Bread.aps" />
     <None Include="dependencies\include\glm\detail\func_common.inl" />
     <None Include="dependencies\include\glm\detail\func_common_simd.inl" />
     <None Include="dependencies\include\glm\detail\func_exponential.inl" />
@@ -815,7 +816,6 @@
     <ResourceCompile Include="Bread.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Users\travi\Desktop\rat.ico" />
     <Image Include="resources\rat.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

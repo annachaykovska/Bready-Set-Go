@@ -2037,6 +2037,7 @@
     <None Include="imgui.ini" />
     <None Include="src\assimp-vc142-mtd.dll" />
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="Bread.aps" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\shaders\vertex.txt" />
@@ -2048,9 +2049,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Users\travi\Desktop\rat.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="resources\rat.ico">
       <Filter>Resource Files</Filter>
     </Image>
