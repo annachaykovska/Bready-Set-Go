@@ -42,6 +42,10 @@ int main()
 	std::string breadPath = "resources/models/bread/PB145_bread_low.obj";
 	Model test(&breadPath[0]);
 
+	// Load breadbus model
+	std::string busPath = "resources/models/breadbus/breadbus.obj";
+	Model bus(&busPath[0]);
+
 	const float radius = 40.0f;
 
 	glEnable(GL_DEPTH_TEST);
@@ -114,7 +118,18 @@ int main()
 		unsigned int projLoc = glGetUniformLocation(shader.getId(), "proj");
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
-		test.draw(shader); // Draw the bread loaf
+		//test.draw(shader); // Draw the bread loaf
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		glUniform1i(texLoc, 1);
+
+		bus.draw(shader);
+
+		glUniform1i(texLoc, 0);
 
 		// Change model matrix for ground plane
 		model = glm::mat4(1.0f);
