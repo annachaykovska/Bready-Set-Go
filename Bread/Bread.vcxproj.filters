@@ -1574,6 +1574,9 @@
     <ClInclude Include="src\PhysicsSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />
@@ -2034,9 +2037,20 @@
     <None Include="imgui.ini" />
     <None Include="src\assimp-vc142-mtd.dll" />
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="Bread.aps" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\shaders\vertex.txt" />
     <Text Include="resources\shaders\fragment.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Bread.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\rat.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

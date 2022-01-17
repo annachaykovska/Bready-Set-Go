@@ -49,6 +49,7 @@
     <IntDir>$(SolutionDir)\bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)dependencies\lib;$(ProjectDir)dependencies\physx\libs_debug</LibraryPath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)dependencies\physx\include;$(IncludePath)</IncludePath>
+    <TargetName>Bready Set Go!!!</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -56,6 +57,7 @@
     <IntDir>$(SolutionDir)\bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)dependencies\physx\libs_release;$(LibraryPath)</LibraryPath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)dependencies\physx\include;$(IncludePath)</IncludePath>
+    <TargetName>Bready Set Go!!!</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -601,6 +603,7 @@
     <ClInclude Include="dependencies\physx\include\vehicle\PxVehicleUtilSetup.h" />
     <ClInclude Include="dependencies\physx\include\vehicle\PxVehicleUtilTelemetry.h" />
     <ClInclude Include="dependencies\physx\include\vehicle\PxVehicleWheels.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ElementBuffer.h" />
@@ -665,6 +668,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="Bread.aps" />
     <None Include="dependencies\include\glm\detail\func_common.inl" />
     <None Include="dependencies\include\glm\detail\func_common_simd.inl" />
     <None Include="dependencies\include\glm\detail\func_exponential.inl" />
@@ -807,6 +811,12 @@
   <ItemGroup>
     <Text Include="resources\shaders\fragment.txt" />
     <Text Include="resources\shaders\vertex.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Bread.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\rat.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

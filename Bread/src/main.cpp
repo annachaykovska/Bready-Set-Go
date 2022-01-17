@@ -25,7 +25,7 @@ int main()
 	glfwInit();
 
 	// Create viewport window
-	Window window(800, 600, "Bread");
+	Window window(800, 600, "Bready Set Go!!!");
 	window.setBackgroundColor(0.2f, 0.3f, 0.3f);
 
 	// Compile shader program
