@@ -47,7 +47,7 @@ void GPU_Geometry::draw()
 {
 	VBO.bind();
 	EBO.bind();
-	texture.bind();
+	//texture.bind();
 
 	size_t vOffset = sizeof(glm::vec3) * geom.verts.size();
 	size_t cOffset = vOffset + sizeof(glm::vec3) * geom.colors.size();

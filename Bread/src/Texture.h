@@ -5,11 +5,11 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-class Texture {
+class Texture2 {
 public:
 
-	Texture(std::string path);
-	Texture();
+	Texture2(std::string path);
+	Texture2();
 
 	void setTexture(std::string path);
 	std::string getPath() { return path;  }

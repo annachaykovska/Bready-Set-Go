@@ -1,8 +1,4 @@
-#define STB_IMAGE_IMPLEMENTATION
-
 #include <iostream>
-
-#include <stbi/stb_image.h>
 
 #include "Texture.h"
 

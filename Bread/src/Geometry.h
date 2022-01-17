@@ -22,7 +22,7 @@ class GPU_Geometry {
 public:
 
 	CPU_Geometry geom;
-	Texture texture;
+	//Texture texture;
 
 	GPU_Geometry();
 	GPU_Geometry(CPU_Geometry& shape);
