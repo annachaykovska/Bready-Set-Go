@@ -47,7 +47,6 @@ int Window::verifyGLFW()
 		return -1;
 	}
 
-	std::cout << "GLFW window created successfully." << std::endl;
 	return 1;
 }
 
@@ -59,6 +58,5 @@ int Window::verifyGLAD()
 		return -1;
 	}
 
-	std::cout << "GLAD initialized successfully." << std::endl;
 	return 1;
 }

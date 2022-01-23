@@ -1,7 +1,0 @@
-﻿  main.cpp
-C:\dev\Bread\Bread\src\Shader.h(16,66): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\dev\Bread\Bread\src\main.cpp(75,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\dev\Bread\Bread\src\main.cpp(90,24): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\dev\Bread\Bread\src\main.cpp(110,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\dev\Bread\Bread\src\main.cpp(111,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Bread.vcxproj -> C:\dev\Bread\bin\Debug-x64\Bread\Bready Set Go!!!.exe

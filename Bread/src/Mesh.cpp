@@ -59,25 +59,33 @@ void Mesh::draw(Shader &shader)
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 
-	// Loop through each texture in the mesh to determine its type (diffuse or specular)
-	// then construct a uniform name 
-	for (unsigned int i = 0; i < textures.size(); i++)
+	if (textures.size() > 0)
 	{
-		glActiveTexture(GL_TEXTURE0 + i);
+		// Loop through each texture in the mesh to determine its type (diffuse or specular)
+		// then construct a uniform name 
+		for (unsigned int i = 0; i < textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
 
-		std::string number;
-		std::string name = textures[i].type;
+			std::string number;
+			std::string name = textures[i].type;
 
-		if (name == "texture_diffuse")
-			number = std::to_string(diffuseNr++);
-		else if (name == "texture_specular")
-			number = std::to_string(specularNr++);
+			if (name == "texture_diffuse")
+				number = std::to_string(diffuseNr++);
+			else if (name == "texture_specular")
+				number = std::to_string(specularNr++);
 
-		shader.setFloat((name + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+			shader.setFloat((name + number).c_str(), i);
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		}
+
+		glActiveTexture(GL_TEXTURE0);
 	}
-
-	glActiveTexture(GL_TEXTURE0);
+	else
+	{
+		unsigned int colorLoc = glGetUniformLocation(shader.getId(), "color");
+		glUniform4f(colorLoc, color.x, color.y, color.z, 1.0f);
+	}
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

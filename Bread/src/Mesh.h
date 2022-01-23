@@ -27,6 +27,7 @@ public:
 	std::vector<Vertex> vertices;	   // List of vertices in the mesh
 	std::vector<unsigned int> indices; // List of indices of faces in the mesh
 	std::vector<Texture> textures;	   // List of textures used by the mesh
+	glm::vec3 color;
 
 	Mesh();
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);

@@ -39,7 +39,7 @@ public:
 		ground.indices.push_back(0);
 		ground.indices.push_back(2);
 		ground.indices.push_back(3);
-
+		
 		// Create and load the wood floor texture
 		unsigned int textureId;
 		glGenTextures(1, &textureId);

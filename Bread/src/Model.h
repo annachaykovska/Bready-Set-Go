@@ -12,12 +12,14 @@ class Model
 {
 public:
 
+	std::vector<Mesh> meshes;
+
 	Model(char* path) { loadModel(path); }
 	void draw(Shader& shader);
+	bool isTextured() { return (textures_loaded.size() != 0); }
 
 private:
 
-	std::vector<Mesh> meshes;
 	std::string directory;
 	std::vector<Texture> textures_loaded;
 	

@@ -24,7 +24,6 @@ Audio::Audio()
 
 	// Load audio library
 	load("bg.wav");
-	load("test.wav");
 	load("horn.wav");
 	load("bread.wav");
 }
@@ -92,8 +91,8 @@ bool Audio::load(std::string fileName)
 	}
 
 	// Print the wav header data for debugging
-	std::cout << "Filename: " << fileName << std::endl;
-	header.summary();
+	//std::cout << "Filename: " << fileName << std::endl;
+	//header.summary();
 
 	// Copy relevant header data to AudioClip
 	uint32_t frequency = header.frequency;
