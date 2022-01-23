@@ -68,7 +68,6 @@ public:
 
 	void update()
 	{
-		newFrame();
 		begin();
 		fps();
 		end();

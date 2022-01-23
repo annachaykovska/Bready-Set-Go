@@ -96,6 +96,8 @@ int main()
 	// GAME LOOP
 	while (!window.shouldClose())
 	{
+		
+
 		// INPUT
 		window.getInput();
 		glfwPollEvents();
@@ -108,8 +110,8 @@ int main()
 
 		// RENDER
 		window.clear();
-		profiler.update();
 		shader.use();
+		profiler.newFrame();
 
 		// View matrix will be handled by the Camera class in the future
 		glm::mat4 view = glm::mat4(1.0f);
@@ -144,6 +146,8 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(texLoc, 1); // Turn textures back on
 		ground.draw(shader); 
+
+		profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();
