@@ -11,11 +11,10 @@ class Entity {
 public:
 
 	unsigned int entityID;
-	std::vector<std::weak_ptr<Component>> components;
+	std::vector<std::shared_ptr<Component>> components;
 
 	Entity();
 	void addComponent(std::shared_ptr<Component> newComponent);
 
 private:
-
 };

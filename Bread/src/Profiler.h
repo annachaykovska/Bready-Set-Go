@@ -66,10 +66,25 @@ public:
 		ImGui::Text("framesPerSecond = %lf", framesPerSecond);
 	}
 
-	void update()
+	void transform(std::string name, glm::vec3& pos)
+	{
+		std::string x = std::to_string(pos.x);
+		std::string y = std::to_string(pos.y);
+		std::string z = std::to_string(pos.z);
+
+		std::string text = "\n" + name + "position: ";
+
+		ImGui::Text(text.c_str());
+		ImGui::SliderFloat("X", &pos.x, -100.0f, 100.0f, x.c_str(), 1.0f);
+		ImGui::SliderFloat("Y", &pos.y, -100.0f, 100.0f, y.c_str(), 1.0f);
+		ImGui::SliderFloat("Z", &pos.z, -100.0f, 100.0f, z.c_str(), 1.0f);
+	}
+
+	void update(glm::vec3& breadmobile)
 	{
 		begin();
 		fps();
+		transform("Breadmobile", breadmobile);
 		end();
 	}
 

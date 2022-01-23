@@ -63,26 +63,6 @@ int main()
 	Geometry geo;
 	Mesh ground = geo.createGround();
 
-	// Create new entities
-	Entity bread;
-
-	// Creation of components should be handled by their respective system in the future
-	std::shared_ptr<Transform> breadTransform = std::make_shared<Transform>();
-	breadTransform->position = glm::vec3(1.0f, 2.0f, 3.0f);
-	breadTransform->rotation = glm::vec3(45.0f, 90.0f, 180.0f);
-	breadTransform->scale = glm::vec3(1.0f, 1.0f, 0.8f);
-
-	// Add a new component to an entity
-	bread.addComponent(breadTransform);
-
-	// Initialize physx
-	PhysicsSystem physics;
-
-	// Play the background music
-	Audio audioTest;
-	AudioSource testSource(0.05f, 1.0f, true);
-	testSource.play(audioTest.get("bg.wav"));
-
 	// MVP uniforms
 	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
 	unsigned int viewLoc = glGetUniformLocation(shader.getId(), "view");
@@ -91,13 +71,43 @@ int main()
 	// For detecting textures
 	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
 
+	// Create a contatiner for transform components (will be handled by systems in future)
+	std::vector<std::shared_ptr<Transform>> transforms;
+
+	// Create entities and initialize their transforms
+	Entity breadBus;
+	transforms.push_back(std::make_shared<Transform>());
+	transforms[0]->position = glm::vec3(0, 2.3f, 0);
+	transforms[0]->rotation = glm::vec3(0, 0, 0);
+	transforms[0]->scale = glm::vec3(3, 3, 3);
+	breadBus.addComponent(transforms[0]);
+
+	Entity tea;
+	transforms.push_back(std::make_shared<Transform>());
+	transforms[1]->position = glm::vec3(50, 0, 50);
+	transforms[1]->rotation = glm::vec3(0, 0, 0);
+	transforms[1]->scale = glm::vec3(50, 50, 50);
+	tea.addComponent(transforms[1]);
+
+	Entity countertop;
+	transforms.push_back(std::make_shared<Transform>());
+	transforms[2]->position = glm::vec3(0, 0, 0);
+	transforms[2]->rotation = glm::vec3(0, 0, 0);
+	transforms[2]->scale = glm::vec3(100, 100, 100);
+	countertop.addComponent(transforms[2]);
+	
+	// Initialize physx
+	PhysicsSystem physics;
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
+
+	// Play the background music
+	Audio audioTest;
+	AudioSource testSource(0.05f, 1.0f, true);
+	testSource.play(audioTest.get("bg.wav"));
 
 	// GAME LOOP
 	while (!window.shouldClose())
 	{
-		
-
 		// INPUT
 		window.getInput();
 		glfwPollEvents();
@@ -125,29 +135,23 @@ int main()
 		proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));		
 
+		// Drawing objects will be handled by Rendering System in the future
 		// Draw breadbus
-		glm::mat4 model = glm::mat4(1.0f); // Model matrix will be handled by transform components in the future
-		model = glm::translate(model, glm::vec3(0.0f, 2.3f, 0.0f));
-		model = glm::scale(model, glm::vec3(3, 3, 3));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[0]->getModelMatrix()));
 		glUniform1i(texLoc, 0); // Turn off textures
 		bus.draw(shader);
 
 		// Draw teapot
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(50, 0, 50));
-		model = glm::scale(model, glm::vec3(50, 50, 50));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[1]->getModelMatrix()));
 		teapot.draw(shader);
 
 		// Draw countertop
-		model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[2]->getModelMatrix()));
 		glUniform1i(texLoc, 1); // Turn textures back on
 		ground.draw(shader); 
 
-		profiler.update();
+		// Update the ImGUI profiler
+		profiler.update(transforms[0]->position);
 
 		// Swap the frame buffers
 		window.swapBuffer();
