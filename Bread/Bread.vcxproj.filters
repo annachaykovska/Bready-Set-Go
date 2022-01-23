@@ -78,6 +78,9 @@
     <ClCompile Include="src\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Audio\Audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -1577,6 +1580,42 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dependencies\include\AL\al.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\AL\alc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\AL\alext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\AL\efx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\AL\efx-creative.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\AL\efx-presets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\Audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\AL\AudioFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\AudioClip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\AudioSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\AudioEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\stbi\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />
@@ -1624,6 +1663,9 @@
     <Library Include="dependencies\physx\libs_release\SnippetRender_static_64.lib" />
     <Library Include="dependencies\physx\libs_release\SnippetUtils_static_64.lib" />
     <Library Include="dependencies\lib\glfw3_mt.lib" />
+    <Library Include="dependencies\lib\common.lib" />
+    <Library Include="dependencies\lib\ex-common.lib" />
+    <Library Include="dependencies\lib\OpenAL32.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dependencies\include\glm\detail\func_common.inl">
@@ -2038,6 +2080,7 @@
     <None Include="src\assimp-vc142-mtd.dll" />
     <None Include="assimp-vc142-mtd.dll" />
     <None Include="Bread.aps" />
+    <None Include="OpenAL32.dll" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\shaders\vertex.txt" />

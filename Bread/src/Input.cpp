@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <glfw/glfw3.h>
 
 #include "Input.h"

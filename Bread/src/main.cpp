@@ -16,8 +16,14 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "PhysicsSystem.h"
+#include "Audio/Audio.h"
+#include "Audio/AudioSource.h"
 
 //Camera camera;
+
+bool horn = false;
+int changeSong = 1;
+bool songChanged = false;
 
 int main()
 {	
@@ -67,6 +73,11 @@ int main()
 	PhysicsSystem physics;
 
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
+
+	Audio audioTest;
+	//AudioSource testSource(0.1f, 1.0f, true);
+	AudioSource testSource2(0.3f, 1.0f, false);
+	//testSource.play(audioTest.get("bg.wav"));
 
 	// GAME LOOP
 	while (!window.shouldClose()) 
@@ -141,6 +152,12 @@ int main()
 		window.swapBuffer();
 
 		// AUDIO
+		testSource2.play(audioTest.get("horn.wav"));
+		glm::vec3 newPos;
+		newPos.x = testSource2.pos.x + 1.0f * deltaTime;
+		newPos.y = testSource2.pos.y;
+		newPos.z = testSource2.pos.z;
+		testSource2.updatePos(newPos);
 	}
 
 	profiler.cleanup();
