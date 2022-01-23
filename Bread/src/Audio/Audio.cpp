@@ -26,6 +26,7 @@ Audio::Audio()
 	load("bg.wav");
 	load("horn.wav");
 	load("bread.wav");
+	load("tone.wav");
 }
 
 Audio::~Audio()

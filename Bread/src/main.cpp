@@ -28,7 +28,7 @@ int main()
 
 	// Create viewport window
 	Window window(800, 600, "Bready Set Go!!!");
-	window.setBackgroundColor(0.2f, 0.3f, 0.3f);
+	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	glEnable(GL_DEPTH_TEST); // This should go somewhere else later
 
@@ -52,7 +52,12 @@ int main()
 	bus.meshes[6].color = glm::vec3(1, 0, 1);
 	//bus.meshes[7].color = glm::vec3(0.8f, 0.039734f, 0); // Dunno!
 	bus.meshes[7].color = glm::vec3(1, 0, 1);
-	bus.meshes[8].color = glm::vec3(0.1f, 0.1f, 0.1f); // Back wheels*/
+	bus.meshes[8].color = glm::vec3(0.1f, 0.1f, 0.1f); // Back wheels
+
+	// Load teapot model
+	std::string teapotPath = "resources/models/teapot/teapot_s0.obj";
+	Model teapot(&teapotPath[0]);
+	teapot.meshes[0].color = glm::vec3(0.3f, 0.3f, 0.3f);
 
 	// Create ground plane
 	Geometry geo;
@@ -75,7 +80,7 @@ int main()
 
 	// Play the background music
 	Audio audioTest;
-	AudioSource testSource(0.1f, 1.0f, true);
+	AudioSource testSource(0.05f, 1.0f, true);
 	testSource.play(audioTest.get("bg.wav"));
 
 	// MVP uniforms
@@ -89,7 +94,7 @@ int main()
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
 
 	// GAME LOOP
-	while (!window.shouldClose()) 
+	while (!window.shouldClose())
 	{
 		// INPUT
 		window.getInput();
@@ -106,14 +111,14 @@ int main()
 		profiler.update();
 		shader.use();
 
-		// View matrix will be handled by Camera class in the future
+		// View matrix will be handled by the Camera class in the future
 		glm::mat4 view = glm::mat4(1.0f);
 		float camX = sin(glfwGetTime()) * radius;
 		float camZ = cos(glfwGetTime()) * radius;
 		view = glm::lookAt(glm::vec3(camX, 10.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-		// Projection matrix will be handled by Camera class in the future
+		// Projection matrix will be handled by the Camera class in the future
 		glm::mat4 proj = glm::mat4(1.0f);
 		proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));		
@@ -121,10 +126,17 @@ int main()
 		// Draw breadbus
 		glm::mat4 model = glm::mat4(1.0f); // Model matrix will be handled by transform components in the future
 		model = glm::translate(model, glm::vec3(0.0f, 2.3f, 0.0f));
-		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		model = glm::scale(model, glm::vec3(3, 3, 3));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(texLoc, 0); // Turn off textures
 		bus.draw(shader);
+
+		// Draw teapot
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(50, 0, 50));
+		model = glm::scale(model, glm::vec3(50, 50, 50));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		teapot.draw(shader);
 
 		// Draw countertop
 		model = glm::mat4(1.0f);
@@ -137,7 +149,7 @@ int main()
 		window.swapBuffer();
 
 		// AUDIO
-		// Doesn't need to be updated every frame yet
+		//testSource.setPosition(glm::vec3(camX / 2, 0, camZ / 2));
 	}
 
 	// Collect garbage

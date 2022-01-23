@@ -15,9 +15,10 @@ struct AudioSource : Component
 	AudioSource()
 	{
 		alGenSources(1, &source);
-		gain = 1;
-		pitch = 1;
-		loop = false;
+		this->gain = 1;
+		this->pitch = 1;
+		this->loop = false;
+		this->pos = glm::vec3(0, 0, 0);
 	}
 
 	AudioSource(float gain, float pitch, bool loop)
@@ -34,9 +35,11 @@ struct AudioSource : Component
 		alDeleteSources(1, &source);
 	}
 
-	void updatePos(glm::vec3 pos)
+	void setPosition(glm::vec3 pos)
 	{
+		this->pos = pos;
 		alSource3f(source, AL_POSITION, pos.x, pos.y, pos.z);
+		std::cout << "Source: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
 	}
 
 	// Plays an AudioClip from this source
