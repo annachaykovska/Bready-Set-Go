@@ -82,6 +82,8 @@ int main()
 	transforms[0]->scale = glm::vec3(3, 3, 3);
 	breadBus.addComponent(transforms[0]);
 
+	std::cout << breadBus.components.size() << std::endl;
+
 	Entity tea;
 	transforms.push_back(std::make_shared<Transform>());
 	transforms[1]->position = glm::vec3(50, 0, 50);
