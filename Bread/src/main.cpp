@@ -10,16 +10,23 @@
 
 #include "Window.h"
 #include "Profiler.h"
+#include "SystemManager.h"
 #include "Geometry.h"
 #include "Shader.h"
 #include "Model.h"
-#include "Entity.h"
+#include "Scene/Entity.h"
 #include "Camera.h"
 #include "PhysicsSystem.h"
-#include "Audio/Audio.h"
-#include "Audio/AudioSource.h"
+#include "Scene/Scene.h"
+#include "Transform.h"
 
 const float radius = 40.0f;
+
+// Global Scene holds all the Entities for easy reference
+Scene g_scene;
+
+// Global SystemManager holds all the Systems for easy reference
+SystemManager g_systems;
 
 int main()
 {	
@@ -30,14 +37,22 @@ int main()
 	Window window(800, 600, "Bready Set Go!!!");
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
-	glEnable(GL_DEPTH_TEST); // This should go somewhere else later
+	// ImGui profiler for debugging
+	Profiler profiler(window);	
 
+	// Initialize Physics System
+	PhysicsSystem physics;
+	g_systems.physics = &physics;
+	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0; // Used for tracking time in the game loop
+
+	// INITIALIZE RENDERING STUFF - will be in the rendering system in the future
+	//-----------------------------------------------------------------------------------
 	// Compile shader program
 	Shader shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt");
 
-	// ImGui profiler for debugging
-	Profiler profiler(window);
-	
+	// Turn on depth testing so we know what objects are in front of what
+	glEnable(GL_DEPTH_TEST);
+
 	// Load breadbus model
 	std::string busPath = "resources/models/breadbus/breadbus.obj";
 	Model bus(&busPath[0]);
@@ -56,8 +71,8 @@ int main()
 
 	// Load teapot model
 	std::string teapotPath = "resources/models/teapot/teapot_s0.obj";
-	Model teapot(&teapotPath[0]);
-	teapot.meshes[0].color = glm::vec3(0.3f, 0.3f, 0.3f);
+	Model teapotModel(&teapotPath[0]);
+	teapotModel.meshes[0].color = glm::vec3(0.3f, 0.3f, 0.3f);
 
 	// Create ground plane
 	Geometry geo;
@@ -70,42 +85,56 @@ int main()
 
 	// For detecting textures
 	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
+	//-----------------------------------------------------------------------------------
 
-	// Create a contatiner for transform components (will be handled by systems in future)
-	std::vector<std::shared_ptr<Transform>> transforms;
+	// ENTITY-COMPONENT STUFF -----------------------------------------------------------
+	// Populate the scene with Entities (will happen on game start)
+	Entity* breadmobile = g_scene.createEntity("breadmobile");
+	Entity* teapot = g_scene.createEntity("teapot");
+	Entity* countertop = g_scene.createEntity("countertop");
 
-	// Create entities and initialize their transforms
-	Entity breadBus;
-	transforms.push_back(std::make_shared<Transform>());
-	transforms[0]->position = glm::vec3(0, 2.3f, 0);
-	transforms[0]->rotation = glm::vec3(0, 0, 0);
-	transforms[0]->scale = glm::vec3(3, 3, 3);
-	breadBus.addComponent(transforms[0]);
-
-	std::cout << breadBus.components.size() << std::endl;
-
-	Entity tea;
-	transforms.push_back(std::make_shared<Transform>());
-	transforms[1]->position = glm::vec3(50, 0, 50);
-	transforms[1]->rotation = glm::vec3(0, 0, 0);
-	transforms[1]->scale = glm::vec3(50, 50, 50);
-	tea.addComponent(transforms[1]);
-
-	Entity countertop;
-	transforms.push_back(std::make_shared<Transform>());
-	transforms[2]->position = glm::vec3(0, 0, 0);
-	transforms[2]->rotation = glm::vec3(0, 0, 0);
-	transforms[2]->scale = glm::vec3(100, 100, 100);
-	countertop.addComponent(transforms[2]);
+	// Create a container for Transform Components (will be handled by a system in the future)
+	// and add some some new Transforms to it for the Entities
+	std::vector<Transform> transforms;
+	transforms.emplace_back(Transform());
+	transforms.emplace_back(Transform());
+	transforms.emplace_back(Transform());
 	
-	// Initialize physx
-	PhysicsSystem physics;
-	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
+	// Attach one of the Transform Components to each Entity in the Scene
+	breadmobile->attachComponent(&transforms[0], "transform");
+	teapot->attachComponent(&transforms[1], "transform");
+	countertop->attachComponent(&transforms[2], "transform");
 
-	// Play the background music
-	Audio audioTest;
-	AudioSource testSource(0.05f, 1.0f, true);
-	testSource.play(audioTest.get("bg.wav"));
+	// Make a reference to each Transform Component for easy updates
+	Transform* breadmobileTransform = breadmobile->getTransform();
+	breadmobileTransform->position = glm::vec3(0, 2.3f, 0);
+	breadmobileTransform->rotation = glm::vec3(0, 0, 0);
+	breadmobileTransform->scale = glm::vec3(3, 3, 3);
+
+	Transform* teapotTransform = teapot->getTransform();
+	teapotTransform->position = glm::vec3(50, 0, 50);
+	teapotTransform->rotation = glm::vec3(0, 0, 0);
+	teapotTransform->scale = glm::vec3(50, 50, 50);
+	
+	Transform* counterTransform = countertop->getTransform();
+	counterTransform->position = glm::vec3(0, 0, 0);
+	counterTransform->rotation = glm::vec3(0, 0, 0);
+	counterTransform->scale = glm::vec3(100, 100, 100);
+	//-----------------------------------------------------------------------------------
+
+	// Initialize Audio System
+	Audio audioSystem;
+	g_systems.audio = &audioSystem;
+
+	// Create an AudioSource Component in the Audio System
+	AudioSource* countertopAudioSource = g_systems.audio->createAudioSource();
+
+	// Attach the new AudioSource Component to an Entity
+	countertop->attachComponent(countertopAudioSource, "audio");
+
+	// Get a reference to the AudioSource Component for easy updates
+	countertopAudioSource = countertop->getAudioSource();
+	countertopAudioSource->play("bread.wav");
 
 	// GAME LOOP
 	while (!window.shouldClose())
@@ -135,25 +164,25 @@ int main()
 		// Projection matrix will be handled by the Camera class in the future
 		glm::mat4 proj = glm::mat4(1.0f);
 		proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));		
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
 		// Drawing objects will be handled by Rendering System in the future
 		// Draw breadbus
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[0]->getModelMatrix()));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(breadmobileTransform->getModelMatrix()));
 		glUniform1i(texLoc, 0); // Turn off textures
 		bus.draw(shader);
 
 		// Draw teapot
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[1]->getModelMatrix()));
-		teapot.draw(shader);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(teapotTransform->getModelMatrix()));
+		teapotModel.draw(shader);
 
 		// Draw countertop
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[2]->getModelMatrix()));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(counterTransform->getModelMatrix()));
 		glUniform1i(texLoc, 1); // Turn textures back on
 		ground.draw(shader); 
 
 		// Update the ImGUI profiler
-		profiler.update(transforms[0]->position);
+		profiler.update(transforms[0].position);
 
 		// Swap the frame buffers
 		window.swapBuffer();

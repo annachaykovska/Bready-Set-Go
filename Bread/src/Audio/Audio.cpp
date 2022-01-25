@@ -2,6 +2,9 @@
 
 Audio::Audio()
 {
+	// Reserve space for AudioSource Components in contiguous memory
+	//audioSources.reserve(10);
+
 	// Set audio device as default
 	device = alcOpenDevice(NULL); // Create device
 	if (!device) std::cout << "ERROR: Default audio device not found.\n";
@@ -14,6 +17,7 @@ Audio::Audio()
 
 	alListeneri(AL_DISTANCE_MODEL, AL_INVERSE_DISTANCE_CLAMPED);
 	alListenerf(AL_GAIN, 0.5f);
+
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListenerfv(AL_ORIENTATION, orientation);
@@ -21,6 +25,9 @@ Audio::Audio()
 	// Set the new context as current
 	if (!alcMakeContextCurrent(context))
 		std::cout << "ERROR: Audio context could not be made current.\n";
+
+	// Set directory
+	this->dir = "resources/audio/";
 
 	// Load audio library
 	load("bg.wav");
@@ -31,6 +38,12 @@ Audio::Audio()
 
 Audio::~Audio()
 {
+	for (auto& it : audioSources)
+	{
+		it.stop();
+		alDeleteSources(1, &(it.source));
+	}
+
 	for (auto& it : audioClips)
 		alDeleteBuffers(1, &(it.second.buffer));
 
@@ -41,11 +54,17 @@ Audio::~Audio()
 	alcCloseDevice(device);
 }
 
-AudioClip* Audio::get(std::string fileName)
+// Returns the AudioClip with the specified file name
+AudioClip* Audio::getAudioClip(std::string fileName)
 {
 	std::string filePath = dir + fileName;
 
-	return &(*audioClips.find(filePath)).second;
+	auto result = audioClips.find(filePath);
+
+	if (result != audioClips.end())
+		return &(result->second);
+	else
+		return nullptr;
 }
 
 bool Audio::load(std::string fileName)
@@ -133,4 +152,25 @@ bool Audio::load(std::string fileName)
 	delete[](data);
 
 	return true;
+}
+
+/// <summary>
+/// Creates a new AudioSource Component in the Audio System's vector.
+/// </summary>
+/// <returns>
+/// A reference to the new AudioSource Component if successful, nullptr otherwise.
+/// </returns>
+AudioSource* Audio::createAudioSource()
+{
+	// Used to see if the new AudioSource is added successfully
+	int size = audioSources.size();
+
+	// Add the new AudioSource to the container of AudioSource Components
+	audioSources.emplace_back(AudioSource());
+
+	// Check if size got bigger, if it did return a ref to the new AudioSource
+	if (size < audioSources.size())
+		return &audioSources.back();
+	else
+		return nullptr;
 }

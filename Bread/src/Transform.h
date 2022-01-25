@@ -1,16 +1,12 @@
 #pragma once
-#include <string>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "Scene/Component.h"
 
-struct Component 
+class Transform : public Component
 {
-	unsigned int entityID;
-};
 
-struct Transform : Component 
-{
+public:
+
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
@@ -26,4 +22,5 @@ struct Transform : Component
 
 		return model;
 	}
+
 };
