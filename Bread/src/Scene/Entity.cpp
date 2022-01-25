@@ -1,15 +1,19 @@
 #include "Entity.h"
 
-int Entity::entityCounter;
-
 Entity::Entity(std::string name)
 {
-	this->entityID = entityCounter++;
+	this->name = name;
 }
 
-void Entity::attachComponent(Component* newComponent, std::string name)
+bool Entity::attachComponent(Component* newComponent, std::string name)
 {
-	components.emplace(name, newComponent);
+	if ((components.emplace(name, newComponent)).second)
+	{
+		newComponent->owner = this;
+		return true;
+	}
+	else
+		return false;
 }
 
 Component* Entity::getComponent(std::string key)

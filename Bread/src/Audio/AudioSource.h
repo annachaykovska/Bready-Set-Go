@@ -10,7 +10,6 @@ class AudioSource : public Component
 {
 public:
 
-	glm::vec3 pos;
 	float gain;
 	float pitch;
 	bool loop;
@@ -22,7 +21,6 @@ public:
 	void operator=(const AudioSource&) =  delete; // No assignment operator
 
 	void setSource();
-	void setPosition(glm::vec3 pos);
 	bool play(std::string clipName);
 	bool stop();
 

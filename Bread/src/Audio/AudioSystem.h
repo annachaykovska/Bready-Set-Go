@@ -16,15 +16,15 @@
 #include "AudioSource.h"
 #include "AudioClip.h"
 
-class Audio
+class AudioSystem
 {
 public:
 
-	Audio();
-	~Audio();
+	AudioSystem();
+	~AudioSystem();
 
-	Audio(Audio& rhs) = delete; // No copy constructor
-	void operator=(const Audio&) = delete; // No assignment operator
+	AudioSystem(AudioSystem& rhs) = delete; // No copy constructor
+	void operator=(const AudioSystem&) = delete; // No assignment operator
 
 	AudioClip* getAudioClip(std::string filePath);
 	bool load(std::string filePath);

@@ -11,14 +11,11 @@
 #include "Window.h"
 #include "Profiler.h"
 #include "SystemManager.h"
+#include "Scene/Scene.h"
 #include "Geometry.h"
 #include "Shader.h"
 #include "Model.h"
-#include "Scene/Entity.h"
 #include "Camera.h"
-#include "PhysicsSystem.h"
-#include "Scene/Scene.h"
-#include "Transform.h"
 
 const float radius = 40.0f;
 
@@ -38,12 +35,11 @@ int main()
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	// ImGui profiler for debugging
-	Profiler profiler(window);	
+	Profiler profiler(window);
 
-	// Initialize Physics System
+	// Initialize physics System
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
-	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0; // Used for tracking time in the game loop
 
 	// INITIALIZE RENDERING STUFF - will be in the rendering system in the future
 	//-----------------------------------------------------------------------------------
@@ -122,9 +118,9 @@ int main()
 	counterTransform->scale = glm::vec3(100, 100, 100);
 	//-----------------------------------------------------------------------------------
 
-	// Initialize Audio System
-	Audio audioSystem;
-	g_systems.audio = &audioSystem;
+	// Initialize audio System
+	AudioSystem audio;
+	g_systems.audio = &audio;
 
 	// Create an AudioSource Component in the Audio System
 	AudioSource* countertopAudioSource = g_systems.audio->createAudioSource();
@@ -135,6 +131,9 @@ int main()
 	// Get a reference to the AudioSource Component for easy updates
 	countertopAudioSource = countertop->getAudioSource();
 	countertopAudioSource->play("bread.wav");
+
+	// Track time
+	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
 
 	// GAME LOOP
 	while (!window.shouldClose())
@@ -147,7 +146,7 @@ int main()
 		newTime = glfwGetTime();
 		deltaTime = newTime - oldTime;
 		oldTime = newTime;
-		physics.update(deltaTime);
+		g_systems.physics->update(deltaTime);
 
 		// RENDER
 		window.clear();

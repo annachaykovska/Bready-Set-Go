@@ -78,7 +78,7 @@
     <ClCompile Include="src\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio\Audio.cpp">
+    <ClCompile Include="src\Audio\AudioSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Audio\AudioSource.cpp">
@@ -1604,7 +1604,7 @@
     <ClInclude Include="dependencies\include\AL\efx-presets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio\Audio.h">
+    <ClInclude Include="src\Audio\AudioSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dependencies\include\AL\AudioFile.h">

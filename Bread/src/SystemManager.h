@@ -1,5 +1,5 @@
 #pragma once
-#include "Audio/Audio.h"
+#include "Audio/AudioSystem.h"
 #include "PhysicsSystem.h"
 
 class SystemManager
@@ -15,7 +15,7 @@ public:
 	SystemManager(SystemManager& rhs) = delete; // No copy constructor
 	void operator=(const SystemManager&) = delete; // No assignment operator
 
-	Audio* audio;
+	AudioSystem* audio;
 	PhysicsSystem* physics;
 
 private:

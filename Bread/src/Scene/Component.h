@@ -1,14 +1,13 @@
 #pragma once
 #include <string>
-#include <iostream>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+class Entity;
 
 class Component 
 {
 public:
 
-	unsigned int entityID;
+	std::string name;
+	Entity* owner;
 
 };

@@ -1,6 +1,6 @@
-#include "Audio.h"
+#include "AudioSystem.h"
 
-Audio::Audio()
+AudioSystem::AudioSystem()
 {
 	// Reserve space for AudioSource Components in contiguous memory
 	//audioSources.reserve(10);
@@ -36,7 +36,7 @@ Audio::Audio()
 	load("tone.wav");
 }
 
-Audio::~Audio()
+AudioSystem::~AudioSystem()
 {
 	for (auto& it : audioSources)
 	{
@@ -55,7 +55,7 @@ Audio::~Audio()
 }
 
 // Returns the AudioClip with the specified file name
-AudioClip* Audio::getAudioClip(std::string fileName)
+AudioClip* AudioSystem::getAudioClip(std::string fileName)
 {
 	std::string filePath = dir + fileName;
 
@@ -67,7 +67,7 @@ AudioClip* Audio::getAudioClip(std::string fileName)
 		return nullptr;
 }
 
-bool Audio::load(std::string fileName)
+bool AudioSystem::load(std::string fileName)
 {
 	std::string filePath = dir + fileName;
 
@@ -160,7 +160,7 @@ bool Audio::load(std::string fileName)
 /// <returns>
 /// A reference to the new AudioSource Component if successful, nullptr otherwise.
 /// </returns>
-AudioSource* Audio::createAudioSource()
+AudioSource* AudioSystem::createAudioSource()
 {
 	// Used to see if the new AudioSource is added successfully
 	int size = audioSources.size();

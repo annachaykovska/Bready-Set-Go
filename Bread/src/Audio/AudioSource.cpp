@@ -1,5 +1,4 @@
 #include "../SystemManager.h"
-#include "Audio.h"
 
 extern SystemManager g_systems;
 
@@ -9,7 +8,6 @@ AudioSource::AudioSource()
 	this->gain = 1;
 	this->pitch = 1;
 	this->loop = false;
-	this->pos = glm::vec3(0, 0, 0);
 }
 
 AudioSource::AudioSource(const AudioSource& rhs)
@@ -18,7 +16,6 @@ AudioSource::AudioSource(const AudioSource& rhs)
 	this->gain = rhs.gain;
 	this->pitch = rhs.pitch;
 	this->loop = rhs.loop;
-	this->pos = rhs.pos;
 }
 
 AudioSource::~AudioSource()
@@ -30,13 +27,6 @@ void AudioSource::setSource()
 {
 	alDeleteSources(1, &(this->source));
 	alGenSources(1, &(this->source));
-}
-
-void AudioSource::setPosition(glm::vec3 pos)
-{
-	this->pos = pos;
-	alSource3f(source, AL_POSITION, pos.x, pos.y, pos.z);
-	std::cout << "Source: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
 }
 
 // Plays an AudioClip from this source
@@ -55,7 +45,7 @@ bool AudioSource::play(std::string clipName)
 	// Set source attributes
 	alSourcef(source, AL_PITCH, pitch);
 	alSourcef(source, AL_GAIN, gain);
-	alSource3f(source, AL_POSITION, pos.x, pos.y, pos.z);
+	alSource3f(source, AL_POSITION, 0, 0, 0);
 	alSource3f(source, AL_VELOCITY, 0, 0, 0); // Just pitch shifting
 	alSourcei(source, AL_LOOPING, loop);
 
