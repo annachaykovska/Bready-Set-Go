@@ -5,6 +5,36 @@
 
 #include "Window.h"
 
+void Window::keyMetaCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
+	callbacks->keyCallback(key, scancode, action, mods);
+}
+
+
+void Window::mouseButtonMetaCallback(GLFWwindow* window, int button, int action, int mods) {
+	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
+	callbacks->mouseButtonCallback(button, action, mods);
+}
+
+
+void Window::cursorPosMetaCallback(GLFWwindow* window, double xpos, double ypos) {
+	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
+	callbacks->cursorPosCallback(xpos, ypos);
+}
+
+
+void Window::scrollMetaCallback(GLFWwindow* window, double xoffset, double yoffset) {
+	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
+	callbacks->scrollCallback(xoffset, yoffset);
+}
+
+
+void Window::windowSizeMetaCallback(GLFWwindow* window, int width, int height) {
+	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
+	callbacks->windowSizeCallback(width, height);
+}
+
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	// make sure the viewport matches the new window dimensions; note that width and 
@@ -12,21 +42,46 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-Window::Window(int width, int height, std::string title)
-	: width(width), height(height), title(title)
+Window::Window(std::shared_ptr<CallbackInterface> callbacks, int width, int height, std::string title)
+	: width(width), height(height), title(title), callbacks(callbacks)
 {
 	setup();
-	window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+	window = std::unique_ptr<GLFWwindow, WindowDeleter>(glfwCreateWindow(width, height, title.c_str(), NULL, NULL));
 	verifyGLFW();
 
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwMakeContextCurrent(window.get());
+	glfwSetFramebufferSizeCallback(window.get(), framebuffer_size_callback);
 	verifyGLAD();
+
+	if (callbacks != nullptr) {
+		connectCallbacks();
+	}
 };
 
-void Window::getInput() 
+Window::Window(int width, int height, std::string title)
+	: Window(nullptr, width, height, title)
+{}
+
+void Window::connectCallbacks() {
+	// set userdata of window to point to the object that carries out the callbacks
+	glfwSetWindowUserPointer(window.get(), callbacks.get());
+
+	// bind meta callbacks to actual callbacks
+	glfwSetKeyCallback(window.get(), keyMetaCallback);
+	glfwSetMouseButtonCallback(window.get(), mouseButtonMetaCallback);
+	glfwSetCursorPosCallback(window.get(), cursorPosMetaCallback);
+	glfwSetScrollCallback(window.get(), scrollMetaCallback);
+	glfwSetWindowSizeCallback(window.get(), windowSizeMetaCallback);
+}
+
+void Window::setCallbacks(std::shared_ptr<CallbackInterface> callbacks_) {
+	callbacks = callbacks_;
+	connectCallbacks();
+}
+
+void Window::getInput()
 {
-	input.processInput(window);
+	input.processInput(window.get());
 }
 
 void Window::setup() {
@@ -38,7 +93,7 @@ void Window::setup() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
 
-int Window::verifyGLFW() 
+int Window::verifyGLFW()
 {
 	if (window == NULL)
 	{
@@ -50,7 +105,7 @@ int Window::verifyGLFW()
 	return 1;
 }
 
-int Window::verifyGLAD() 
+int Window::verifyGLAD()
 {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{

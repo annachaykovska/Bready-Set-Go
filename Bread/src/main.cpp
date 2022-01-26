@@ -16,6 +16,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Camera.h"
+#include "Controls.cpp"
 
 const float radius = 40.0f;
 
@@ -26,7 +27,7 @@ Scene g_scene;
 SystemManager g_systems;
 
 int main()
-{	
+{
 	// Initialize GLFW library
 	glfwInit();
 
@@ -81,9 +82,10 @@ int main()
 
 	// For detecting textures
 	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
-	//-----------------------------------------------------------------------------------
 
-	// ENTITY-COMPONENT STUFF -----------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	// ENTITY-COMPONENT STUFF 
+  //-----------------------------------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
@@ -131,10 +133,15 @@ int main()
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
 
 	// Tell the AudioSource Component to play a sound file
-	countertopAudioSource->play("bread.wav");
+	//countertopAudioSource->play("bread.wav");
 
 	// Track time
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
+
+	// Set movement control callbacks
+	// TODO: generalize this
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(player1Transform); 
+	window.setCallbacks(movementCallbacks);
 
 	// GAME LOOP
 	while (!window.shouldClose())
@@ -180,7 +187,7 @@ int main()
 		// Draw countertop
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(counterTransform->getModelMatrix()));
 		glUniform1i(texLoc, 1); // Turn textures back on
-		ground.draw(shader); 
+		ground.draw(shader);
 
 		// Update the ImGUI profiler
 		profiler.update(transforms[0].position);

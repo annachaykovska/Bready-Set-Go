@@ -1,5 +1,6 @@
 # Project specific
 bin-int/		# Maybe leave this in
+bin/
 
 # Visual Studio cache/options directory
 .vs/
