@@ -13,6 +13,7 @@ public:
 	
 	Entity(std::string name);
 	bool attachComponent(Component* newComponent, std::string);
+	bool attachComponent(Component* newComponent, std::string&);
 	Component* getComponent(std::string);
 	Transform* getTransform();
 	AudioSource* getAudioSource();

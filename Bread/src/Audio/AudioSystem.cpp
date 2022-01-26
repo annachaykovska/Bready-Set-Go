@@ -6,7 +6,7 @@ extern Scene g_scene;
 AudioSystem::AudioSystem()
 {
 	// Reserve space for AudioSource Components in contiguous memory
-	//audioSources.reserve(10);
+	audioSources.reserve(g_scene.count());
 
 	// Set audio device as default
 	device = alcOpenDevice(NULL); // Create device
@@ -20,7 +20,6 @@ AudioSystem::AudioSystem()
 
 	alListeneri(AL_DISTANCE_MODEL, AL_INVERSE_DISTANCE_CLAMPED);
 	alListenerf(AL_GAIN, 0.5f);
-
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListenerfv(AL_ORIENTATION, orientation);

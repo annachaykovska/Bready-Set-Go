@@ -85,9 +85,13 @@ int main()
 
 	// ENTITY-COMPONENT STUFF -----------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
-	Entity* player1 = g_scene.createEntity("player1");
-	Entity* player2 = g_scene.createEntity("player2");
-	Entity* countertop = g_scene.createEntity("countertop");
+	// This happens all at once to avoid dangling pointers in the future
+	g_scene.createEntities();
+
+	// Get references to Entities for easy use
+	Entity* player1 = g_scene.getEntity("player1");
+	Entity* player2 = g_scene.getEntity("player2");
+	Entity* countertop = g_scene.getEntity("countertop");
 
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
