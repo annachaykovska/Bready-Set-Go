@@ -102,7 +102,8 @@ int main()
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
 
 	// Set movement control callbacks
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(transforms[0]);
+	// TODO: generalize this
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(transforms[0]); 
 	window.setCallbacks(movementCallbacks);
 
 

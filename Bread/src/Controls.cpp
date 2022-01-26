@@ -19,17 +19,22 @@ public:
 
 	virtual void keyCallback(int key, int scancode, int action, int mods) {
 		if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+			transform->position.x += 0.5;
 			printf("W");
 		}
 		if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+			transform->position.z -= 0.5;
 			printf("A");
 		}
 		if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+			transform->position.x -= 0.5;
 			printf("S");
 		}
 		if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+			transform->position.z += 0.5;
 			printf("D");
 		}
+		transform->position;
 	}
 
 	
