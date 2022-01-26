@@ -1,7 +1,0 @@
-﻿  main.cpp
-C:\Users\annac\Documents\Local School\CPSC\585\CPSC-585-Game-Project\Bread\src\Shader.h(16,66): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
-C:\Users\annac\Documents\Local School\CPSC\585\CPSC-585-Game-Project\Bread\src\main.cpp(102,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\annac\Documents\Local School\CPSC\585\CPSC-585-Game-Project\Bread\src\main.cpp(118,24): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\annac\Documents\Local School\CPSC\585\CPSC-585-Game-Project\Bread\src\main.cpp(130,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\annac\Documents\Local School\CPSC\585\CPSC-585-Game-Project\Bread\src\main.cpp(131,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Bread.vcxproj -> C:\Users\annac\Documents\Local School\CPSC\585\CPSC-585-Game-Project\bin\Debug-x64\Bread\Bready Set Go!!!.exe
