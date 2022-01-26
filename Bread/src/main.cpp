@@ -18,11 +18,12 @@
 #include "PhysicsSystem.h"
 #include "Audio/Audio.h"
 #include "Audio/AudioSource.h"
+#include "Controls.cpp"
 
 const float radius = 40.0f;
 
 int main()
-{	
+{
 	// Initialize GLFW library
 	glfwInit();
 
@@ -37,7 +38,7 @@ int main()
 
 	// ImGui profiler for debugging
 	Profiler profiler(window);
-	
+
 	// Load breadbus model
 	std::string busPath = "resources/models/breadbus/breadbus.obj";
 	Model bus(&busPath[0]);
@@ -95,15 +96,15 @@ int main()
 	transforms[2]->rotation = glm::vec3(0, 0, 0);
 	transforms[2]->scale = glm::vec3(100, 100, 100);
 	countertop.addComponent(transforms[2]);
-	
+
 	// Initialize physx
 	PhysicsSystem physics;
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
 
-	// Play the background music
-	Audio audioTest;
-	AudioSource testSource(0.05f, 1.0f, true);
-	testSource.play(audioTest.get("bg.wav"));
+	// Set movement control callbacks
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(transforms[0]);
+	window.setCallbacks(movementCallbacks);
+
 
 	// GAME LOOP
 	while (!window.shouldClose())
@@ -133,7 +134,7 @@ int main()
 		// Projection matrix will be handled by the Camera class in the future
 		glm::mat4 proj = glm::mat4(1.0f);
 		proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));		
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
 		// Drawing objects will be handled by Rendering System in the future
 		// Draw breadbus
@@ -148,7 +149,7 @@ int main()
 		// Draw countertop
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transforms[2]->getModelMatrix()));
 		glUniform1i(texLoc, 1); // Turn textures back on
-		ground.draw(shader); 
+		ground.draw(shader);
 
 		// Update the ImGUI profiler
 		profiler.update(transforms[0]->position);
