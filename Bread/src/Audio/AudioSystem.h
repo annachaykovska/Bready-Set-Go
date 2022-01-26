@@ -1,6 +1,5 @@
 #pragma once
 
-#include <thread>
 #include <iostream>
 #include <vector>
 #include <cassert>
@@ -14,18 +13,22 @@
 #include <AL/AudioFile.h>
 #include <glm/glm.hpp>
 
-#include "AudioClip.h"
 #include "AudioSource.h"
+#include "AudioClip.h"
 
-class Audio
+class AudioSystem
 {
 public:
 
-	Audio();
-	~Audio();
+	AudioSystem();
+	~AudioSystem();
 
-	AudioClip* get(std::string filePath);
+	AudioSystem(AudioSystem& rhs) = delete; // No copy constructor
+	void operator=(const AudioSystem&) = delete; // No assignment operator
+
+	AudioClip* getAudioClip(std::string filePath);
 	bool load(std::string filePath);
+	AudioSource* createAudioSource();
 
 private:
 
@@ -34,7 +37,7 @@ private:
 
 	ALCdevice* device;
 	ALCcontext* context;
-	std::string dir = "resources/audio/";
+	std::string dir;
 
 	struct  WavHeader
 	{

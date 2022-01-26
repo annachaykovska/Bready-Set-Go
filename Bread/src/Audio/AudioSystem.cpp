@@ -1,7 +1,13 @@
-#include "Audio.h"
+#include "AudioSystem.h"
+#include "../Scene/Scene.h"
 
-Audio::Audio()
+extern Scene g_scene;
+
+AudioSystem::AudioSystem()
 {
+	// Reserve space for AudioSource Components in contiguous memory
+	audioSources.reserve(g_scene.count());
+
 	// Set audio device as default
 	device = alcOpenDevice(NULL); // Create device
 	if (!device) std::cout << "ERROR: Default audio device not found.\n";
@@ -22,15 +28,31 @@ Audio::Audio()
 	if (!alcMakeContextCurrent(context))
 		std::cout << "ERROR: Audio context could not be made current.\n";
 
+	// Set directory
+	this->dir = "resources/audio/";
+
 	// Load audio library
 	load("bg.wav");
 	load("horn.wav");
 	load("bread.wav");
 	load("tone.wav");
+
+	// Create AudioSource Components
+	AudioSource* countertopAudioSource = createAudioSource();
+
+	// Attach AudioSource Components to Entities
+	Entity* countertop = g_scene.getEntity("countertop");
+	countertop->attachComponent(countertopAudioSource, "audio");
 }
 
-Audio::~Audio()
+AudioSystem::~AudioSystem()
 {
+	for (auto& it : audioSources)
+	{
+		it.stop();
+		alDeleteSources(1, &(it.source));
+	}
+
 	for (auto& it : audioClips)
 		alDeleteBuffers(1, &(it.second.buffer));
 
@@ -41,14 +63,20 @@ Audio::~Audio()
 	alcCloseDevice(device);
 }
 
-AudioClip* Audio::get(std::string fileName)
+// Returns the AudioClip with the specified file name
+AudioClip* AudioSystem::getAudioClip(std::string fileName)
 {
 	std::string filePath = dir + fileName;
 
-	return &(*audioClips.find(filePath)).second;
+	auto result = audioClips.find(filePath);
+
+	if (result != audioClips.end())
+		return &(result->second);
+	else
+		return nullptr;
 }
 
-bool Audio::load(std::string fileName)
+bool AudioSystem::load(std::string fileName)
 {
 	std::string filePath = dir + fileName;
 
@@ -133,4 +161,25 @@ bool Audio::load(std::string fileName)
 	delete[](data);
 
 	return true;
+}
+
+/// <summary>
+/// Creates a new AudioSource Component in the Audio System's vector.
+/// </summary>
+/// <returns>
+/// A reference to the new AudioSource Component if successful, nullptr otherwise.
+/// </returns>
+AudioSource* AudioSystem::createAudioSource()
+{
+	// Used to see if the new AudioSource is added successfully
+	int size = audioSources.size();
+
+	// Add the new AudioSource to the container of AudioSource Components
+	audioSources.emplace_back(AudioSource());
+
+	// Check if size got bigger, if it did return a ref to the new AudioSource
+	if (size < audioSources.size())
+		return &audioSources.back();
+	else
+		return nullptr;
 }

@@ -1,9 +1,7 @@
 #include <iostream>
-
-#include <PxPhysicsAPI.h>
+#include <cassert>
 
 #include "PhysicsSystem.h"
-#include <cassert>
 
 PhysicsSystem::PhysicsSystem()
 {
