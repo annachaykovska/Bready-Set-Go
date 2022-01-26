@@ -2,7 +2,12 @@
 * Keyboard and Controller callback handler
 */
 #include <vector>
-#include "Component.h"
+#include <memory>
+
+#include <glfw/glfw3.h>
+
+#include "Scene/Entity.h"
+#include "Window.h"
 
 using namespace std;
 /*
@@ -67,8 +72,6 @@ public:
 		// Update position in transform
 		transform->position;
 	}
-
-	
 
 private:
 	ButtonState state;

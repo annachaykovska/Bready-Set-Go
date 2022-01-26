@@ -111,12 +111,12 @@ int main()
 	Transform* aComponent = (Transform*)player1->getComponent("transform");
 	Transform* player1Transform = player1->getTransform();
 	player1Transform->position = glm::vec3(-10, 2.3f, 3);
-	player1Transform->rotation = glm::vec3(0, 90, 0);
+	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* player2Transform = player2->getTransform();
 	player2Transform->position = glm::vec3(10, 2.3f, -3);
-	player2Transform->rotation = glm::vec3(0, 0, 0);
+	player2Transform->rotation = glm::vec3(0, 90, 0);
 	player2Transform->scale = glm::vec3(3, 3, 3);
 	
 	Transform* counterTransform = countertop->getTransform();
@@ -140,7 +140,9 @@ int main()
 
 	// Set movement control callbacks
 	// TODO: generalize this
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(player1Transform); 
+	std::shared_ptr<Transform> t = std::make_shared<Transform>();
+	t->position = player1Transform->position;
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(t); 
 	window.setCallbacks(movementCallbacks);
 
 	// GAME LOOP
@@ -149,6 +151,7 @@ int main()
 		// INPUT
 		window.getInput();
 		glfwPollEvents();
+		player1Transform->position = t->position;
 
 		// SIMULATE
 		newTime = glfwGetTime();
