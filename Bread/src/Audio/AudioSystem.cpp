@@ -1,4 +1,7 @@
 #include "AudioSystem.h"
+#include "../Scene/Scene.h"
+
+extern Scene g_scene;
 
 AudioSystem::AudioSystem()
 {
@@ -34,6 +37,13 @@ AudioSystem::AudioSystem()
 	load("horn.wav");
 	load("bread.wav");
 	load("tone.wav");
+
+	// Create AudioSource Components
+	AudioSource* countertopAudioSource = createAudioSource();
+
+	// Attach AudioSource Components to Entities
+	Entity* countertop = g_scene.getEntity("countertop");
+	countertop->attachComponent(countertopAudioSource, "audio");
 }
 
 AudioSystem::~AudioSystem()

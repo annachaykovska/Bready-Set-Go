@@ -19,7 +19,21 @@ Entity* Scene::createEntity(std::string name)
 		return nullptr;
 }
 
+/// <summary>
+/// Returns a reference to the Entity with name.
+/// </summary>
+/// <param name="name">
+/// The name of the Entity.
+/// </param>
+/// <returns>
+/// Returns a pointer to the Entity if successful. Nullptr otherwise.
+/// </returns>
 Entity* Scene::getEntity(std::string name)
 {
-	return nullptr;
+	auto result = entities.find(name);
+
+	if (result != entities.end())
+		return &(result->second);
+	else
+		return nullptr;
 }

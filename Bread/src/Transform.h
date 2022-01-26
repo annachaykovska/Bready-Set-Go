@@ -14,6 +14,13 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
+	Transform()
+	{
+		position = glm::vec3(0, 0, 0);
+		rotation = glm::vec3(0, 0, 0);
+		scale = glm::vec3(1, 1, 1);
+	}
+
 	glm::mat4 getModelMatrix()
 	{
 		glm::mat4 model = glm::mat4(1.0f);

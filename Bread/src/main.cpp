@@ -50,25 +50,25 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Load breadbus model
-	std::string busPath = "resources/models/breadbus/breadbus.obj";
-	Model bus(&busPath[0]);
-	bus.meshes[0].color = glm::vec3(0.8f, 0.467381f, 0.072319f); // Face
-	bus.meshes[1].color = glm::vec3(0.366761f, 0.134041f, 0); // Crust
-	bus.meshes[2].color = glm::vec3(0.75f, 0.85f, 0.85f); // Windows
-	bus.meshes[3].color = glm::vec3(1, 0.89f, 0.71f); // Headlights
-	bus.meshes[4].color = glm::vec3(0.1f, 0.1f, 0.1f); // Front wheels
-	//bus.meshes[5].color = glm::vec3(0.266761f, 0.034041f, 0); // Dunno!
-	bus.meshes[5].color = glm::vec3(1, 0, 1);
-	//bus.meshes[6].color = glm::vec3(0.8f, 0.467381f, 0.072319f); // Dunno!
-	bus.meshes[6].color = glm::vec3(1, 0, 1);
-	//bus.meshes[7].color = glm::vec3(0.8f, 0.039734f, 0); // Dunno!
-	bus.meshes[7].color = glm::vec3(1, 0, 1);
-	bus.meshes[8].color = glm::vec3(0.1f, 0.1f, 0.1f); // Back wheels
+	std::string breadmobilePath = "resources/models/breadbus/breadbus.obj";
+	Model breadmobile(&breadmobilePath[0]);
+	breadmobile.meshes[0].color = glm::vec3(0.8f, 0.467381f, 0.072319f); // Face
+	breadmobile.meshes[1].color = glm::vec3(0.366761f, 0.134041f, 0); // Crust
+	breadmobile.meshes[2].color = glm::vec3(0.75f, 0.85f, 0.85f); // Windows
+	breadmobile.meshes[3].color = glm::vec3(1, 0.89f, 0.71f); // Headlights
+	breadmobile.meshes[4].color = glm::vec3(0.1f, 0.1f, 0.1f); // Front wheels
+	//breadmobile.meshes[5].color = glm::vec3(0.266761f, 0.034041f, 0); // Dunno!
+	breadmobile.meshes[5].color = glm::vec3(1, 0, 1);
+	//breadmobile.meshes[6].color = glm::vec3(0.8f, 0.467381f, 0.072319f); // Dunno!
+	breadmobile.meshes[6].color = glm::vec3(1, 0, 1);
+	//breadmobile.meshes[7].color = glm::vec3(0.8f, 0.039734f, 0); // Dunno!
+	breadmobile.meshes[7].color = glm::vec3(1, 0, 1);
+	breadmobile.meshes[8].color = glm::vec3(0.1f, 0.1f, 0.1f); // Back wheels
 
 	// Load teapot model
-	std::string teapotPath = "resources/models/teapot/teapot_s0.obj";
-	Model teapotModel(&teapotPath[0]);
-	teapotModel.meshes[0].color = glm::vec3(0.3f, 0.3f, 0.3f);
+	//std::string teapotPath = "resources/models/teapot/teapot_s0.obj";
+	//Model teapotModel(&teapotPath[0]);
+	//teapotModel.meshes[0].color = glm::vec3(0.3f, 0.3f, 0.3f);
 
 	// Create ground plane
 	Geometry geo;
@@ -85,8 +85,8 @@ int main()
 
 	// ENTITY-COMPONENT STUFF -----------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
-	Entity* breadmobile = g_scene.createEntity("breadmobile");
-	Entity* teapot = g_scene.createEntity("teapot");
+	Entity* player1 = g_scene.createEntity("player1");
+	Entity* player2 = g_scene.createEntity("player2");
 	Entity* countertop = g_scene.createEntity("countertop");
 
 	// Create a container for Transform Components (will be handled by a system in the future)
@@ -97,20 +97,21 @@ int main()
 	transforms.emplace_back(Transform());
 	
 	// Attach one of the Transform Components to each Entity in the Scene
-	breadmobile->attachComponent(&transforms[0], "transform");
-	teapot->attachComponent(&transforms[1], "transform");
+	player1->attachComponent(&transforms[0], "transform");
+	player2->attachComponent(&transforms[1], "transform");
 	countertop->attachComponent(&transforms[2], "transform");
 
 	// Make a reference to each Transform Component for easy updates
-	Transform* breadmobileTransform = breadmobile->getTransform();
-	breadmobileTransform->position = glm::vec3(0, 2.3f, 0);
-	breadmobileTransform->rotation = glm::vec3(0, 0, 0);
-	breadmobileTransform->scale = glm::vec3(3, 3, 3);
+	Transform* aComponent = (Transform*)player1->getComponent("transform");
+	Transform* player1Transform = player1->getTransform();
+	player1Transform->position = glm::vec3(-10, 2.3f, 3);
+	player1Transform->rotation = glm::vec3(0, 90, 0);
+	player1Transform->scale = glm::vec3(3, 3, 3);
 
-	Transform* teapotTransform = teapot->getTransform();
-	teapotTransform->position = glm::vec3(50, 0, 50);
-	teapotTransform->rotation = glm::vec3(0, 0, 0);
-	teapotTransform->scale = glm::vec3(50, 50, 50);
+	Transform* player2Transform = player2->getTransform();
+	player2Transform->position = glm::vec3(10, 2.3f, -3);
+	player2Transform->rotation = glm::vec3(0, 0, 0);
+	player2Transform->scale = glm::vec3(3, 3, 3);
 	
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, 0, 0);
@@ -122,14 +123,10 @@ int main()
 	AudioSystem audio;
 	g_systems.audio = &audio;
 
-	// Create an AudioSource Component in the Audio System
-	AudioSource* countertopAudioSource = g_systems.audio->createAudioSource();
-
-	// Attach the new AudioSource Component to an Entity
-	countertop->attachComponent(countertopAudioSource, "audio");
-
 	// Get a reference to the AudioSource Component for easy updates
-	countertopAudioSource = countertop->getAudioSource();
+	AudioSource* countertopAudioSource = countertop->getAudioSource();
+
+	// Tell the AudioSource Component to play a sound file
 	countertopAudioSource->play("bread.wav");
 
 	// Track time
@@ -167,13 +164,14 @@ int main()
 
 		// Drawing objects will be handled by Rendering System in the future
 		// Draw breadbus
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(breadmobileTransform->getModelMatrix()));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player1Transform->getModelMatrix()));
 		glUniform1i(texLoc, 0); // Turn off textures
-		bus.draw(shader);
+		breadmobile.draw(shader);
 
 		// Draw teapot
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(teapotTransform->getModelMatrix()));
-		teapotModel.draw(shader);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));
+		//teapotModel.draw(shader);
+		breadmobile.draw(shader);
 
 		// Draw countertop
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(counterTransform->getModelMatrix()));
@@ -187,7 +185,7 @@ int main()
 		window.swapBuffer();
 
 		// AUDIO
-		//testSource.setPosition(glm::vec3(camX / 2, 0, camZ / 2));
+		// update AudioSource
 	}
 
 	// Collect garbage
