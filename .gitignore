@@ -1,6 +1,5 @@
 # Project specific 
-bin-int/	
-bin/
+bin-int/
 
 # Visual Studio cache/options directory
 .vs/
@@ -16,7 +15,6 @@ ipch/
 *.VC.db
 *.VC.VC.opendb
 *.pdb
-*.exe
 *.ini
 *.obj
 *.log

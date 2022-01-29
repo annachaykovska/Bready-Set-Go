@@ -2324,9 +2324,7 @@
     </None>
     <None Include="imgui.ini" />
     <None Include="src\assimp-vc142-mtd.dll" />
-    <None Include="assimp-vc142-mtd.dll" />
     <None Include="Bread.aps" />
-    <None Include="OpenAL32.dll" />
     <None Include="dependencies\include\assimp\color4.inl">
       <Filter>Header Files</Filter>
     </None>

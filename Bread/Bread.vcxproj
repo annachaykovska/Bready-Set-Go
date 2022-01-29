@@ -765,7 +765,6 @@
     <Library Include="dependencies\physx\libs_release\SnippetUtils_static_64.lib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assimp-vc142-mtd.dll" />
     <None Include="Bread.aps" />
     <None Include="dependencies\include\assimp\.editorconfig" />
     <None Include="dependencies\include\assimp\color4.inl" />
@@ -913,7 +912,6 @@
     <None Include="dependencies\include\glm\gtx\vector_query.inl" />
     <None Include="dependencies\include\glm\gtx\wrap.inl" />
     <None Include="imgui.ini" />
-    <None Include="OpenAL32.dll" />
     <None Include="src\assimp-vc142-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
