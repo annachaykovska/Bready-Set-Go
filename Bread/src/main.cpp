@@ -85,7 +85,7 @@ int main()
 
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
-  //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
