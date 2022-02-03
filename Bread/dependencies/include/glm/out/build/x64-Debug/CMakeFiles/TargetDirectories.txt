@@ -1,0 +1,2 @@
+C:/Users/annac/Documents/Local School/CPSC/585/CPSC-585-Game-Project/Bread/dependencies/include/glm/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/annac/Documents/Local School/CPSC/585/CPSC-585-Game-Project/Bread/dependencies/include/glm/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
