@@ -45,28 +45,52 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vShaderCode, NULL);
 	glCompileShader(vertexShader);
-	//checkCompileErrors(vertexShader, "VERTEX");
+	checkCompileErrors(vertexShader, "VERTEX");
 
 	// Fragment Shader
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fShaderCode, NULL);
 	glCompileShader(fragmentShader);
-	//checkCompileErrors(fragmentShader, "FRAGMENT");
+	checkCompileErrors(fragmentShader, "FRAGMENT");
 
 	// Link shaders into Shader Program
 	shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
-	//checkCompileErrors(shaderProgram, "PROGRAM");
+	checkCompileErrors(shaderProgram, "PROGRAM");
 
 	// Clean up
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
 
-// TODO implement this method
-void Shader::checkCompileErrors(unsigned int ID, std::string name)
+/// <summary>
+/// Spits out error messages if the shader program fails to compile
+/// correctly or if the shaders fails to link correctly.
+/// </summary>
+void Shader::checkCompileErrors(unsigned int shaderID, std::string type)
 {
-
+	int success;
+	char infoLog[1024];
+	if (type != "PROGRAM")
+	{
+		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+		if (!success)
+		{
+			glGetShaderInfoLog(shaderID, 1024, NULL, infoLog);
+			std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type 
+					  << "\n" << infoLog << "\n --------------------------------------\n";
+		}
+	}
+	else
+	{
+		glGetProgramiv(shaderID, GL_LINK_STATUS, &success);
+		if (!success)
+		{
+			glGetProgramInfoLog(shaderID, 1024, NULL, infoLog);
+			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type 
+					  << "\n" << infoLog << "\n --------------------------------------\n";
+		}
+	}
 }
