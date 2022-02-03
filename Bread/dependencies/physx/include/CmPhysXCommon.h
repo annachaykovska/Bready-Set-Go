@@ -33,7 +33,7 @@
 
 //! \file Top level internal include file for PhysX SDK
 
-#include "Ps.h"
+#include "foundation/Ps.h"
 
 // Enable debug visualization
 #define PX_ENABLE_DEBUG_VISUALIZATION	1

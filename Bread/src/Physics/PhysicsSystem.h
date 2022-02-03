@@ -1,24 +1,51 @@
 #pragma once
 
 #include <PxPhysicsAPI.h>
+#include <snippetvehiclecommon/SnippetVehicleSceneQuery.h>
+
+using namespace physx;
+using namespace snippetvehicle;
 
 class PhysicsSystem
 {
 public:
 
 	PhysicsSystem();
+	void initVehicleSDK();
 	void update(const float timeStep);
+	void startAccelerateForwardsMode();
+	void startAccelerateReverseMode();
+	void startBrakeMode();
+	void startTurnHardLeftMode();
+	void startTurnHardRightMode();
+	void startHandbrakeTurnLeftMode();
+	void startHandbrakeTurnRightMode();
+	void releaseAllControls();
+	// void incrementDrivingMode(const PxF32 timestep);
+	// void stepPhysics();
+	// void cleanupPhysics();
+	// void keyPress();
 
 private:
-
-	physx::PxDefaultErrorCallback mDefaultErrorCallback;
-	physx::PxDefaultAllocator mDefaultAllocatorCallback;
-	physx::PxFoundation* mFoundation;
-	physx::PxPhysics* mPhysics;
-	physx::PxDefaultCpuDispatcher* mDispatcher;
-	physx::PxScene* mScene;
-	physx::PxCooking* gCooking;
-	physx::PxMaterial* mMaterial;
-	physx::PxPvd* mPvd;
-
-};
+	PxDefaultErrorCallback mDefaultErrorCallback;
+	PxDefaultAllocator mDefaultAllocatorCallback;
+	PxFoundation* mFoundation;
+	PxPhysics* mPhysics;
+	PxDefaultCpuDispatcher* mDispatcher;
+	PxScene* mScene;
+	PxCooking* mCooking;
+	PxMaterial* mMaterial;
+	PxPvd* mPvd;
+	VehicleSceneQueryData* mVehicleSceneQueryData;
+	PxBatchQuery* mBatchQuery;
+	PxVehicleDrivableSurfaceToTireFrictionPairs* mFrictionPairs;
+	PxRigidStatic* mGroundPlane;
+	PxVehicleDrive4W* mVehicle4W;
+	bool mIsVehicleInAir = true;
+	PxVehicleDrive4WRawInputData mVehicleInputData;
+	PxF32 mVehicleModeLifetime = 4.0f;
+	PxF32 mVehicleModeTimer = 0.0f;
+	PxU32 mVehicleOrderProgress = 0;
+	bool mVehicleOrderComplete = false;
+	bool mMimicKeyInputs = false;
+}; 

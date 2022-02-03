@@ -31,13 +31,13 @@
 
 #include "CmPhysXCommon.h"
 
-#include "PsAtomic.h"
-#include "PsString.h"
-#include "PsSync.h"
-#include "PsThread.h"
-#include "PsTime.h"
-#include "PsMutex.h"
-#include "PsAllocator.h"
+#include "foundation/PsAtomic.h"
+#include "foundation/PsString.h"
+#include "foundation/PsSync.h"
+#include "foundation/PsThread.h"
+#include "foundation/PsTime.h"
+#include "foundation/PsMutex.h"
+#include "foundation/PsAllocator.h"
 #include "extensions/PxDefaultAllocator.h"
 
 

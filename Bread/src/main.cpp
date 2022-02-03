@@ -16,7 +16,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Camera.h"
-#include "Controls.cpp"
+#include "Physics/VehicleController.cpp"
 
 const float radius = 40.0f;
 
