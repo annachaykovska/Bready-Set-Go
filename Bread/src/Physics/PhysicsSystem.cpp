@@ -196,7 +196,6 @@ PhysicsSystem::PhysicsSystem()
 	mVehicleOrderProgress = 0;
 	startBrakeMode();
 
-
 	// Add some boxes
 	unsigned int size = 10;
 	float halfExtent = 5.0f;

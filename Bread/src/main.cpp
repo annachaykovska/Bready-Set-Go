@@ -90,8 +90,9 @@ int main()
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
 
-	// Get references to Entities for easy use
+	// Get references to Entities for easy use and set vehicle physx objects
 	Entity* player1 = g_scene.getEntity("player1");
+	player1->vehicle = physics.mVehicle4W; 
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* countertop = g_scene.getEntity("countertop");
 

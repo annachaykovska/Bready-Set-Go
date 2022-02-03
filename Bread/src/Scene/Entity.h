@@ -4,12 +4,15 @@
 #include "Component.h"
 #include "../Transform.h"
 #include "../Audio/AudioSource.h"
+#include <PxPhysicsAPI.h>
+
+using namespace physx;
 
 class Entity {
 
 public:
-
 	std::string name;
+	PxVehicleDrive4W* vehicle;
 	
 	Entity(std::string name);
 	bool attachComponent(Component* newComponent, std::string);

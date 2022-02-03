@@ -26,6 +26,9 @@ public:
 	// void cleanupPhysics();
 	// void keyPress();
 
+	// Public Variables
+	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
+
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;
 	PxDefaultAllocator mDefaultAllocatorCallback;
@@ -40,7 +43,6 @@ private:
 	PxBatchQuery* mBatchQuery;
 	PxVehicleDrivableSurfaceToTireFrictionPairs* mFrictionPairs;
 	PxRigidStatic* mGroundPlane;
-	PxVehicleDrive4W* mVehicle4W;
 	bool mIsVehicleInAir = true;
 	PxVehicleDrive4WRawInputData mVehicleInputData;
 	PxF32 mVehicleModeLifetime = 4.0f;
