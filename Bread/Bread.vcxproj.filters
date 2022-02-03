@@ -75,7 +75,7 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PhysicsSystem.cpp">
+    <ClCompile Include="src\Physics\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Audio\AudioSystem.cpp">
@@ -87,7 +87,31 @@
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Controls.cpp">
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleSceneQuery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicle4WCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleFilterShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleNoDriveCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleTankCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleTireFriction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetcommon\ClassicMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\physx\include\snippetutils\SnippetUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1583,7 +1607,7 @@
     <ClInclude Include="dependencies\physx\include\PxVisualizationParameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PhysicsSystem.h">
+    <ClInclude Include="src\Physics\PhysicsSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -1860,6 +1884,162 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleSceneQuery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleConcurrency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleCreate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleFilterShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleTireFriction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleWheelQueryResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\Ps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsAlignedMalloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsAlloca.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsAoS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsAtomic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsBasicTemplates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsBitUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsBroadcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsCpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsFoundation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsFPU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsHash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsHashInternals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsHashMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsHashSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsInlineAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsInlineAoS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsInlineArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsIntrinsics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsMathUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsMutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsSList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsSort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsSortInternals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsSync.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsTempAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsUserAllocated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsUtilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecMathAoSScalar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecMathAoSScalarInline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecMathSSE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecMathUtilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecQuat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\foundation\PsVecTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetcommon\SnippetPrint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetcommon\SnippetPVD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\snippetutils\SnippetUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\physx\include\CmPhysXCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
