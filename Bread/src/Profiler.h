@@ -1,92 +1,18 @@
 #pragma once
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+class Window;
 
 class Profiler {
 public:
 
-	Profiler(Window &window) 
-	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
-		ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
-		ImGui_ImplOpenGL3_Init("#version 330");
-
-		frameCounter = 0;
-		t0 = glfwGetTime();
-		msPerFrame = 0;
-		framesPerSecond = 0;
-	}
-
-	void newFrame()
-	{
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-	}
-
-	void cleanup()
-	{
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-	}
-
-	void begin()
-	{
-		bool closable = true;
-		ImGui::Begin("Profiler", &closable);
-		ImGui::SetWindowFontScale(2.0f);
-	}
-
-	void end()
-	{
-		ImGui::End();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	void fps()
-	{
-		frameCounter++;
-		double t1 = glfwGetTime();
-		if (t1 - t0 >= 1.0)
-		{
-			msPerFrame = 1000.0 / (double)frameCounter;
-			framesPerSecond = frameCounter / (t1 - t0);
-			frameCounter = 0;
-			t0 += 1.0;
-		}
-
-		ImGui::Text("msPerFrame = %lf", msPerFrame);
-		ImGui::Text("framesPerSecond = %lf", framesPerSecond);
-	}
-
-	void transform(std::string name, glm::vec3& pos)
-	{
-		std::string x = std::to_string(pos.x);
-		std::string y = std::to_string(pos.y);
-		std::string z = std::to_string(pos.z);
-
-		std::string text = "\n" + name + "position: ";
-
-		ImGui::Text(text.c_str());
-		ImGui::SliderFloat("X", &pos.x, -100.0f, 100.0f, x.c_str(), 1.0f);
-		ImGui::SliderFloat("Y", &pos.y, -100.0f, 100.0f, y.c_str(), 1.0f);
-		ImGui::SliderFloat("Z", &pos.z, -100.0f, 100.0f, z.c_str(), 1.0f);
-	}
-
-	void update(glm::vec3& breadmobile)
-	{
-		begin();
-		fps();
-		transform("Breadmobile", breadmobile);
-		end();
-	}
+	Profiler(Window& window);
+	void newFrame();
+	void cleanup();
+	void begin();
+	void end();
+	void fps();
+	void transform();
+	void update();
 
 private:
 

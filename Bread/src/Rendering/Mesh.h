@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "Shader.h"
+#include "Material.h"
 
 struct Vertex
 {
@@ -20,7 +21,7 @@ struct Texture
 	std::string path; // The path to the texture's image file
 };
 
-class Mesh 
+class Mesh
 {
 public:
 
@@ -29,7 +30,10 @@ public:
 	std::vector<Texture> textures;	   // List of textures used by the mesh
 	glm::vec3 color;
 
+	Material material;
+
 	Mesh();
+	Mesh(const Mesh& rhs);
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	void setupMesh();		   // Initialization
 	void draw(Shader& shader); // Render mesh

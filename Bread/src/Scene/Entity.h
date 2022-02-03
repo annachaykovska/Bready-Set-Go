@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "../Transform.h"
 #include "../Audio/AudioSource.h"
+#include "../Rendering/Model.h"
 
 class Entity {
 
@@ -16,6 +17,7 @@ public:
 	bool attachComponent(Component* newComponent, std::string&);
 	Component* getComponent(std::string);
 	Transform* getTransform();
+	Model* getModel();
 	AudioSource* getAudioSource();
 
 private:

@@ -1,5 +1,9 @@
-#include "Mesh.h"
+#include <iostream>
+
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Mesh.h"
 
 /// <summary>
 /// Initializes a Mesh object with the provided lists of vertices, indices, and textures
@@ -17,6 +21,15 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 Mesh::Mesh() {}
+
+Mesh::Mesh(const Mesh& rhs)
+{
+	this->vertices = rhs.vertices;
+	this->indices = rhs.indices;
+	this->textures = rhs.textures;
+	
+	setupMesh();
+}
 
 /// <summary>
 /// Initializes the vertex array object, vertex buffer object, and element buffer object needed
@@ -40,14 +53,14 @@ void Mesh::setupMesh()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 	// Define the attributes (vertices, normals, and texture coordinates) for the VAO
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(0); // (layout = 0) positions
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(1); // (layout = 1) normals
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(2); // (layout = 2) texture coordinates
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
-	glBindVertexArray(0);
+	glBindVertexArray(0); // Unbind VAO
 }
 
 /// <summary>
@@ -83,8 +96,35 @@ void Mesh::draw(Shader &shader)
 	}
 	else
 	{
-		unsigned int colorLoc = glGetUniformLocation(shader.getId(), "color");
-		glUniform4f(colorLoc, color.x, color.y, color.z, 1.0f);
+		unsigned int ambientLoc = glGetUniformLocation(shader.getId(), "material.ambient");
+		glUniform3f(ambientLoc, material.ambient.r, material.ambient.g, material.ambient.b);
+
+		unsigned int diffuseLoc = glGetUniformLocation(shader.getId(), "material.diffuse");
+		glUniform3f(diffuseLoc, material.diffuse.r, material.diffuse.g, material.diffuse.b);
+
+		unsigned int specularLoc = glGetUniformLocation(shader.getId(), "material.specular");
+		glUniform3f(specularLoc, material.specular.r, material.specular.g, material.specular.b);
+
+		unsigned int shinyLoc = glGetUniformLocation(shader.getId(), "material.shininess");
+		glUniform1f(shinyLoc, this->material.shininess);
+
+		unsigned int opaqueLoc = glGetUniformLocation(shader.getId(), "material.opacity");
+		glUniform1f(opaqueLoc, this->material.opacity);
+
+		unsigned int lightColorLoc = glGetUniformLocation(shader.getId(), "light.color");
+		glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
+
+		unsigned int lightDirLoc = glGetUniformLocation(shader.getId(), "light.direction");
+		glUniform3f(lightDirLoc, 0.1f, -1.f, 0.1f);
+
+		unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
+		glUniform3f(aIntensityLoc, 0.1f, 0.1f, 0.1f);
+
+		unsigned int dIntensityLoc = glGetUniformLocation(shader.getId(), "light.diffuse");
+		glUniform3f(dIntensityLoc, 1.0f, 1.0f, 1.0f);
+
+		unsigned int sIntensityLoc = glGetUniformLocation(shader.getId(), "light.specular");
+		glUniform3f(sIntensityLoc, 0.5f, 0.5f, 0.5f);
 	}
 
 	glBindVertexArray(VAO);

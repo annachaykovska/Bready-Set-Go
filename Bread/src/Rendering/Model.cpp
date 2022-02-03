@@ -8,6 +8,23 @@
 
 #include "Model.h"
 
+Model::Model()
+{
+
+}
+
+Model::Model(const Model& rhs)
+{
+	this->meshes = rhs.meshes;
+	this->directory = rhs.directory;
+	this->textures_loaded = rhs.textures_loaded;
+}
+
+Model::Model(Mesh mesh)
+{
+	this->meshes.push_back(mesh);
+}
+
 // Renders every mesh in this model
 void Model::draw(Shader &shader)
 {
@@ -17,7 +34,7 @@ void Model::draw(Shader &shader)
 
 void Model::loadModel(std::string path)
 {
-	// Declare an Assimp's importer to read a model file
+	// Declare Assimp's (model loading library) importer to read a model file
 	Assimp::Importer importer;
 
 	// Dump all of the data in the model file into Assimp's scene object
@@ -59,7 +76,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-// Extracts all of the relevant mesh data from the model's mesh
+// Extracts all of the relevant mesh data from a model's node
 // and save it to memory in an easy to use form
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
@@ -112,10 +129,45 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 	}
 
+	Mesh newMesh(vertices, indices, textures);
+
 	// If the mesh has texture image files associated with it, get those too
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		aiString materialName;
+		material->Get(AI_MATKEY_NAME, materialName);
+
+		aiColor3D diffuseColor;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+
+		aiColor3D specularColor;
+		material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
+
+		aiColor3D ambientColor;
+		material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor);
+
+		aiColor3D emissiveColor;
+		material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
+
+		float shininess;
+		material->Get(AI_MATKEY_SHININESS, shininess);
+		
+		float opacity;
+		material->Get(AI_MATKEY_OPACITY, opacity);
+
+		float refractionIndex;
+		material->Get(AI_MATKEY_REFRACTI, refractionIndex);
+
+		newMesh.material.name = std::string(materialName.C_Str());
+		newMesh.material.ambient = glm::vec3(ambientColor.r, ambientColor.g, ambientColor.b);
+		newMesh.material.diffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+		newMesh.material.specular = glm::vec3(specularColor.r, specularColor.g, specularColor.b);
+		newMesh.material.emissive = glm::vec3(emissiveColor.r, emissiveColor.g, emissiveColor.b);
+		newMesh.material.shininess = shininess;
+		newMesh.material.opacity = opacity;
+		newMesh.material.refractionIndex = refractionIndex;
 
 		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -124,7 +176,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
-	return Mesh(vertices, indices, textures);
+	return newMesh;
 }
 
 // Loads texture data for meshes

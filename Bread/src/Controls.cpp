@@ -4,8 +4,6 @@
 #include <vector>
 #include <memory>
 
-#include <glfw/glfw3.h>
-
 #include "Scene/Entity.h"
 #include "Window.h"
 

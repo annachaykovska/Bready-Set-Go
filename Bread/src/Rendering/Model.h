@@ -8,15 +8,21 @@
 
 #include "Mesh.h"
 
-class Model
+class Model : public Component
 {
 public:
 
 	std::vector<Mesh> meshes;
 
+	Model();
+	Model(const Model& rhs);
 	Model(char* path) { loadModel(path); }
+	Model(Mesh mesh);
 	void draw(Shader& shader);
 	bool isTextured() { return (textures_loaded.size() != 0); }
+
+	//Model(Model& rhs) = delete; // No copy constructor
+	//void operator=(const Model&) = delete; // No assignment operator
 
 private:
 

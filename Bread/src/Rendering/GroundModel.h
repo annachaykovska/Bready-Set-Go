@@ -2,14 +2,14 @@
 
 #include <stbi/stb_image.h>
 
-#include "Mesh.h"
+#include "Model.h"
 
-class Geometry
+class GroundModel
 {
 public:
 
 	// Make ground plane
-	Mesh createGround()
+	static Model createGround()
 	{
 		Mesh ground;
 
@@ -56,6 +56,8 @@ public:
 		ground.textures.push_back(groundTexture);
 		ground.setupMesh();
 
-		return ground;
+		Model groundModel(ground);
+
+		return groundModel;
 	}
 };
