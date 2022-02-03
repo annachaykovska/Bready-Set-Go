@@ -11,9 +11,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 {
 	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
 	player1 = Model(&breadmobilePath[0]);
-	std::cout << "After player1" << std::endl;
 	player2 = Model(&breadmobilePath[0]);
-	countertop = Model(GroundModel::createGround());
+	std::string groundPath = "resources/models/ground/roughGround.obj";
+	countertop = Model(&groundPath[0]);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -106,17 +106,19 @@ void RenderingSystem::update()
 		models[i].draw(getShader());
 	}*/
 	
+	glUniform1i(texLoc, 0); // Turn off textures
+
 	// Draw player1 with new transform
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player1Transform->getModelMatrix()));
-	glUniform1i(texLoc, 0); // Turn off textures
+	//std::cout << "Drawing player1" << std::endl;
 	player1Model->draw(getShader());
 
 	// Draw player2 with new transform
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));
+	//std::cout << "Drawing player2" << std::endl;
 	player2Model->draw(getShader());
 
 	// Draw countertop with new transform
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(countertopTransform->getModelMatrix()));
-	glUniform1i(texLoc, 1); // Turn textures back on
 	countertopModel->draw(getShader());
 }

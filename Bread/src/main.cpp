@@ -79,13 +79,13 @@ int main()
 	player2Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* counterTransform = countertop->getTransform();
-	counterTransform->position = glm::vec3(0, 0, 0);
+	counterTransform->position = glm::vec3(0, -10, 900);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
-	counterTransform->scale = glm::vec3(100, 100, 100);
+	counterTransform->scale = glm::vec3(50, 50, 50);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
-	// Leaving this here for now so people can turn the music off easily should it get annoying
+	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
 	//countertopAudioSource->play("bg.wav");
 

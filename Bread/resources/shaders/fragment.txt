@@ -68,6 +68,7 @@ void main()
 		// Phong light
 		vec3 phong = ambient + 2.f * diffuse;// + specular;
 
-		fragColor = vec4(phong, material.opacity);
+		//fragColor = vec4(phong, material.opacity);
+		fragColor = vec4(material.diffuse, material.opacity);
 	}
 }

@@ -27,6 +27,7 @@ Mesh::Mesh(const Mesh& rhs)
 	this->vertices = rhs.vertices;
 	this->indices = rhs.indices;
 	this->textures = rhs.textures;
+	this->material = rhs.material;
 	
 	setupMesh();
 }
