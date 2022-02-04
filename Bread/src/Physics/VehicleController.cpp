@@ -6,8 +6,8 @@
 
 #include <glfw/glfw3.h>
 
-#include "Scene/Entity.h"
-#include "Window.h"
+#include "../Scene/Entity.h"
+#include "../Window.h"
 
 using namespace std;
 /*

@@ -159,6 +159,7 @@ int main()
 		deltaTime = newTime - oldTime;
 		oldTime = newTime;
 		g_systems.physics->update(deltaTime);
+		//g_systems.physics->
 
 		// RENDER
 		window.clear();
