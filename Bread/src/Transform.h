@@ -38,9 +38,11 @@ public:
 	{
 		glm::vec3 euler;
 
-		euler.x = atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y));
-		euler.y = asin(2 * (q.w * q.y - q.z * q.x));
-		euler.z = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
+		euler.x = glm::degrees(atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y)));
+		euler.y = glm::degrees(asin(2 * (q.w * q.y - q.z * q.x)));
+		euler.z = glm::degrees(atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z)));
+
+		euler.y += 90.f;
 
 		return euler;
 	}

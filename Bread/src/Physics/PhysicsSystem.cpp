@@ -15,7 +15,6 @@ using namespace physx;
 
 extern Scene g_scene;
 
-
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.75f,
@@ -94,7 +93,6 @@ DriveMode gDriveModeOrder[] =
 	eDRIVE_MODE_NONE
 };
 
-
 VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 {
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
@@ -135,7 +133,6 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	return vehicleDesc;
 }
-
 
 PhysicsSystem::PhysicsSystem()
 {
@@ -206,9 +203,9 @@ PhysicsSystem::PhysicsSystem()
 	mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehicle4W->mDriveDynData.setUseAutoGears(true);
 
-	mVehicleModeTimer = 0.0f;
-	mVehicleOrderProgress = 0;
-	startBrakeMode();
+	//mVehicleModeTimer = 0.0f;
+	//mVehicleOrderProgress = 0;
+	//startBrakeMode();
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -262,7 +259,7 @@ void PhysicsSystem::startAccelerateForwardsMode()
 
 void PhysicsSystem::startAccelerateReverseMode()
 {
-	this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+	//this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 
 	if (this->mMimicKeyInputs)
 	{
@@ -430,7 +427,7 @@ void PhysicsSystem::update(const float timestep)
 	Transform* player1Transform = player1->getTransform();
 
 	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
-	incrementDrivingMode(timestep);
+	//incrementDrivingMode(timestep);
 
 	//Update the control inputs for the vehicle.
 	if (this->mMimicKeyInputs)
@@ -461,8 +458,8 @@ void PhysicsSystem::update(const float timestep)
 	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
 	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->position = glm::vec3(currentPosision.x, currentPosision.y, currentPosision.z);
-	player1Transform->rotation = glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z);
-	//printf("%f, %f, %f, %f\n", currentRotation.x, currentRotation.y, currentRotation.z, currentRotation.w);
+	player1Transform->rotation = player1Transform->convert(currentRotation);
+	//printf("Player1 Rotation: (%f, %f, %f) \n", player1Transform->rotation.x, player1Transform->rotation.y, player1Transform->rotation.z);
 
 	//Scene update.
 	this->mScene->simulate(timestep);
@@ -491,8 +488,6 @@ void PhysicsSystem::cleanupPhysics()
 		PX_RELEASE(transport);
 	}
 	PX_RELEASE(this->mFoundation);
-
-	printf("SnippetVehicle4W done.\n");
 }
 
 
@@ -510,34 +505,38 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 //void PhysicsSystem::keyPress(unsigned char key, const PxTransform& camera)
 void PhysicsSystem::keyPress(unsigned char key)
 {
-	/*PX_UNUSED(camera);
-	PX_UNUSED(key);*/
-	PxTransform camera = PxTransform(PxVec3(1.0f));
 	printf("KeyPress: %c\n", key);
+
 	switch (toupper(key))
 	{
-		case 'S':
-			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
-				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		case 'W':
+			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
+			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+			this->mVehicleInputData.setDigitalBrake(false);
+			this->mVehicleInputData.setAnalogBrake(0.f);
 			startAccelerateForwardsMode();
 			break;
-		case 'W':
-			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		case 'S':
+			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+			this->mVehicleInputData.setDigitalBrake(false);
+			this->mVehicleInputData.setAnalogBrake(0.f);
 			startAccelerateReverseMode();
 			break;
-		case 'A':
+		case 'D':
 			startTurnHardRightMode();
 			break;
-		case 'D':
+		case 'A':
 			startTurnHardLeftMode();
 			break;
 		case ' ':
-			//startBrakeMode();
+			startBrakeMode();
 			break;
 		default:
-			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+			this->mVehicleInputData.setDigitalBrake(false);
+			this->mVehicleInputData.setAnalogBrake(0.f);
 			releaseAllControls();
 			break;
 	}

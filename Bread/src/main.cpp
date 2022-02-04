@@ -111,7 +111,7 @@ int main()
 	// Make a reference to each Transform Component for easy updates
 	Transform* aComponent = (Transform*)player1->getComponent("transform");
 	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(-10, 2.3f, 3);
+	player1Transform->position = glm::vec3(0, 0, 0);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
@@ -169,7 +169,7 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		float camX = sin(glfwGetTime()) * radius;
 		float camZ = cos(glfwGetTime()) * radius;
-		view = glm::lookAt(glm::vec3(15.0f, 10.0f, -15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(0.f, 50.0f, -100.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 		// Projection matrix will be handled by the Camera class in the future
