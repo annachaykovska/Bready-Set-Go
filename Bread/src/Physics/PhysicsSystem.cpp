@@ -496,8 +496,25 @@ void PhysicsSystem::cleanupPhysics()
 	printf("SnippetVehicle4W done.\n");
 }
 
-void PhysicsSystem::keyPress(unsigned char key, const PxTransform& camera)
+PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 {
-	PX_UNUSED(camera);
-	PX_UNUSED(key);
+	PxRigidDynamic* dynamic = PxCreateDynamic(*this->mPhysics, t, geometry, *this->mMaterial, 10.0f);
+	dynamic->setAngularDamping(0.5f);
+	dynamic->setLinearVelocity(velocity);
+	this->mScene->addActor(*dynamic);
+	return dynamic;
+}
+
+// Readd the camera probably 
+//void PhysicsSystem::keyPress(unsigned char key, const PxTransform& camera)
+void PhysicsSystem::keyPress(unsigned char key)
+{
+	/*PX_UNUSED(camera);
+	PX_UNUSED(key);*/
+	printf("Key pressed");
+	PxTransform camera = PxTransform(PxVec3(1.0f));
+	switch (toupper(key))
+	{
+	case ' ':	createDynamic(camera, PxSphereGeometry(3.0f), camera.rotate(PxVec3(0, 0, -1)) * 200);	break;
+	}
 }

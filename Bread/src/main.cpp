@@ -141,9 +141,9 @@ int main()
 
 	// Set movement control callbacks
 	// TODO: generalize this
-	std::shared_ptr<Transform> t = std::make_shared<Transform>();
-	t->position = player1Transform->position;
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(t); 
+	/*std::shared_ptr<Transform> t = std::make_shared<Transform>();
+	t->position = player1Transform->position;*/
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics);
 	window.setCallbacks(movementCallbacks);
 
 	// GAME LOOP
@@ -152,7 +152,7 @@ int main()
 		// INPUT
 		window.getInput();
 		glfwPollEvents();
-		player1Transform->position = t->position;
+		//player1Transform->position = physics;
 
 		// SIMULATE
 		newTime = glfwGetTime();
