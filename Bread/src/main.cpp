@@ -79,7 +79,7 @@ int main()
 	player2Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* counterTransform = countertop->getTransform();
-	counterTransform->position = glm::vec3(0, -10, 900);
+	counterTransform->position = glm::vec3(0, -10, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
 	counterTransform->scale = glm::vec3(50, 50, 50);
 	//-----------------------------------------------------------------------------------
@@ -95,8 +95,7 @@ int main()
 	// Set movement control callbacks
 	// TODO: generalize this
 	std::shared_ptr<Transform> t = std::make_shared<Transform>();
-	t.get()->position = player1Transform->position;
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(t); 
+	std::shared_ptr<MovementCallbacks> movementCallbacks = std::make_shared<MovementCallbacks>(t);
 	window.setCallbacks(movementCallbacks);
 
 	// GAME LOOP

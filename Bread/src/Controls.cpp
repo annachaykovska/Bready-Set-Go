@@ -4,8 +4,12 @@
 #include <vector>
 #include <memory>
 
-#include "Scene/Entity.h"
+#include "Scene/Scene.h"
 #include "Window.h"
+#include "Transform.h"
+#include "Scene/Entity.h"
+
+extern Scene g_scene;
 
 using namespace std;
 /*
@@ -21,34 +25,38 @@ struct ButtonState {
 	bool rightHeld = false;
 };
 	
-
 class MovementCallbacks : public CallbackInterface {
 
 public:
+
 	// Currently just taking a pointer to the main player transform????
 	MovementCallbacks(shared_ptr<Transform> transform) : transform(transform) {
 		state = ButtonState();
 	}
 
-	virtual void keyCallback(int key, int scancode, int action, int mods) {
+	virtual void keyCallback(int key, int scancode, int action, int mods) 
+	{
+		Entity* player1 = g_scene.getEntity("player1");
+		Transform* p1Transform = player1->getTransform();
+
 		// Pressing settings
 		if (state.forwardsHeld || (key == GLFW_KEY_W && action == GLFW_PRESS)) {
-			transform->position.x += 0.5;
+			p1Transform->position.x += 0.5;
 			state.forwardsHeld = true;
 			printf("W");
 		}
 		if (state.leftHeld || (key == GLFW_KEY_A && action == GLFW_PRESS)) {
-			transform->position.z -= 0.5;
+			p1Transform->position.z += 0.5;
 			state.leftHeld = true;
 			printf("A");
 		}
 		if (state.backwardsHeld || (key == GLFW_KEY_S && action == GLFW_PRESS)) {
-			transform->position.x -= 0.5;
+			p1Transform->position.x -= 0.5;
 			state.backwardsHeld = true;
 			printf("S");
 		}
 		if (state.rightHeld || (key == GLFW_KEY_D && action == GLFW_PRESS)) {
-			transform->position.z += 0.5;
+			p1Transform->position.z -= 0.5;
 			state.rightHeld = true;
 			printf("D");
 		}
@@ -66,12 +74,10 @@ public:
 		if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
 			state.rightHeld = false;
 		}
-
-		// Update position in transform
-		transform->position;
 	}
 
 private:
+
 	ButtonState state;
 	shared_ptr<Transform> transform;
 };
