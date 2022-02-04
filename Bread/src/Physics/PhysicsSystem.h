@@ -12,7 +12,7 @@ public:
 
 	PhysicsSystem();
 	void initVehicleSDK();
-	void update(const float timeStep);
+	void update(const float timestep);
 	void startAccelerateForwardsMode();
 	void startAccelerateReverseMode();
 	void startBrakeMode();
@@ -21,10 +21,11 @@ public:
 	void startHandbrakeTurnLeftMode();
 	void startHandbrakeTurnRightMode();
 	void releaseAllControls();
-	// void incrementDrivingMode(const PxF32 timestep);
-	// void stepPhysics();
-	// void cleanupPhysics();
-	// void keyPress();
+	void incrementDrivingMode(const PxF32 timestep);
+	void cleanupPhysics();
+	// void keyPress(unsigned char key, const PxTransform& camera);
+	void keyPress(unsigned char key);
+	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
 	// Public Variables
 	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
