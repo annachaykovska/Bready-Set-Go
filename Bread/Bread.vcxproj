@@ -115,6 +115,7 @@
     <ClCompile Include="src\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Audio\AudioSource.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Physics\VehicleControlInputs.cpp" />
     <ClCompile Include="src\Physics\VehicleController.cpp" />
     <ClCompile Include="src\Scene\Entity.cpp" />
     <ClCompile Include="src\glad.c" />
@@ -757,6 +758,7 @@
     <ClInclude Include="src\Audio\AudioEvent.h" />
     <ClInclude Include="src\Audio\AudioSource.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Physics\VehicleControlInputs.h" />
     <ClInclude Include="src\Physics\VehicleController.h" />
     <ClInclude Include="src\Scene\Component.h" />
     <ClInclude Include="src\ElementBuffer.h" />

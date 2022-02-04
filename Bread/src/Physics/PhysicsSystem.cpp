@@ -2,14 +2,18 @@
 #include <cassert>
 
 #include "PhysicsSystem.h"
+#include <glm/glm.hpp>
 
 #include <snippetvehiclecommon/SnippetVehicleCreate.h>
 #include <snippetvehiclecommon/SnippetVehicleFilterShader.h>
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
+#include "../Scene/Scene.h"
 
 using namespace snippetvehicle;
 using namespace physx;
+
+extern Scene g_scene;
 
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
@@ -184,11 +188,16 @@ PhysicsSystem::PhysicsSystem()
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
 
 	// Add the ground plane to drive on
+	Entity* countertop = g_scene.getEntity("countertop");
+	Transform* countertopTransform = countertop->getTransform();
 	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
 	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
 	mScene->addActor(*mGroundPlane);
+	PxVec3 gp = this->mGroundPlane->getGlobalPose().p;
+	countertopTransform->position = glm::vec3(gp.x, gp.y, gp.z);
 
 	//Create a vehicle that will drive on the plane.
+	// PLAYER 1
 	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
 	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
@@ -204,23 +213,6 @@ PhysicsSystem::PhysicsSystem()
 	mVehicleModeTimer = 0.0f;
 	mVehicleOrderProgress = 0;
 	startBrakeMode();
-
-	// Add some boxes
-	unsigned int size = 10;
-	float halfExtent = 5.0f;
-	PxTransform t(PxVec3(0));
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
-	for (unsigned int i = 0; i < size; i++)
-	{
-		for (unsigned int j = 0; j < size; j++)
-		{
-			PxTransform localTm(PxVec3(PxReal(j * 2) - PxReal(size - i), PxReal(i * 2 + 1), 0) * halfExtent);
-			PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
-			body->attachShape(*shape);
-			PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-			mScene->addActor(*body);
-		}
-	}
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -437,6 +429,10 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 
 void PhysicsSystem::update(const float timestep)
 {
+	// Get player 1
+	Entity* player1 = g_scene.getEntity("player1");
+	Transform* player1Transform = player1->getTransform();
+
 	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
 	incrementDrivingMode(timestep);
 
@@ -464,6 +460,10 @@ void PhysicsSystem::update(const float timestep)
 
 	//Work out if the vehicle is in the air.
 	this->mIsVehicleInAir = this->mVehicle4W->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+
+	// Set player 1 transform
+	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
+	player1Transform->position = glm::vec3(currentPosision.x, currentPosision.y, currentPosision.z);
 
 	//Scene update.
 	this->mScene->simulate(timestep);
@@ -496,6 +496,7 @@ void PhysicsSystem::cleanupPhysics()
 	printf("SnippetVehicle4W done.\n");
 }
 
+
 PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*this->mPhysics, t, geometry, *this->mMaterial, 10.0f);
@@ -505,16 +506,39 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 	return dynamic;
 }
 
+
 // Readd the camera probably 
 //void PhysicsSystem::keyPress(unsigned char key, const PxTransform& camera)
 void PhysicsSystem::keyPress(unsigned char key)
 {
 	/*PX_UNUSED(camera);
 	PX_UNUSED(key);*/
-	printf("Key pressed");
 	PxTransform camera = PxTransform(PxVec3(1.0f));
 	switch (toupper(key))
 	{
-	case ' ':	createDynamic(camera, PxSphereGeometry(3.0f), camera.rotate(PxVec3(0, 0, -1)) * 200);	break;
+		case 'W':
+			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
+				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+			startAccelerateForwardsMode();
+			break;
+		case 'S':
+			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+			startAccelerateReverseMode();
+			break;
+		case 'D':
+			startTurnHardRightMode();
+			break;
+		case 'A':
+			startTurnHardLeftMode();
+			break;
+		case ' ':
+			startBrakeMode();
+			break;
+		default:
+			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+			releaseAllControls();
+			break;
 	}
 }

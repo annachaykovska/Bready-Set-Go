@@ -143,7 +143,7 @@ int main()
 	// TODO: generalize this
 	/*std::shared_ptr<Transform> t = std::make_shared<Transform>();
 	t->position = player1Transform->position;*/
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics);
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
 
 	// GAME LOOP
@@ -152,14 +152,13 @@ int main()
 		// INPUT
 		window.getInput();
 		glfwPollEvents();
-		//player1Transform->position = physics;
+		//player1Transform->position = t->position;
 
 		// SIMULATE
 		newTime = glfwGetTime();
 		deltaTime = newTime - oldTime;
 		oldTime = newTime;
 		g_systems.physics->update(deltaTime);
-		//g_systems.physics->
 
 		// RENDER
 		window.clear();
@@ -170,7 +169,7 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		float camX = sin(glfwGetTime()) * radius;
 		float camZ = cos(glfwGetTime()) * radius;
-		view = glm::lookAt(glm::vec3(camX, 10.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(15.0f, 10.0f, -15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 		// Projection matrix will be handled by the Camera class in the future
@@ -185,9 +184,9 @@ int main()
 		breadmobile.draw(shader);
 
 		// Draw teapot
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));
-		//teapotModel.draw(shader);
-		breadmobile.draw(shader);
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));
+		////teapotModel.draw(shader);
+		//breadmobile.draw(shader);
 
 		// Draw countertop
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(counterTransform->getModelMatrix()));
@@ -205,6 +204,7 @@ int main()
 	}
 
 	// Collect garbage
+	physics.cleanupPhysics();
 	profiler.cleanup();
 	shader.cleanup();
 	glfwTerminate();
