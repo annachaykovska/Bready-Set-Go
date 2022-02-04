@@ -33,4 +33,14 @@ public:
 		return model;
 	}
 
+	glm::vec3 convert(physx::PxQuat q)
+	{
+		glm::vec3 euler;
+
+		euler.x = atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y));
+		euler.y = asin(2 * (q.w * q.y - q.z * q.x));
+		euler.z = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
+
+		return euler;
+	}
 };
