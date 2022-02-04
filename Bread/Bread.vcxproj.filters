@@ -114,9 +114,6 @@
     <ClCompile Include="src\Physics\VehicleController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Physics\VehicleControlInputs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -2046,9 +2043,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics\VehicleController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics\VehicleControlInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

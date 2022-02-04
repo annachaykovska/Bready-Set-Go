@@ -162,7 +162,7 @@ PhysicsSystem::PhysicsSystem()
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = mDispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.filterShader = VehicleFilterShader;
 	this->mScene = mPhysics->createScene(sceneDesc);
 
 	// Material
@@ -188,13 +188,9 @@ PhysicsSystem::PhysicsSystem()
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
 
 	// Add the ground plane to drive on
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
 	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
 	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
 	mScene->addActor(*mGroundPlane);
-	PxVec3 gp = this->mGroundPlane->getGlobalPose().p;
-	countertopTransform->position = glm::vec3(gp.x, gp.y, gp.z);
 
 	//Create a vehicle that will drive on the plane.
 	// PLAYER 1
@@ -461,9 +457,12 @@ void PhysicsSystem::update(const float timestep)
 	//Work out if the vehicle is in the air.
 	this->mIsVehicleInAir = this->mVehicle4W->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
-	// Set player 1 transform
+	// Set player 1 transform and rotation
 	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
+	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->position = glm::vec3(currentPosision.x, currentPosision.y, currentPosision.z);
+	player1Transform->rotation = glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z);
+	//printf("%f, %f, %f, %f\n", currentRotation.x, currentRotation.y, currentRotation.z, currentRotation.w);
 
 	//Scene update.
 	this->mScene->simulate(timestep);
@@ -514,26 +513,27 @@ void PhysicsSystem::keyPress(unsigned char key)
 	/*PX_UNUSED(camera);
 	PX_UNUSED(key);*/
 	PxTransform camera = PxTransform(PxVec3(1.0f));
+	printf("KeyPress: %c\n", key);
 	switch (toupper(key))
 	{
-		case 'W':
+		case 'S':
 			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
 				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 			startAccelerateForwardsMode();
 			break;
-		case 'S':
+		case 'W':
 			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
 				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
 			startAccelerateReverseMode();
 			break;
-		case 'D':
+		case 'A':
 			startTurnHardRightMode();
 			break;
-		case 'A':
+		case 'D':
 			startTurnHardLeftMode();
 			break;
 		case ' ':
-			startBrakeMode();
+			//startBrakeMode();
 			break;
 		default:
 			if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
