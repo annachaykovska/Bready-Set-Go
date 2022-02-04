@@ -23,6 +23,13 @@ struct ButtonState {
 	bool leftHeld = false;
 	bool backwardsHeld = false;
 	bool rightHeld = false;
+
+	bool cameraForward = false;
+	bool cameraBackward = false;
+	bool cameraRight = false;
+	bool cameraLeft = false;
+	bool cameraUp = false;
+	bool cameraDown = false;
 };
 	
 class MovementCallbacks : public CallbackInterface {
@@ -43,22 +50,46 @@ public:
 		if (state.forwardsHeld || (key == GLFW_KEY_W && action == GLFW_PRESS)) {
 			p1Transform->position.x += 0.5;
 			state.forwardsHeld = true;
-			printf("W");
 		}
 		if (state.leftHeld || (key == GLFW_KEY_A && action == GLFW_PRESS)) {
 			p1Transform->position.z += 0.5;
 			state.leftHeld = true;
-			printf("A");
 		}
 		if (state.backwardsHeld || (key == GLFW_KEY_S && action == GLFW_PRESS)) {
 			p1Transform->position.x -= 0.5;
 			state.backwardsHeld = true;
-			printf("S");
 		}
 		if (state.rightHeld || (key == GLFW_KEY_D && action == GLFW_PRESS)) {
 			p1Transform->position.z -= 0.5;
 			state.rightHeld = true;
-			printf("D");
+		}
+
+		Camera* camera = &(g_scene.camera);
+
+		// Debug camera controls
+		if (state.cameraForward || key == GLFW_KEY_I && action == GLFW_PRESS) {
+			state.cameraForward = true;
+			camera->position.x += 0.5;
+		}
+		if (state.cameraBackward || key == GLFW_KEY_K && action == GLFW_PRESS) {
+			state.cameraBackward = true;
+			camera->position.x -= 0.5;
+		}
+		if (state.cameraRight || key == GLFW_KEY_L && action == GLFW_PRESS) {
+			state.cameraRight = true;
+			camera->position.z += 0.5;
+		}
+		if (state.cameraLeft || key == GLFW_KEY_J && action == GLFW_PRESS) {
+			state.cameraLeft = true;
+			camera->position.z -= 0.5;
+		}
+		if (state.cameraUp || key == GLFW_KEY_O && action == GLFW_PRESS) {
+			state.cameraUp = true;
+			camera->position.y += 0.5;
+		}
+		if (state.cameraDown || key == GLFW_KEY_U && action == GLFW_PRESS) {
+			state.cameraDown = true;
+			camera->position.y -= 0.5;
 		}
 
 		// Release settings
@@ -73,6 +104,24 @@ public:
 		}
 		if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
 			state.rightHeld = false;
+		}
+		if (key == GLFW_KEY_I && action == GLFW_RELEASE) {
+			state.cameraForward = false;
+		}
+		if (key == GLFW_KEY_K && action == GLFW_RELEASE) {
+			state.cameraBackward = false;
+		}
+		if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
+			state.cameraRight = false;
+		}
+		if (key == GLFW_KEY_J && action == GLFW_RELEASE) {
+			state.cameraLeft = false;
+		}
+		if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
+			state.cameraUp = false;
+		}
+		if (key == GLFW_KEY_U && action == GLFW_RELEASE) {
+			state.cameraDown = false;
 		}
 	}
 

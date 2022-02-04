@@ -69,38 +69,45 @@ void Profiler::fps()
 	ImGui::Text("framesPerSecond = %lf", framesPerSecond);
 }
 
-void Profiler::transform()
+void Profiler::player1Transform()
 {
 	Entity* player1 = g_scene.getEntity("player1");
 	Transform* player1Transform = player1->getTransform();
 
-	std::string x = std::to_string(player1Transform->position.x);
-	std::string y = std::to_string(player1Transform->position.y);
-	std::string z = std::to_string(player1Transform->position.z);
-
-	std::string text = "\nPlayer1 position: ";
-
-	//ImGui::Text(text.c_str());
-	ImGui::SliderFloat("xpos", &(player1Transform->position.x), -100.0f, 100.0f, x.c_str(), 1.0f);
-	ImGui::SliderFloat("ypos", &(player1Transform->position.y), -100.0f, 100.0f, y.c_str(), 1.0f);
-	ImGui::SliderFloat("zpos", &(player1Transform->position.z), -100.0f, 100.0f, z.c_str(), 1.0f);
-
-	x = std::to_string(player1Transform->rotation.x);
-	y = std::to_string(player1Transform->rotation.y);
-	z = std::to_string(player1Transform->rotation.z);
-
-	text = "\nPlayer1 rotation: ";
+	std::string text = "\nPlayer1: ";
 
 	ImGui::Text(text.c_str());
-	ImGui::SliderFloat("xrot", &(player1Transform->rotation.x), -180.0f, 180.0f, x.c_str(), 1.0f);
-	ImGui::SliderFloat("yrot", &(player1Transform->rotation.y), -180.0f, 180.0f, y.c_str(), 1.0f);
-	ImGui::SliderFloat("zrot", &(player1Transform->rotation.z), -180.0f, 180.0f, z.c_str(), 1.0f);
+	ImGui::SliderFloat("xpos", &(player1Transform->position.x), -100.0f, 100.0f, "%.3f", 1.0f);
+	ImGui::SliderFloat("ypos", &(player1Transform->position.y), -100.0f, 100.0f, "%.3f", 1.0f);
+	ImGui::SliderFloat("zpos", &(player1Transform->position.z), -100.0f, 100.0f, "%.3f", 1.0f);
+
+	ImGui::SliderFloat("xrot", &(player1Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
+	ImGui::SliderFloat("yrot", &(player1Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
+	ImGui::SliderFloat("zrot", &(player1Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
+}
+
+void Profiler::cameraTransform()
+{
+	Camera* camera = &(g_scene.camera);
+
+	float xBuf[50];
+	float step = 0.05f;
+	float stepFast = 1.f;
+
+	ImGui::InputFloat("cameraXPos", &(camera->position.x), step, stepFast, "%.3f");
+	ImGui::InputFloat("cameraYPos", &(camera->position.y), step, stepFast, "%.3f");
+	ImGui::InputFloat("cameraZPos", &(camera->position.z), step, stepFast, "%.3f");
+
+	ImGui::InputFloat("cameraYaw", &(camera->yaw), step, stepFast, "%.3f");
+	ImGui::InputFloat("cameraPitch", &(camera->pitch), step, stepFast, "%.3f");
+	
 }
 
 void Profiler::update()
 {
 	begin();
 	fps();
-	transform();
+	player1Transform();
+	cameraTransform();
 	end();
 }

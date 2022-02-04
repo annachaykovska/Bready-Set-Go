@@ -11,7 +11,8 @@ public:
 	void begin();
 	void end();
 	void fps();
-	void transform();
+	void player1Transform();
+	void cameraTransform();
 	void update();
 
 private:

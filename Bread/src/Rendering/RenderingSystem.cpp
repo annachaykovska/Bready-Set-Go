@@ -62,8 +62,12 @@ void RenderingSystem::loadModels()
 void RenderingSystem::setupCameras()
 {
 	// View matrix will be handled by the Camera class in the future
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::lookAt(glm::vec3(0, 10.0f, -50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//glm::mat4 view = glm::mat4(1.0f);
+	//view = glm::lookAt(glm::vec3(0, 10.0f, -50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+	// Get view matrix from Camera and update the Shader
+	glm::mat4 view = g_scene.camera.getViewMatrix();
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 	// Tell shader about camera position
@@ -92,6 +96,7 @@ void RenderingSystem::update()
 	Transform* countertopTransform = countertop->getTransform();
 
 	shader.use();
+	g_scene.camera.updateCameraVectors();
 	setupCameras();
 
 	//glUniform1i(texLoc, 0); // Turn off textures
