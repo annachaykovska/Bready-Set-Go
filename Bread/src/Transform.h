@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <PxPhysicsAPI.h>
 
 #include "Scene/Component.h"
 
