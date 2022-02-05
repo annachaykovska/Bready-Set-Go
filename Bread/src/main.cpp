@@ -169,7 +169,7 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		float camX = sin(glfwGetTime()) * radius;
 		float camZ = cos(glfwGetTime()) * radius;
-		view = glm::lookAt(glm::vec3(0.f, 50.0f, -100.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(0.f, 50.0f, -50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 		// Projection matrix will be handled by the Camera class in the future

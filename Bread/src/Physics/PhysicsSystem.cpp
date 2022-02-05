@@ -422,9 +422,7 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 
 void PhysicsSystem::update(const float timestep)
 {
-	// Get player 1
-	Entity* player1 = g_scene.getEntity("player1");
-	Transform* player1Transform = player1->getTransform();
+	
 
 	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
 	//incrementDrivingMode(timestep);
@@ -454,12 +452,20 @@ void PhysicsSystem::update(const float timestep)
 	//Work out if the vehicle is in the air.
 	this->mIsVehicleInAir = this->mVehicle4W->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
-	// Set player 1 transform and rotation
+	// Set player 1 transform
+	Entity* player1 = g_scene.getEntity("player1");
+	Transform* player1Transform = player1->getTransform();
 	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
 	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
-	player1Transform->position = glm::vec3(currentPosision.x, currentPosision.y, currentPosision.z);
-	player1Transform->rotation = player1Transform->convert(currentRotation);
-	//printf("Player1 Rotation: (%f, %f, %f) \n", player1Transform->rotation.x, player1Transform->rotation.y, player1Transform->rotation.z);
+	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
+
+	// Set the ground's transform
+	Entity* countertop = g_scene.getEntity("countertop");
+	Transform* countertopTransform = countertop->getTransform();
+	physx::PxShape* shapes[1];
+	mGroundPlane->getShapes(shapes, 1);
+	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
+	countertopTransform->update(groundTransform);
 
 	//Scene update.
 	this->mScene->simulate(timestep);
