@@ -208,7 +208,7 @@ PhysicsSystem::PhysicsSystem()
 
 	mVehicleModeTimer = 0.0f;
 	mVehicleOrderProgress = 0;
-	startBrakeMode();
+	//startBrakeMode();
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -295,7 +295,7 @@ void PhysicsSystem::startTurnHardLeftMode()
 	}
 	else
 	{
-		this->mVehicleInputData.setAnalogAccel(true);
+		//this->mVehicleInputData.setAnalogAccel(true);
 		this->mVehicleInputData.setAnalogSteer(-1.0f);
 	}
 }
@@ -309,7 +309,7 @@ void PhysicsSystem::startTurnHardRightMode()
 	}
 	else
 	{
-		this->mVehicleInputData.setAnalogAccel(1.0f);
+		//this->mVehicleInputData.setAnalogAccel(1.0f);
 		this->mVehicleInputData.setAnalogSteer(1.0f);
 	}
 }
@@ -339,6 +339,26 @@ void PhysicsSystem::startHandbrakeTurnRightMode()
 	{
 		this->mVehicleInputData.setAnalogSteer(1.0f);
 		this->mVehicleInputData.setAnalogHandbrake(1.0f);
+	}
+}
+
+void PhysicsSystem::releaseGas()
+{
+	if (this->mMimicKeyInputs)
+	{
+		this->mVehicleInputData.setDigitalAccel(false);
+	}
+	else
+	{
+		this->mVehicleInputData.setAnalogAccel(0.0f);
+	}
+}
+
+void PhysicsSystem::releaseSteering()
+{
+	if(!this->mMimicKeyInputs)
+	{
+		this->mVehicleInputData.setAnalogSteer(0.0f);
 	}
 }
 
@@ -430,7 +450,7 @@ void PhysicsSystem::update(const float timestep)
 	Transform* player1Transform = player1->getTransform();
 
 	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
-	incrementDrivingMode(timestep);
+	//incrementDrivingMode(timestep);
 
 	//Update the control inputs for the vehicle.
 	if (this->mMimicKeyInputs)
@@ -540,5 +560,33 @@ void PhysicsSystem::keyPress(unsigned char key)
 				this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
 			releaseAllControls();
 			break;
+	}
+}
+
+void PhysicsSystem::keyRelease(unsigned char key)
+{
+	/*PX_UNUSED(camera);
+	PX_UNUSED(key);*/
+	PxTransform camera = PxTransform(PxVec3(1.0f));
+	printf("KeyPress: %c\n", key);
+	switch (toupper(key))
+	{
+	case 'S':
+		releaseGas();
+		break;
+	case 'W':
+		releaseGas();
+		break;
+	case 'A':
+		releaseSteering();
+		break;
+	case 'D':
+		releaseSteering();
+		break;
+	default:
+		if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		releaseAllControls();
+		break;
 	}
 }
