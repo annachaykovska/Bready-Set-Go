@@ -508,7 +508,6 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 
 
 // Readd the camera probably 
-//void PhysicsSystem::keyPress(unsigned char key, const PxTransform& camera)
 void PhysicsSystem::keyPress(unsigned char key)
 {
 	printf("KeyPress: %c\n", key);
