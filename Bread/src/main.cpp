@@ -18,8 +18,6 @@
 #include "Camera.h"
 #include "Physics/VehicleController.cpp"
 
-const float radius = 40.0f;
-
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
 
@@ -42,6 +40,7 @@ int main()
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
 
+	//-----------------------------------------------------------------------------------
 	// INITIALIZE RENDERING STUFF - will be in the rendering system in the future
 	//-----------------------------------------------------------------------------------
 	// Compile shader program
@@ -51,25 +50,14 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Load breadbus model
-	std::string breadmobilePath = "resources/models/breadbus/breadbus.obj";
+	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
 	Model breadmobile(&breadmobilePath[0]);
 	breadmobile.meshes[0].color = glm::vec3(0.8f, 0.467381f, 0.072319f); // Face
 	breadmobile.meshes[1].color = glm::vec3(0.366761f, 0.134041f, 0); // Crust
 	breadmobile.meshes[2].color = glm::vec3(0.75f, 0.85f, 0.85f); // Windows
 	breadmobile.meshes[3].color = glm::vec3(1, 0.89f, 0.71f); // Headlights
 	breadmobile.meshes[4].color = glm::vec3(0.1f, 0.1f, 0.1f); // Front wheels
-	//breadmobile.meshes[5].color = glm::vec3(0.266761f, 0.034041f, 0); // Dunno!
-	breadmobile.meshes[5].color = glm::vec3(1, 0, 1);
-	//breadmobile.meshes[6].color = glm::vec3(0.8f, 0.467381f, 0.072319f); // Dunno!
-	breadmobile.meshes[6].color = glm::vec3(1, 0, 1);
-	//breadmobile.meshes[7].color = glm::vec3(0.8f, 0.039734f, 0); // Dunno!
-	breadmobile.meshes[7].color = glm::vec3(1, 0, 1);
-	breadmobile.meshes[8].color = glm::vec3(0.1f, 0.1f, 0.1f); // Back wheels
-
-	// Load teapot model
-	//std::string teapotPath = "resources/models/teapot/teapot_s0.obj";
-	//Model teapotModel(&teapotPath[0]);
-	//teapotModel.meshes[0].color = glm::vec3(0.3f, 0.3f, 0.3f);
+	breadmobile.meshes[5].color = glm::vec3(0.1f, 0.1f, 0.1f); // Back wheels
 
 	// Create ground plane
 	Geometry geo;
@@ -84,8 +72,8 @@ int main()
 	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
 
 	//-----------------------------------------------------------------------------------
-	// ENTITY-COMPONENT STUFF 
-  //-----------------------------------------------------------------------------------
+	// ENTITY-COMPONENT STUFF
+	//-----------------------------------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
@@ -111,7 +99,7 @@ int main()
 	// Make a reference to each Transform Component for easy updates
 	Transform* aComponent = (Transform*)player1->getComponent("transform");
 	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(-10, 2.3f, 3);
+	player1Transform->position = glm::vec3(0, 0, 0);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
@@ -167,9 +155,7 @@ int main()
 
 		// View matrix will be handled by the Camera class in the future
 		glm::mat4 view = glm::mat4(1.0f);
-		float camX = sin(glfwGetTime()) * radius;
-		float camZ = cos(glfwGetTime()) * radius;
-		view = glm::lookAt(glm::vec3(15.0f, 10.0f, -15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(0.f, 50.0f, -50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 		// Projection matrix will be handled by the Camera class in the future
@@ -178,12 +164,12 @@ int main()
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
 		// Drawing objects will be handled by Rendering System in the future
-		// Draw breadbus
+		// Draw player1
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player1Transform->getModelMatrix()));
 		glUniform1i(texLoc, 0); // Turn off textures
 		breadmobile.draw(shader);
 
-		// Draw teapot
+		// Draw player2
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));
 		////teapotModel.draw(shader);
 		//breadmobile.draw(shader);
