@@ -7,7 +7,7 @@
 
 Camera::Camera()
 {
-	this->position = glm::vec3(0, 0, 0);
+	this->position = glm::vec3(0, 200.0f, 500.0f);
 	this->front = glm::vec3(0, 0, -1.f);
 	this->up = glm::vec3(0, 1.f, 0);
 	this->worldUp = glm::vec3(0, 1.f, 0);	
