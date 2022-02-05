@@ -203,13 +203,8 @@ PhysicsSystem::PhysicsSystem()
 	mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehicle4W->mDriveDynData.setUseAutoGears(true);
 
-<<<<<<< HEAD
-	mVehicleModeTimer = 0.0f;
-	mVehicleOrderProgress = 0;
-=======
 	//mVehicleModeTimer = 0.0f;
 	//mVehicleOrderProgress = 0;
->>>>>>> fix_car_driving_rotation
 	//startBrakeMode();
 }
 
