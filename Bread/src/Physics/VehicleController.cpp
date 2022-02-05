@@ -66,7 +66,16 @@ public:
 		//}
 
 		// Update keypress
-		physics->keyPress(key);
+
+		if (action == GLFW_PRESS)
+		{
+			physics->keyPress(key);
+		}
+		
+		if (action == GLFW_RELEASE)
+		{
+			physics->keyRelease(key);
+		}
 	}
 
 private:

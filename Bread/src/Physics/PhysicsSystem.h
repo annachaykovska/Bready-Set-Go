@@ -20,11 +20,14 @@ public:
 	void startTurnHardRightMode();
 	void startHandbrakeTurnLeftMode();
 	void startHandbrakeTurnRightMode();
+	void releaseGas();
+	void releaseSteering();
 	void releaseAllControls();
 	void incrementDrivingMode(const PxF32 timestep);
 	void cleanupPhysics();
 	// void keyPress(unsigned char key, const PxTransform& camera);
 	void keyPress(unsigned char key);
+	void keyRelease(unsigned char key);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
 	// Public Variables
