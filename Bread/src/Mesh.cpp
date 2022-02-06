@@ -13,6 +13,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	this->indices = indices;
 	this->textures = textures;
 
+	wireframe = false;
 	setupMesh();
 }
 
@@ -48,6 +49,11 @@ void Mesh::setupMesh()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
 	glBindVertexArray(0);
+}
+
+void Mesh::setWireframe(bool drawWireFrame)
+{
+	wireframe = drawWireFrame;
 }
 
 /// <summary>
@@ -88,6 +94,13 @@ void Mesh::draw(Shader &shader)
 	}
 
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	if (wireframe)
+	{
+		glDrawElements(GL_LINE_LOOP, indices.size(), GL_UNSIGNED_INT, 0);
+	}
+	else
+	{
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	}
 	glBindVertexArray(0);
 }

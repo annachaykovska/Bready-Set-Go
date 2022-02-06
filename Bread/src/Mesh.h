@@ -32,11 +32,13 @@ public:
 	Mesh();
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	void setupMesh();		   // Initialization
+	void setWireframe(bool drawWireframe);
 	void draw(Shader& shader); // Render mesh
 
 private:
 
 	unsigned int VAO, VBO, EBO; // Rendering data
+	bool wireframe;
 	//void setupMesh();			// Initialization
 
 };

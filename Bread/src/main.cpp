@@ -75,6 +75,27 @@ int main()
 	Geometry geo;
 	Mesh ground = geo.createGround();
 
+	Mesh navDebug;
+	Vertex nav0, nav1, nav2;
+	nav0.position = glm::vec3(10.0f, 1.0f, 10.0f);
+	nav0.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+	nav1.position = glm::vec3(10.0f, 1.0f, 0.0f);
+	nav1.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+	nav2.position = glm::vec3(0.0f, 1.0f, 0.0f);
+	nav2.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	navDebug.vertices.push_back(nav0);
+	navDebug.vertices.push_back(nav1);
+	navDebug.vertices.push_back(nav2);
+
+	navDebug.indices.push_back(0);
+	navDebug.indices.push_back(1);
+	navDebug.indices.push_back(2);
+
+	navDebug.setWireframe(true);
+
+	navDebug.setupMesh();
+
 	// MVP uniforms
 	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
 	unsigned int viewLoc = glGetUniformLocation(shader.getId(), "view");
@@ -95,6 +116,11 @@ int main()
 	player1->vehicle = physics.mVehicle4W; 
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* countertop = g_scene.getEntity("countertop");
+
+	Transform navMeshTransform;
+	navMeshTransform.position = glm::vec3(0, 0, 0);
+	navMeshTransform.rotation = glm::vec3(0, 0, 0);
+	navMeshTransform.scale = glm::vec3(1, 1, 1);
 
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
@@ -167,9 +193,8 @@ int main()
 
 		// View matrix will be handled by the Camera class in the future
 		glm::mat4 view = glm::mat4(1.0f);
-		float camX = sin(glfwGetTime()) * radius;
-		float camZ = cos(glfwGetTime()) * radius;
-		view = glm::lookAt(glm::vec3(15.0f, 10.0f, -15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(0.f, 50.0f, 50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//view = glm::lookAt(glm::vec3(0.f, 200.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 		// Projection matrix will be handled by the Camera class in the future
@@ -192,6 +217,12 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(counterTransform->getModelMatrix()));
 		glUniform1i(texLoc, 1); // Turn textures back on
 		ground.draw(shader);
+		
+		// Draw nav debug mesh
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(navMeshTransform.getModelMatrix()));
+		glUniform1i(texLoc, 0); // Turn textures off
+		navDebug.draw(shader);
+
 
 		// Update the ImGUI profiler
 		profiler.update(transforms[0].position);
