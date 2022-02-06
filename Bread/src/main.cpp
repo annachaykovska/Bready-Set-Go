@@ -17,6 +17,8 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Physics/VehicleController.cpp"
+#include "Navigation/NavMesh.h"
+#include "Navigation/PathFinder.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -63,26 +65,12 @@ int main()
 	Geometry geo;
 	Mesh ground = geo.createGround();
 
-	Mesh navDebug;
-	Vertex nav0, nav1, nav2;
-	nav0.position = glm::vec3(10.0f, 1.0f, 10.0f);
-	nav0.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-	nav1.position = glm::vec3(10.0f, 1.0f, 0.0f);
-	nav1.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-	nav2.position = glm::vec3(0.0f, 1.0f, 0.0f);
-	nav2.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+	// Create the navigation mesh
+	NavMesh navMesh;
 
-	navDebug.vertices.push_back(nav0);
-	navDebug.vertices.push_back(nav1);
-	navDebug.vertices.push_back(nav2);
+	PathFinder pathFinder(navMesh);
 
-	navDebug.indices.push_back(0);
-	navDebug.indices.push_back(1);
-	navDebug.indices.push_back(2);
-
-	navDebug.setWireframe(true);
-
-	navDebug.setupMesh();
+	pathFinder.findPath(glm::vec3(5.0f, 0.0f, -5.0f), glm::vec3(45.0f, 0.0f, -75.0f));
 
 	// MVP uniforms
 	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
@@ -104,11 +92,6 @@ int main()
 	player1->vehicle = physics.mVehicle4W; 
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* countertop = g_scene.getEntity("countertop");
-
-	Transform navMeshTransform;
-	navMeshTransform.position = glm::vec3(0, 0, 0);
-	navMeshTransform.rotation = glm::vec3(0, 0, 0);
-	navMeshTransform.scale = glm::vec3(1, 1, 1);
 
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
@@ -182,8 +165,8 @@ int main()
 		// View matrix will be handled by the Camera class in the future
 		glm::mat4 view = glm::mat4(1.0f);
 
-		view = glm::lookAt(glm::vec3(0.f, 50.0f, 50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//view = glm::lookAt(glm::vec3(0.f, 200.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//view = glm::lookAt(glm::vec3(0.f, 50.0f, 50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(0.f, 400.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -204,14 +187,14 @@ int main()
 		//breadmobile.draw(shader);
 
 		// Draw countertop
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(counterTransform->getModelMatrix()));
-		glUniform1i(texLoc, 1); // Turn textures back on
-		ground.draw(shader);
+		//gluniformmatrix4fv(modelloc, 1, gl_false, glm::value_ptr(countertransform->getmodelmatrix()));
+		//gluniform1i(texloc, 1); // turn textures back on
+		//ground.draw(shader);
 		
 		// Draw nav debug mesh
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(navMeshTransform.getModelMatrix()));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(navMesh.getWireframeTransform().getModelMatrix()));
 		glUniform1i(texLoc, 0); // Turn textures off
-		navDebug.draw(shader);
+		navMesh.getWireframe().draw(shader);
 
 
 		// Update the ImGUI profiler

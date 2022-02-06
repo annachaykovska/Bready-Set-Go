@@ -96,11 +96,12 @@ void Mesh::draw(Shader &shader)
 	glBindVertexArray(VAO);
 	if (wireframe)
 	{
-		glDrawElements(GL_LINE_LOOP, indices.size(), GL_UNSIGNED_INT, 0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	else
 	{
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
