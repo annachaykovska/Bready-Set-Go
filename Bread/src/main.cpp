@@ -5,9 +5,12 @@
 #include "Profiler.h"
 #include "SystemManager.h"
 #include "Scene/Scene.h"
-#include "Controls.cpp"
-
-const float radius = 40.0f;
+#include "Scene/Entity.h"
+#include "Transform.h"
+#include "Rendering/RenderingSystem.h"
+#include "Audio/AudioSystem.h"
+#include "Physics/VehicleController.cpp"
+//#include "Controls.cpp"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -28,13 +31,13 @@ int main()
 	Profiler profiler(window);
 
 	//-----------------------------------------------------------------------------------
-	// INITIALIZE ENTITIES
-	//-----------------------------------------------------------------------------------
+	// ENTITY-COMPONENT STUFF 
+    //-----------------------------------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
 
-	// Get references to Entities for easy use
+	// Get references to Entities for easy use and set vehicle physx objects
 	Entity* player1 = g_scene.getEntity("player1");
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* countertop = g_scene.getEntity("countertop");
@@ -44,6 +47,7 @@ int main()
 	//-----------------------------------------------------------------------------------
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
+	player1->vehicle = physics.mVehicle4W; // Don't think this is needed?
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
@@ -69,7 +73,7 @@ int main()
 	// Initialize transform components
 	Transform* aComponent = (Transform*)player1->getComponent("transform");
 	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(-10, 0, 3);
+	player1Transform->position = glm::vec3(-10, 2.3f, 3);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
@@ -94,8 +98,7 @@ int main()
 
 	// Set movement control callbacks
 	// TODO: generalize this
-	std::shared_ptr<Transform> t = std::make_shared<Transform>();
-	std::shared_ptr<MovementCallbacks> movementCallbacks = std::make_shared<MovementCallbacks>(t);
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
 
 	// GAME LOOP
@@ -107,8 +110,8 @@ int main()
 		// SIMULATE
 		newTime = glfwGetTime();
 		deltaTime = newTime - oldTime;
-		oldTime = newTime;
 		g_systems.physics->update(deltaTime);
+		oldTime = newTime;
 
 		// RENDER
 		window.clear();
@@ -126,6 +129,7 @@ int main()
 	}
 
 	// Collect garbage
+	physics.cleanupPhysics();
 	profiler.cleanup();
 	renderer.getShader().cleanup();
 	glfwTerminate();

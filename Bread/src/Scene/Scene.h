@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-#include "../Rendering/Camera.h"
+#include "../Camera.h"
 
 class Entity;
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "Audio/AudioSystem.h"
-#include "PhysicsSystem.h"
-#include "Rendering/RenderingSystem.h"
+//#include "Audio/AudioSystem.h"
+//#include "Physics/PhysicsSystem.h"
+//#include "Rendering/RenderingSystem.h"
 
 class AudioSystem;
 class PhysicsSystem;

@@ -7,6 +7,7 @@
 #include <stbi/stb_image.h>
 
 #include "Model.h"
+#include <glad/glad.h>
 
 Model::Model()
 {

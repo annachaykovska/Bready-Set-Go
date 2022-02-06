@@ -1,4 +1,5 @@
 #include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
 
 #include "RenderingSystem.h"
 #include "../Scene/Scene.h"

@@ -8,6 +8,15 @@
 
 #include "Shader.h"
 
+void Shader::use() { glUseProgram(shaderProgram); }
+void Shader::cleanup() { glDeleteProgram(shaderProgram); }
+unsigned int Shader::getId() { return shaderProgram; }
+
+void Shader::setFloat(const std::string& name, unsigned int value)
+{
+	glUniform1f(glGetUniformLocation(this->shaderProgram, name.c_str()), value);
+}
+
 Shader::Shader(std::string vertexPath, std::string fragmentPath) 
 {
 	std::string vertexCode;

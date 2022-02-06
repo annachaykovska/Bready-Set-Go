@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <glad/glad.h>
+
 
 class Shader {
 public:
@@ -10,13 +10,10 @@ public:
 	Shader(std::string vertexPath, std::string fragmentPath);
 
 	void checkCompileErrors(unsigned int ID, std::string name);
-	void use() { glUseProgram(shaderProgram); }
-	void cleanup() { glDeleteProgram(shaderProgram); }
-	unsigned int getId() { return shaderProgram; }
-	void setFloat(const std::string& name, unsigned int value)
-	{
-		glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
-	}
+	void use();
+	void cleanup();
+	unsigned int getId();
+	void setFloat(const std::string& name, unsigned int value);
 
 private:
 

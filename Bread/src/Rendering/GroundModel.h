@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include <stbi/stb_image.h>
 
 #include "Model.h"
@@ -60,4 +60,4 @@ public:
 
 		return groundModel;
 	}
-};
+};*/
