@@ -118,7 +118,6 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Controls.cpp" />
     <ClCompile Include="src\Rendering\RenderingSystem.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Physics\VehicleController.cpp" />
     <ClCompile Include="src\Scene\Entity.cpp" />
     <ClCompile Include="src\glad.c" />
