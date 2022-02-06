@@ -17,7 +17,13 @@ Camera::Camera()
 	this->mouseSensitivity = SENSITIVITY;
 	this->zoom = ZOOM;
 
-	updateCameraVectors();
+	Transform transform = Transform();
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	transform.position = front;
+	updateCameraVectors(&transform);
 }
 
 glm::mat4 Camera::getViewMatrix()
@@ -25,7 +31,7 @@ glm::mat4 Camera::getViewMatrix()
 	return glm::lookAt(position, position + front, up);
 }
 
-void Camera::updateCameraVectors()
+void Camera::updateCameraVectors(Transform* playerTransform)
 {
 	// Calculate new front vector using Euler angles
 	glm::vec3 front;
@@ -37,4 +43,8 @@ void Camera::updateCameraVectors()
 	// Calculate new right and up vectors using cross product
 	this->right = glm::normalize(glm::cross(front, worldUp));
 	this->up = glm::normalize(glm::cross(right, front));
+
+	this->position.x = playerTransform->position.x;
+	this->position.y = playerTransform->position.y + 100.0f;
+	this->position.z = playerTransform->position.z + 100.0f;
 }

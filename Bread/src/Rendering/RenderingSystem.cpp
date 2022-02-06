@@ -97,7 +97,7 @@ void RenderingSystem::update()
 	Transform* countertopTransform = countertop->getTransform();
 
 	shader.use();
-	g_scene.camera.updateCameraVectors();
+	g_scene.camera.updateCameraVectors(player1Transform);
 	setupCameras();
 
 	//glUniform1i(texLoc, 0); // Turn off textures

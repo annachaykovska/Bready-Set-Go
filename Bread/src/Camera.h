@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
-
 #include <glm/glm.hpp>
+
+#include "Transform.h"
+
 
 const float YAW = -90.0f;
 const float PITCH = -30.0f;
@@ -20,7 +22,7 @@ public:
 
 	Camera();
 	glm::mat4 getViewMatrix();
-	void updateCameraVectors();
+	void updateCameraVectors(Transform* playerTransform);
 
 private:
 
