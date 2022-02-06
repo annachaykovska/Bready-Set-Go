@@ -1,5 +1,6 @@
 #include "AudioSystem.h"
 #include "../Scene/Scene.h"
+#include "../Scene/Entity.h"
 
 extern Scene g_scene;
 

@@ -1,26 +1,35 @@
 #pragma once
 
+#include <string>
+
 #include <glm/glm.hpp>
+
+const float YAW = -90.0f;
+const float PITCH = -30.0f;
+const float SPEED = 2.5f;
+const float SENSITIVITY = 0.1f;
+const float ZOOM = 45.0f;
 
 class Camera
 {
 public:
 
-	Camera(float theta, float phi, float radius);
+	glm::vec3 position;
+	float yaw;
+	float pitch;
 
-	glm::mat4 getView();
-	glm::vec3 getPos();
-	void incrementTheta(float dt);
-	void incrementPhi(float dp);
-	void incrementR(float dr);
+	Camera();
+	glm::mat4 getViewMatrix();
+	void updateCameraVectors();
 
 private:
 
-	float theta;
-	float phi;
-	float radius;
+	glm::vec3 front;
+	glm::vec3 up;
+	glm::vec3 right;
+	glm::vec3 worldUp;
 
-	glm::vec3 cameraPos;
-	glm::vec3 cameraFront;
-	glm::vec3 cameraUp;
+	float movementSpeed;
+	float mouseSensitivity;
+	float zoom;
 };

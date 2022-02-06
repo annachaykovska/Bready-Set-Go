@@ -23,3 +23,5 @@ ipch/
 *.ilk
 *.lastbuildstate
 *.tlog
+
+!/resources/*.obj

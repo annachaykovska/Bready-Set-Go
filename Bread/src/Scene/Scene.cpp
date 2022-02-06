@@ -1,5 +1,5 @@
 #include "Scene.h"
-
+#include "Entity.h"
 
 /// <summary>
 /// Creates all the Entities in the Scene.
@@ -10,7 +10,6 @@ void Scene::createEntities()
 	createEntity("player2");
 	createEntity("countertop");
 }
-
 
 /// <summary>
 /// Returns a reference to the Entity with name.

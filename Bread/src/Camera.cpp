@@ -5,52 +5,36 @@
 
 #include "Camera.h"
 
-Camera::Camera(float theta, float phi, float radius)
+Camera::Camera()
 {
-	this->theta = theta;
-	this->phi = phi;
-	this->radius = radius;
+	this->position = glm::vec3(0, 200.0f, 500.0f);
+	this->front = glm::vec3(0, 0, -1.f);
+	this->up = glm::vec3(0, 1.f, 0);
+	this->worldUp = glm::vec3(0, 1.f, 0);	
+	this->yaw = YAW;
+	this->pitch = PITCH;
+	this->movementSpeed = SPEED;
+	this->mouseSensitivity = SENSITIVITY;
+	this->zoom = ZOOM;
 
-	this->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	this->cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	this->cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	updateCameraVectors();
 }
 
-glm::mat4 Camera::getView()
+glm::mat4 Camera::getViewMatrix()
 {
-	glm::vec3 cameraPosition = radius * glm::vec3(std::cos(theta) * std::sin(phi), std::sin(theta), std::cos(theta) * std::cos(phi));
-	glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	return glm::lookAt(cameraPosition, cameraDirection, cameraUp);
+	return glm::lookAt(position, position + front, up);
 }
 
-glm::vec3 Camera::getPos() 
+void Camera::updateCameraVectors()
 {
-	return radius * glm::vec3(std::cos(theta) * std::sin(phi), std::sin(theta), std::cos(theta) * std::cos(phi));
-}
+	// Calculate new front vector using Euler angles
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	this->front = glm::normalize(front);
 
-void Camera::incrementTheta(float dt) 
-{
-	if (theta + (dt / 100.0f) < M_PI_2 && theta + (dt / 100.0f) > -M_PI_2) 
-	{
-		theta += dt / 100.0f;
-	}
-}
-
-void Camera::incrementPhi(float dp) 
-{
-	phi -= dp / 100.0f;
-
-	if (phi > 2.0 * M_PI) {
-		phi -= 2.0 * M_PI;
-	}
-	else if (phi < 0.0f) {
-		phi += 2.0 * M_PI;
-	}
-}
-
-void Camera::incrementR(float dr) 
-{
-	radius -= dr;
+	// Calculate new right and up vectors using cross product
+	this->right = glm::normalize(glm::cross(front, worldUp));
+	this->up = glm::normalize(glm::cross(right, front));
 }

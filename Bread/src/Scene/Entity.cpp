@@ -31,6 +31,11 @@ Transform* Entity::getTransform()
 	return (Transform*)(this->getComponent("transform"));
 }
 
+Model* Entity::getModel()
+{
+	return (Model*)(this->getComponent("model"));
+}
+
 AudioSource* Entity::getAudioSource()
 {
 	return (AudioSource*)(this->getComponent("audio"));

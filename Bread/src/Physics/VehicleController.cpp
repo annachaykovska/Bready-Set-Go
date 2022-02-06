@@ -4,8 +4,6 @@
 #include <vector>
 #include <memory>
 
-#include <glfw/glfw3.h>
-
 #include "../Window.h"
 #include "PhysicsSystem.h"
 
@@ -17,7 +15,6 @@ struct ButtonState {
 	bool backwardsHeld = false;
 	bool rightHeld = false;
 };
-	
 
 class MovementCallbacks : public CallbackInterface {
 

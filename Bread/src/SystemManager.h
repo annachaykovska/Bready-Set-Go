@@ -1,6 +1,11 @@
 #pragma once
-#include "Audio/AudioSystem.h"
-#include "Physics/PhysicsSystem.h"
+//#include "Audio/AudioSystem.h"
+//#include "Physics/PhysicsSystem.h"
+//#include "Rendering/RenderingSystem.h"
+
+class AudioSystem;
+class PhysicsSystem;
+class RenderingSystem;
 
 class SystemManager
 {
@@ -10,6 +15,7 @@ public:
 	{
 		audio = nullptr;
 		physics = nullptr;
+		render = nullptr;
 	}
 
 	SystemManager(SystemManager& rhs) = delete; // No copy constructor
@@ -17,6 +23,7 @@ public:
 
 	AudioSystem* audio;
 	PhysicsSystem* physics;
+	RenderingSystem* render;
 
 private:
 };

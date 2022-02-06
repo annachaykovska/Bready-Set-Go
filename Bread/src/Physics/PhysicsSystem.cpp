@@ -10,6 +10,9 @@
 #include <snippetutils/SnippetUtils.h>
 #include "../Scene/Scene.h"
 
+#include "../Transform.h"
+#include "../Scene/Entity.h"
+
 using namespace snippetvehicle;
 using namespace physx;
 
