@@ -10,7 +10,6 @@
 #include "Rendering/RenderingSystem.h"
 #include "Audio/AudioSystem.h"
 #include "Physics/VehicleController.cpp"
-//#include "Controls.cpp"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -40,6 +39,8 @@ int main()
 	// Get references to Entities for easy use and set vehicle physx objects
 	Entity* player1 = g_scene.getEntity("player1");
 	Entity* player2 = g_scene.getEntity("player2");
+	Entity* player3 = g_scene.getEntity("player3");
+	Entity* player4 = g_scene.getEntity("player4");
 	Entity* countertop = g_scene.getEntity("countertop");
 
 	//-----------------------------------------------------------------------------------
@@ -64,11 +65,15 @@ int main()
 	transforms.emplace_back(Transform());
 	transforms.emplace_back(Transform());
 	transforms.emplace_back(Transform());
+	transforms.emplace_back(Transform());
+	transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
 	player1->attachComponent(&transforms[0], "transform");
 	player2->attachComponent(&transforms[1], "transform");
-	countertop->attachComponent(&transforms[2], "transform");
+	player3->attachComponent(&transforms[2], "transform");
+	player4->attachComponent(&transforms[3], "transform");
+	countertop->attachComponent(&transforms[4], "transform");
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
@@ -77,9 +82,19 @@ int main()
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* player2Transform = player2->getTransform();
-	player2Transform->position = glm::vec3(10, 5.3f, 10);
-	player2Transform->rotation = glm::vec3(0, 90, 0);
+	player2Transform->position = glm::vec3(100, 2.3f, 0);
+	player2Transform->rotation = glm::vec3(0, 0, 0);
 	player2Transform->scale = glm::vec3(3, 3, 3);
+
+	Transform* player3Transform = player3->getTransform();
+	player3Transform->position = glm::vec3(-100, 2.3f, 0);
+	player3Transform->rotation = glm::vec3(0, 0, 0);
+	player3Transform->scale = glm::vec3(3, 3, 3);
+
+	Transform* player4Transform = player4->getTransform();
+	player4Transform->position = glm::vec3(0, 2.3f, -100);
+	player4Transform->rotation = glm::vec3(0, 0, 0);
+	player4Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, -10, 0);

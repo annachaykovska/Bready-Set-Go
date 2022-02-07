@@ -13,6 +13,8 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
 	this->player1 = Model(&breadmobilePath[0]);
 	this->player2 = Model(&breadmobilePath[0]);
+	this->player3 = Model(&breadmobilePath[0]);
+	this->player4 = Model(&breadmobilePath[0]);
 	std::string groundPath = "resources/models/ground/roughGround.obj";
 	this->countertop = Model(&groundPath[0]);
 
@@ -54,10 +56,14 @@ void RenderingSystem::loadModels()
 
 	Entity* p1 = g_scene.getEntity("player1");
 	Entity* p2 = g_scene.getEntity("player2");
+	Entity* p3 = g_scene.getEntity("player3");
+	Entity* p4 = g_scene.getEntity("player4");
 	Entity* ground = g_scene.getEntity("countertop");
 
 	p1->attachComponent(&(this->player1), "model");
 	p2->attachComponent(&(this->player2), "model");
+	p3->attachComponent(&(this->player3), "model");
+	p4->attachComponent(&(this->player4), "model");
 	ground->attachComponent(&(this->countertop), "model");
 }
 
@@ -82,17 +88,25 @@ void RenderingSystem::update()
 	// Get references to things that need to be updated
 	Entity* p1 = g_scene.getEntity("player1");
 	Entity* p2 = g_scene.getEntity("player2");
+	Entity* p3 = g_scene.getEntity("player3");
+	Entity* p4 = g_scene.getEntity("player4");
 	Entity* ground = g_scene.getEntity("countertop");
 
 	Model* p1Model = p1->getModel();
 	Model* p2Model = p2->getModel();
+	Model* p3Model = p3->getModel();
+	Model* p4Model = p4->getModel();
 	Model* groundModel = ground->getModel();
 
 	Transform* p1Transform = p1->getTransform();
 	Transform* p2Transform = p2->getTransform();
+	Transform* p3Transform = p3->getTransform();
+	Transform* p4Transform = p4->getTransform();
 	Transform* groundTransform = ground->getTransform();
 
 	p2Transform->update();
+	p3Transform->update();
+	p4Transform->update();
 	groundTransform->update();
 
 	shader.use();
@@ -120,6 +134,14 @@ void RenderingSystem::update()
 	// Draw player2 with new transform
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p2Transform->getModelMatrix()));
 	p2Model->draw(getShader());
+
+	// Draw player3 with new transform
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p3Transform->getModelMatrix()));
+	p3Model->draw(getShader());
+
+	// Draw player4 with new transform
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p4Transform->getModelMatrix()));
+	p4Model->draw(getShader());
 
 	// Draw countertop with new transform
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(groundTransform->getModelMatrix()));

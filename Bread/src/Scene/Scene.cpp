@@ -10,6 +10,8 @@ void Scene::createEntities()
 
 	createEntity("player1");
 	createEntity("player2");
+	createEntity("player3");
+	createEntity("player4");
 	createEntity("countertop");
 }
 
