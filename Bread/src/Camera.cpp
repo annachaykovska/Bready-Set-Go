@@ -8,6 +8,7 @@
 #include "Camera.h"
 
 #define CAMERA_DISTANCE 50.0
+#define CAMERA_GROUND_HEIGHT 30.0
 
 Camera::Camera()
 {
@@ -27,27 +28,18 @@ Camera::Camera()
 
 glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 {
-	/*glm::vec3 offset = glm::vec3(0, 3, 20);
-	glm::mat4 cp = glm::rotate(glm::mat4(1.0f), float(yaw), glm::vec3(0, 1, 0));
-	this->position = playerTransform->position * cp + offset;*/
-	/*glm::vec3 positionFromParent = {
-				CAMERA_DISTANCE * sin(playerTransform->rotation.x),
-				CAMERA_DISTANCE * sin(playerTransform->rotation.y) * sin(playerTransform->rotation.z) + 20,
-				CAMERA_DISTANCE * cos(playerTransform->rotation.x)
-	};
-	position = playerTransform->position;*/
-	glm::mat4 rotation45 = glm::mat4(cos(45), 0, sin(45), 0,
+	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(45.0)), 0, sin(glm::radians(45.0)), 0,
 		0, 1.0f, 0, 0,
-		-sin(45), 0, cos(45), 0,
+		-sin(glm::radians(45.0)), 0, cos(glm::radians(45.0)), 0,
 		0, 0, 0, 1.0f);;
 	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
 	float xChange = CAMERA_DISTANCE * positionFromVehicle.x;
 	float zChange = CAMERA_DISTANCE * positionFromVehicle.z;
 
 	position.x = playerTransform->position.x + xChange;
-	position.y = playerTransform->position.y + 40.0f;
+	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
 	position.z = playerTransform->position.z + zChange;
-	return glm::lookAt(position, playerTransform->position, up);
+	return glm::lookAt(position, playerTransform->position, worldUp);
 }
 
 void Camera::updateCameraVectors(Transform* playerTransform)
