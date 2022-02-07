@@ -4,6 +4,7 @@
 
 #include "Shader.h"
 #include "Model.h"
+#include "../Transform.h"
 
 class RenderingSystem
 {
@@ -19,7 +20,7 @@ public:
 	unsigned int getShaderId();
 	Shader& getShader();
 	void loadModels();
-	void setupCameras();
+	void setupCameras(Transform* playerTransform);
 	void update();
 
 	Model player1;

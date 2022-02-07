@@ -17,6 +17,7 @@ public:
 
 	glm::vec3 position;
 	glm::vec3 rotation;
+	glm::mat4 rotationMat;
 	glm::vec3 scale;
 
 	glm::mat4 model;
@@ -25,6 +26,7 @@ public:
 	{
 		position = glm::vec3(0, 0, 0);
 		rotation = glm::vec3(0, 0, 0);
+		rotationMat = glm::mat4(1.0f);
 		scale = glm::vec3(1, 1, 1);
 
 		model = glm::mat4(1.f);
@@ -44,10 +46,10 @@ public:
 		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.f), this->position);
 
 		glm::quat newQuat = glm::quat(transform.q.w, transform.q.x, transform.q.y, transform.q.z);
-		glm::mat4 rotationMatrix = toMat4(newQuat);
+		this->rotationMat = toMat4(newQuat);
 
 		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.f), this->scale);
 		
-		this->model = translationMatrix * rotationMatrix * scaleMatrix;
+		this->model = translationMatrix * rotationMat * scaleMatrix;
 	}
 };
