@@ -13,6 +13,8 @@ public:
 	void fps();
 	void player1Transform();
 	void player2Transform();
+	void player3Transform();
+	void player4Transform();
 	void cameraTransform();
 	void update();
 

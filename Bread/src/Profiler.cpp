@@ -103,6 +103,40 @@ void Profiler::player2Transform()
 	}
 }
 
+void Profiler::player3Transform()
+{
+	Entity* player3 = g_scene.getEntity("player3");
+	Transform* player3Transform = player3->getTransform();
+
+	if (ImGui::CollapsingHeader("Player 3"))
+	{
+		ImGui::InputFloat("p3.pos.x", &(player3Transform->position.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p3.pos.y", &(player3Transform->position.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p3.pos.z", &(player3Transform->position.z), 1.f, 10.f, "%.3f");
+
+		//ImGui::SliderFloat("xrot2", &(player2Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
+		//ImGui::SliderFloat("yrot2", &(player2Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
+		//ImGui::SliderFloat("zrot2", &(player2Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
+	}
+}
+
+void Profiler::player4Transform()
+{
+	Entity* player4 = g_scene.getEntity("player4");
+	Transform* player4Transform = player4->getTransform();
+
+	if (ImGui::CollapsingHeader("Player 4"))
+	{
+		ImGui::InputFloat("p4.pos.x", &(player4Transform->position.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p4.pos.y", &(player4Transform->position.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p4.pos.z", &(player4Transform->position.z), 1.f, 10.f, "%.3f");
+
+		//ImGui::SliderFloat("xrot2", &(player2Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
+		//ImGui::SliderFloat("yrot2", &(player2Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
+		//ImGui::SliderFloat("zrot2", &(player2Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
+	}
+}
+
 void Profiler::cameraTransform()
 {
 	Camera* camera = &(g_scene.camera);
@@ -128,6 +162,8 @@ void Profiler::update()
 	fps();
 	player1Transform();
 	player2Transform();
+	player3Transform();
+	player4Transform();
 	cameraTransform();
 	end();
 }

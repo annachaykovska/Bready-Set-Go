@@ -19,7 +19,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->countertop = Model(&groundPath[0]);
 
 	glEnable(GL_DEPTH_TEST);
-
+	 
 	this->models.reserve(g_scene.count());
 
 	this->modelLoc = glGetUniformLocation(getShaderId(), "model");
