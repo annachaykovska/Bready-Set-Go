@@ -60,9 +60,6 @@
     <ClCompile Include="src\Scene\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Physics\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

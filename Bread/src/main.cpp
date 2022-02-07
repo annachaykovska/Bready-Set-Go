@@ -71,14 +71,13 @@ int main()
 	countertop->attachComponent(&transforms[2], "transform");
 
 	// Initialize transform components
-	Transform* aComponent = (Transform*)player1->getComponent("transform");
 	Transform* player1Transform = player1->getTransform();
 	player1Transform->position = glm::vec3(-10, 2.3f, 3);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* player2Transform = player2->getTransform();
-	player2Transform->position = glm::vec3(10, 0, -3);
+	player2Transform->position = glm::vec3(10, 5.3f, 10);
 	player2Transform->rotation = glm::vec3(0, 90, 0);
 	player2Transform->scale = glm::vec3(3, 3, 3);
 

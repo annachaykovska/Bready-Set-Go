@@ -12,6 +12,7 @@ public:
 	void end();
 	void fps();
 	void player1Transform();
+	void player2Transform();
 	void cameraTransform();
 	void update();
 

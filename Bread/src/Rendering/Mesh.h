@@ -41,6 +41,4 @@ public:
 private:
 
 	unsigned int VAO, VBO, EBO; // Rendering data
-	//void setupMesh();			// Initialization
-
 };

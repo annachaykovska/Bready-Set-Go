@@ -16,6 +16,7 @@ public:
 	unsigned int projLoc;
 
 	RenderingSystem();
+	~RenderingSystem();
 	unsigned int getShaderId();
 	Shader& getShader();
 	void loadModels();

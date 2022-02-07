@@ -25,3 +25,4 @@ ipch/
 *.tlog
 
 !/resources/*.obj
+!Bread/resources/models/*/*.obj

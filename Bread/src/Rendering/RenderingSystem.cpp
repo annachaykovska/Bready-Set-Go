@@ -11,10 +11,12 @@ extern Scene g_scene;
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
 {
 	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
-	player1 = Model(&breadmobilePath[0]);
-	player2 = Model(&breadmobilePath[0]);
+	this->player1 = Model(&breadmobilePath[0]);
+	
 	std::string groundPath = "resources/models/ground/roughGround.obj";
-	countertop = Model(&groundPath[0]);
+	this->countertop = Model(&groundPath[0]);
+
+	this->player2 = Model(&breadmobilePath[0]);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -30,6 +32,8 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	setupCameras();
 }
 
+RenderingSystem::~RenderingSystem() { }
+
 unsigned int RenderingSystem::getShaderId()
 {
 	return this->shader.getId();
@@ -42,7 +46,6 @@ Shader& RenderingSystem::getShader()
 
 void RenderingSystem::loadModels()
 {
-	
 	// Load breadmobile models
 	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
 	//models.push_back(Model(&breadmobilePath[0]));
@@ -51,22 +54,20 @@ void RenderingSystem::loadModels()
 	// Create ground plane
 	//models.push_back(GroundModel::createGround());
 
-	Entity* player1 = g_scene.getEntity("player1");
-	Entity* player2 = g_scene.getEntity("player2");
-	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* p1 = g_scene.getEntity("player1");
+	Entity* p2 = g_scene.getEntity("player2");
+	Entity* ground = g_scene.getEntity("countertop");
 
-	player1->attachComponent(&(this->player1), "model");
-	player2->attachComponent(&(this->player2), "model");
-	countertop->attachComponent(&(this->countertop), "model");
+	if (p1->attachComponent(&(this->player1), "model"))
+		std::cout << "Player1 model attached succesfully!\n";
+	if (p2->attachComponent(&(this->player2), "model"))
+		std::cout << "Player2 model attached succesfully!\n";
+	if (ground->attachComponent(&(this->countertop), "model"))
+		std::cout << "Countertop model attached succesfully!\n";
 }
 
 void RenderingSystem::setupCameras()
 {
-	// View matrix will be handled by the Camera class in the future
-	//glm::mat4 view = glm::mat4(1.0f);
-	//view = glm::lookAt(glm::vec3(0, 10.0f, -50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
 	// Get view matrix from Camera and update the Shader
 	glm::mat4 view = g_scene.camera.getViewMatrix();
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
@@ -84,17 +85,17 @@ void RenderingSystem::setupCameras()
 void RenderingSystem::update()
 {
 	// Get references to things that need to be updated
-	Entity* player1 = g_scene.getEntity("player1");
-	Entity* player2 = g_scene.getEntity("player2");
-	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* p1 = g_scene.getEntity("player1");
+	Entity* p2 = g_scene.getEntity("player2");
+	Entity* ground = g_scene.getEntity("countertop");
 
-	Model* player1Model = player1->getModel();
-	Model* player2Model = player2->getModel();
-	Model* countertopModel = countertop->getModel();
+	Model* p1Model = p1->getModel();
+	Model* p2Model = p2->getModel();
+	Model* groundModel = ground->getModel();
 
-	Transform* player1Transform = player1->getTransform();
-	Transform* player2Transform = player2->getTransform();
-	Transform* countertopTransform = countertop->getTransform();
+	Transform* p1Transform = p1->getTransform();
+	Transform* p2Transform = p2->getTransform();
+	Transform* groundTransform = ground->getTransform();
 
 	shader.use();
 	g_scene.camera.updateCameraVectors();
@@ -114,17 +115,21 @@ void RenderingSystem::update()
 	
 	glUniform1i(texLoc, 0); // Turn off textures
 
+	//std::cout << "Player1: (" << p1Transform->position.x << ", " << p1Transform->position.y
+	//		  << ", " << p1Transform->position.z << ")\n";
+
+	//std::cout << "Player2: (" << p2Transform->position.x << ", " << p2Transform->position.y
+	//		  << ", " << p2Transform->position.z << ")\n";
+
 	// Draw player1 with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player1Transform->getModelMatrix()));
-	//std::cout << "Drawing player1" << std::endl;
-	player1Model->draw(getShader());
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p1Transform->getModelMatrix()));
+	p1Model->draw(getShader());
 
 	// Draw player2 with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));
-	//std::cout << "Drawing player2" << std::endl;
-	player2Model->draw(getShader());
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p2Transform->getModelMatrix()));
+	p2Model->draw(getShader());
 
 	// Draw countertop with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(countertopTransform->getModelMatrix()));
-	countertopModel->draw(getShader());
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(groundTransform->getModelMatrix()));
+	groundModel->draw(getShader());
 }
