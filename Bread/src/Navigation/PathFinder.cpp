@@ -115,7 +115,7 @@ bool PathFinder::stepContainsTarget(position target, PathStep* step)
 	return false;
 }
 
-void PathFinder::findPath(position start, position end)
+std::vector<position> PathFinder::findPath(position start, position end)
 {
 	open_.clear();
 	closed_.clear();
@@ -152,17 +152,26 @@ void PathFinder::findPath(position start, position end)
 		if (current == nullptr)
 		{
 			printPath(previous);
-			return;
+			std::vector<position> empty;
+			return empty;
 		}
-
-		printPath(current);
 
 		// if current is the target node // path has been found
 		if (stepContainsTarget(end, current))
 		{
 			std::cout << "Done" << std::endl;
 			printPath(current);
-			return;
+
+			std::vector<position> finalPath;
+
+			while (current->parent != nullptr)
+			{
+				finalPath.push_back(current->segment.first->position_);
+				current = current->parent;
+			}
+			finalPath.push_back(current->segment.first->position_);
+			
+			return finalPath;
 		}
 
 		// for each neighbour of the current node

@@ -22,7 +22,7 @@ class PathFinder
 public:
 	PathFinder(NavMesh& navMesh);
 
-	void findPath(position start, position end);
+	std::vector<position> findPath(position start, position end);
 	void printPath(PathStep* finalStep);
 
 private:

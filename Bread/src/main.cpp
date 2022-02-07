@@ -19,6 +19,8 @@
 #include "Physics/VehicleController.cpp"
 #include "Navigation/NavMesh.h"
 #include "Navigation/PathFinder.h"
+#include "Navigation/WaypointUpdater.h"
+#include "Navigation/Steering.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -70,7 +72,7 @@ int main()
 
 	PathFinder pathFinder(navMesh);
 
-	pathFinder.findPath(glm::vec3(5.0f, 0.0f, -5.0f), glm::vec3(45.0f, 0.0f, -75.0f));
+	std::vector<glm::vec3> listOfWaypoints = pathFinder.findPath(glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(45.0f, 0.0f, -75.0f));
 
 	// MVP uniforms
 	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
@@ -93,6 +95,9 @@ int main()
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* countertop = g_scene.getEntity("countertop");
 
+	WaypointUpdater waypointUpdater(*player1, listOfWaypoints);
+	Steering steering(*player1, physics);
+
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
@@ -108,7 +113,7 @@ int main()
 	// Make a reference to each Transform Component for easy updates
 	Transform* aComponent = (Transform*)player1->getComponent("transform");
 	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(0, 0, 0);
+	player1Transform->position = glm::vec3(1, 0, -1);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(3, 3, 3);
 
@@ -143,6 +148,9 @@ int main()
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
 
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glEnable(GL_MULTISAMPLE);
+
 	// GAME LOOP
 	while (!window.shouldClose())
 	{
@@ -166,7 +174,7 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 
 		//view = glm::lookAt(glm::vec3(0.f, 50.0f, 50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::lookAt(glm::vec3(0.f, 400.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(glm::vec3(30.f, 100.0f, 50.0f), glm::vec3(30.0f, 0.0f, -30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -180,6 +188,11 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player1Transform->getModelMatrix()));
 		glUniform1i(texLoc, 0); // Turn off textures
 		breadmobile.draw(shader);
+		//std::cout << player1->getTransform()->position.x << ", " << player1->getTransform()->position.z << std::endl;
+		//std::cout << player1->getTransform()->rotation.x << ", " << player1->getTransform()->rotation.y << ", " << player1->getTransform()->rotation.z << std::endl;
+		//std::cout << player1->getTransform()->heading.x << ", " << player1->getTransform()->heading.y << ", " << player1->getTransform()->heading.z << std::endl;
+		waypointUpdater.updateWaypoints();
+		steering.updateSteering(waypointUpdater.currentWaypoint());
 
 		// Draw player2
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));

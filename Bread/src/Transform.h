@@ -19,6 +19,8 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
+	glm::vec3 heading;
+
 	glm::mat4 model;
 
 	Transform()
@@ -47,6 +49,8 @@ public:
 		glm::mat4 rotationMatrix = toMat4(newQuat);
 
 		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.f), this->scale);
+
+		this->heading = rotationMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
 		
 		this->model = translationMatrix * rotationMatrix * scaleMatrix;
 	}
