@@ -76,9 +76,9 @@ void Profiler::player1Transform()
 
 	if (ImGui::CollapsingHeader("Player 1"))
 	{
-		ImGui::SliderFloat("xpos", &(player1Transform->position.x), -100.0f, 100.0f, "%.3f", 1.0f);
-		ImGui::SliderFloat("ypos", &(player1Transform->position.y), -100.0f, 100.0f, "%.3f", 1.0f);
-		ImGui::SliderFloat("zpos", &(player1Transform->position.z), -100.0f, 100.0f, "%.3f", 1.0f);
+		ImGui::InputFloat("p1.pos.x", &(player1Transform->position.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p1.pos.y", &(player1Transform->position.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p1.pos.z", &(player1Transform->position.z), 1.f, 10.f, "%.3f");
 
 		//ImGui::SliderFloat("xrot", &(player1Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
 		//ImGui::SliderFloat("yrot", &(player1Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
@@ -93,9 +93,9 @@ void Profiler::player2Transform()
 
 	if (ImGui::CollapsingHeader("Player 2"))
 	{
-		ImGui::SliderFloat("xpos2", &(player2Transform->position.x), -100.0f, 100.0f, "%.3f", 1.0f);
-		ImGui::SliderFloat("ypos2", &(player2Transform->position.y), -100.0f, 100.0f, "%.3f", 1.0f);
-		ImGui::SliderFloat("zpos2", &(player2Transform->position.z), -100.0f, 100.0f, "%.3f", 1.0f);
+		ImGui::InputFloat("p2.pos.x", &(player2Transform->position.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p2.pos.y", &(player2Transform->position.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("p2.pos.z", &(player2Transform->position.z), 1.f, 10.f, "%.3f");
 
 		//ImGui::SliderFloat("xrot2", &(player2Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
 		//ImGui::SliderFloat("yrot2", &(player2Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
@@ -111,12 +111,15 @@ void Profiler::cameraTransform()
 	float step = 1.f;
 	float stepFast = 10.f;
 
-	ImGui::InputFloat("cameraXPos", &(camera->position.x), step, stepFast, "%.3f");
-	ImGui::InputFloat("cameraYPos", &(camera->position.y), step, stepFast, "%.3f");
-	ImGui::InputFloat("cameraZPos", &(camera->position.z), step, stepFast, "%.3f");
+	if (ImGui::CollapsingHeader("Camera"))
+	{
+		ImGui::InputFloat("cameraXPos", &(camera->position.x), step, stepFast, "%.3f");
+		ImGui::InputFloat("cameraYPos", &(camera->position.y), step, stepFast, "%.3f");
+		ImGui::InputFloat("cameraZPos", &(camera->position.z), step, stepFast, "%.3f");
 
-	ImGui::InputFloat("cameraYaw", &(camera->yaw), step, stepFast, "%.3f");
-	ImGui::InputFloat("cameraPitch", &(camera->pitch), step, stepFast, "%.3f");
+		ImGui::InputFloat("cameraYaw", &(camera->yaw), step, stepFast, "%.3f");
+		ImGui::InputFloat("cameraPitch", &(camera->pitch), step, stepFast, "%.3f");
+	}
 }
 
 void Profiler::update()

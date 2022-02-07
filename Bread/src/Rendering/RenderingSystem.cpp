@@ -12,11 +12,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 {
 	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
 	this->player1 = Model(&breadmobilePath[0]);
-	
+	this->player2 = Model(&breadmobilePath[0]);
 	std::string groundPath = "resources/models/ground/roughGround.obj";
 	this->countertop = Model(&groundPath[0]);
-
-	this->player2 = Model(&breadmobilePath[0]);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -58,12 +56,9 @@ void RenderingSystem::loadModels()
 	Entity* p2 = g_scene.getEntity("player2");
 	Entity* ground = g_scene.getEntity("countertop");
 
-	if (p1->attachComponent(&(this->player1), "model"))
-		std::cout << "Player1 model attached succesfully!\n";
-	if (p2->attachComponent(&(this->player2), "model"))
-		std::cout << "Player2 model attached succesfully!\n";
-	if (ground->attachComponent(&(this->countertop), "model"))
-		std::cout << "Countertop model attached succesfully!\n";
+	p1->attachComponent(&(this->player1), "model");
+	p2->attachComponent(&(this->player2), "model");
+	ground->attachComponent(&(this->countertop), "model");
 }
 
 void RenderingSystem::setupCameras()
@@ -97,6 +92,9 @@ void RenderingSystem::update()
 	Transform* p2Transform = p2->getTransform();
 	Transform* groundTransform = ground->getTransform();
 
+	p2Transform->update();
+	groundTransform->update();
+
 	shader.use();
 	g_scene.camera.updateCameraVectors();
 	setupCameras();
@@ -114,12 +112,6 @@ void RenderingSystem::update()
 	}*/
 	
 	glUniform1i(texLoc, 0); // Turn off textures
-
-	//std::cout << "Player1: (" << p1Transform->position.x << ", " << p1Transform->position.y
-	//		  << ", " << p1Transform->position.z << ")\n";
-
-	//std::cout << "Player2: (" << p2Transform->position.x << ", " << p2Transform->position.y
-	//		  << ", " << p2Transform->position.z << ")\n";
 
 	// Draw player1 with new transform
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p1Transform->getModelMatrix()));

@@ -6,6 +6,8 @@
 /// </summary>
 void Scene::createEntities()
 {
+	this->entities.reserve(count());
+
 	createEntity("player1");
 	createEntity("player2");
 	createEntity("countertop");
