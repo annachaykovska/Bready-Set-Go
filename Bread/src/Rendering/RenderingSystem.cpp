@@ -27,7 +27,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
 	loadModels();
-	setupCameras();
+	Transform transform = Transform();
+	transform.position = glm::vec3(1.0f);
+	setupCameras(&transform);
 }
 
 unsigned int RenderingSystem::getShaderId()
@@ -60,7 +62,7 @@ void RenderingSystem::loadModels()
 	countertop->attachComponent(&(this->countertop), "model");
 }
 
-void RenderingSystem::setupCameras()
+void RenderingSystem::setupCameras(Transform* player1Transform)
 {
 	// View matrix will be handled by the Camera class in the future
 	//glm::mat4 view = glm::mat4(1.0f);
@@ -68,7 +70,7 @@ void RenderingSystem::setupCameras()
 	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 	// Get view matrix from Camera and update the Shader
-	glm::mat4 view = g_scene.camera.getViewMatrix();
+	glm::mat4 view = g_scene.camera.getViewMatrix(player1Transform);
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 	// Tell shader about camera position
@@ -97,8 +99,8 @@ void RenderingSystem::update()
 	Transform* countertopTransform = countertop->getTransform();
 
 	shader.use();
-	g_scene.camera.updateCameraVectors();
-	setupCameras();
+	g_scene.camera.updateCameraVectors(player1Transform);
+	setupCameras(player1Transform);
 
 	//glUniform1i(texLoc, 0); // Turn off textures
 

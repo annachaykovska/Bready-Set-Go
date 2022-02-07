@@ -2,8 +2,13 @@
 #include <math.h>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "Camera.h"
+
+#define CAMERA_DISTANCE 50.0
+#define CAMERA_GROUND_HEIGHT 30.0
 
 Camera::Camera()
 {
@@ -16,16 +21,28 @@ Camera::Camera()
 	this->movementSpeed = SPEED;
 	this->mouseSensitivity = SENSITIVITY;
 	this->zoom = ZOOM;
-
-	updateCameraVectors();
+	Transform transform = Transform();
+	transform.position = glm::vec3(1.0f);
+	updateCameraVectors(&transform);
 }
 
-glm::mat4 Camera::getViewMatrix()
+glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 {
-	return glm::lookAt(position, position + front, up);
+	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(45.0)), 0, sin(glm::radians(45.0)), 0,
+		0, 1.0f, 0, 0,
+		-sin(glm::radians(45.0)), 0, cos(glm::radians(45.0)), 0,
+		0, 0, 0, 1.0f);;
+	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
+	float xChange = CAMERA_DISTANCE * positionFromVehicle.x;
+	float zChange = CAMERA_DISTANCE * positionFromVehicle.z;
+
+	position.x = playerTransform->position.x + xChange;
+	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
+	position.z = playerTransform->position.z + zChange;
+	return glm::lookAt(position, playerTransform->position, worldUp);
 }
 
-void Camera::updateCameraVectors()
+void Camera::updateCameraVectors(Transform* playerTransform)
 {
 	// Calculate new front vector using Euler angles
 	glm::vec3 front;
