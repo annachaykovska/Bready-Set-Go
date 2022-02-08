@@ -137,6 +137,45 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
+void PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
+{
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
+	shape->setSimulationFilterData(cheeseFilter);
+
+	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	mScene->addActor(*body);
+	shape->release();
+}
+
+
+void PhysicsSystem::initializeActors() {
+	// GROUND ---------------------------------------------------------------------------------------------------------------------
+	// Add the ground plane to drive on
+	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
+	mScene->addActor(*mGroundPlane);
+
+
+	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
+	//Create a vehicle that will drive on the plane.
+	// PLAYER 1
+	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
+	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
+	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
+
+	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	// CHEESE
+	float halfExtent = 1.0f;
+	PxTransform cheeseTransform(PxVec3(0));
+	createFoodBlock(cheeseTransform, halfExtent);
+}
+
 PhysicsSystem::PhysicsSystem()
 {
 	this->mCooking = NULL;
@@ -187,18 +226,8 @@ PhysicsSystem::PhysicsSystem()
 	//Create the friction table for each combination of tire and surface type.
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
 
-	// Add the ground plane to drive on
-	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
-	mScene->addActor(*mGroundPlane);
-
-	//Create a vehicle that will drive on the plane.
-	// PLAYER 1
-	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
-	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
-	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
-	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
+	//Set all of the ground/player/object actors
+	initializeActors();
 
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
@@ -445,8 +474,6 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 
 void PhysicsSystem::update(const float timestep)
 {
-	
-
 	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
 	//incrementDrivingMode(timestep);
 

@@ -50,6 +50,11 @@ PxFilterFlags VehicleFilterShader
 		return PxFilterFlag::eSUPPRESS;
 
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+	if ((filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_GROUND) ||
+		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_GROUND)) {
+		printf("FOOD COLLIDE\n");
+		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	}
 	pairFlags |= PxPairFlags(PxU16(filterData0.word2 | filterData1.word2));
 
 	return PxFilterFlags();

@@ -102,7 +102,7 @@ int main()
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->position = glm::vec3(0, 5, 0);
 	cheeseTransform->rotation = glm::vec3(0, 0, 0);
-	cheeseTransform->scale = glm::vec3(3, 3, 3);
+	cheeseTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, -10, 0);

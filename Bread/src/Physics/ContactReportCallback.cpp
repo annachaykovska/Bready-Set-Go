@@ -1,0 +1,4 @@
+
+
+class ContactReportCallback : public PxSimulationEventCallback {
+};

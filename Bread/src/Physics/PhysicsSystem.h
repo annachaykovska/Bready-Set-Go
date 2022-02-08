@@ -12,6 +12,8 @@ public:
 
 	PhysicsSystem();
 	void initVehicleSDK();
+	void initializeActors();
+	void createFoodBlock(const PxTransform& t, PxReal halfExtent);
 	void update(const float timestep);
 	void startAccelerateForwardsMode();
 	void startAccelerateReverseMode();
