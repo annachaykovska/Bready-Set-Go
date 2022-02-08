@@ -2,6 +2,7 @@
 #include <cassert>
 
 #include "PhysicsSystem.h"
+#include "ContactReportCallback.cpp"
 #include <glm/glm.hpp>
 
 #include <snippetvehiclecommon/SnippetVehicleCreate.h>
@@ -204,6 +205,8 @@ PhysicsSystem::PhysicsSystem()
 	sceneDesc.cpuDispatcher = mDispatcher;
 	sceneDesc.filterShader = VehicleFilterShader;
 	this->mScene = mPhysics->createScene(sceneDesc);
+	auto crc = ContactReportCallback();
+	sceneDesc.simulationEventCallback = &crc;
 
 	// Material
 	this->mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
