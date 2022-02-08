@@ -100,7 +100,7 @@ int main()
 	player4Transform->scale = glm::vec3(3, 3, 3);
 
 	Transform* cheeseTransform = cheese->getTransform();
-	cheeseTransform->position = glm::vec3(0, 5, 0);
+	cheeseTransform->position = glm::vec3(20, 5, 20);
 	cheeseTransform->rotation = glm::vec3(0, 0, 0);
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
 

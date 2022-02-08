@@ -116,7 +116,6 @@ void RenderingSystem::update()
 	p2Transform->update();
 	p3Transform->update();
 	p4Transform->update();
-	cheeseTransform->update();
 	groundTransform->update();
 
 	shader.use();

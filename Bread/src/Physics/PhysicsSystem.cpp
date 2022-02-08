@@ -137,7 +137,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
-void PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
 {
 	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
@@ -149,6 +149,7 @@ void PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
 	mScene->addActor(*body);
 	shape->release();
+	return body;
 }
 
 
@@ -173,7 +174,7 @@ void PhysicsSystem::initializeActors() {
 	// CHEESE
 	float halfExtent = 1.0f;
 	PxTransform cheeseTransform(PxVec3(0));
-	createFoodBlock(cheeseTransform, halfExtent);
+	this->cheese = createFoodBlock(cheeseTransform, halfExtent);
 }
 
 PhysicsSystem::PhysicsSystem()
@@ -509,6 +510,9 @@ void PhysicsSystem::update(const float timestep)
 	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
 
+	// Update the food transforms
+	updateFoodTransforms();
+
 	// Set the ground's transform
 	Entity* countertop = g_scene.getEntity("countertop");
 	Transform* countertopTransform = countertop->getTransform();
@@ -520,6 +524,12 @@ void PhysicsSystem::update(const float timestep)
 	//Scene update.
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
+}
+
+void PhysicsSystem::updateFoodTransforms() {
+	Entity* cheese = g_scene.getEntity("cheese");
+	Transform* cheeseTransform = cheese->getTransform();
+	cheeseTransform->update(this->cheese->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()
