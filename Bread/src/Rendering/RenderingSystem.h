@@ -28,6 +28,7 @@ public:
 	Model player2;
 	Model player3;
 	Model player4;
+	Model cheese;
 	Model countertop;
 
 private:

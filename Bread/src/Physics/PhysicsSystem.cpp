@@ -2,6 +2,7 @@
 #include <cassert>
 
 #include "PhysicsSystem.h"
+#include "ContactReportCallback.cpp"
 #include <glm/glm.hpp>
 
 #include <snippetvehiclecommon/SnippetVehicleCreate.h>
@@ -137,6 +138,46 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
+{
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
+	shape->setSimulationFilterData(cheeseFilter);
+
+	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	mScene->addActor(*body);
+	shape->release();
+	return body;
+}
+
+
+void PhysicsSystem::initializeActors() {
+	// GROUND ---------------------------------------------------------------------------------------------------------------------
+	// Add the ground plane to drive on
+	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
+	mScene->addActor(*mGroundPlane);
+
+
+	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
+	//Create a vehicle that will drive on the plane.
+	// PLAYER 1
+	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
+	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
+	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
+
+	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	// CHEESE
+	float halfExtent = 1.0f;
+	PxTransform cheeseTransform(PxVec3(0));
+	this->cheese = createFoodBlock(cheeseTransform, halfExtent);
+}
+
 PhysicsSystem::PhysicsSystem()
 {
 	this->mCooking = NULL;
@@ -164,6 +205,8 @@ PhysicsSystem::PhysicsSystem()
 	sceneDesc.cpuDispatcher = mDispatcher;
 	sceneDesc.filterShader = VehicleFilterShader;
 	this->mScene = mPhysics->createScene(sceneDesc);
+	auto crc = ContactReportCallback();
+	sceneDesc.simulationEventCallback = &crc;
 
 	// Material
 	this->mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
@@ -187,18 +230,8 @@ PhysicsSystem::PhysicsSystem()
 	//Create the friction table for each combination of tire and surface type.
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
 
-	// Add the ground plane to drive on
-	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
-	mScene->addActor(*mGroundPlane);
-
-	//Create a vehicle that will drive on the plane.
-	// PLAYER 1
-	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
-	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
-	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
-	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
+	//Set all of the ground/player/object actors
+	initializeActors();
 
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
@@ -445,8 +478,6 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 
 void PhysicsSystem::update(const float timestep)
 {
-	
-
 	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
 	//incrementDrivingMode(timestep);
 
@@ -482,6 +513,9 @@ void PhysicsSystem::update(const float timestep)
 	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
 
+	// Update the food transforms
+	updateFoodTransforms();
+
 	// Set the ground's transform
 	Entity* countertop = g_scene.getEntity("countertop");
 	Transform* countertopTransform = countertop->getTransform();
@@ -493,6 +527,12 @@ void PhysicsSystem::update(const float timestep)
 	//Scene update.
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
+}
+
+void PhysicsSystem::updateFoodTransforms() {
+	Entity* cheese = g_scene.getEntity("cheese");
+	Transform* cheeseTransform = cheese->getTransform();
+	cheeseTransform->update(this->cheese->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()

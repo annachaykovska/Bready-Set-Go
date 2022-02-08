@@ -12,7 +12,10 @@ public:
 
 	PhysicsSystem();
 	void initVehicleSDK();
+	void initializeActors();
+	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent);
 	void update(const float timestep);
+	void updateFoodTransforms();
 	void startAccelerateForwardsMode();
 	void startAccelerateReverseMode();
 	void startBrakeMode();
@@ -29,8 +32,9 @@ public:
 	void keyRelease(unsigned char key);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
-	// Public Variables
+	// Public Entities
 	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
+	PxRigidDynamic* cheese;
 
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;
@@ -53,4 +57,5 @@ private:
 	PxU32 mVehicleOrderProgress = 0;
 	bool mVehicleOrderComplete = false;
 	bool mMimicKeyInputs = false;
+
 }; 
