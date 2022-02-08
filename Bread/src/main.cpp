@@ -41,6 +41,7 @@ int main()
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
+	Entity* cheese = g_scene.getEntity("cheese");
 	Entity* countertop = g_scene.getEntity("countertop");
 
 	//-----------------------------------------------------------------------------------
@@ -67,13 +68,15 @@ int main()
 	transforms.emplace_back(Transform());
 	transforms.emplace_back(Transform());
 	transforms.emplace_back(Transform());
+	transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
 	player1->attachComponent(&transforms[0], "transform");
 	player2->attachComponent(&transforms[1], "transform");
 	player3->attachComponent(&transforms[2], "transform");
 	player4->attachComponent(&transforms[3], "transform");
-	countertop->attachComponent(&transforms[4], "transform");
+	cheese->attachComponent(&transforms[4], "transform");
+	countertop->attachComponent(&transforms[5], "transform");
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
@@ -95,6 +98,11 @@ int main()
 	player4Transform->position = glm::vec3(0, 2.3f, -100);
 	player4Transform->rotation = glm::vec3(0, 0, 0);
 	player4Transform->scale = glm::vec3(3, 3, 3);
+
+	Transform* cheeseTransform = cheese->getTransform();
+	cheeseTransform->position = glm::vec3(0, 5, 0);
+	cheeseTransform->rotation = glm::vec3(0, 0, 0);
+	cheeseTransform->scale = glm::vec3(3, 3, 3);
 
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, -10, 0);
