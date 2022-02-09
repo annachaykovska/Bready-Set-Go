@@ -166,10 +166,10 @@ void PhysicsSystem::initializeActors() {
 	//Create a vehicle that will drive on the plane.
 	// PLAYER 1
 	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
-	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	vehiclePlayer1 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
-	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
+	vehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransform);
+	mScene->addActor(*vehiclePlayer1->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
 	// CHEESE
@@ -235,9 +235,9 @@ PhysicsSystem::PhysicsSystem()
 
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
-	mVehicle4W->setToRestState();
-	mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	mVehicle4W->mDriveDynData.setUseAutoGears(true);
+	vehiclePlayer1->setToRestState();
+	vehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	vehiclePlayer1->mDriveDynData.setUseAutoGears(true);
 
 	//mVehicleModeTimer = 0.0f;
 	//mVehicleOrderProgress = 0;
@@ -295,7 +295,7 @@ void PhysicsSystem::startAccelerateForwardsMode()
 
 void PhysicsSystem::startAccelerateReverseMode()
 {
-	//this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+	//this->vehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 
 	if (this->mMimicKeyInputs)
 	{
@@ -424,7 +424,7 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 		//If the mode just completed was eDRIVE_MODE_ACCEL_REVERSE then switch back to forward gears.
 		if (eDRIVE_MODE_ACCEL_REVERSE == gDriveModeOrder[this->mVehicleOrderProgress])
 		{
-			this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+			this->vehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 		}
 
 		//Increment to next driving mode.
@@ -471,7 +471,7 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 		//If the mode about to start is eDRIVE_MODE_ACCEL_REVERSE then switch to reverse gears.
 		if (eDRIVE_MODE_ACCEL_REVERSE == gDriveModeOrder[this->mVehicleOrderProgress])
 		{
-			this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+			this->vehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 		}
 	}
 }
@@ -484,15 +484,15 @@ void PhysicsSystem::update(const float timestep)
 	//Update the control inputs for the vehicle.
 	if (this->mMimicKeyInputs)
 	{
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehicle4W);
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->vehiclePlayer1);
 	}
 	else
 	{
-		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehicle4W);
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->vehiclePlayer1);
 	}
 
 	//Raycasts.
-	PxVehicleWheels* vehicles[1] = { this->mVehicle4W };
+	PxVehicleWheels* vehicles[1] = { this->vehiclePlayer1 };
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
@@ -500,18 +500,18 @@ void PhysicsSystem::update(const float timestep)
 	//Vehicle update.
 	const PxVec3 grav = this->mScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehicle4W->mWheelsSimData.getNbWheels()} };
+	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->vehiclePlayer1->mWheelsSimData.getNbWheels()} };
 	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
 
 	//Work out if the vehicle is in the air.
-	this->mIsVehicleInAir = this->mVehicle4W->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+	this->mIsVehicleInAir = this->vehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
 	// Set player 1 transform
 	Entity* player1 = g_scene.getEntity("player1");
 	Transform* player1Transform = player1->getTransform();
-	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
-	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
-	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
+	PxVec3 currentPosision = this->vehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p;
+	PxQuat currentRotation = this->vehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
+	player1Transform->update(this->vehiclePlayer1->getRigidDynamicActor()->getGlobalPose());
 
 	// Update the food transforms
 	updateFoodTransforms();
@@ -537,8 +537,8 @@ void PhysicsSystem::updateFoodTransforms() {
 
 void PhysicsSystem::cleanupPhysics()
 {
-	this->mVehicle4W->getRigidDynamicActor()->release();
-	this->mVehicle4W->free();
+	this->vehiclePlayer1->getRigidDynamicActor()->release();
+	this->vehiclePlayer1->free();
 	PX_RELEASE(this->mGroundPlane);
 	PX_RELEASE(this->mBatchQuery);
 	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
@@ -570,7 +570,6 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 }
 
 
-// Readd the camera probably 
 void PhysicsSystem::keyPress(unsigned char key)
 {
 	printf("KeyPress: %c\n", key);
@@ -578,15 +577,15 @@ void PhysicsSystem::keyPress(unsigned char key)
 	switch (toupper(key))
 	{
 		case 'W':
-			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
+			this->vehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 			this->mVehicleInputData.setDigitalBrake(false);
 			this->mVehicleInputData.setAnalogBrake(0.f);
 			startAccelerateForwardsMode();
 			break;
 		case 'S':
-			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+			this->vehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
 			this->mVehicleInputData.setDigitalBrake(false);
 			this->mVehicleInputData.setAnalogBrake(0.f);
 			startAccelerateReverseMode();
@@ -601,8 +600,8 @@ void PhysicsSystem::keyPress(unsigned char key)
 			startBrakeMode();
 			break;
 		default:
-			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+			this->vehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
 			this->mVehicleInputData.setDigitalBrake(false);
 			this->mVehicleInputData.setAnalogBrake(0.f);
 			releaseAllControls();
@@ -631,8 +630,8 @@ void PhysicsSystem::keyRelease(unsigned char key)
 		releaseSteering();
 		break;
 	default:
-		if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+			this->vehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
 		releaseAllControls();
 		break;
 	}

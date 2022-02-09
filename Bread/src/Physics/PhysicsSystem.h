@@ -33,7 +33,7 @@ public:
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
 	// Public Entities
-	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
+	PxVehicleDrive4W* vehiclePlayer1; // TODO: Rename this?
 	PxRigidDynamic* cheese;
 
 private:

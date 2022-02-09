@@ -49,7 +49,7 @@ int main()
 	//-----------------------------------------------------------------------------------
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
-	player1->vehicle = physics.mVehicle4W; // Don't think this is needed?
+	player1->vehicle = physics.vehiclePlayer1; // Don't think this is needed?
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
