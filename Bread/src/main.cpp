@@ -49,7 +49,7 @@ int main()
 	//-----------------------------------------------------------------------------------
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
-	player1->vehicle = physics.vehiclePlayer1; // Don't think this is needed?
+	player1->vehicle = physics.mVehiclePlayer1; // Don't think this is needed?
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
@@ -82,22 +82,22 @@ int main()
 	Transform* player1Transform = player1->getTransform();
 	player1Transform->position = glm::vec3(-10, 2.3f, 3);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
-	player1Transform->scale = glm::vec3(3, 3, 3);
+	player1Transform->scale = glm::vec3(1, 1, 1);
 
 	Transform* player2Transform = player2->getTransform();
 	player2Transform->position = glm::vec3(100, 2.3f, 0);
 	player2Transform->rotation = glm::vec3(0, 0, 0);
-	player2Transform->scale = glm::vec3(3, 3, 3);
+	player2Transform->scale = glm::vec3(1, 1, 1);
 
 	Transform* player3Transform = player3->getTransform();
 	player3Transform->position = glm::vec3(-100, 2.3f, 0);
 	player3Transform->rotation = glm::vec3(0, 0, 0);
-	player3Transform->scale = glm::vec3(3, 3, 3);
+	player3Transform->scale = glm::vec3(1, 1, 1);
 
 	Transform* player4Transform = player4->getTransform();
 	player4Transform->position = glm::vec3(0, 2.3f, -100);
 	player4Transform->rotation = glm::vec3(0, 0, 0);
-	player4Transform->scale = glm::vec3(3, 3, 3);
+	player4Transform->scale = glm::vec3(1, 1, 1);
 
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->position = glm::vec3(20, 5, 20);
@@ -105,7 +105,7 @@ int main()
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* counterTransform = countertop->getTransform();
-	counterTransform->position = glm::vec3(0, -10, 0);
+	counterTransform->position = glm::vec3(0, 0, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
 	counterTransform->scale = glm::vec3(50, 50, 50);
 	//-----------------------------------------------------------------------------------
