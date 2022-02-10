@@ -83,6 +83,8 @@ void Profiler::player1Inventory()
 
 	if (p1Inv->tomato == 1 && p1Inv->cheese == 1 && p1Inv->sausage == 1 && p1Inv->dough == 1)
 		ImGui::Text("Recipe complete!");
+	else
+		ImGui::Text("Complete the recipe!");
 }
 
 void Profiler::player1Transform()
