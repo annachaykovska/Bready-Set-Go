@@ -1,16 +1,15 @@
-#include <iostream>
 #include <cassert>
 
-#include "PhysicsSystem.h"
-#include "ContactReportCallback.cpp"
 #include <glm/glm.hpp>
 
 #include <snippetvehiclecommon/SnippetVehicleCreate.h>
 #include <snippetvehiclecommon/SnippetVehicleFilterShader.h>
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
-#include "../Scene/Scene.h"
 
+#include "PhysicsSystem.h"
+#include "CollisionCallback.h"
+#include "../Scene/Scene.h"
 #include "../Transform.h"
 #include "../Scene/Entity.h"
 
@@ -18,6 +17,8 @@ using namespace snippetvehicle;
 using namespace physx;
 
 extern Scene g_scene;
+
+CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
@@ -138,7 +139,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
-PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
 	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
@@ -147,12 +148,20 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
-	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
+
+	// Set physx actor name
+	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* vp = static_cast<void*>(new std::string(name));
+	body->userData = vp;
+
 	mScene->addActor(*body);
 	shape->release();
+
 	return body;
 }
-
 
 void PhysicsSystem::initializeActors() {
 	// GROUND ---------------------------------------------------------------------------------------------------------------------
@@ -161,7 +170,6 @@ void PhysicsSystem::initializeActors() {
 	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
 	mScene->addActor(*mGroundPlane);
 
-
 	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
 	//Create a vehicle that will drive on the plane.
 	// PLAYER 1
@@ -169,13 +177,36 @@ void PhysicsSystem::initializeActors() {
 	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
+
+	// Set physx actor name
+	mVehicle4W->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
+	
+	// Attach the entity to the physx actor
+	Entity* player1 = g_scene.getEntity("player1");
+	void* vp = static_cast<void*>(new std::string("player1"));
+	mVehicle4W->getRigidDynamicActor()->userData = vp;
+
 	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	
+	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
-	PxTransform cheeseTransform(PxVec3(0));
-	this->cheese = createFoodBlock(cheeseTransform, halfExtent);
+	PxTransform cheeseTransform(PxVec3(0, 0, 30));
+	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
+
+	// SAUSAGE
+	PxTransform sausageTransform(PxVec3(0, 0, -30));
+	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
+
+	// TOMATO
+	PxTransform tomatoTransform(PxVec3(30, 0, 0));
+	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
+
+	// DOUGH
+	PxTransform doughTransform(PxVec3(-30, 0, 0));
+	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 
 PhysicsSystem::PhysicsSystem()
@@ -197,16 +228,15 @@ PhysicsSystem::PhysicsSystem()
 
 	// Dispatcher
 	PxU32 numWorkers = 1;
-	this->mDispatcher = mDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
+	this->mDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 
-	// Scene
+	// Physx scene
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = mDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader;
+	sceneDesc.cpuDispatcher = this->mDispatcher;
+	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader
+	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
 	this->mScene = mPhysics->createScene(sceneDesc);
-	auto crc = ContactReportCallback();
-	sceneDesc.simulationEventCallback = &crc;
 
 	// Material
 	this->mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
@@ -238,10 +268,6 @@ PhysicsSystem::PhysicsSystem()
 	mVehicle4W->setToRestState();
 	mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehicle4W->mDriveDynData.setUseAutoGears(true);
-
-	//mVehicleModeTimer = 0.0f;
-	//mVehicleOrderProgress = 0;
-	//startBrakeMode();
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -478,10 +504,11 @@ void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
 
 void PhysicsSystem::update(const float timestep)
 {
-	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
-	//incrementDrivingMode(timestep);
+	// Update scene in physics simulation
+	this->mScene->simulate(timestep);
+	this->mScene->fetchResults(true);
 
-	//Update the control inputs for the vehicle.
+	// Update the control inputs for the vehicle
 	if (this->mMimicKeyInputs)
 	{
 		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehicle4W);
@@ -491,54 +518,70 @@ void PhysicsSystem::update(const float timestep)
 		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehicle4W);
 	}
 
-	//Raycasts.
+	// Raycasts
 	PxVehicleWheels* vehicles[1] = { this->mVehicle4W };
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
 
-	//Vehicle update.
+	// Vehicle update
 	const PxVec3 grav = this->mScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehicle4W->mWheelsSimData.getNbWheels()} };
 	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
 
-	//Work out if the vehicle is in the air.
+	// Work out if the vehicle is in the air
 	this->mIsVehicleInAir = this->mVehicle4W->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
 	// Set player 1 transform
 	Entity* player1 = g_scene.getEntity("player1");
 	Transform* player1Transform = player1->getTransform();
-	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
-	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
 
 	// Update the food transforms
 	updateFoodTransforms();
 
-	// Set the ground's transform
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
-	physx::PxShape* shapes[1];
-	mGroundPlane->getShapes(shapes, 1);
-	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	countertopTransform->update(groundTransform);
-
-	//Scene update.
-	this->mScene->simulate(timestep);
-	this->mScene->fetchResults(true);
+	// Set the ground's transform - this isn't working
+	//Entity* countertop = g_scene.getEntity("countertop");
+	//Transform* countertopTransform = countertop->getTransform();
+	//physx::PxShape* shapes[1];
+	//mGroundPlane->getShapes(shapes, 1);
+	//physx::PxTransform groundTransform = shapes[0]->getLocalPose();
+	//countertopTransform->update(groundTransform);
 }
 
-void PhysicsSystem::updateFoodTransforms() {
-	Entity* cheese = g_scene.getEntity("cheese");
-	Transform* cheeseTransform = cheese->getTransform();
-	cheeseTransform->update(this->cheese->getGlobalPose());
+void PhysicsSystem::updateFoodTransforms() 
+{
+	// Cheese
+	Transform* cheese = g_scene.getEntity("cheese")->getTransform();
+	cheese->update(this->cheese->getGlobalPose());
+
+	// Sausage
+	Transform* sausage = g_scene.getEntity("sausage")->getTransform();
+	sausage->update(this->sausage->getGlobalPose());
+
+	// Tomato
+	Transform* tomato = g_scene.getEntity("tomato")->getTransform();
+	tomato->update(this->tomato->getGlobalPose());
+
+	// Dough
+	Transform* dough = g_scene.getEntity("dough")->getTransform();
+	dough->update(this->dough->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()
 {
+	// Players
 	this->mVehicle4W->getRigidDynamicActor()->release();
 	this->mVehicle4W->free();
+
+	// Ingredients
+	this->cheese->release();
+	this->tomato->release();
+	this->dough->release();
+	this->sausage->release();
+
+	// PHYSX
 	PX_RELEASE(this->mGroundPlane);
 	PX_RELEASE(this->mBatchQuery);
 	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
@@ -573,7 +616,6 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 // Readd the camera probably 
 void PhysicsSystem::keyPress(unsigned char key)
 {
-	printf("KeyPress: %c\n", key);
 
 	switch (toupper(key))
 	{
@@ -612,10 +654,8 @@ void PhysicsSystem::keyPress(unsigned char key)
 
 void PhysicsSystem::keyRelease(unsigned char key)
 {
-	/*PX_UNUSED(camera);
-	PX_UNUSED(key);*/
 	PxTransform camera = PxTransform(PxVec3(1.0f));
-	printf("KeyPress: %c\n", key);
+
 	switch (toupper(key))
 	{
 	case 'S':

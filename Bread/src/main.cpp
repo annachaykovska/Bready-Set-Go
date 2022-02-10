@@ -10,6 +10,7 @@
 #include "Rendering/RenderingSystem.h"
 #include "Audio/AudioSystem.h"
 #include "Physics/VehicleController.cpp"
+#include "Inventory.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -42,6 +43,9 @@ int main()
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
 	Entity* cheese = g_scene.getEntity("cheese");
+	Entity* sausage = g_scene.getEntity("sausage");
+	Entity* tomato = g_scene.getEntity("tomato");
+	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
 
 	//-----------------------------------------------------------------------------------
@@ -63,12 +67,8 @@ int main()
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
+	for (int i = 0; i < 9; i++)
+		transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
 	player1->attachComponent(&transforms[0], "transform");
@@ -76,7 +76,10 @@ int main()
 	player3->attachComponent(&transforms[2], "transform");
 	player4->attachComponent(&transforms[3], "transform");
 	cheese->attachComponent(&transforms[4], "transform");
-	countertop->attachComponent(&transforms[5], "transform");
+	sausage->attachComponent(&transforms[5], "transform");
+	tomato->attachComponent(&transforms[6], "transform");
+	dough->attachComponent(&transforms[7], "transform");
+	countertop->attachComponent(&transforms[8], "transform");
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
@@ -104,6 +107,21 @@ int main()
 	cheeseTransform->rotation = glm::vec3(0, 0, 0);
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
 
+	Transform* sausageTransform = sausage->getTransform();
+	sausageTransform->position = glm::vec3(-20, 5, 20);
+	sausageTransform->rotation = glm::vec3(0, 0, 0);
+	sausageTransform->scale = glm::vec3(30, 30, 30);
+
+	Transform* tomatoTransform = tomato->getTransform();
+	tomatoTransform->position = glm::vec3(20, 5, -20);
+	tomatoTransform->rotation = glm::vec3(0, 0, 0);
+	tomatoTransform->scale = glm::vec3(30, 30, 30);
+
+	Transform* doughTransform = dough->getTransform();
+	doughTransform->position = glm::vec3(-20, 5, -20);
+	doughTransform->rotation = glm::vec3(0, 0, 0);
+	doughTransform->scale = glm::vec3(30, 30, 30);
+
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, -10, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
@@ -113,7 +131,8 @@ int main()
 	// Get a reference to the countertop's AudioSource to play background music
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
-	//countertopAudioSource->play("bg.wav");
+	countertopAudioSource->gain = 0.01f; // Volume control
+	countertopAudioSource->play("bg.wav"); // Comment this out to turn off the music on load
 
 	// Track time
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
@@ -122,6 +141,12 @@ int main()
 	// TODO: generalize this
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
+
+	//-----------------------------------------------------------------------------------
+	// GameLogic stuff - will go in GameLogic eventually
+	//-----------------------------------------------------------------------------------
+	Inventory p1Inv;
+	player1->attachComponent(&p1Inv, "inventory");
 
 	// GAME LOOP
 	while (!window.shouldClose())

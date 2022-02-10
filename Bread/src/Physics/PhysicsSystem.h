@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <PxPhysicsAPI.h>
 #include <snippetvehiclecommon/SnippetVehicleSceneQuery.h>
 
@@ -13,7 +15,7 @@ public:
 	PhysicsSystem();
 	void initVehicleSDK();
 	void initializeActors();
-	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent);
+	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
 	void update(const float timestep);
 	void updateFoodTransforms();
 	void startAccelerateForwardsMode();
@@ -35,6 +37,10 @@ public:
 	// Public Entities
 	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
 	PxRigidDynamic* cheese;
+	PxRigidDynamic* sausage;
+	PxRigidDynamic* tomato;
+	PxRigidDynamic* dough;
+
 
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;
