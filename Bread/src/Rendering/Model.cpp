@@ -11,11 +11,12 @@
 
 Model::Model()
 {
-
+	this->visible = true;
 }
 
 Model::Model(const Model& rhs)
 {
+	this->visible = true;
 	this->meshes = rhs.meshes;
 	this->directory = rhs.directory;
 	this->textures_loaded = rhs.textures_loaded;
@@ -23,14 +24,16 @@ Model::Model(const Model& rhs)
 
 Model::Model(Mesh mesh)
 {
+	this->visible = true;
 	this->meshes.push_back(mesh);
 }
 
 // Renders every mesh in this model
 void Model::draw(Shader &shader)
 {
-	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].draw(shader);
+	if (visible)
+		for (unsigned int i = 0; i < meshes.size(); i++)
+			meshes[i].draw(shader);
 }
 
 void Model::loadModel(std::string path)

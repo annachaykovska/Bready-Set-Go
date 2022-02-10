@@ -39,20 +39,24 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         {
             p1Inv->tomato = 1;
             entity0->getAudioSource()->play("pickup.wav");
+            entity1->getModel()->visible = false;
         }
         if (entity1->name == "cheese" && p1Inv->cheese == 0)
         {
             p1Inv->cheese = 1;
             entity0->getAudioSource()->play("pickup.wav");
+            entity1->getModel()->visible = false;
         }
         if (entity1->name == "dough" && p1Inv->dough == 0) 
         {
             p1Inv->dough = 1;
             entity0->getAudioSource()->play("pickup.wav");
+            entity1->getModel()->visible = false;
         }
         if (entity1->name == "sausage" && p1Inv->sausage == 0) {
             p1Inv->sausage = 1;
             entity0->getAudioSource()->play("pickup.wav");
+            entity1->getModel()->visible = false;
         }
 
         if (p1Inv->checkPizza())
@@ -66,23 +70,25 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         {
             p1Inv->tomato = 1;
             entity1->getAudioSource()->play("pickup.wav");
+            entity0->getModel()->visible = false;
         }
         if (entity0->name == "cheese" && p1Inv->cheese == 0)
         {
             p1Inv->cheese = 1;
             entity1->getAudioSource()->play("pickup.wav");
+            entity0->getModel()->visible = false;
         }
         if (entity0->name == "dough" && p1Inv->dough == 0)
         {
             p1Inv->dough = 1;
             entity1->getAudioSource()->play("pickup.wav");
-
+            entity0->getModel()->visible = false;
         }
         if (entity0->name == "sausage" && p1Inv->sausage == 0)
         {
             p1Inv->sausage = 1;
             entity1->getAudioSource()->play("pickup.wav");
-
+            entity0->getModel()->visible = false;
         }
 
         if (p1Inv->checkPizza())

@@ -148,7 +148,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
-	PxRigidBodyExt::updateMassAndInertia(*body, 5.0f);
+	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
 	// Set physx actor name
 	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
