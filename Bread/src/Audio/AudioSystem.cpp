@@ -37,13 +37,19 @@ AudioSystem::AudioSystem()
 	load("horn.wav");
 	load("bread.wav");
 	load("tone.wav");
+	load("ding.wav");
+	load("pickup.wav");
 
 	// Create AudioSource Components
 	AudioSource* countertopAudioSource = createAudioSource();
+	AudioSource* p1AudioSource = createAudioSource();
 
 	// Attach AudioSource Components to Entities
 	Entity* countertop = g_scene.getEntity("countertop");
 	countertop->attachComponent(countertopAudioSource, "audio");
+
+	Entity* player1 = g_scene.getEntity("player1");
+	player1->attachComponent(p1AudioSource, "audio");
 }
 
 AudioSystem::~AudioSystem()

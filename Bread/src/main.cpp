@@ -131,7 +131,8 @@ int main()
 	// Get a reference to the countertop's AudioSource to play background music
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
-	//countertopAudioSource->play("bg.wav");
+	countertopAudioSource->gain = 0.1f;
+	countertopAudioSource->play("bg.wav");
 
 	// Track time
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;

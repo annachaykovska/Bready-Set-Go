@@ -20,4 +20,12 @@ public:
 		this->sausage = 0;
 		this->tomato = 0;
 	}
+
+	bool checkPizza()
+	{
+		if (this->cheese == 1 && this->dough == 1 && this->sausage == 1 && this->tomato == 1)
+			return true;
+		else
+			return false;
+	}
 };
