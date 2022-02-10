@@ -10,6 +10,7 @@
 #include "Rendering/RenderingSystem.h"
 #include "Audio/AudioSystem.h"
 #include "Physics/VehicleController.cpp"
+#include "Inventory.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -139,6 +140,12 @@ int main()
 	// TODO: generalize this
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
+
+	//-----------------------------------------------------------------------------------
+	// GameLogic stuff - will go in GameLogic eventually
+	//-----------------------------------------------------------------------------------
+	Inventory p1Inv;
+	player1->attachComponent(&p1Inv, "inventory");
 
 	// GAME LOOP
 	while (!window.shouldClose())

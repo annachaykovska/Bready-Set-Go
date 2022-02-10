@@ -2045,6 +2045,9 @@
     <ClInclude Include="src\Physics\CollisionCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />

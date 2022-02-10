@@ -11,6 +11,7 @@ public:
 	void begin();
 	void end();
 	void fps();
+	void player1Inventory();
 	void player1Transform();
 	void player2Transform();
 	void player3Transform();

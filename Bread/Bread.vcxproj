@@ -757,6 +757,7 @@
     <ClInclude Include="src\Audio\AudioEvent.h" />
     <ClInclude Include="src\Audio\AudioSource.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Inventory.h" />
     <ClInclude Include="src\Physics\CollisionCallback.h" />
     <ClInclude Include="src\Rendering\LightSource.h" />
     <ClInclude Include="src\Rendering\Material.h" />

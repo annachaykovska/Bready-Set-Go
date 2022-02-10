@@ -7,6 +7,7 @@
 #include "Scene/Scene.h"
 #include "Transform.h"
 #include "Scene/Entity.h"
+#include "Inventory.h"
 
 extern Scene g_scene;
 
@@ -67,6 +68,17 @@ void Profiler::fps()
 
 	ImGui::Text("msPerFrame = %lf", msPerFrame);
 	ImGui::Text("framesPerSecond = %lf", framesPerSecond);
+}
+
+void Profiler::player1Inventory()
+{
+	Entity* player1 = g_scene.getEntity("player1");
+	Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
+
+	ImGui::Text("Tomato: %d/1", p1Inv->tomato);
+	ImGui::Text("Cheese: %d/1", p1Inv->cheese);
+	ImGui::Text("Sausage: %d/1", p1Inv->sausage);
+	ImGui::Text("Dough: %d/1", p1Inv->dough);
 }
 
 void Profiler::player1Transform()
@@ -160,6 +172,7 @@ void Profiler::update()
 {
 	begin();
 	fps();
+	player1Inventory();
 	player1Transform();
 	player2Transform();
 	player3Transform();
