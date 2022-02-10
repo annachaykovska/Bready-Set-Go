@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cassert>
 
 #include <glm/glm.hpp>
@@ -140,7 +139,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
-PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
 	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
@@ -150,11 +149,19 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 5.0f);
+
+	// Set physx actor name
+	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* vp = static_cast<void*>(new std::string(name));
+	body->userData = vp;
+
 	mScene->addActor(*body);
 	shape->release();
+
 	return body;
 }
-
 
 void PhysicsSystem::initializeActors() {
 	// GROUND ---------------------------------------------------------------------------------------------------------------------
@@ -163,7 +170,6 @@ void PhysicsSystem::initializeActors() {
 	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
 	mScene->addActor(*mGroundPlane);
 
-
 	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
 	//Create a vehicle that will drive on the plane.
 	// PLAYER 1
@@ -171,25 +177,36 @@ void PhysicsSystem::initializeActors() {
 	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
+
+	// Set physx actor name
+	mVehicle4W->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
+	
+	// Attach the entity to the physx actor
+	Entity* player1 = g_scene.getEntity("player1");
+	void* vp = static_cast<void*>(new std::string("player1"));
+	mVehicle4W->getRigidDynamicActor()->userData = vp;
+
 	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	
+	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
 	PxTransform cheeseTransform(PxVec3(0, 0, 30));
-	this->cheese = createFoodBlock(cheeseTransform, halfExtent);
+	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
 	// SAUSAGE
 	PxTransform sausageTransform(PxVec3(0, 0, -30));
-	this->sausage = createFoodBlock(sausageTransform, halfExtent);
+	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
 	PxTransform tomatoTransform(PxVec3(30, 0, 0));
-	this->tomato = createFoodBlock(tomatoTransform, halfExtent);
+	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH
 	PxTransform doughTransform(PxVec3(-30, 0, 0));
-	this->dough = createFoodBlock(doughTransform, halfExtent);
+	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 
 PhysicsSystem::PhysicsSystem()

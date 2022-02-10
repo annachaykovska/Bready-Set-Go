@@ -56,7 +56,6 @@ PxFilterFlags VehicleFilterShader
 		(filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_CHASSIS) ||
 		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_CHASSIS)) 
 	{
-		printf("cheese touch\n");
 		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 	}
 
