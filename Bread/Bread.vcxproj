@@ -114,6 +114,7 @@
     <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleTireFriction.cpp" />
     <ClCompile Include="src\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Audio\AudioSource.cpp" />
+    <ClCompile Include="src\Physics\CollisionCallback.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Controls.cpp" />
@@ -756,6 +757,7 @@
     <ClInclude Include="src\Audio\AudioEvent.h" />
     <ClInclude Include="src\Audio\AudioSource.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Physics\CollisionCallback.h" />
     <ClInclude Include="src\Rendering\LightSource.h" />
     <ClInclude Include="src\Rendering\Material.h" />
     <ClInclude Include="src\Rendering\RenderingSystem.h" />

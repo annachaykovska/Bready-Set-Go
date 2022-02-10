@@ -18,16 +18,6 @@ public:
 	void setupCameras(Transform* playerTransform);
 	void update();
 
-	Model player1;
-	Model player2;
-	Model player3;
-	Model player4;
-	Model cheese;
-	Model tomato;
-	Model sausage;
-	Model dough;
-	Model countertop;
-
 private:
 
 	unsigned int modelLoc;

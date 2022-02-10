@@ -35,6 +35,10 @@ public:
 	// Public Entities
 	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
 	PxRigidDynamic* cheese;
+	PxRigidDynamic* sausage;
+	PxRigidDynamic* tomato;
+	PxRigidDynamic* dough;
+
 
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;

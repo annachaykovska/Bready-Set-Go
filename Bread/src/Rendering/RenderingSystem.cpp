@@ -128,7 +128,11 @@ void RenderingSystem::update()
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
-		ownerTransform->update();
+		
+		// TODO Temporary until all objects are attached to physics system
+		if (i >= 1 && i <= 4)
+			ownerTransform->update();
+
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 		models[i].draw(getShader());
 	}
