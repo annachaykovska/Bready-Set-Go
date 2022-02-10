@@ -6,6 +6,7 @@
 #include "CollisionCallback.h"
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
+#include "../Inventory.h"
 
 
 extern Scene g_scene;
@@ -26,6 +27,40 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
 
     Entity* entity0 = g_scene.getEntity(a0name);
     Entity* entity1 = g_scene.getEntity(a1name);
+
+    std::cout << "entity0->name = " << entity0->name << std::endl;
+    std::cout << "entity1->name = " << entity1->name << std::endl;
+
+    if (entity0->name == "player1")
+    {
+        std::cout << "here" << std::endl;
+
+        Inventory* p1Inv = (Inventory*)entity0->getComponent("inventory");
+        
+        if (entity1->name == "tomato")
+            p1Inv->tomato = 1;
+        if (entity1->name == "cheese")
+            p1Inv->cheese = 1;
+        if (entity1->name == "dough")
+            p1Inv->dough = 1;
+        if (entity1->name == "sausage")
+            p1Inv->sausage = 1;
+    }
+    else if (entity1->name == "player1")
+    {
+        std::cout << "there" << std::endl;
+
+        Inventory* p1Inv = (Inventory*)entity1->getComponent("inventory");
+
+        if (entity0->name == "tomato")
+            p1Inv->tomato = 1;
+        if (entity0->name == "cheese")
+            p1Inv->cheese = 1;
+        if (entity0->name == "dough")
+            p1Inv->dough = 1;
+        if (entity0->name == "sausage")
+            p1Inv->sausage = 1;
+    }
 }
 
 void CollisionCallback::onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) 
