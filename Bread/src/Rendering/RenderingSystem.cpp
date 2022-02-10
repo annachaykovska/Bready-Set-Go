@@ -10,30 +10,22 @@ extern Scene g_scene;
 
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
 {
-	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
-	this->player1 = Model(&breadmobilePath[0]);
-	this->player2 = Model(&breadmobilePath[0]);
-	this->player3 = Model(&breadmobilePath[0]);
-	this->player4 = Model(&breadmobilePath[0]);
-	std::string cheesePath = "resources/models/ingredients/cheese.obj";
-	this->cheese = Model(&cheesePath[0]);
-	std::string groundPath = "resources/models/ground/roughGround.obj";
-	this->countertop = Model(&groundPath[0]);
+	this->models.reserve(g_scene.count()); // Create space for models
 
-	glEnable(GL_DEPTH_TEST);
-	 
-	this->models.reserve(g_scene.count());
-
+	// Rendering uniforms
 	this->modelLoc = glGetUniformLocation(getShaderId(), "model");
 	this->texLoc = glGetUniformLocation(getShaderId(), "textured");
-
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
-	loadModels();
+	glEnable(GL_DEPTH_TEST); // Turn on depth testing
+
+	loadModels(); // Load model files into the models vector
+
+	// Camera
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
-	setupCameras(&transform);
+	setupCameras(&transform); // Setup the camera
 }
 
 RenderingSystem::~RenderingSystem() { }
@@ -50,27 +42,57 @@ Shader& RenderingSystem::getShader()
 
 void RenderingSystem::loadModels()
 {
-	// Load breadmobile models
+	//-----------------------------------------------------------------------------------
+	// Player models
+	//-----------------------------------------------------------------------------------
 	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
-	//models.push_back(Model(&breadmobilePath[0]));
-	//models.push_back(Model(&breadmobilePath[0]));
+	
+	// Player 1
+	this->models.emplace_back(Model(&breadmobilePath[0]));
+	g_scene.getEntity("player1")->attachComponent(&(this->models[0]), "model");
+	
+	// Player 2
+	this->models.emplace_back(Model(&breadmobilePath[0]));
+	g_scene.getEntity("player2")->attachComponent(&(this->models[1]), "model");
+	
+	// Player 3
+	this->models.emplace_back(Model(&breadmobilePath[0]));
+	g_scene.getEntity("player3")->attachComponent(&(this->models[2]), "model");
+	
+	// Player 4
+	this->models.emplace_back(Model(&breadmobilePath[0]));
+	g_scene.getEntity("player4")->attachComponent(&(this->models[3]), "model");
 
-	// Create ground plane
-	//models.push_back(GroundModel::createGround());
+	//-----------------------------------------------------------------------------------
+	// Environment models
+	//-----------------------------------------------------------------------------------
+	// Ground
+	std::string groundPath = "resources/models/ground/roughGround.obj";
+	this->models.emplace_back(Model(&groundPath[0])); 
+	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
-	Entity* p1 = g_scene.getEntity("player1");
-	Entity* p2 = g_scene.getEntity("player2");
-	Entity* p3 = g_scene.getEntity("player3");
-	Entity* p4 = g_scene.getEntity("player4");
-	Entity* cheese = g_scene.getEntity("cheese");
-	Entity* ground = g_scene.getEntity("countertop");
+	//-----------------------------------------------------------------------------------
+	// Ingredient models
+	//-----------------------------------------------------------------------------------
+	// Cheese
+	std::string cheesePath = "resources/models/ingredients/cheese.obj";
+	this->models.emplace_back(Model(&cheesePath[0])); // Cheese ingredient
+	g_scene.getEntity("cheese")->attachComponent(&(this->models[5]), "model");
 
-	p1->attachComponent(&(this->player1), "model");
-	p2->attachComponent(&(this->player2), "model");
-	p3->attachComponent(&(this->player3), "model");
-	p4->attachComponent(&(this->player4), "model");
-	cheese->attachComponent(&(this->cheese), "model");
-	ground->attachComponent(&(this->countertop), "model");
+	// Sausage
+	std::string sausagePath = "resources/models/ingredients/sausage.obj";
+	this->models.emplace_back(Model(&sausagePath[0])); // Sausage ingredient
+	g_scene.getEntity("sausage")->attachComponent(&(this->models[6]), "model");
+
+	// Tomato
+	std::string tomatoPath = "resources/models/ingredients/tomato.obj";
+	this->models.emplace_back(Model(&tomatoPath[0])); // Tomato ingredient
+	g_scene.getEntity("tomato")->attachComponent(&(this->models[7]), "model");
+
+	// Dough
+	std::string doughPath = "resources/models/ingredients/dough.obj";
+	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
+	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -91,72 +113,23 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 void RenderingSystem::update()
 {
-	// Get references to things that need to be updated
-	Entity* p1 = g_scene.getEntity("player1");
-	Entity* p2 = g_scene.getEntity("player2");
-	Entity* p3 = g_scene.getEntity("player3");
-	Entity* p4 = g_scene.getEntity("player4");
-	Entity* cheese = g_scene.getEntity("cheese");
-	Entity* ground = g_scene.getEntity("countertop");
-
-	Model* p1Model = p1->getModel();
-	Model* p2Model = p2->getModel();
-	Model* p3Model = p3->getModel();
-	Model* p4Model = p4->getModel();
-	Model* cheeseModel = cheese->getModel();
-	Model* groundModel = ground->getModel();
-
-	Transform* p1Transform = p1->getTransform();
-	Transform* p2Transform = p2->getTransform();
-	Transform* p3Transform = p3->getTransform();
-	Transform* p4Transform = p4->getTransform();
-	Transform* cheeseTransform = cheese->getTransform();
-	Transform* groundTransform = ground->getTransform();
-
-	p2Transform->update();
-	p3Transform->update();
-	p4Transform->update();
-	groundTransform->update();
-
+	// Declare shader to use
 	shader.use();
+
+	// Update camera
+	Transform* p1Transform = g_scene.getEntity("player1")->getTransform();
 	g_scene.camera.updateCameraVectors(p1Transform);
 	setupCameras(p1Transform);
 
-	//glUniform1i(texLoc, 0); // Turn off textures
+	// Turn off textures - temporary
+	glUniform1i(texLoc, 0);
 
 	// Iterate through all the models in the scene and render them at their new transforms
-	/*
 	for (int i = 0; i < models.size(); i++)
 	{
-		Entity* ownerEntity = models[i].owner;
-		glm::mat4 modelMatrix = ownerEntity->getTransform()->getModelMatrix();
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		Transform* ownerTransform = models[i].owner->getTransform();
+		ownerTransform->update();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 		models[i].draw(getShader());
-	}*/
-	
-	glUniform1i(texLoc, 0); // Turn off textures
-
-	// Draw player1 with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p1Transform->getModelMatrix()));
-	p1Model->draw(getShader());
-
-	// Draw player2 with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p2Transform->getModelMatrix()));
-	p2Model->draw(getShader());
-
-	// Draw player3 with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p3Transform->getModelMatrix()));
-	p3Model->draw(getShader());
-
-	// Draw player4 with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(p4Transform->getModelMatrix()));
-	p4Model->draw(getShader());
-
-	// Draw cheese with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(cheeseTransform->getModelMatrix()));
-	cheeseModel->draw(getShader());
-
-	// Draw countertop with new transform
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(groundTransform->getModelMatrix()));
-	groundModel->draw(getShader());
+	}
 }

@@ -10,12 +10,6 @@ class RenderingSystem
 {
 public:
 
-	unsigned int modelLoc;
-	unsigned int texLoc;
-
-	unsigned int viewLoc;
-	unsigned int projLoc;
-
 	RenderingSystem();
 	~RenderingSystem();
 	unsigned int getShaderId();
@@ -29,10 +23,17 @@ public:
 	Model player3;
 	Model player4;
 	Model cheese;
+	Model tomato;
+	Model sausage;
+	Model dough;
 	Model countertop;
 
 private:
 
+	unsigned int modelLoc;
+	unsigned int texLoc;
+	unsigned int viewLoc;
+	unsigned int projLoc;
 	Shader shader;
 	std::vector<Model> models;
 	

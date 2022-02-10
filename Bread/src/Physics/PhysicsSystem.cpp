@@ -509,27 +509,26 @@ void PhysicsSystem::update(const float timestep)
 	// Set player 1 transform
 	Entity* player1 = g_scene.getEntity("player1");
 	Transform* player1Transform = player1->getTransform();
-	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
-	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
 
 	// Update the food transforms
 	updateFoodTransforms();
 
-	// Set the ground's transform
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
-	physx::PxShape* shapes[1];
-	mGroundPlane->getShapes(shapes, 1);
-	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	countertopTransform->update(groundTransform);
+	// Set the ground's transform - this isn't working
+	//Entity* countertop = g_scene.getEntity("countertop");
+	//Transform* countertopTransform = countertop->getTransform();
+	//physx::PxShape* shapes[1];
+	//mGroundPlane->getShapes(shapes, 1);
+	//physx::PxTransform groundTransform = shapes[0]->getLocalPose();
+	//countertopTransform->update(groundTransform);
 
 	//Scene update.
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
 }
 
-void PhysicsSystem::updateFoodTransforms() {
+void PhysicsSystem::updateFoodTransforms() 
+{
 	Entity* cheese = g_scene.getEntity("cheese");
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->update(this->cheese->getGlobalPose());

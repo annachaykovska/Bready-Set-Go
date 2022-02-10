@@ -42,6 +42,9 @@ int main()
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
 	Entity* cheese = g_scene.getEntity("cheese");
+	Entity* sausage = g_scene.getEntity("sausage");
+	Entity* tomato = g_scene.getEntity("tomato");
+	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
 
 	//-----------------------------------------------------------------------------------
@@ -63,12 +66,8 @@ int main()
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
-	transforms.emplace_back(Transform());
+	for (int i = 0; i < 9; i++)
+		transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
 	player1->attachComponent(&transforms[0], "transform");
@@ -76,7 +75,10 @@ int main()
 	player3->attachComponent(&transforms[2], "transform");
 	player4->attachComponent(&transforms[3], "transform");
 	cheese->attachComponent(&transforms[4], "transform");
-	countertop->attachComponent(&transforms[5], "transform");
+	sausage->attachComponent(&transforms[5], "transform");
+	tomato->attachComponent(&transforms[6], "transform");
+	dough->attachComponent(&transforms[7], "transform");
+	countertop->attachComponent(&transforms[8], "transform");
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
@@ -103,6 +105,21 @@ int main()
 	cheeseTransform->position = glm::vec3(20, 5, 20);
 	cheeseTransform->rotation = glm::vec3(0, 0, 0);
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
+
+	Transform* sausageTransform = sausage->getTransform();
+	sausageTransform->position = glm::vec3(-20, 5, 20);
+	sausageTransform->rotation = glm::vec3(0, 0, 0);
+	sausageTransform->scale = glm::vec3(30, 30, 30);
+
+	Transform* tomatoTransform = tomato->getTransform();
+	tomatoTransform->position = glm::vec3(20, 5, -20);
+	tomatoTransform->rotation = glm::vec3(0, 0, 0);
+	tomatoTransform->scale = glm::vec3(30, 30, 30);
+
+	Transform* doughTransform = dough->getTransform();
+	doughTransform->position = glm::vec3(-20, 5, -20);
+	doughTransform->rotation = glm::vec3(0, 0, 0);
+	doughTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, -10, 0);
