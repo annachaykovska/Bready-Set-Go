@@ -11,6 +11,9 @@ void Scene::createEntities()
 	createEntity("player3");
 	createEntity("player4");
 	createEntity("cheese");
+	createEntity("sausage");
+	createEntity("tomato");
+	createEntity("dough");
 	createEntity("countertop");
 }
 

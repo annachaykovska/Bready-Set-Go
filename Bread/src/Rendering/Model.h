@@ -13,6 +13,7 @@ class Model : public Component
 public:
 
 	std::vector<Mesh> meshes;
+	bool visible;
 
 	Model();
 	Model(const Model& rhs);

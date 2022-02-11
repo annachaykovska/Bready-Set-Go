@@ -10,12 +10,6 @@ class RenderingSystem
 {
 public:
 
-	unsigned int modelLoc;
-	unsigned int texLoc;
-
-	unsigned int viewLoc;
-	unsigned int projLoc;
-
 	RenderingSystem();
 	~RenderingSystem();
 	unsigned int getShaderId();
@@ -24,15 +18,12 @@ public:
 	void setupCameras(Transform* playerTransform);
 	void update();
 
-	Model player1;
-	Model player2;
-	Model player3;
-	Model player4;
-	Model cheese;
-	Model countertop;
-
 private:
 
+	unsigned int modelLoc;
+	unsigned int texLoc;
+	unsigned int viewLoc;
+	unsigned int projLoc;
 	Shader shader;
 	std::vector<Model> models;
 	

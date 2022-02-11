@@ -1,16 +1,15 @@
-#include <iostream>
 #include <cassert>
 
-#include "PhysicsSystem.h"
-#include "ContactReportCallback.cpp"
 #include <glm/glm.hpp>
 
 #include <snippetvehiclecommon/SnippetVehicleCreate.h>
 #include <snippetvehiclecommon/SnippetVehicleFilterShader.h>
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
-#include "../Scene/Scene.h"
 
+#include "PhysicsSystem.h"
+#include "CollisionCallback.h"
+#include "../Scene/Scene.h"
 #include "../Transform.h"
 #include "../Scene/Entity.h"
 
@@ -19,6 +18,7 @@ using namespace physx;
 
 extern Scene g_scene;
 
+CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
@@ -111,7 +111,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
-PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent)
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
 	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
@@ -120,12 +120,20 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
-	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
+
+	// Set physx actor name
+	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* vp = static_cast<void*>(new std::string(name));
+	body->userData = vp;
+
 	mScene->addActor(*body);
 	shape->release();
+
 	return body;
 }
-
 
 void PhysicsSystem::initializeActors() {
 	// GROUND ---------------------------------------------------------------------------------------------------------------------
@@ -134,7 +142,6 @@ void PhysicsSystem::initializeActors() {
 	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
 	mScene->addActor(*mGroundPlane);
 
-
 	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
 	//Create a vehicle that will drive on the plane.
 	// PLAYER 1
@@ -142,13 +149,36 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer1 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransform);
+
+	// Set physx actor name
+	mVehiclePlayer1->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
+	
+	// Attach the entity to the physx actor
+	Entity* player1 = g_scene.getEntity("player1");
+	void* vp = static_cast<void*>(new std::string("player1"));
+	mVehiclePlayer1->getRigidDynamicActor()->userData = vp;
+
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	
+	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
-	PxTransform cheeseTransform(PxVec3(0));
-	this->cheese = createFoodBlock(cheeseTransform, halfExtent);
+	PxTransform cheeseTransform(PxVec3(0, 0, 30));
+	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
+
+	// SAUSAGE
+	PxTransform sausageTransform(PxVec3(0, 0, -30));
+	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
+
+	// TOMATO
+	PxTransform tomatoTransform(PxVec3(30, 0, 0));
+	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
+
+	// DOUGH
+	PxTransform doughTransform(PxVec3(-30, 0, 0));
+	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 
 PhysicsSystem::PhysicsSystem()
@@ -170,16 +200,15 @@ PhysicsSystem::PhysicsSystem()
 
 	// Dispatcher
 	PxU32 numWorkers = 1;
-	this->mDispatcher = mDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
+	this->mDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 
-	// Scene
+	// Physx scene
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = mDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader;
+	sceneDesc.cpuDispatcher = this->mDispatcher;
+	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader
+	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
 	this->mScene = mPhysics->createScene(sceneDesc);
-	auto crc = ContactReportCallback();
-	sceneDesc.simulationEventCallback = &crc;
 
 	// Material
 	this->mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
@@ -233,7 +262,11 @@ void PhysicsSystem::initVehicleSDK()
 
 void PhysicsSystem::update(const float timestep)
 {
-	//Update the control inputs for the vehicle.
+	// Update scene in physics simulation
+	this->mScene->simulate(timestep);
+	this->mScene->fetchResults(true);
+
+	// Update the control inputs for the vehicle
 	if (this->mMimicKeyInputs)
 	{
 		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
@@ -249,7 +282,7 @@ void PhysicsSystem::update(const float timestep)
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
 
-	//Vehicle update.
+	// Vehicle update
 	const PxVec3 grav = this->mScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehiclePlayer1->mWheelsSimData.getNbWheels()} };
@@ -261,8 +294,6 @@ void PhysicsSystem::update(const float timestep)
 	// Set player 1 transform
 	Entity* player1 = g_scene.getEntity("player1");
 	Transform* player1Transform = player1->getTransform();
-	PxVec3 currentPosision = this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p;
-	PxQuat currentRotation = this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
 	player1Transform->update(this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose());
 
 	// Update the food transforms
@@ -276,22 +307,39 @@ void PhysicsSystem::update(const float timestep)
 	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
 	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
 	countertopTransform->update(groundTransform);
-
-	//Scene update.
-	this->mScene->simulate(timestep);
-	this->mScene->fetchResults(true);
 }
 
-void PhysicsSystem::updateFoodTransforms() {
-	Entity* cheese = g_scene.getEntity("cheese");
-	Transform* cheeseTransform = cheese->getTransform();
-	cheeseTransform->update(this->cheese->getGlobalPose());
+void PhysicsSystem::updateFoodTransforms(){
+	// Cheese
+	Transform* cheese = g_scene.getEntity("cheese")->getTransform();
+	cheese->update(this->cheese->getGlobalPose());
+
+	// Sausage
+	Transform* sausage = g_scene.getEntity("sausage")->getTransform();
+	sausage->update(this->sausage->getGlobalPose());
+
+	// Tomato
+	Transform* tomato = g_scene.getEntity("tomato")->getTransform();
+	tomato->update(this->tomato->getGlobalPose());
+
+	// Dough
+	Transform* dough = g_scene.getEntity("dough")->getTransform();
+	dough->update(this->dough->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()
 {
+	// Players
 	this->mVehiclePlayer1->getRigidDynamicActor()->release();
 	this->mVehiclePlayer1->free();
+
+	// Ingredients
+	this->cheese->release();
+	this->tomato->release();
+	this->dough->release();
+	this->sausage->release();
+
+	// PHYSX
 	PX_RELEASE(this->mGroundPlane);
 	PX_RELEASE(this->mBatchQuery);
 	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
@@ -325,7 +373,6 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 
 void PhysicsSystem::keyPress(unsigned char key)
 {
-	printf("KeyPress: %c\n", key);
 
 	switch (toupper(key))
 	{
@@ -364,10 +411,8 @@ void PhysicsSystem::keyPress(unsigned char key)
 
 void PhysicsSystem::keyRelease(unsigned char key)
 {
-	/*PX_UNUSED(camera);
-	PX_UNUSED(key);*/
 	PxTransform camera = PxTransform(PxVec3(1.0f));
-	printf("KeyPress: %c\n", key);
+
 	switch (toupper(key))
 	{
 	case 'S':
