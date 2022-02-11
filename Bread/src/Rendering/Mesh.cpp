@@ -75,8 +75,6 @@ void Mesh::draw(Shader &shader)
 
 	if (textures.size() > 0)
 	{
-		std::cout << "Adding a texture\n";
-
 		// Loop through each texture in the mesh to determine its type (diffuse or specular)
 		// then construct a uniform name 
 		for (unsigned int i = 0; i < textures.size(); i++)
@@ -93,8 +91,6 @@ void Mesh::draw(Shader &shader)
 
 			shader.setFloat((name + number).c_str(), i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
-
-			std::cout << textures[i].id << std::endl;
 		}
 
 		glActiveTexture(GL_TEXTURE0);

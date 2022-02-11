@@ -127,27 +127,26 @@ void RenderingSystem::update()
 	setupCameras(p1Transform);
 
 	// Turn off textures - temporary
-	glUniform1i(texLoc, 0);
+	glUniform1i(this->texLoc, 0);
 	
-	std::cout << models.size() << std::endl;
-
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
 		
 		// TODO Temporary until all objects are attached to physics system
-		if ((i >= 1 && i <= 4))
+		if ((i >= 1 && i <= 4) || i >= 9)
 			ownerTransform->update();
-
-		if (i >= 9)
-		{
-			glUniform1i(texLoc, 1);
-			ownerTransform->update();
-			glUniform1i(texLoc, 0);
-		}
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-		models[i].draw(getShader());
+
+		if (i >= 9) 
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(getShader());
+			glUniform1i(texLoc, 0);
+		}
+		else
+			models[i].draw(getShader());
 	}
 }

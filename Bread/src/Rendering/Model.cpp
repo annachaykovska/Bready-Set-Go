@@ -138,8 +138,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	// If the mesh has texture image files associated with it, get those too
 	if (mesh->mMaterialIndex >= 0)
 	{
-		std::cout << mesh->mName.C_Str() << std::endl;
-
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		aiString materialName;

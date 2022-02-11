@@ -40,10 +40,9 @@ uniform Light light;
 
 void main()
 {
-	if (textured == 1)
+	if (textured > 0)
 	{
-		//fragColor = texture(texture_diffuse1, ourTexCoord);
-		fragColor = vec4(1.0f);
+		fragColor = texture(texture_diffuse1, ourTexCoord);
 	}
 	else
 	{
