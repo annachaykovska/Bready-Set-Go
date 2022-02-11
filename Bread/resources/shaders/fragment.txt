@@ -42,7 +42,8 @@ void main()
 {
 	if (textured == 1)
 	{
-		fragColor = texture(texture_diffuse1, ourTexCoord);
+		//fragColor = texture(texture_diffuse1, ourTexCoord);
+		fragColor = vec4(1.0f);
 	}
 	else
 	{

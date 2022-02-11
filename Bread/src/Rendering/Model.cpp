@@ -138,6 +138,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	// If the mesh has texture image files associated with it, get those too
 	if (mesh->mMaterialIndex >= 0)
 	{
+		std::cout << mesh->mName.C_Str() << std::endl;
+
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		aiString materialName;
@@ -174,10 +176,12 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		newMesh.material.refractionIndex = refractionIndex;
 
 		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		for (auto it = diffuseMaps.begin(); it < diffuseMaps.end(); it++)
+			newMesh.textures.push_back(*it);
 
 		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+		for(auto it = diffuseMaps.begin(); it < diffuseMaps.end(); it++)
+			newMesh.textures.push_back(*it);
 	}
 
 	return newMesh;
