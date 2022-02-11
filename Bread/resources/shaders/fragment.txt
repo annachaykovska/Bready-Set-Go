@@ -33,7 +33,7 @@ uniform sampler2D texture_specular2;
 uniform sampler2D texture_specular3;
 uniform int textured;
 
-uniform vec4 color;
+//uniform vec4 color;
 uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
@@ -44,7 +44,6 @@ void main()
 	
 	if (textured > 0)
 	{
-		//fragColor = texture(texture_diffuse1, ourTexCoord);
 		vec4 texColor = texture(texture_diffuse1, ourTexCoord);
 		diffuseColor = vec3(texColor.x, texColor.y, texColor.z);
 	}
@@ -73,7 +72,7 @@ void main()
 	}
 
 	// Phong light
-	vec3 phong = ambient + 2.f * diffuse;// + specular;
+	vec3 phong = ambient + 2.f * diffuse + specular;
 
 	// Final
 	fragColor = vec4(phong, material.opacity);

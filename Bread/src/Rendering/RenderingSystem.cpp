@@ -140,7 +140,7 @@ void RenderingSystem::update()
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
-		if (i >= 9) 
+		if (i >= 5) 
 		{
 			glUniform1i(texLoc, 1);
 			models[i].draw(getShader());
