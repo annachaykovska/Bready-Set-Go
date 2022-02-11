@@ -1,7 +1,10 @@
 #pragma once
+#include <vector>
 
 #include <PxPhysicsAPI.h>
 #include <snippetvehiclecommon/SnippetVehicleSceneQuery.h>
+
+#include "PhysicsEnums.h"
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -26,7 +29,6 @@ public:
 	void releaseGas();
 	void releaseSteering();
 	void releaseAllControls();
-	void incrementDrivingMode(const PxF32 timestep);
 	void cleanupPhysics();
 	void keyPress(unsigned char key);
 	void keyRelease(unsigned char key);
@@ -36,6 +38,22 @@ public:
 	PxVehicleDrive4W* mVehiclePlayer1; // TODO: Rename this?
 	PxRigidDynamic* cheese;
 
+	// Button State
+	struct ButtonState {
+		bool forwardsHeld = false;
+		bool leftHeld = false;
+		bool backwardsHeld = false;
+		bool rightHeld = false;
+
+		bool cameraForward = false;
+		bool cameraBackward = false;
+		bool cameraRight = false;
+		bool cameraLeft = false;
+		bool cameraUp = false;
+		bool cameraDown = false;
+	};
+
+	
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;
 	PxDefaultAllocator mDefaultAllocatorCallback;
@@ -52,10 +70,9 @@ private:
 	PxRigidStatic* mGroundPlane;
 	bool mIsVehicleInAir = true;
 	PxVehicleDrive4WRawInputData mVehicleInputData;
-	PxF32 mVehicleModeLifetime = 4.0f;
+	PxF32 mVehicleModeLifetime = 0.2f;
 	PxF32 mVehicleModeTimer = 0.0f;
 	PxU32 mVehicleOrderProgress = 0;
 	bool mVehicleOrderComplete = false;
 	bool mMimicKeyInputs = false;
-
 }; 

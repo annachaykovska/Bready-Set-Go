@@ -19,6 +19,7 @@ using namespace physx;
 
 extern Scene g_scene;
 
+
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.75f,
@@ -68,34 +69,6 @@ PxVehiclePadSmoothingData gPadSmoothingData =
 	}
 };
 
-enum DriveMode
-{
-	eDRIVE_MODE_ACCEL_FORWARDS = 0,
-	eDRIVE_MODE_ACCEL_REVERSE,
-	eDRIVE_MODE_HARD_TURN_LEFT,
-	eDRIVE_MODE_HANDBRAKE_TURN_LEFT,
-	eDRIVE_MODE_HARD_TURN_RIGHT,
-	eDRIVE_MODE_HANDBRAKE_TURN_RIGHT,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_NONE
-};
-
-DriveMode gDriveModeOrder[] =
-{
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_ACCEL_FORWARDS,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_ACCEL_REVERSE,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_HARD_TURN_LEFT,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_HARD_TURN_RIGHT,
-	eDRIVE_MODE_ACCEL_FORWARDS,
-	eDRIVE_MODE_HANDBRAKE_TURN_LEFT,
-	eDRIVE_MODE_ACCEL_FORWARDS,
-	eDRIVE_MODE_HANDBRAKE_TURN_RIGHT,
-	eDRIVE_MODE_NONE
-};
 
 VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 {
@@ -209,7 +182,7 @@ PhysicsSystem::PhysicsSystem()
 	sceneDesc.simulationEventCallback = &crc;
 
 	// Material
-	this->mMaterial = mPhysics->createMaterial(0.7f, 0.4f, 0.6f);
+	this->mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	// Cooking
 	this->mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
@@ -236,7 +209,7 @@ PhysicsSystem::PhysicsSystem()
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
 	mVehiclePlayer1->setToRestState();
-	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eTHIRD);
+	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
 
 	//mVehicleModeTimer = 0.0f;
@@ -255,97 +228,11 @@ void PhysicsSystem::initVehicleSDK()
 
 	// Set the vehicle update mode to be immediate velocity changes
 	physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
-
-
-	// The following is necessary, but it all gets handled by the snippetvehicle code currently
-	// We might want to handle this ourselves once we know what we're doing
-
-	//const physx::PxU32 numWheels = 4;
-
-	// Suspension strength and damping rate, wheel mass, tire stiffness, and suspension travel direction
-	//physx::PxVehicleWheelsSimData* wheelsSimData = physx::PxVehicleWheelsSimData::allocate(numWheels);
-	//setupWheelsSimulationData(wheelsSimData)
-
-	// Engine peak torque, clutch strength, gearing ratios, and Ackermann steering correction
-	//physx::PxVehicleDriveSimData4W driveSimData;
-	//setupDriveSimData(driveSimData)
-
-	// Needs geometry for wheels and chassis, mass, moment of inertia, and center of mass
-	//physx::PxTransform t(physx::PxVec3(0, 0, 0));
-	//physx::PxRigidDynamic* vehActor = mPhysics->createRigidDynamic(t);
-	//setupVehicleActor(vehActor)
-	//mScene->addActor(*vehActor);
-
-	//physx::PxVehicleDrive4W* vehDrive4W = physx::PxVehicleDrive4W::allocate(numWheels);
-	//vehDrive4W->setup(mPhysics, vehActor, *wheelsSimData, driveSimData, numWheels - 4);
 }
 
-
-void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
-{
-	this->mVehicleModeTimer += timestep;
-	if (this->mVehicleModeTimer > this->mVehicleModeLifetime)
-	{
-		//If the mode just completed was eDRIVE_MODE_ACCEL_REVERSE then switch back to forward gears.
-		if (eDRIVE_MODE_ACCEL_REVERSE == gDriveModeOrder[this->mVehicleOrderProgress])
-		{
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eTHIRD);
-		}
-
-		//Increment to next driving mode.
-		this->mVehicleModeTimer = 0.0f;
-		this->mVehicleOrderProgress++;
-		releaseAllControls();
-
-		//If we are at the end of the list of driving modes then start again.
-		if (eDRIVE_MODE_NONE == gDriveModeOrder[this->mVehicleOrderProgress])
-		{
-			this->mVehicleOrderProgress = 0;
-			this->mVehicleOrderComplete = true;
-		}
-
-		//Start driving in the selected mode.
-		DriveMode eDriveMode = gDriveModeOrder[this->mVehicleOrderProgress];
-		switch (eDriveMode)
-		{
-		case eDRIVE_MODE_ACCEL_FORWARDS:
-			startAccelerateForwardsMode();
-			break;
-		case eDRIVE_MODE_ACCEL_REVERSE:
-			startAccelerateReverseMode();
-			break;
-		case eDRIVE_MODE_HARD_TURN_LEFT:
-			startTurnHardLeftMode();
-			break;
-		case eDRIVE_MODE_HANDBRAKE_TURN_LEFT:
-			startHandbrakeTurnLeftMode();
-			break;
-		case eDRIVE_MODE_HARD_TURN_RIGHT:
-			startTurnHardRightMode();
-			break;
-		case eDRIVE_MODE_HANDBRAKE_TURN_RIGHT:
-			startHandbrakeTurnRightMode();
-			break;
-		case eDRIVE_MODE_BRAKE:
-			startBrakeMode();
-			break;
-		case eDRIVE_MODE_NONE:
-			break;
-		};
-
-		//If the mode about to start is eDRIVE_MODE_ACCEL_REVERSE then switch to reverse gears.
-		if (eDRIVE_MODE_ACCEL_REVERSE == gDriveModeOrder[this->mVehicleOrderProgress])
-		{
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		}
-	}
-}
 
 void PhysicsSystem::update(const float timestep)
 {
-	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
-	//incrementDrivingMode(timestep);
-
 	//Update the control inputs for the vehicle.
 	if (this->mMimicKeyInputs)
 	{
@@ -446,7 +333,7 @@ void PhysicsSystem::keyPress(unsigned char key)
 			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
 			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f);
+			this->mVehicleInputData.setAnalogBrake(0.f); 
 			startAccelerateForwardsMode();
 			break;
 		case 'S':
