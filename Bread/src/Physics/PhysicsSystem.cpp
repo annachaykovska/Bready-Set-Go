@@ -88,7 +88,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	const PxF32 wheelMass = 20.0f;
 	const PxF32 wheelRadius = 0.5f;
 	const PxF32 wheelWidth = 0.4f;
-	const PxF32 wheelMOI = 0.5f * wheelMass * wheelRadius * wheelRadius;
+	const PxF32 wheelMOI = 0.3f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -314,7 +314,7 @@ void PhysicsSystem::updateFoodTransforms(){
 	Transform* cheese = g_scene.getEntity("cheese")->getTransform();
 	cheese->update(this->cheese->getGlobalPose());
 
-	// Sausage
+	// Sausagea
 	Transform* sausage = g_scene.getEntity("sausage")->getTransform();
 	sausage->update(this->sausage->getGlobalPose());
 
@@ -373,39 +373,43 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 
 void PhysicsSystem::keyPress(unsigned char key)
 {
-
-	switch (toupper(key))
-	{
-		case 'W':
-			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
+	if (this->buttonState.forwardsHeld) {
+		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL) {
 			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
-			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f); 
-			startAccelerateForwardsMode();
-			break;
-		case 'S':
-			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f);
-			startAccelerateReverseMode();
-			break;
-		case 'D':
-			startTurnHardRightMode();
-			break;
-		case 'A':
-			startTurnHardLeftMode();
-			break;
-		case ' ':
-			startBrakeMode();
-			break;
-		default:
-			//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
-			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f);
-			releaseAllControls();
-			break;
+		}
+		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
+			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eSECOND);
+		}
+		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eSECOND) {
+			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eTHIRD);
+		}
+		this->mVehicleInputData.setDigitalBrake(false);
+		this->mVehicleInputData.setAnalogBrake(0.f);
+		startAccelerateForwardsMode();
+	}
+	if (this->buttonState.backwardsHeld) {
+		//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+		this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		this->mVehicleInputData.setDigitalBrake(false);
+		this->mVehicleInputData.setAnalogBrake(0.f);
+		startAccelerateReverseMode();
+	}
+	if (this->buttonState.rightHeld) {
+		startTurnHardRightMode();
+	}
+	if (this->buttonState.leftHeld) {
+		startTurnHardLeftMode();
+	}
+	if (this->buttonState.brakeHeld) {
+		startBrakeMode();
+	}
+	if (!this->buttonState.forwardsHeld && !this->buttonState.backwardsHeld && !this->buttonState.leftHeld &&
+		!this->buttonState.rightHeld && !this->buttonState.brakeHeld) {
+		//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+		this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		this->mVehicleInputData.setDigitalBrake(false);
+		this->mVehicleInputData.setAnalogBrake(0.f);
+		releaseAllControls();
 	}
 }
 
@@ -413,26 +417,24 @@ void PhysicsSystem::keyRelease(unsigned char key)
 {
 	PxTransform camera = PxTransform(PxVec3(1.0f));
 
-	switch (toupper(key))
-	{
-	case 'S':
+
+	if (!this->buttonState.forwardsHeld) {
 		releaseGas();
-		break;
-	case 'W':
-		releaseGas();
-		break;
-	case 'A':
-		releaseSteering();
-		break;
-	case 'D':
-		releaseSteering();
-		break;
-	default:
-		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
-		releaseAllControls();
-		break;
 	}
+	if (!this->buttonState.backwardsHeld) {
+		releaseGas();
+	}
+	if (!this->buttonState.rightHeld) {
+		releaseSteering();
+	}
+	if (!this->buttonState.leftHeld) {
+		releaseSteering();
+	}
+	if (this->buttonState.brakeHeld) {
+		startBrakeMode();
+	}
+	if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+		releaseAllControls();
 }
 
 void PhysicsSystem::startAccelerateForwardsMode()

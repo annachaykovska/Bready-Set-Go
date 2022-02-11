@@ -43,22 +43,8 @@ public:
 	PxRigidDynamic* tomato;
 	PxRigidDynamic* dough;
 
-
-	// Button State
-	struct ButtonState {
-		bool forwardsHeld = false;
-		bool leftHeld = false;
-		bool backwardsHeld = false;
-		bool rightHeld = false;
-
-		bool cameraForward = false;
-		bool cameraBackward = false;
-		bool cameraRight = false;
-		bool cameraLeft = false;
-		bool cameraUp = false;
-		bool cameraDown = false;
-	};
-
+	ButtonState buttonState;
+	
 	
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;
