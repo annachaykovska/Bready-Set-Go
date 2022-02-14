@@ -31,6 +31,16 @@ Transform* Entity::getTransform()
 	return (Transform*)(this->getComponent("transform"));
 }
 
+Model* Entity::getModel()
+{
+	Model* result = (Model*)(this->getComponent("model"));
+	
+	if (!result)
+		std::cout << "Model component not found!\n";
+	
+	return result;
+}
+
 AudioSource* Entity::getAudioSource()
 {
 	return (AudioSource*)(this->getComponent("audio"));

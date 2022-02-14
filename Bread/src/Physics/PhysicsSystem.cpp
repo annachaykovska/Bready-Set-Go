@@ -1,19 +1,24 @@
-#include <iostream>
 #include <cassert>
 
-#include "PhysicsSystem.h"
 #include <glm/glm.hpp>
 
 #include <snippetvehiclecommon/SnippetVehicleCreate.h>
 #include <snippetvehiclecommon/SnippetVehicleFilterShader.h>
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
+
+#include "PhysicsSystem.h"
+#include "CollisionCallback.h"
 #include "../Scene/Scene.h"
+#include "../Transform.h"
+#include "../Scene/Entity.h"
 
 using namespace snippetvehicle;
 using namespace physx;
 
 extern Scene g_scene;
+
+CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
@@ -64,34 +69,6 @@ PxVehiclePadSmoothingData gPadSmoothingData =
 	}
 };
 
-enum DriveMode
-{
-	eDRIVE_MODE_ACCEL_FORWARDS = 0,
-	eDRIVE_MODE_ACCEL_REVERSE,
-	eDRIVE_MODE_HARD_TURN_LEFT,
-	eDRIVE_MODE_HANDBRAKE_TURN_LEFT,
-	eDRIVE_MODE_HARD_TURN_RIGHT,
-	eDRIVE_MODE_HANDBRAKE_TURN_RIGHT,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_NONE
-};
-
-DriveMode gDriveModeOrder[] =
-{
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_ACCEL_FORWARDS,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_ACCEL_REVERSE,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_HARD_TURN_LEFT,
-	eDRIVE_MODE_BRAKE,
-	eDRIVE_MODE_HARD_TURN_RIGHT,
-	eDRIVE_MODE_ACCEL_FORWARDS,
-	eDRIVE_MODE_HANDBRAKE_TURN_LEFT,
-	eDRIVE_MODE_ACCEL_FORWARDS,
-	eDRIVE_MODE_HANDBRAKE_TURN_RIGHT,
-	eDRIVE_MODE_NONE
-};
 
 VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 {
@@ -111,8 +88,8 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	const PxF32 wheelMass = 20.0f;
 	const PxF32 wheelRadius = 0.5f;
 	const PxF32 wheelWidth = 0.4f;
-	const PxF32 wheelMOI = 0.5f * wheelMass * wheelRadius * wheelRadius;
-	const PxU32 nbWheels = 6;
+	const PxF32 wheelMOI = 0.3f * wheelMass * wheelRadius * wheelRadius;
+	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
 
@@ -134,6 +111,76 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
+{
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
+	shape->setSimulationFilterData(cheeseFilter);
+
+	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
+
+	// Set physx actor name
+	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* vp = static_cast<void*>(new std::string(name));
+	body->userData = vp;
+
+	mScene->addActor(*body);
+	shape->release();
+
+	return body;
+}
+
+void PhysicsSystem::initializeActors() {
+	// GROUND ---------------------------------------------------------------------------------------------------------------------
+	// Add the ground plane to drive on
+	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
+	mScene->addActor(*mGroundPlane);
+
+	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
+	//Create a vehicle that will drive on the plane.
+	// PLAYER 1
+	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
+	mVehiclePlayer1 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransform);
+
+	// Set physx actor name
+	mVehiclePlayer1->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
+	
+	// Attach the entity to the physx actor
+	Entity* player1 = g_scene.getEntity("player1");
+	void* vp = static_cast<void*>(new std::string("player1"));
+	mVehiclePlayer1->getRigidDynamicActor()->userData = vp;
+
+	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
+
+	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	
+	// Note: Physx actor name must match Entity name
+	// CHEESE
+	float halfExtent = 1.0f;
+	PxTransform cheeseTransform(PxVec3(0, 0, 30));
+	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
+
+	// SAUSAGE
+	PxTransform sausageTransform(PxVec3(0, 0, -30));
+	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
+
+	// TOMATO
+	PxTransform tomatoTransform(PxVec3(30, 0, 0));
+	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
+
+	// DOUGH
+	PxTransform doughTransform(PxVec3(-30, 0, 0));
+	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
+}
+
 PhysicsSystem::PhysicsSystem()
 {
 	this->mCooking = NULL;
@@ -153,13 +200,14 @@ PhysicsSystem::PhysicsSystem()
 
 	// Dispatcher
 	PxU32 numWorkers = 1;
-	this->mDispatcher = mDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
+	this->mDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 
-	// Scene
+	// Physx scene
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = mDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader;
+	sceneDesc.cpuDispatcher = this->mDispatcher;
+	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader
+	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
 	this->mScene = mPhysics->createScene(sceneDesc);
 
 	// Material
@@ -184,24 +232,14 @@ PhysicsSystem::PhysicsSystem()
 	//Create the friction table for each combination of tire and surface type.
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
 
-	// Add the ground plane to drive on
-	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
-	mScene->addActor(*mGroundPlane);
-
-	//Create a vehicle that will drive on the plane.
-	// PLAYER 1
-	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
-	mVehicle4W = createVehicle4W(vehicleDesc, mPhysics, mCooking);
-	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	mVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
-	mScene->addActor(*mVehicle4W->getRigidDynamicActor());
+	//Set all of the ground/player/object actors
+	initializeActors();
 
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
-	mVehicle4W->setToRestState();
-	mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	mVehicle4W->mDriveDynData.setUseAutoGears(true);
+	mVehiclePlayer1->setToRestState();
+	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
 
 	//mVehicleModeTimer = 0.0f;
 	//mVehicleOrderProgress = 0;
@@ -219,31 +257,185 @@ void PhysicsSystem::initVehicleSDK()
 
 	// Set the vehicle update mode to be immediate velocity changes
 	physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
-
-
-	// The following is necessary, but it all gets handled by the snippetvehicle code currently
-	// We might want to handle this ourselves once we know what we're doing
-
-	//const physx::PxU32 numWheels = 4;
-
-	// Suspension strength and damping rate, wheel mass, tire stiffness, and suspension travel direction
-	//physx::PxVehicleWheelsSimData* wheelsSimData = physx::PxVehicleWheelsSimData::allocate(numWheels);
-	//setupWheelsSimulationData(wheelsSimData)
-
-	// Engine peak torque, clutch strength, gearing ratios, and Ackermann steering correction
-	//physx::PxVehicleDriveSimData4W driveSimData;
-	//setupDriveSimData(driveSimData)
-
-	// Needs geometry for wheels and chassis, mass, moment of inertia, and center of mass
-	//physx::PxTransform t(physx::PxVec3(0, 0, 0));
-	//physx::PxRigidDynamic* vehActor = mPhysics->createRigidDynamic(t);
-	//setupVehicleActor(vehActor)
-	//mScene->addActor(*vehActor);
-
-	//physx::PxVehicleDrive4W* vehDrive4W = physx::PxVehicleDrive4W::allocate(numWheels);
-	//vehDrive4W->setup(mPhysics, vehActor, *wheelsSimData, driveSimData, numWheels - 4);
 }
 
+
+void PhysicsSystem::update(const float timestep)
+{
+	// Update scene in physics simulation
+	this->mScene->simulate(timestep);
+	this->mScene->fetchResults(true);
+
+	// Update the control inputs for the vehicle
+	if (this->mMimicKeyInputs)
+	{
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	}
+	else
+	{
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	}
+
+	//Raycasts.
+	PxVehicleWheels* vehicles[1] = { this->mVehiclePlayer1 };
+	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
+	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+	// Vehicle update
+	const PxVec3 grav = this->mScene->getGravity();
+	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehiclePlayer1->mWheelsSimData.getNbWheels()} };
+	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
+
+	//Work out if the vehicle is in the air.
+	this->mIsVehicleInAir = this->mVehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+
+	// Set player 1 transform
+	Entity* player1 = g_scene.getEntity("player1");
+	Transform* player1Transform = player1->getTransform();
+	player1Transform->update(this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose());
+
+	// Update the food transforms
+	updateFoodTransforms();
+
+	// Set the ground's transform
+	Entity* countertop = g_scene.getEntity("countertop");
+	Transform* countertopTransform = countertop->getTransform();
+	physx::PxShape* shapes[1];
+	mGroundPlane->getShapes(shapes, 1);
+	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
+	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
+	countertopTransform->update(groundTransform);
+}
+
+void PhysicsSystem::updateFoodTransforms(){
+	// Cheese
+	Transform* cheese = g_scene.getEntity("cheese")->getTransform();
+	cheese->update(this->cheese->getGlobalPose());
+
+	// Sausagea
+	Transform* sausage = g_scene.getEntity("sausage")->getTransform();
+	sausage->update(this->sausage->getGlobalPose());
+
+	// Tomato
+	Transform* tomato = g_scene.getEntity("tomato")->getTransform();
+	tomato->update(this->tomato->getGlobalPose());
+
+	// Dough
+	Transform* dough = g_scene.getEntity("dough")->getTransform();
+	dough->update(this->dough->getGlobalPose());
+}
+
+void PhysicsSystem::cleanupPhysics()
+{
+	// Players
+	this->mVehiclePlayer1->getRigidDynamicActor()->release();
+	this->mVehiclePlayer1->free();
+
+	// Ingredients
+	this->cheese->release();
+	this->tomato->release();
+	this->dough->release();
+	this->sausage->release();
+
+	// PHYSX
+	PX_RELEASE(this->mGroundPlane);
+	PX_RELEASE(this->mBatchQuery);
+	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
+	PX_RELEASE(this->mFrictionPairs);
+	PxCloseVehicleSDK();
+
+	PX_RELEASE(this->mMaterial);
+	PX_RELEASE(this->mCooking);
+	PX_RELEASE(this->mScene);
+	PX_RELEASE(this->mDispatcher);
+	PX_RELEASE(this->mPhysics);
+	if (this->mPvd)
+	{
+		PxPvdTransport* transport = this->mPvd->getTransport();
+		this->mPvd->release();	this->mPvd = NULL;
+		PX_RELEASE(transport);
+	}
+	PX_RELEASE(this->mFoundation);
+}
+
+
+PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
+{
+	PxRigidDynamic* dynamic = PxCreateDynamic(*this->mPhysics, t, geometry, *this->mMaterial, 10.0f);
+	dynamic->setAngularDamping(0.5f);
+	dynamic->setLinearVelocity(velocity);
+	this->mScene->addActor(*dynamic);
+	return dynamic;
+}
+
+
+void PhysicsSystem::keyPress(unsigned char key)
+{
+	if (this->buttonState.forwardsHeld) {
+		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL) {
+			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		}
+		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
+			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eSECOND);
+		}
+		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eSECOND) {
+			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eTHIRD);
+		}
+		this->mVehicleInputData.setDigitalBrake(false);
+		this->mVehicleInputData.setAnalogBrake(0.f);
+		startAccelerateForwardsMode();
+	}
+	if (this->buttonState.backwardsHeld) {
+		//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+		this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		this->mVehicleInputData.setDigitalBrake(false);
+		this->mVehicleInputData.setAnalogBrake(0.f);
+		startAccelerateReverseMode();
+	}
+	if (this->buttonState.rightHeld) {
+		startTurnHardRightMode();
+	}
+	if (this->buttonState.leftHeld) {
+		startTurnHardLeftMode();
+	}
+	if (this->buttonState.brakeHeld) {
+		startBrakeMode();
+	}
+	if (!this->buttonState.forwardsHeld && !this->buttonState.backwardsHeld && !this->buttonState.leftHeld &&
+		!this->buttonState.rightHeld && !this->buttonState.brakeHeld) {
+		//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+		this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		this->mVehicleInputData.setDigitalBrake(false);
+		this->mVehicleInputData.setAnalogBrake(0.f);
+		releaseAllControls();
+	}
+}
+
+void PhysicsSystem::keyRelease(unsigned char key)
+{
+	PxTransform camera = PxTransform(PxVec3(1.0f));
+
+
+	if (!this->buttonState.forwardsHeld) {
+		releaseGas();
+	}
+	if (!this->buttonState.backwardsHeld) {
+		releaseGas();
+	}
+	if (!this->buttonState.rightHeld) {
+		releaseSteering();
+	}
+	if (!this->buttonState.leftHeld) {
+		releaseSteering();
+	}
+	if (this->buttonState.brakeHeld) {
+		startBrakeMode();
+	}
+	if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+		releaseAllControls();
+}
 
 void PhysicsSystem::startAccelerateForwardsMode()
 {
@@ -259,7 +451,7 @@ void PhysicsSystem::startAccelerateForwardsMode()
 
 void PhysicsSystem::startAccelerateReverseMode()
 {
-	//this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+	//this->vehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 
 	if (this->mMimicKeyInputs)
 	{
@@ -381,7 +573,7 @@ void PhysicsSystem::releaseGas()
 
 void PhysicsSystem::releaseSteering()
 {
-	if(!this->mMimicKeyInputs)
+	if (!this->mMimicKeyInputs)
 	{
 		this->mVehicleInputData.setAnalogSteer(0.0f);
 	}
@@ -404,221 +596,5 @@ void PhysicsSystem::releaseAllControls()
 		this->mVehicleInputData.setAnalogSteer(0.0f);
 		this->mVehicleInputData.setAnalogBrake(0.0f);
 		this->mVehicleInputData.setAnalogHandbrake(0.0f);
-	}
-}
-
-
-void PhysicsSystem::incrementDrivingMode(const PxF32 timestep)
-{
-	this->mVehicleModeTimer += timestep;
-	if (this->mVehicleModeTimer > this->mVehicleModeLifetime)
-	{
-		//If the mode just completed was eDRIVE_MODE_ACCEL_REVERSE then switch back to forward gears.
-		if (eDRIVE_MODE_ACCEL_REVERSE == gDriveModeOrder[this->mVehicleOrderProgress])
-		{
-			this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-		}
-
-		//Increment to next driving mode.
-		this->mVehicleModeTimer = 0.0f;
-		this->mVehicleOrderProgress++;
-		releaseAllControls();
-
-		//If we are at the end of the list of driving modes then start again.
-		if (eDRIVE_MODE_NONE == gDriveModeOrder[this->mVehicleOrderProgress])
-		{
-			this->mVehicleOrderProgress = 0;
-			this->mVehicleOrderComplete = true;
-		}
-
-		//Start driving in the selected mode.
-		DriveMode eDriveMode = gDriveModeOrder[this->mVehicleOrderProgress];
-		switch (eDriveMode)
-		{
-		case eDRIVE_MODE_ACCEL_FORWARDS:
-			startAccelerateForwardsMode();
-			break;
-		case eDRIVE_MODE_ACCEL_REVERSE:
-			startAccelerateReverseMode();
-			break;
-		case eDRIVE_MODE_HARD_TURN_LEFT:
-			startTurnHardLeftMode();
-			break;
-		case eDRIVE_MODE_HANDBRAKE_TURN_LEFT:
-			startHandbrakeTurnLeftMode();
-			break;
-		case eDRIVE_MODE_HARD_TURN_RIGHT:
-			startTurnHardRightMode();
-			break;
-		case eDRIVE_MODE_HANDBRAKE_TURN_RIGHT:
-			startHandbrakeTurnRightMode();
-			break;
-		case eDRIVE_MODE_BRAKE:
-			startBrakeMode();
-			break;
-		case eDRIVE_MODE_NONE:
-			break;
-		};
-
-		//If the mode about to start is eDRIVE_MODE_ACCEL_REVERSE then switch to reverse gears.
-		if (eDRIVE_MODE_ACCEL_REVERSE == gDriveModeOrder[this->mVehicleOrderProgress])
-		{
-			this->mVehicle4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		}
-	}
-}
-
-void PhysicsSystem::update(const float timestep)
-{
-	
-
-	//Cycle through the driving modes to demonstrate how to accelerate/reverse/brake/turn etc.
-	//incrementDrivingMode(timestep);
-
-	//Update the control inputs for the vehicle.
-	if (this->mMimicKeyInputs)
-	{
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehicle4W);
-	}
-	else
-	{
-		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehicle4W);
-	}
-
-	//Raycasts.
-	PxVehicleWheels* vehicles[1] = { this->mVehicle4W };
-	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
-	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
-	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
-
-	//Vehicle update.
-	const PxVec3 grav = this->mScene->getGravity();
-	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehicle4W->mWheelsSimData.getNbWheels()} };
-	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
-
-	//Work out if the vehicle is in the air.
-	this->mIsVehicleInAir = this->mVehicle4W->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
-
-	// Set player 1 transform
-	Entity* player1 = g_scene.getEntity("player1");
-	Transform* player1Transform = player1->getTransform();
-	PxVec3 currentPosision = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().p;
-	PxQuat currentRotation = this->mVehicle4W->getRigidDynamicActor()->getGlobalPose().q;
-	player1Transform->update(this->mVehicle4W->getRigidDynamicActor()->getGlobalPose());
-
-	// Set the ground's transform
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
-	physx::PxShape* shapes[1];
-	mGroundPlane->getShapes(shapes, 1);
-	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	countertopTransform->update(groundTransform);
-
-	//Scene update.
-	this->mScene->simulate(timestep);
-	this->mScene->fetchResults(true);
-}
-
-void PhysicsSystem::cleanupPhysics()
-{
-	this->mVehicle4W->getRigidDynamicActor()->release();
-	this->mVehicle4W->free();
-	PX_RELEASE(this->mGroundPlane);
-	PX_RELEASE(this->mBatchQuery);
-	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
-	PX_RELEASE(this->mFrictionPairs);
-	PxCloseVehicleSDK();
-
-	PX_RELEASE(this->mMaterial);
-	PX_RELEASE(this->mCooking);
-	PX_RELEASE(this->mScene);
-	PX_RELEASE(this->mDispatcher);
-	PX_RELEASE(this->mPhysics);
-	if (this->mPvd)
-	{
-		PxPvdTransport* transport = this->mPvd->getTransport();
-		this->mPvd->release();	this->mPvd = NULL;
-		PX_RELEASE(transport);
-	}
-	PX_RELEASE(this->mFoundation);
-}
-
-
-PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
-{
-	PxRigidDynamic* dynamic = PxCreateDynamic(*this->mPhysics, t, geometry, *this->mMaterial, 10.0f);
-	dynamic->setAngularDamping(0.5f);
-	dynamic->setLinearVelocity(velocity);
-	this->mScene->addActor(*dynamic);
-	return dynamic;
-}
-
-
-// Readd the camera probably 
-void PhysicsSystem::keyPress(unsigned char key)
-{
-	printf("KeyPress: %c\n", key);
-
-	switch (toupper(key))
-	{
-		case 'W':
-			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
-			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f);
-			startAccelerateForwardsMode();
-			break;
-		case 'S':
-			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f);
-			startAccelerateReverseMode();
-			break;
-		case 'D':
-			startTurnHardRightMode();
-			break;
-		case 'A':
-			startTurnHardLeftMode();
-			break;
-		case ' ':
-			startBrakeMode();
-			break;
-		default:
-			//if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
-			this->mVehicleInputData.setDigitalBrake(false);
-			this->mVehicleInputData.setAnalogBrake(0.f);
-			releaseAllControls();
-			break;
-	}
-}
-
-void PhysicsSystem::keyRelease(unsigned char key)
-{
-	/*PX_UNUSED(camera);
-	PX_UNUSED(key);*/
-	PxTransform camera = PxTransform(PxVec3(1.0f));
-	printf("KeyPress: %c\n", key);
-	switch (toupper(key))
-	{
-	case 'S':
-		releaseGas();
-		break;
-	case 'W':
-		releaseGas();
-		break;
-	case 'A':
-		releaseSteering();
-		break;
-	case 'D':
-		releaseSteering();
-		break;
-	default:
-		if (this->mVehicle4W->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			this->mVehicle4W->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
-		releaseAllControls();
-		break;
 	}
 }

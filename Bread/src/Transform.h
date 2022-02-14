@@ -17,6 +17,7 @@ public:
 
 	glm::vec3 position;
 	glm::vec3 rotation;
+	glm::mat4 rotationMat;
 	glm::vec3 scale;
 
 	glm::vec3 heading;
@@ -27,6 +28,7 @@ public:
 	{
 		position = glm::vec3(0, 0, 0);
 		rotation = glm::vec3(0, 0, 0);
+		rotationMat = glm::mat4(1.0f);
 		scale = glm::vec3(1, 1, 1);
 
 		model = glm::mat4(1.f);
@@ -35,6 +37,17 @@ public:
 	glm::mat4 getModelMatrix()
 	{
 		return model;
+	}
+
+	void update()
+	{
+		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.f), this->position);
+		glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians(this->rotation.x), glm::vec3(1.f, 0, 0));
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(this->rotation.y), glm::vec3(0, 1.f, 0));
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(this->rotation.z), glm::vec3(0, 0, 1.f));
+		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.f), this->scale);
+
+		this->model = translationMatrix * rotationMatrix * scaleMatrix;
 	}
 
 	void update(physx::PxTransform transform)
@@ -46,12 +59,12 @@ public:
 		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.f), this->position);
 
 		glm::quat newQuat = glm::quat(transform.q.w, transform.q.x, transform.q.y, transform.q.z);
-		glm::mat4 rotationMatrix = toMat4(newQuat);
+		this->rotationMat = toMat4(newQuat);
 
 		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.f), this->scale);
 
 		this->heading = rotationMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
 		
-		this->model = translationMatrix * rotationMatrix * scaleMatrix;
+		this->model = translationMatrix * rotationMat * scaleMatrix;
 	}
 };

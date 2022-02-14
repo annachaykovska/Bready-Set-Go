@@ -1,5 +1,7 @@
 #include "../SystemManager.h"
 #include "../Scene/Entity.h"
+#include "AudioClip.h"
+#include "AudioSystem.h"
 
 extern SystemManager g_systems;
 

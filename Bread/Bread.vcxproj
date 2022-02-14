@@ -114,20 +114,19 @@
     <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleTireFriction.cpp" />
     <ClCompile Include="src\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Audio\AudioSource.cpp" />
+    <ClCompile Include="src\Physics\CollisionCallback.cpp" />
+    <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Rendering\RenderingSystem.cpp" />
     <ClCompile Include="src\Physics\VehicleController.cpp" />
     <ClCompile Include="src\Scene\Entity.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Rendering\Mesh.cpp" />
+    <ClCompile Include="src\Rendering\Model.cpp" />
     <ClCompile Include="src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\ElementBuffer.cpp" />
-    <ClCompile Include="src\VertexArray.cpp" />
-    <ClCompile Include="src\VertexBuffer.cpp" />
+    <ClCompile Include="src\Rendering\Shader.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -757,22 +756,24 @@
     <ClInclude Include="src\Audio\AudioEvent.h" />
     <ClInclude Include="src\Audio\AudioSource.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Inventory.h" />
+    <ClInclude Include="src\Physics\CollisionCallback.h" />
+    <ClInclude Include="src\Physics\PhysicsEnums.h" />
+    <ClInclude Include="src\Rendering\LightSource.h" />
+    <ClInclude Include="src\Rendering\Material.h" />
+    <ClInclude Include="src\Rendering\RenderingSystem.h" />
     <ClInclude Include="src\Physics\VehicleController.h" />
     <ClInclude Include="src\Scene\Component.h" />
-    <ClInclude Include="src\ElementBuffer.h" />
     <ClInclude Include="src\Scene\Entity.h" />
-    <ClInclude Include="src\Geometry.h" />
-    <ClInclude Include="src\Input.h" />
-    <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Rendering\GroundModel.h" />
+    <ClInclude Include="src\Rendering\Mesh.h" />
+    <ClInclude Include="src\Rendering\Model.h" />
     <ClInclude Include="src\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\Profiler.h" />
     <ClInclude Include="src\Scene\Scene.h" />
-    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Rendering\Shader.h" />
     <ClInclude Include="src\SystemManager.h" />
     <ClInclude Include="src\Transform.h" />
-    <ClInclude Include="src\VertexArray.h" />
-    <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -977,6 +978,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\shaders\fragment.txt" />
+    <Text Include="resources\shaders\lightSourceFragment.txt" />
+    <Text Include="resources\shaders\lightSourceVertex.txt" />
     <Text Include="resources\shaders\vertex.txt" />
   </ItemGroup>
   <ItemGroup>

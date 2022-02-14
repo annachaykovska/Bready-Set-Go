@@ -1,5 +1,5 @@
 #include "Scene.h"
-
+#include "Entity.h"
 
 /// <summary>
 /// Creates all the Entities in the Scene.
@@ -8,9 +8,14 @@ void Scene::createEntities()
 {
 	createEntity("player1");
 	createEntity("player2");
+	createEntity("player3");
+	createEntity("player4");
+	createEntity("cheese");
+	createEntity("sausage");
+	createEntity("tomato");
+	createEntity("dough");
 	createEntity("countertop");
 }
-
 
 /// <summary>
 /// Returns a reference to the Entity with name.

@@ -1,8 +1,9 @@
 #pragma once
-
 #include <string>
+#include <memory>
 
-#include "Input.h"
+#include "glad/glad.h"
+#include "glfw/glfw3.h"
 
 class CallbackInterface {
 public:
@@ -34,7 +35,6 @@ public:
 	void swapBuffer() { glfwSwapBuffers(window.get()); }
 	int shouldClose() { return glfwWindowShouldClose(window.get()); }
 	GLFWwindow* getWindow() { return window.get(); }
-	void getInput();
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 	void clear() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
@@ -42,7 +42,7 @@ public:
 
 private:
 	std::unique_ptr<GLFWwindow, WindowDeleter> window;
-	std::shared_ptr<CallbackInterface> callbacks;      // optional shared owning ptr (user provided)
+	std::shared_ptr<CallbackInterface> callbacks; // optional shared owning ptr (user provided)
 
 	void setup();
 	int verifyGLFW();
@@ -52,7 +52,6 @@ private:
 	int width;
 	int height;
 	std::string title;
-	Input input;
 
 	static void keyMetaCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void mouseButtonMetaCallback(GLFWwindow* window, int button, int action, int mods);

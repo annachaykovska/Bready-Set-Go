@@ -46,10 +46,19 @@ PxFilterFlags VehicleFilterShader
 	PX_UNUSED(constantBlock);
 	PX_UNUSED(constantBlockSize);
 
-	if( (0 == (filterData0.word0 & filterData1.word1)) && (0 == (filterData1.word0 & filterData0.word1)) )
+	if ( (0 == (filterData0.word0 & filterData1.word1)) && (0 == (filterData1.word0 & filterData0.word1)) )
 		return PxFilterFlag::eSUPPRESS;
 
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+	
+	if ((filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_WHEEL) ||
+		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_WHEEL) ||
+		(filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_CHASSIS) ||
+		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_CHASSIS)) 
+	{
+		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	}
+
 	pairFlags |= PxPairFlags(PxU16(filterData0.word2 | filterData1.word2));
 
 	return PxFilterFlags();

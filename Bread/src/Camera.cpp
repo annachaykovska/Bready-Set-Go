@@ -2,55 +2,56 @@
 #include <math.h>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "Camera.h"
 
-Camera::Camera(float theta, float phi, float radius)
-{
-	this->theta = theta;
-	this->phi = phi;
-	this->radius = radius;
+#define CAMERA_DISTANCE 30.0
+#define CAMERA_GROUND_HEIGHT 15.0
 
-	this->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	this->cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	this->cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera::Camera()
+{
+	this->position = glm::vec3(0, 200.0f, 500.0f);
+	this->front = glm::vec3(0, 0, -1.f);
+	this->up = glm::vec3(0, 1.f, 0);
+	this->worldUp = glm::vec3(0, 1.f, 0);	
+	this->yaw = YAW;
+	this->pitch = PITCH;
+	this->movementSpeed = SPEED;
+	this->mouseSensitivity = SENSITIVITY;
+	this->zoom = ZOOM; 
+	Transform transform = Transform();
+	transform.position = glm::vec3(1.0f);
+	updateCameraVectors(&transform);
 }
 
-glm::mat4 Camera::getView()
+glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 {
-	glm::vec3 cameraPosition = radius * glm::vec3(std::cos(theta) * std::sin(phi), std::sin(theta), std::cos(theta) * std::cos(phi));
-	glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(45.0)), 0, sin(glm::radians(45.0)), 0,
+		0, 1.0f, 0, 0,
+		-sin(glm::radians(45.0)), 0, cos(glm::radians(45.0)), 0,
+		0, 0, 0, 1.0f);;
+	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
+	float xChange = CAMERA_DISTANCE * positionFromVehicle.x;
+	float zChange = CAMERA_DISTANCE * positionFromVehicle.z;
 
-	return glm::lookAt(cameraPosition, cameraDirection, cameraUp);
+	position.x = playerTransform->position.x + xChange;
+	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
+	position.z = playerTransform->position.z + zChange;
+	return glm::lookAt(position, playerTransform->position, worldUp);
 }
 
-glm::vec3 Camera::getPos() 
+void Camera::updateCameraVectors(Transform* playerTransform)
 {
-	return radius * glm::vec3(std::cos(theta) * std::sin(phi), std::sin(theta), std::cos(theta) * std::cos(phi));
-}
+	// Calculate new front vector using Euler angles
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	this->front = glm::normalize(front);
 
-void Camera::incrementTheta(float dt) 
-{
-	if (theta + (dt / 100.0f) < M_PI_2 && theta + (dt / 100.0f) > -M_PI_2) 
-	{
-		theta += dt / 100.0f;
-	}
-}
-
-void Camera::incrementPhi(float dp) 
-{
-	phi -= dp / 100.0f;
-
-	if (phi > 2.0 * M_PI) {
-		phi -= 2.0 * M_PI;
-	}
-	else if (phi < 0.0f) {
-		phi += 2.0 * M_PI;
-	}
-}
-
-void Camera::incrementR(float dr) 
-{
-	radius -= dr;
+	// Calculate new right and up vectors using cross product
+	this->right = glm::normalize(glm::cross(front, worldUp));
+	this->up = glm::normalize(glm::cross(right, front));
 }

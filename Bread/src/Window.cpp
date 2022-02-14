@@ -1,8 +1,5 @@
 #include <iostream>
 
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
-
 #include "Window.h"
 
 void Window::keyMetaCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -10,30 +7,25 @@ void Window::keyMetaCallback(GLFWwindow* window, int key, int scancode, int acti
 	callbacks->keyCallback(key, scancode, action, mods);
 }
 
-
 void Window::mouseButtonMetaCallback(GLFWwindow* window, int button, int action, int mods) {
 	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
 	callbacks->mouseButtonCallback(button, action, mods);
 }
-
 
 void Window::cursorPosMetaCallback(GLFWwindow* window, double xpos, double ypos) {
 	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
 	callbacks->cursorPosCallback(xpos, ypos);
 }
 
-
 void Window::scrollMetaCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
 	callbacks->scrollCallback(xoffset, yoffset);
 }
 
-
 void Window::windowSizeMetaCallback(GLFWwindow* window, int width, int height) {
 	CallbackInterface* callbacks = static_cast<CallbackInterface*>(glfwGetWindowUserPointer(window));
 	callbacks->windowSizeCallback(width, height);
 }
-
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -77,11 +69,6 @@ void Window::connectCallbacks() {
 void Window::setCallbacks(std::shared_ptr<CallbackInterface> callbacks_) {
 	callbacks = callbacks_;
 	connectCallbacks();
-}
-
-void Window::getInput()
-{
-	input.processInput(window.get());
 }
 
 void Window::setup() {

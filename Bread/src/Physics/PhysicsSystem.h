@@ -1,7 +1,12 @@
 #pragma once
+#include <vector>
+
+#include <iostream>
 
 #include <PxPhysicsAPI.h>
 #include <snippetvehiclecommon/SnippetVehicleSceneQuery.h>
+
+#include "PhysicsEnums.h"
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -12,7 +17,10 @@ public:
 
 	PhysicsSystem();
 	void initVehicleSDK();
+	void initializeActors();
+	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
 	void update(const float timestep);
+	void updateFoodTransforms();
 	void startAccelerateForwardsMode();
 	void startAccelerateReverseMode();
 	void startBrakeMode();
@@ -25,15 +33,21 @@ public:
 	void releaseGas();
 	void releaseSteering();
 	void releaseAllControls();
-	void incrementDrivingMode(const PxF32 timestep);
 	void cleanupPhysics();
 	void keyPress(unsigned char key);
 	void keyRelease(unsigned char key);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
-	// Public Variables
-	PxVehicleDrive4W* mVehicle4W; // TODO: Rename this?
+	// Public Entities
+	PxVehicleDrive4W* mVehiclePlayer1; // TODO: Rename this?
+	PxRigidDynamic* cheese;
+	PxRigidDynamic* sausage;
+	PxRigidDynamic* tomato;
+	PxRigidDynamic* dough;
 
+	ButtonState buttonState;
+	
+	
 private:
 	PxDefaultErrorCallback mDefaultErrorCallback;
 	PxDefaultAllocator mDefaultAllocatorCallback;
@@ -50,7 +64,7 @@ private:
 	PxRigidStatic* mGroundPlane;
 	bool mIsVehicleInAir = true;
 	PxVehicleDrive4WRawInputData mVehicleInputData;
-	PxF32 mVehicleModeLifetime = 4.0f;
+	PxF32 mVehicleModeLifetime = 0.2f;
 	PxF32 mVehicleModeTimer = 0.0f;
 	PxU32 mVehicleOrderProgress = 0;
 	bool mVehicleOrderComplete = false;
