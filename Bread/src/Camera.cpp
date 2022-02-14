@@ -7,8 +7,8 @@
 
 #include "Camera.h"
 
-#define CAMERA_DISTANCE 50.0
-#define CAMERA_GROUND_HEIGHT 30.0
+#define CAMERA_DISTANCE 30.0
+#define CAMERA_GROUND_HEIGHT 15.0
 
 Camera::Camera()
 {
@@ -20,7 +20,7 @@ Camera::Camera()
 	this->pitch = PITCH;
 	this->movementSpeed = SPEED;
 	this->mouseSensitivity = SENSITIVITY;
-	this->zoom = ZOOM;
+	this->zoom = ZOOM; 
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	updateCameraVectors(&transform);
