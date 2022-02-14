@@ -1,5 +1,5 @@
 #pragma once
-#include "../Mesh.h"
+#include "../Rendering/Mesh.h"
 #include "../Transform.h"
 
 typedef std::pair<int, int> SegmentVertex;

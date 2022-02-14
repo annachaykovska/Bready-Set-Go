@@ -17,7 +17,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	this->indices = indices;
 	this->textures = textures;
 
-	wireframe = false;
 	setupMesh();
 }
 

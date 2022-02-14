@@ -42,7 +42,7 @@ public:
 private:
 
 	unsigned int VAO, VBO, EBO; // Rendering data
-	bool wireframe;
+	bool wireframe = false;
 	//void setupMesh();			// Initialization
 
 };
