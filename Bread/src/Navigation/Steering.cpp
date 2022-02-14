@@ -28,8 +28,6 @@ void Steering::updateSteering(position target)
 	float theta = acos(dot(vectorB, vectorA) / (length(vectorA) * length(vectorB)));
 	glm::vec3 upVector = cross(vectorB, vectorA);
 
-	std::cout << distance << std::endl;
-
 	if (abs(theta) > TURN_THRESHOLD)
 	{
 		//std::cout << "Correcting" << std::endl;

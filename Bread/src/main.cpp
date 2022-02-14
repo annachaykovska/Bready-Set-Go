@@ -192,7 +192,7 @@ int main()
 		//std::cout << player1->getTransform()->rotation.x << ", " << player1->getTransform()->rotation.y << ", " << player1->getTransform()->rotation.z << std::endl;
 		//std::cout << player1->getTransform()->heading.x << ", " << player1->getTransform()->heading.y << ", " << player1->getTransform()->heading.z << std::endl;
 		waypointUpdater.updateWaypoints();
-		steering.updateSteering(waypointUpdater.currentWaypoint());
+		steering.updateSteering(waypointUpdater.interpolator());
 
 		// Draw player2
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(player2Transform->getModelMatrix()));

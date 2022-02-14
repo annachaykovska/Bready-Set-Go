@@ -253,7 +253,7 @@ void PhysicsSystem::startAccelerateForwardsMode()
 	}
 	else
 	{
-		this->mVehicleInputData.setAnalogAccel(0.6f);
+		this->mVehicleInputData.setAnalogAccel(0.8f);
 	}
 }
 

@@ -13,8 +13,11 @@ public:
 
 	void updateWaypoints();
 	position currentWaypoint();
+	position interpolator();
 
 private:
 	Entity& entity_;
 	std::vector<position> waypoints_;
+	
+	position interpolator_;
 };
