@@ -26,6 +26,8 @@ public:
 	void startBrakeMode();
 	void startTurnHardLeftMode();
 	void startTurnHardRightMode();
+	void startTurnSoftLeftMode(float value);
+	void startTurnSoftRightMode(float value);
 	void startHandbrakeTurnLeftMode();
 	void startHandbrakeTurnRightMode();
 	void releaseGas();

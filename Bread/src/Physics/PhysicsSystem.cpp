@@ -503,6 +503,34 @@ void PhysicsSystem::startTurnHardRightMode()
 	}
 }
 
+void PhysicsSystem::startTurnSoftLeftMode(float value)
+{
+	if (this->mMimicKeyInputs)
+	{
+		this->mVehicleInputData.setDigitalAccel(true);
+		this->mVehicleInputData.setDigitalSteerLeft(true);
+	}
+	else
+	{
+		//this->mVehicleInputData.setAnalogAccel(true);
+		this->mVehicleInputData.setAnalogSteer(value);
+	}
+}
+
+void PhysicsSystem::startTurnSoftRightMode(float value)
+{
+	if (this->mMimicKeyInputs)
+	{
+		this->mVehicleInputData.setDigitalAccel(true);
+		this->mVehicleInputData.setDigitalSteerRight(true);
+	}
+	else
+	{
+		//this->mVehicleInputData.setAnalogAccel(1.0f);
+		this->mVehicleInputData.setAnalogSteer(value);
+	}
+}
+
 void PhysicsSystem::startHandbrakeTurnLeftMode()
 {
 	if (this->mMimicKeyInputs)

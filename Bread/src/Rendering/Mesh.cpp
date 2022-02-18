@@ -64,6 +64,11 @@ void Mesh::setupMesh()
 	glBindVertexArray(0); // Unbind VAO
 }
 
+void Mesh::setWireframe(bool drawWireFrame)
+{
+	wireframe = drawWireFrame;
+}
+
 /// <summary>
 /// Renders the mesh to the screen using the provided Shader program.
 /// </summary>
@@ -129,6 +134,14 @@ void Mesh::draw(Shader &shader)
 	}
 
 	glBindVertexArray(VAO);
+	if (wireframe)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

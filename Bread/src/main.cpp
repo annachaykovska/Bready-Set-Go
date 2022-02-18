@@ -32,7 +32,7 @@ int main()
 
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
-    //-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
 	// Populate the scene with Entities (will happen on game start)
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
@@ -139,7 +139,7 @@ int main()
 
 	// Set movement control callbacks
 	// TODO: generalize this
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics);
 	window.setCallbacks(movementCallbacks);
 
 	//-----------------------------------------------------------------------------------
