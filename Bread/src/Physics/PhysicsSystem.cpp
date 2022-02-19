@@ -69,7 +69,6 @@ PxVehiclePadSmoothingData gPadSmoothingData =
 	}
 };
 
-
 VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 {
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
@@ -135,7 +134,8 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	return body;
 }
 
-void PhysicsSystem::initializeActors() {
+void PhysicsSystem::initializeActors() 
+{
 	// GROUND ---------------------------------------------------------------------------------------------------------------------
 	// Add the ground plane to drive on
 	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
@@ -238,12 +238,8 @@ PhysicsSystem::PhysicsSystem()
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
 	mVehiclePlayer1->setToRestState();
-	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
-
-	//mVehicleModeTimer = 0.0f;
-	//mVehicleOrderProgress = 0;
-	//startBrakeMode();
+	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -253,12 +249,11 @@ void PhysicsSystem::initVehicleSDK()
 	physx::PxInitVehicleSDK(*mPhysics);
 
 	// Set basis vectors
-	physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1, 0), physx::PxVec3(0, 0, -1));
+	physx::PxVehicleSetBasisVectors(physx::PxVec3(0, 1.0f, 0), physx::PxVec3(0, 0, 1.0f));
 
 	// Set the vehicle update mode to be immediate velocity changes
 	physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 }
-
 
 void PhysicsSystem::update(const float timestep)
 {
@@ -267,16 +262,10 @@ void PhysicsSystem::update(const float timestep)
 	this->mScene->fetchResults(true);
 
 	// Update the control inputs for the vehicle
-	if (this->mMimicKeyInputs)
-	{
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
-	}
-	else
-	{
-		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
-	}
+	PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	//PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
 
-	//Raycasts.
+	// Raycasts
 	PxVehicleWheels* vehicles[1] = { this->mVehiclePlayer1 };
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
@@ -288,7 +277,7 @@ void PhysicsSystem::update(const float timestep)
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehiclePlayer1->mWheelsSimData.getNbWheels()} };
 	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
 
-	//Work out if the vehicle is in the air.
+	// Work out if the vehicle is in the air
 	this->mIsVehicleInAir = this->mVehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
 	// Set player 1 transform
@@ -309,7 +298,8 @@ void PhysicsSystem::update(const float timestep)
 	countertopTransform->update(groundTransform);
 }
 
-void PhysicsSystem::updateFoodTransforms(){
+void PhysicsSystem::updateFoodTransforms()
+{
 	// Cheese
 	Transform* cheese = g_scene.getEntity("cheese")->getTransform();
 	cheese->update(this->cheese->getGlobalPose());
@@ -351,15 +341,16 @@ void PhysicsSystem::cleanupPhysics()
 	PX_RELEASE(this->mScene);
 	PX_RELEASE(this->mDispatcher);
 	PX_RELEASE(this->mPhysics);
+	
 	if (this->mPvd)
 	{
 		PxPvdTransport* transport = this->mPvd->getTransport();
 		this->mPvd->release();	this->mPvd = NULL;
 		PX_RELEASE(transport);
 	}
+
 	PX_RELEASE(this->mFoundation);
 }
-
 
 PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 {
@@ -368,233 +359,4 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 	dynamic->setLinearVelocity(velocity);
 	this->mScene->addActor(*dynamic);
 	return dynamic;
-}
-
-
-void PhysicsSystem::keyPress(unsigned char key)
-{
-	if (this->buttonState.forwardsHeld) {
-		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL) {
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
-		}
-		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eSECOND);
-		}
-		if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eSECOND) {
-			this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eTHIRD);
-		}
-		this->mVehicleInputData.setDigitalBrake(false);
-		this->mVehicleInputData.setAnalogBrake(0.f);
-		startAccelerateForwardsMode();
-	}
-	if (this->buttonState.backwardsHeld) {
-		//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-		this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-		this->mVehicleInputData.setDigitalBrake(false);
-		this->mVehicleInputData.setAnalogBrake(0.f);
-		startAccelerateReverseMode();
-	}
-	if (this->buttonState.rightHeld) {
-		startTurnHardRightMode();
-	}
-	if (this->buttonState.leftHeld) {
-		startTurnHardLeftMode();
-	}
-	if (this->buttonState.brakeHeld) {
-		startBrakeMode();
-	}
-	if (!this->buttonState.forwardsHeld && !this->buttonState.backwardsHeld && !this->buttonState.leftHeld &&
-		!this->buttonState.rightHeld && !this->buttonState.brakeHeld) {
-		//if (this->vehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-		this->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
-		this->mVehicleInputData.setDigitalBrake(false);
-		this->mVehicleInputData.setAnalogBrake(0.f);
-		releaseAllControls();
-	}
-}
-
-void PhysicsSystem::keyRelease(unsigned char key)
-{
-	PxTransform camera = PxTransform(PxVec3(1.0f));
-
-
-	if (!this->buttonState.forwardsHeld) {
-		releaseGas();
-	}
-	if (!this->buttonState.backwardsHeld) {
-		releaseGas();
-	}
-	if (!this->buttonState.rightHeld) {
-		releaseSteering();
-	}
-	if (!this->buttonState.leftHeld) {
-		releaseSteering();
-	}
-	if (this->buttonState.brakeHeld) {
-		startBrakeMode();
-	}
-	if (this->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-		releaseAllControls();
-}
-
-void PhysicsSystem::startAccelerateForwardsMode()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(true);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogAccel(1.0f);
-	}
-}
-
-void PhysicsSystem::startAccelerateReverseMode()
-{
-	//this->vehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(true);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogAccel(1.0f);
-	}
-}
-
-void PhysicsSystem::startBrakeMode()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalBrake(true);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogBrake(1.0f);
-	}
-}
-
-void PhysicsSystem::startTurnHardLeftMode()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(true);
-		this->mVehicleInputData.setDigitalSteerLeft(true);
-	}
-	else
-	{
-		//this->mVehicleInputData.setAnalogAccel(true);
-		this->mVehicleInputData.setAnalogSteer(-1.0f);
-	}
-}
-
-void PhysicsSystem::startTurnHardRightMode()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(true);
-		this->mVehicleInputData.setDigitalSteerRight(true);
-	}
-	else
-	{
-		//this->mVehicleInputData.setAnalogAccel(1.0f);
-		this->mVehicleInputData.setAnalogSteer(1.0f);
-	}
-}
-
-void PhysicsSystem::startTurnSoftLeftMode(float value)
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(true);
-		this->mVehicleInputData.setDigitalSteerLeft(true);
-	}
-	else
-	{
-		//this->mVehicleInputData.setAnalogAccel(true);
-		this->mVehicleInputData.setAnalogSteer(value);
-	}
-}
-
-void PhysicsSystem::startTurnSoftRightMode(float value)
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(true);
-		this->mVehicleInputData.setDigitalSteerRight(true);
-	}
-	else
-	{
-		//this->mVehicleInputData.setAnalogAccel(1.0f);
-		this->mVehicleInputData.setAnalogSteer(value);
-	}
-}
-
-void PhysicsSystem::startHandbrakeTurnLeftMode()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalSteerLeft(true);
-		this->mVehicleInputData.setDigitalHandbrake(true);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogSteer(-1.0f);
-		this->mVehicleInputData.setAnalogHandbrake(1.0f);
-	}
-}
-
-void PhysicsSystem::startHandbrakeTurnRightMode()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalSteerRight(true);
-		this->mVehicleInputData.setDigitalHandbrake(true);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogSteer(1.0f);
-		this->mVehicleInputData.setAnalogHandbrake(1.0f);
-	}
-}
-
-void PhysicsSystem::releaseGas()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(false);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogAccel(0.0f);
-	}
-}
-
-void PhysicsSystem::releaseSteering()
-{
-	if (!this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setAnalogSteer(0.0f);
-	}
-}
-
-
-void PhysicsSystem::releaseAllControls()
-{
-	if (this->mMimicKeyInputs)
-	{
-		this->mVehicleInputData.setDigitalAccel(false);
-		this->mVehicleInputData.setDigitalSteerLeft(false);
-		this->mVehicleInputData.setDigitalSteerRight(false);
-		this->mVehicleInputData.setDigitalBrake(false);
-		this->mVehicleInputData.setDigitalHandbrake(false);
-	}
-	else
-	{
-		this->mVehicleInputData.setAnalogAccel(0.0f);
-		this->mVehicleInputData.setAnalogSteer(0.0f);
-		this->mVehicleInputData.setAnalogBrake(0.0f);
-		this->mVehicleInputData.setAnalogHandbrake(0.0f);
-	}
 }
