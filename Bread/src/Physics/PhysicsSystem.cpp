@@ -36,7 +36,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 PxVehicleKeySmoothingData gKeySmoothingData =
 {
 	{
-		6.0f,	//rise rate eANALOG_INPUT_ACCEL
+		10.0f,	//rise rate eANALOG_INPUT_ACCEL
 		6.0f,	//rise rate eANALOG_INPUT_BRAKE		
 		6.0f,	//rise rate eANALOG_INPUT_HANDBRAKE	
 		2.5f,	//rise rate eANALOG_INPUT_STEER_LEFT
@@ -243,7 +243,7 @@ PhysicsSystem::PhysicsSystem()
 
 	//mVehicleModeTimer = 0.0f;
 	//mVehicleOrderProgress = 0;
-	//startBrakeMode();
+	startBrakeMode();
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -288,6 +288,9 @@ void PhysicsSystem::update(const float timestep)
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehiclePlayer1->mWheelsSimData.getNbWheels()} };
 	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
 
+	PxVec3 ang_vel = mVehiclePlayer1->getRigidDynamicActor()->getAngularVelocity();
+	mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(ang_vel.x / 1.1f, ang_vel.y / 1.1f, ang_vel.z / 1.1f));
+
 	//Work out if the vehicle is in the air.
 	this->mIsVehicleInAir = this->mVehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
@@ -307,6 +310,7 @@ void PhysicsSystem::update(const float timestep)
 	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
 	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
 	countertopTransform->update(groundTransform);
+	keyPress('0');
 }
 
 void PhysicsSystem::updateFoodTransforms(){
@@ -439,6 +443,7 @@ void PhysicsSystem::keyRelease(unsigned char key)
 
 void PhysicsSystem::startAccelerateForwardsMode()
 {
+	printf("ACCEL\n");
 	if (this->mMimicKeyInputs)
 	{
 		this->mVehicleInputData.setDigitalAccel(true);
@@ -471,7 +476,7 @@ void PhysicsSystem::startBrakeMode()
 	}
 	else
 	{
-		this->mVehicleInputData.setAnalogBrake(1.0f);
+		this->mVehicleInputData.setAnalogBrake(0.9f);
 	}
 }
 
@@ -485,7 +490,7 @@ void PhysicsSystem::startTurnHardLeftMode()
 	else
 	{
 		//this->mVehicleInputData.setAnalogAccel(true);
-		this->mVehicleInputData.setAnalogSteer(-1.0f);
+		this->mVehicleInputData.setAnalogSteer(-0.9f);
 	}
 }
 
