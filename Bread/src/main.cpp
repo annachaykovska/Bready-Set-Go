@@ -9,7 +9,7 @@
 #include "Transform.h"
 #include "Rendering/RenderingSystem.h"
 #include "Audio/AudioSystem.h"
-#include "Physics/VehicleController.cpp"
+#include "Physics/VehicleController.h"
 #include "Inventory.h"
 
 // Global Scene holds all the Entities for easy reference
@@ -138,9 +138,10 @@ int main()
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
 
 	// Set movement control callbacks
-	// TODO: generalize this
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
+	XboxController controllers = XboxController(&physics);
+	controllers.setControllers();
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
@@ -153,6 +154,9 @@ int main()
 	{
 		// INPUT
 		glfwPollEvents();
+
+		// READ CONTROLLERS
+		controllers.setButtonStateFromController();
 
 		// SIMULATE
 		newTime = glfwGetTime();
@@ -172,7 +176,7 @@ int main()
 		window.swapBuffer();
 
 		// AUDIO
-		// update AudioSource
+		// update AudioSource	
 	}
 
 	// Collect garbage

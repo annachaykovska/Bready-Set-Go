@@ -1,118 +1,81 @@
 /*
 * Keyboard and Controller callback handler
 */
-#include <vector>
-#include <memory>
-
-#include "../Window.h"
-#include "../Scene/Scene.h"
-#include "PhysicsSystem.h"
+#include "VehicleController.h"
 
 using namespace std;
 
-extern Scene g_scene;
+XboxController::XboxController(PhysicsSystem* physicsSystem) {
+	this->physics = physicsSystem;
+}
 
+void XboxController::setControllers() {
+	int controllerId = -1;
 
-class MovementCallbacks : public CallbackInterface {
+	for (DWORD i = 0; i < XUSER_MAX_COUNT && controllerId == -1; i++)
+	{
+		XINPUT_STATE state;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
 
-public:
-	// Currently just taking a pointer to the main player transform????
-	MovementCallbacks(PhysicsSystem* physics) : physics(physics) {
-	}
-
-	virtual void keyCallback(int key, int scancode, int action, int mods) {
-		// Pressing settings
-		if (physics->buttonState.forwardsHeld || (key == GLFW_KEY_W && action == GLFW_PRESS)) {
-			physics->buttonState.forwardsHeld = true;
-		}
-		if (physics->buttonState.leftHeld || (key == GLFW_KEY_A && action == GLFW_PRESS)) {
-			physics->buttonState.leftHeld = true;
-		}
-		if (physics->buttonState.backwardsHeld || (key == GLFW_KEY_S && action == GLFW_PRESS)) {
-			physics->buttonState.backwardsHeld = true;
-		}
-		if (physics->buttonState.rightHeld || (key == GLFW_KEY_D && action == GLFW_PRESS)) {
-			physics->buttonState.rightHeld = true;
-		}
-		if (physics->buttonState.brakeHeld || (key == GLFW_KEY_SPACE && action == GLFW_PRESS)) {
-			physics->buttonState.brakeHeld = true;
-		}
-
-		Camera* camera = &(g_scene.camera);
-
-		// Debug camera controls
-		if (physics->buttonState.cameraForward || key == GLFW_KEY_I && action == GLFW_PRESS) {
-			physics->buttonState.cameraForward = true;
-			camera->position.x += 0.5;
-		}
-		if (physics->buttonState.cameraBackward || key == GLFW_KEY_K && action == GLFW_PRESS) {
-			physics->buttonState.cameraBackward = true;
-			camera->position.x -= 0.5;
-		}
-		if (physics->buttonState.cameraRight || key == GLFW_KEY_L && action == GLFW_PRESS) {
-			physics->buttonState.cameraRight = true;
-			camera->position.z += 0.5;
-		}
-		if (physics->buttonState.cameraLeft || key == GLFW_KEY_J && action == GLFW_PRESS) {
-			physics->buttonState.cameraLeft = true;
-			camera->position.z -= 0.5;
-		}
-		if (physics->buttonState.cameraUp || key == GLFW_KEY_O && action == GLFW_PRESS) {
-			physics->buttonState.cameraUp = true;
-			camera->position.y += 0.5;
-		}
-		if (physics->buttonState.cameraDown || key == GLFW_KEY_U && action == GLFW_PRESS) {
-			physics->buttonState.cameraDown = true;
-			camera->position.y -= 0.5;
-		}
-
-		// Release settings
-		if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
-			physics->buttonState.forwardsHeld = false;
-		}
-		if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
-			physics->buttonState.leftHeld = false;
-		}
-		if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-			physics->buttonState.backwardsHeld = false;
-		}
-		if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
-			physics->buttonState.rightHeld = false;
-		}
-		if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
-			physics->buttonState.brakeHeld = false;
-		}
-		if (key == GLFW_KEY_I && action == GLFW_RELEASE) {
-			physics->buttonState.cameraForward = false;
-		}
-		if (key == GLFW_KEY_K && action == GLFW_RELEASE) {
-			physics->buttonState.cameraBackward = false;
-		}
-		if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
-			physics->buttonState.cameraRight = false;
-		}
-		if (key == GLFW_KEY_J && action == GLFW_RELEASE) {
-			physics->buttonState.cameraLeft = false;
-		}
-		if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
-			physics->buttonState.cameraUp = false;
-		}
-		if (key == GLFW_KEY_U && action == GLFW_RELEASE) {
-			physics->buttonState.cameraDown = false;
-		}
-
-		// Update keypress
-		if (action == GLFW_PRESS)
-		{
-			physics->keyPress(key);
-		}
-		
-		if (action == GLFW_RELEASE)
-		{
-			physics->keyRelease(key);
+		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+			controllerId = i;
+			
 		}
 	}
+	printf("The controller ID: %d", controllerId);
+}
 
-private:
-	PhysicsSystem* physics;
-};
+_XINPUT_STATE XboxController::getControllerState(int controllerId) {
+	XINPUT_STATE state;
+	ZeroMemory(&state, sizeof(XINPUT_STATE));
+	DWORD dwResult;
+
+	dwResult = XInputGetState(controllerId, &state);
+	return state;
+}
+
+void XboxController::setButtonStateFromController() {
+	int i = 0;
+	XINPUT_STATE state = getControllerState(i);
+
+
+	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Enter?
+	bool B_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // idk
+
+
+	float LX = state.Gamepad.sThumbLX;
+	float LY = state.Gamepad.sThumbLY;
+
+	// LEFT THUMB ------------------------------------------------------------------------------------
+	//determine how far the controller is pushed
+	float magnitude = sqrt(LX * LX + LY * LY);
+
+	//determine the direction the controller is pushed
+	float normalizedLX = LX / magnitude;
+	float normalizedLY = LY / magnitude;
+
+	float normalizedMagnitude = 0;
+
+	//check if the controller is outside a circular dead zone
+	if (magnitude > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+	{
+		//clip the magnitude at its expected maximum value
+		if (magnitude > 32767) magnitude = 32767;
+
+		//adjust magnitude relative to the end of the dead zone
+		magnitude -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+		//optionally normalize the magnitude with respect to its expected range
+		//giving a magnitude value of 0.0 to 1.0
+		normalizedMagnitude = magnitude / (32767 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+	}
+	else //if the controller is in the deadzone zero out the magnitude
+	{
+		magnitude = 0.0;
+		normalizedMagnitude = 0.0;
+	}
+
+	printf("MAG:%f\tNMAG:%f\n", magnitude, normalizedMagnitude);
+
+	//repeat for right thumb stick
+}
