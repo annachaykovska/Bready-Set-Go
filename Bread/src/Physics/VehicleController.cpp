@@ -45,12 +45,12 @@ public:
 					break;
 
 				case GLFW_KEY_A:
-					input->setDigitalSteerLeft(true);
+					input->setDigitalSteerRight(true);
 					//input->setAnalogSteer(-1.0f);
 					break;
 
 				case GLFW_KEY_D:
-					input->setDigitalSteerRight(true);
+					input->setDigitalSteerLeft(true);
 					//input->setAnalogSteer(1.0f);
 					
 					break;
@@ -79,12 +79,12 @@ public:
 					break;
 
 				case GLFW_KEY_A:
-					input->setDigitalSteerLeft(false);
+					input->setDigitalSteerRight(false);
 					//input->setAnalogSteer(0.0f);
 					break;
 
 				case GLFW_KEY_D:
-					input->setDigitalSteerRight(false);
+					input->setDigitalSteerLeft(false);
 					//input->setAnalogSteer(0.0f);
 					break;
 
