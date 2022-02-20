@@ -15,6 +15,7 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics)
 
 void Steering::updateSteering(position target)
 {
+	//std::cout << target.x << ", " << target.y << ", " << target.z << std::endl;
 	glm::vec3 vectorA = target - entity_.getTransform()->position;
 	float distance = length(vectorA);
 	distance /= 20;
@@ -30,7 +31,6 @@ void Steering::updateSteering(position target)
 
 	if (abs(theta) > TURN_THRESHOLD)
 	{
-		//std::cout << "Correcting" << std::endl;
 		if (upVector.y < 0)
 		{
 			physics_.startTurnHardRightMode();
@@ -42,7 +42,6 @@ void Steering::updateSteering(position target)
 	}
 	else
 	{
-		//std::cout << "Stay on Target" << std::endl;
 		physics_.releaseSteering();
 	}
 }

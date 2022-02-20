@@ -7,10 +7,14 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 #include "Transform.h"
+#include "Rendering/DebugOverlay.h"
 #include "Rendering/RenderingSystem.h"
 #include "Audio/AudioSystem.h"
+#include "Navigation/NavMesh.h"
+#include "Navigation/NavigationSystem.h"
 #include "Physics/VehicleController.cpp"
 #include "Inventory.h"
+#include "DebugSettings.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -55,7 +59,8 @@ int main()
 	g_systems.physics = &physics;
 	player1->vehicle = physics.mVehiclePlayer1; // Don't think this is needed?
 
-	RenderingSystem renderer;
+	DebugOverlay debugOverlay;
+	RenderingSystem renderer(debugOverlay);
 	g_systems.render = &renderer;
 
 	AudioSystem audio;
@@ -83,7 +88,7 @@ int main()
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(-10, 2.3f, 3);
+	player1Transform->position = glm::vec3(2.f, 2.3f, -3.f);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
 	player1Transform->scale = glm::vec3(1, 1, 1);
 
@@ -146,7 +151,20 @@ int main()
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
 	Inventory p1Inv;
+	NavMesh navMesh;
+	NavigationSystem p1NavSystem(*player1, physics, navMesh);
+
+	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
+
 	player1->attachComponent(&p1Inv, "inventory");
+	player1->attachComponent(&p1NavSystem, "navigation");
+
+	// TODO: Dynamically pick the target and plan path
+	p1NavSystem.planPath(glm::vec3(45.f, 0.f, -75.f));
+
+	Shader shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt");
+	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
+	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
 
 	// GAME LOOP
 	while (!window.shouldClose())
@@ -171,8 +189,12 @@ int main()
 		// Swap the frame buffers
 		window.swapBuffer();
 
+		// AI
+		p1NavSystem.update();
+
 		// AUDIO
 		// update AudioSource
+
 	}
 
 	// Collect garbage

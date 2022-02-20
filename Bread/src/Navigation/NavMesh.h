@@ -22,20 +22,23 @@ public:
 	class MeshSegment
 	{
 	public:
-		MeshSegment(Node* v0, Node* v1, Node* v2, vert normal = vert(0.0f, 1.0f, 0.0f))
+		MeshSegment(vert v0, vert v1, vert v2, glm::vec3 normal = vert(0.0f, 1.0f, 0.0f))
 		{
 			v0_ = v0;
 			v1_ = v1;
 			v2_ = v2;
 			normal_ = normal;
+			
+			meshStep_ = new Node(vert((v0_.x + v1_.x + v2_.x) / 3.f, (v0_.y + v1_.y + v2_.y) / 3.f, (v0_.z + v1_.z + v2_.z) / 3.f));
 		}
 
 		char id_;
 		bool traversable_ = true;
-		Node* v0_;
-		Node* v1_;
-		Node* v2_;
-		vert normal_;
+		vert v0_;
+		vert v1_;
+		vert v2_;
+		Node* meshStep_;
+		glm::vec3 normal_;
 
 		std::vector<std::pair<Node*, MeshSegment*>> neighbors;
 		int numNeighbors;
@@ -49,7 +52,7 @@ public:
 
 private:
 	void setupVisualizer();
-	bool hasMatchingNode(Node* node, MeshSegment* segment);
+	bool hasMatchingVertex(vert node, MeshSegment* segment);
 	bool alreadyContainsNeighbor(MeshSegment* segment, MeshSegment* neighbor);
 
 	std::vector<MeshSegment*> mesh_;

@@ -8,7 +8,7 @@
 
 extern Scene g_scene;
 
-RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
+RenderingSystem::RenderingSystem(DebugOverlay& debug) : debugOverlay(debug), shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
 {
 	this->models.reserve(g_scene.count()); // Create space for models
 
@@ -71,6 +71,7 @@ void RenderingSystem::loadModels()
 	this->models.emplace_back(Model(&groundPath[0])); 
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
+
 	//-----------------------------------------------------------------------------------
 	// Ingredient models
 	//-----------------------------------------------------------------------------------
@@ -123,6 +124,16 @@ void RenderingSystem::update()
 
 	// Turn off textures - temporary
 	glUniform1i(texLoc, 0);
+	for (toggleDebugView view : debugOverlay.debugMeshes())
+	{
+		if (view.second)
+		{
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
+			glUniform1i(texLoc, 0); // Turn textures off
+			view.first.setWireframe(true);
+			view.first.draw(getShader());
+		}
+	}
 
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
@@ -133,7 +144,10 @@ void RenderingSystem::update()
 		if (i >= 1 && i <= 4)
 			ownerTransform->update();
 
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-		models[i].draw(getShader());
+		//if (i != 4)
+		//{
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+			models[i].draw(getShader());
+		//}
 	}
 }

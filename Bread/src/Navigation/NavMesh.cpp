@@ -2,32 +2,32 @@
 
 NavMesh::NavMesh()
 {
-	Node *n1, *n2, *n3, *n4, *n5, *n6, *n7, *n8, *n9, *n10, *n11, *n12, *n13, *n14, *n15, *n16, *n17, *n18, *n19, *n20;
+	vert n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20;
 
-	n1 = new Node(vert(0.0f, 0.0f, 0.0f));
-	n2 = new Node(vert(20.0f, 0.0f, 0.0f));
-	n3 = new Node(vert(40.0f, 0.0f, 0.0f));
-	n4 = new Node(vert(60.0f, 0.0f, 0.0f));
-	n5 = new Node(vert(80.0f, 0.0f, 0.0f));
+	n1 = vert(0.0f, 0.0f, 0.0f);
+	n2 = vert(20.0f, 0.0f, 0.0f);
+	n3 = vert(40.0f, 0.0f, 0.0f);
+	n4 = vert(60.0f, 0.0f, 0.0f);
+	n5 = vert(80.0f, 0.0f, 0.0f);
 
-	n6 = new Node(vert(0.0f, 0.0f, -20.0f));
-	n7 = new Node(vert(20.0f, 0.0f, -20.0f));
-	n8 = new Node(vert(40.0f, 0.0f, -20.0f));
-	n9 = new Node(vert(60.0f, 0.0f, -20.0f));
-	n10 = new Node(vert(80.0f, 0.0f, -20.0f));
+	n6 = vert(0.0f, 0.0f, -20.0f);
+	n7 = vert(20.0f, 0.0f, -20.0f);
+	n8 = vert(40.0f, 0.0f, -20.0f);
+	n9 = vert(60.0f, 0.0f, -20.0f);
+	n10 = vert(80.0f, 0.0f, -20.0f);
 
-	n11 = new Node(vert(0.0f, 0.0f, -40.0f));
-	n12 = new Node(vert(20.0f, 0.0f, -40.0f));
-	n13 = new Node(vert(40.0f, 0.0f, -40.0f));
-	n14 = new Node(vert(60.0f, 0.0f, -40.0f));
+	n11 = vert(0.0f, 0.0f, -40.0f);
+	n12 = vert(20.0f, 0.0f, -40.0f);
+	n13 = vert(40.0f, 0.0f, -40.0f);
+	n14 = vert(60.0f, 0.0f, -40.0f);
 
-	n15 = new Node(vert(0.0f, 0.0f, -60.0f));
-	n16 = new Node(vert(20.0f, 0.0f, -60.0f));
-	n17 = new Node(vert(40.0f, 0.0f, -60.0f));
-	n18 = new Node(vert(60.0f, 0.0f, -60.0f));
+	n15 = vert(0.0f, 0.0f, -60.0f);
+	n16 = vert(20.0f, 0.0f, -60.0f);
+	n17 = vert(40.0f, 0.0f, -60.0f);
+	n18 = vert(60.0f, 0.0f, -60.0f);
 
-	n19 = new Node(vert(40.0f, 0.0f, -80.0f));
-	n20 = new Node(vert(60.0f, 0.0f, -80.0f));
+	n19 = vert(40.0f, 0.0f, -80.0f);
+	n20 = vert(60.0f, 0.0f, -80.0f);
 
 	MeshSegment* A = new MeshSegment(n2, n6, n1);
 	MeshSegment* B = new MeshSegment(n6, n2, n7);
@@ -102,9 +102,9 @@ void NavMesh::setupVisualizer()
 	for (MeshSegment* seg : mesh_)
 	{
 		Vertex a, b, c;
-		a.position = seg->v0_->position_;
-		b.position = seg->v1_->position_;
-		c.position = seg->v2_->position_;
+		a.position = seg->v0_;
+		b.position = seg->v1_;
+		c.position = seg->v2_;
 		a.normal = seg->normal_;
 		b.normal = seg->normal_;
 		c.normal = seg->normal_;
@@ -132,20 +132,20 @@ void NavMesh::connectMesh()
 		for (int j = 0; j < mesh_.size(); j++)
 		{
 			int sharesNodes = 0;
-			std::vector<Node*> sharedNodes;
+			std::vector<vert> sharedNodes;
 			if (mesh_.at(i) != mesh_.at(j))
 			{
-				if (hasMatchingNode(mesh_.at(i)->v0_, mesh_.at(j)))
+				if (hasMatchingVertex(mesh_.at(i)->v0_, mesh_.at(j)))
 				{
 					sharesNodes++;
 					sharedNodes.push_back(mesh_.at(i)->v0_);
 				}
-				if (hasMatchingNode(mesh_.at(i)->v1_, mesh_.at(j)))
+				if (hasMatchingVertex(mesh_.at(i)->v1_, mesh_.at(j)))
 				{
 					sharesNodes++;
 					sharedNodes.push_back(mesh_.at(i)->v1_);
 				}
-				if (hasMatchingNode(mesh_.at(i)->v2_, mesh_.at(j)))
+				if (hasMatchingVertex(mesh_.at(i)->v2_, mesh_.at(j)))
 				{
 					sharesNodes++;
 					sharedNodes.push_back(mesh_.at(i)->v2_);
@@ -154,9 +154,7 @@ void NavMesh::connectMesh()
 				if (!alreadyContainsNeighbor(mesh_.at(i), mesh_.at(j)) && sharesNodes == 2)
 				{
 					std::cout << mesh_.at(i)->id_ << " " << mesh_.at(j)->id_ << std::endl;
-					mesh_.at(i)->neighbors.push_back(std::pair <Node*, MeshSegment*> (sharedNodes.at(0), mesh_.at(j)));
-
-					mesh_.at(i)->neighbors.push_back(std::pair <Node*, MeshSegment*> (sharedNodes.at(1), mesh_.at(j)));
+					mesh_.at(i)->neighbors.push_back(std::pair <Node*, MeshSegment*> (mesh_.at(j)->meshStep_, mesh_.at(j)));
 				}
 			}
 		}
@@ -178,7 +176,7 @@ std::vector<NavMesh::MeshSegment*> NavMesh::getSegments()
 	return mesh_;
 }
 
-bool NavMesh::hasMatchingNode(Node* node, MeshSegment* segment)
+bool NavMesh::hasMatchingVertex(vert node, NavMesh::MeshSegment* segment)
 {
 	if (node == segment->v0_ || node == segment->v1_ || node == segment->v2_)
 	{

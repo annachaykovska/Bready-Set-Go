@@ -3,7 +3,7 @@
 namespace
 {
 	double PI = 3.141592653589;
-	double EPSILON = 0.00001;
+	double EPSILON = 0.001;
 }
 
 PathFinder::PathFinder(NavMesh& navMesh) : navMesh_(navMesh)
@@ -20,44 +20,42 @@ void PathFinder::updateTraversablePathSteps()
 		NavMesh::MeshSegment* segment = navMesh_.getSegments().at(i);
 		if (segment->traversable_)
 		{
-			PathStep* step1 = new PathStep();
-			PathStep* step2 = new PathStep();
-			PathStep* step3 = new PathStep();
+			PathStep* step = new PathStep();
 
-			step1->segment.second = segment;
-			step2->segment.second = segment;
-			step3->segment.second = segment;
+			step->segment.second = segment;
 
-			step1->segment.first = segment->v0_;
-			step2->segment.first = segment->v1_;
-			step3->segment.first = segment->v2_;
+			step->segment.first = segment->meshStep_;
 
-			traversablePathSteps_.push_back(step1);
-			traversablePathSteps_.push_back(step2);
-			traversablePathSteps_.push_back(step3);
+			traversablePathSteps_.push_back(step);
 		}
 	}
 }
 
 NavMesh::MeshSegment* PathFinder::findStartingSegment(position start)
 {
+	start.y = 0;
+	std::cout << start.x << ", " << start.y << ", " << start.z << std::endl;
 	for (int i = 0; i < navMesh_.getSegments().size(); i++)
 	{
 		float summedAngle = 0;
 
-		glm::vec3 vectorA = navMesh_.getSegments().at(i)->v0_->position_ - start;
-		glm::vec3 vectorB = navMesh_.getSegments().at(i)->v1_->position_ - start;
-		glm::vec3 vectorC = navMesh_.getSegments().at(i)->v2_->position_ - start;
+		glm::vec3 vectorA = navMesh_.getSegments().at(i)->v0_ - start;
+		glm::vec3 vectorB = navMesh_.getSegments().at(i)->v1_ - start;
+		glm::vec3 vectorC = navMesh_.getSegments().at(i)->v2_ - start;
 
 		summedAngle += acos(dot(vectorA, vectorB) / (length(vectorA) * length(vectorB)));
 		summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));
 		summedAngle += acos(dot(vectorB, vectorC) / (length(vectorB) * length(vectorC)));
 
+		std::cout << abs(summedAngle - 2 * PI) << std::endl;
+
 		if (abs(summedAngle - 2 * PI) < EPSILON)
 		{
+			std::cout << "Good Start" << std::endl;
 			return navMesh_.getSegments().at(i);
 		}
 	}
+	std::cout << "Bad Start" << std::endl;
 	return nullptr;
 }
 
@@ -100,9 +98,9 @@ int PathFinder::indexOfPathStep(PathStep* step)
 bool PathFinder::stepContainsTarget(position target, PathStep* step)
 {
 	float summedAngle = 0;
-	glm::vec3 vectorA = step->segment.second->v0_->position_ - target;
-	glm::vec3 vectorB = step->segment.second->v1_->position_ - target;
-	glm::vec3 vectorC = step->segment.second->v2_->position_ - target;
+	glm::vec3 vectorA = step->segment.second->v0_ - target;
+	glm::vec3 vectorB = step->segment.second->v1_ - target;
+	glm::vec3 vectorC = step->segment.second->v2_ - target;
 
 	summedAngle += acos(dot(vectorA, vectorB) / (length(vectorA) * length(vectorB)));
 	summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));

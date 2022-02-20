@@ -4,13 +4,14 @@
 
 #include "Shader.h"
 #include "Model.h"
+#include "DebugOverlay.h"
 #include "../Transform.h"
 
 class RenderingSystem
 {
 public:
 
-	RenderingSystem();
+	RenderingSystem(DebugOverlay& debug);
 	~RenderingSystem();
 	unsigned int getShaderId();
 	Shader& getShader();
@@ -19,6 +20,8 @@ public:
 	void update();
 
 private:
+
+	DebugOverlay& debugOverlay;
 
 	unsigned int modelLoc;
 	unsigned int texLoc;

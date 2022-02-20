@@ -243,7 +243,7 @@ PhysicsSystem::PhysicsSystem()
 
 	//mVehicleModeTimer = 0.0f;
 	//mVehicleOrderProgress = 0;
-	//startBrakeMode();
+	startBrakeMode();
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -445,7 +445,7 @@ void PhysicsSystem::startAccelerateForwardsMode()
 	}
 	else
 	{
-		this->mVehicleInputData.setAnalogAccel(1.0f);
+		this->mVehicleInputData.setAnalogAccel(0.8f);
 	}
 }
 
