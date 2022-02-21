@@ -296,7 +296,6 @@ void PhysicsSystem::update(const float timestep)
 	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
 	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
 	countertopTransform->update(groundTransform);
-	keyPress('0');
 }
 
 void PhysicsSystem::updateFoodTransforms()
