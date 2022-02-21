@@ -94,6 +94,14 @@ void RenderingSystem::loadModels()
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
 	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
+
+	//-----------------------------------------------------------------------------------
+	// Prototype models
+	//-----------------------------------------------------------------------------------
+	// Demo Obstacle
+	std::string demoObstaclePath = "resources/models/prototype/demoObstacle.obj";
+	this->models.emplace_back(Model(&demoObstaclePath[0])); // Prototype obstacle
+	g_scene.getEntity("demoObstacle")->attachComponent(&(this->models[9]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)

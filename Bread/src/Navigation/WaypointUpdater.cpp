@@ -4,11 +4,14 @@ namespace
 {
 	const float THRESHOLD = 9.0f;
 	const float INTERPOLATOR_THRESHOLD = 1.0f;
-	const float LEAD_DISTANCE = 20.0f;
+	const float LEAD_DISTANCE = 25.0f;
+
+	position INVALID_POS = position(0.f, -99999999.f, 0.f);
 }
 
 WaypointUpdater::WaypointUpdater(Entity& entity)
 	: entity_(entity)
+	, replanFlag_(false)
 {
 }
 
@@ -27,16 +30,45 @@ void WaypointUpdater::updateWaypoints()
 			std::cout << "Reached waypoint" << std::endl;
 			waypoints_.pop_back();
 		}
+		for (int i = 1; i < waypoints_.size(); i++)
+		{
+			if (futureWaypoint(i) != INVALID_POS)
+			{
+				if (length(entity_.getTransform()->position - futureWaypoint(i)) < length(entity_.getTransform()->position - currentWaypoint()))
+				{
+					std::cout << "Reached waypoint" << std::endl;
+					waypoints_.pop_back();
+				}
+			}
+		}
 	}
+}
+
+bool WaypointUpdater::pathComplete()
+{
+	if (waypoints_.size() == 0)
+	{
+		replanFlag_ = true;
+	}
+	else
+	{
+		replanFlag_ = false;
+	}
+	return replanFlag_;
 }
 
 position WaypointUpdater::currentWaypoint()
 {
-	if (waypoints_.size() == 0)
-	{
-		return glm::vec3(0.0f, 0.0f, 0.0f);
-	}
 	return waypoints_.back();
+}
+
+position WaypointUpdater::futureWaypoint(int iter)
+{
+	if (waypoints_.size() - (iter + 1) > 0)
+	{
+		return waypoints_.at(waypoints_.size() - (iter + 1));
+	}
+	return INVALID_POS;
 }
 
 position WaypointUpdater::interpolator()

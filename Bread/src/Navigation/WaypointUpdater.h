@@ -13,7 +13,9 @@ public:
 
 	void setWaypoints(std::vector<position> waypoints);
 	void updateWaypoints();
+	bool pathComplete();
 	position currentWaypoint();
+	position futureWaypoint(int iter);
 	position interpolator();
 
 private:
@@ -21,4 +23,5 @@ private:
 	std::vector<position> waypoints_;
 	
 	position interpolator_;
+	bool replanFlag_;
 };

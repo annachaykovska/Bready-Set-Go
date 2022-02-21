@@ -51,6 +51,7 @@ int main()
 	Entity* tomato = g_scene.getEntity("tomato");
 	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* demoObstacle = g_scene.getEntity("demoObstacle");
 
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE SYSTEMS
@@ -72,7 +73,7 @@ int main()
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i++)
 		transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
@@ -85,12 +86,13 @@ int main()
 	tomato->attachComponent(&transforms[6], "transform");
 	dough->attachComponent(&transforms[7], "transform");
 	countertop->attachComponent(&transforms[8], "transform");
+	demoObstacle->attachComponent(&transforms[9], "transform");
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
 	player1Transform->position = glm::vec3(2.f, 2.3f, -3.f);
 	player1Transform->rotation = glm::vec3(0, 0, 0);
-	player1Transform->scale = glm::vec3(1, 1, 1);
+	player1Transform->scale = glm::vec3(2, 2, 2);
 
 	Transform* player2Transform = player2->getTransform();
 	player2Transform->position = glm::vec3(100, 2.3f, 0);
@@ -131,6 +133,11 @@ int main()
 	counterTransform->position = glm::vec3(0, 0, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
 	counterTransform->scale = glm::vec3(50, 50, 50);
+
+	Transform* demoObstacleTransform = demoObstacle->getTransform();
+	demoObstacleTransform->position = glm::vec3(0, 0, 0);
+	demoObstacleTransform->rotation = glm::vec3(0, 0, 0);
+	demoObstacleTransform->scale = glm::vec3(10, 10, 10);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
@@ -160,7 +167,7 @@ int main()
 	player1->attachComponent(&p1NavSystem, "navigation");
 
 	// TODO: Dynamically pick the target and plan path
-	p1NavSystem.planPath(glm::vec3(45.f, 0.f, -75.f));
+	p1NavSystem.planPath(glm::vec3(95.f, 0.f, -95.f));
 
 	Shader shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt");
 	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");

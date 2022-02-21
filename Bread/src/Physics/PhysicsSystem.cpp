@@ -135,6 +135,30 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	return body;
 }
 
+PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfExtent, std::string name)
+{
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
+	shape->setSimulationFilterData(cheeseFilter);
+
+	PxTransform localTm(PxVec3(0, 2, 0) * halfExtent);
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 100.f);
+
+	// Set physx actor name
+	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* vp = static_cast<void*>(new std::string(name));
+	body->userData = vp;
+
+	mScene->addActor(*body);
+	shape->release();
+
+	return body;
+}
+
 void PhysicsSystem::initializeActors() {
 	// GROUND ---------------------------------------------------------------------------------------------------------------------
 	// Add the ground plane to drive on
@@ -179,6 +203,10 @@ void PhysicsSystem::initializeActors() {
 	// DOUGH
 	PxTransform doughTransform(PxVec3(-30, 0, 0));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
+
+	// DEMO OBSTACLE
+	PxTransform demoObstacleTransform(PxVec3(30, 0, -30));
+	this->demoObstacle = createObstacle(demoObstacleTransform, 10.f, "demoObstacle");
 }
 
 PhysicsSystem::PhysicsSystem()
@@ -307,6 +335,9 @@ void PhysicsSystem::update(const float timestep)
 	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
 	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
 	countertopTransform->update(groundTransform);
+
+	Transform* demoObstacle = g_scene.getEntity("demoObstacle")->getTransform();
+	demoObstacle->update(this->demoObstacle->getGlobalPose());
 }
 
 void PhysicsSystem::updateFoodTransforms(){
@@ -445,7 +476,7 @@ void PhysicsSystem::startAccelerateForwardsMode()
 	}
 	else
 	{
-		this->mVehicleInputData.setAnalogAccel(0.8f);
+		this->mVehicleInputData.setAnalogAccel(1.0f);
 	}
 }
 

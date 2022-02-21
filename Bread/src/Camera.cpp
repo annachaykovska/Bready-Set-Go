@@ -39,6 +39,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	position.x = playerTransform->position.x + xChange;
 	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
 	position.z = playerTransform->position.z + zChange;
+	return glm::lookAt(glm::vec3(30.f, 150.0f, 50.0f), glm::vec3(30.0f, 0.0f, -30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	return glm::lookAt(position, playerTransform->position, worldUp);
 }
 

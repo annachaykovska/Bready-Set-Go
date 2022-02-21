@@ -2,7 +2,7 @@
 
 NavMesh::NavMesh()
 {
-	vert n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20;
+	vert n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, n23, n24, n25, n26, n27, n28;
 
 	n1 = vert(0.0f, 0.0f, 0.0f);
 	n2 = vert(20.0f, 0.0f, 0.0f);
@@ -28,6 +28,16 @@ NavMesh::NavMesh()
 
 	n19 = vert(40.0f, 0.0f, -80.0f);
 	n20 = vert(60.0f, 0.0f, -80.0f);
+	n21 = vert(40.0f, 0.0f, -100.0f);
+	n22 = vert(60.0f, 0.0f, -100.0f);
+
+	n23 = vert(80.0f, 0.0f, -100.0f);
+	n24 = vert(80.0f, 0.0f, -80.0f);
+	n25 = vert(100.0f, 0.0f, -100.0f);
+	n26 = vert(100.0f, 0.0f, -80.0f);
+
+	n27 = vert(80.0f, 0.0f, -60.0f);
+	n28 = vert(100.0f, 0.0f, -80.0f);
 
 	MeshSegment* A = new MeshSegment(n2, n6, n1);
 	MeshSegment* B = new MeshSegment(n6, n2, n7);
@@ -49,6 +59,14 @@ NavMesh::NavMesh()
 	MeshSegment* R = new MeshSegment(n17, n14, n18);
 	MeshSegment* S = new MeshSegment(n19, n17, n20);
 	MeshSegment* T = new MeshSegment(n17, n20, n18);
+	MeshSegment* U = new MeshSegment(n19, n20, n21);
+	MeshSegment* V = new MeshSegment(n20, n22, n21);
+	MeshSegment* W = new MeshSegment(n20, n23, n22);
+	MeshSegment* X = new MeshSegment(n20, n24, n23);
+	MeshSegment* Y = new MeshSegment(n24, n26, n23);
+	MeshSegment* Z = new MeshSegment(n26, n25, n23);
+	MeshSegment* AA = new MeshSegment(n24, n27, n26);
+	MeshSegment* AB = new MeshSegment(n27, n28, n26);
 
 	A->id_ = 'A';
 	B->id_ = 'B';
@@ -70,6 +88,14 @@ NavMesh::NavMesh()
 	R->id_ = 'R';
 	S->id_ = 'S';
 	T->id_ = 'T';
+	U->id_ = 'U';
+	V->id_ = 'V';
+	W->id_ = 'W';
+	X->id_ = 'X';
+	Y->id_ = 'Y';
+	Z->id_ = 'Z';
+	AA->id_ = 'a';
+	AB->id_ = 'b';
 
 	mesh_.push_back(A);
 	mesh_.push_back(B);
@@ -91,6 +117,14 @@ NavMesh::NavMesh()
 	mesh_.push_back(R);
 	mesh_.push_back(S);
 	mesh_.push_back(T);
+	mesh_.push_back(U);
+	mesh_.push_back(V);
+	mesh_.push_back(W);
+	mesh_.push_back(X);
+	mesh_.push_back(Y);
+	mesh_.push_back(Z);
+	mesh_.push_back(AA);
+	mesh_.push_back(AB);
 
 	setupVisualizer();
 	connectMesh();

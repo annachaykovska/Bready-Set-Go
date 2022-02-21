@@ -34,7 +34,7 @@ void PathFinder::updateTraversablePathSteps()
 NavMesh::MeshSegment* PathFinder::findStartingSegment(position start)
 {
 	start.y = 0;
-	std::cout << start.x << ", " << start.y << ", " << start.z << std::endl;
+	//std::cout << start.x << ", " << start.y << ", " << start.z << std::endl;
 	for (int i = 0; i < navMesh_.getSegments().size(); i++)
 	{
 		float summedAngle = 0;
@@ -47,15 +47,15 @@ NavMesh::MeshSegment* PathFinder::findStartingSegment(position start)
 		summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));
 		summedAngle += acos(dot(vectorB, vectorC) / (length(vectorB) * length(vectorC)));
 
-		std::cout << abs(summedAngle - 2 * PI) << std::endl;
+		//std::cout << abs(summedAngle - 2 * PI) << std::endl;
 
 		if (abs(summedAngle - 2 * PI) < EPSILON)
 		{
-			std::cout << "Good Start" << std::endl;
+			//std::cout << "Good Start" << std::endl;
 			return navMesh_.getSegments().at(i);
 		}
 	}
-	std::cout << "Bad Start" << std::endl;
+	//std::cout << "Bad Start" << std::endl;
 	return nullptr;
 }
 
@@ -115,6 +115,8 @@ bool PathFinder::stepContainsTarget(position target, PathStep* step)
 
 std::vector<position> PathFinder::findPath(position start, position end)
 {
+	std::cout << "Finding Path";
+	updateTraversablePathSteps();
 	open_.clear();
 	closed_.clear();
 
@@ -149,6 +151,7 @@ std::vector<position> PathFinder::findPath(position start, position end)
 
 		if (current == nullptr)
 		{
+			std::cout << "Not What we want" << std::endl;
 			printPath(previous);
 			std::vector<position> empty;
 			return empty;
@@ -157,7 +160,6 @@ std::vector<position> PathFinder::findPath(position start, position end)
 		// if current is the target node // path has been found
 		if (stepContainsTarget(end, current))
 		{
-			std::cout << "Done" << std::endl;
 			printPath(current);
 
 			std::vector<position> finalPath;

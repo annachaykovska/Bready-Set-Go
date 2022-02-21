@@ -6,6 +6,7 @@
 /// </summary>
 void Scene::createEntities()
 {
+	// Game Entities
 	createEntity("player1");
 	createEntity("player2");
 	createEntity("player3");
@@ -15,6 +16,11 @@ void Scene::createEntities()
 	createEntity("tomato");
 	createEntity("dough");
 	createEntity("countertop");
+
+	// Prototype Entities
+	createEntity("demoObstacle");
+
+	// Debug Entities
 	createEntity("navmesh-debug");
 }
 

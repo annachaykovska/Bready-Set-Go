@@ -19,6 +19,7 @@ public:
 	void initVehicleSDK();
 	void initializeActors();
 	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
+	PxRigidDynamic* createObstacle(const PxTransform& t, PxReal halfExtent, std::string name);
 	void update(const float timestep);
 	void updateFoodTransforms();
 	void startAccelerateForwardsMode();
@@ -44,6 +45,7 @@ public:
 	PxRigidDynamic* sausage;
 	PxRigidDynamic* tomato;
 	PxRigidDynamic* dough;
+	PxRigidDynamic* demoObstacle;
 
 	ButtonState buttonState;
 	

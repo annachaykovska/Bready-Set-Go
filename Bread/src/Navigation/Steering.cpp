@@ -10,7 +10,6 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics)
 	: entity_(entity)
 	, physics_(physics)
 {
-	physics_.startAccelerateForwardsMode();
 }
 
 void Steering::updateSteering(position target)

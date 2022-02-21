@@ -17,6 +17,11 @@ void NavigationSystem::planPath(position target)
 
 void NavigationSystem::update()
 {
-	steering_.updateSteering(waypointUpdater_.currentWaypoint());
+	if (waypointUpdater_.pathComplete())
+	{
+		waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(95.f, 0.f, -95.f), glm::vec3(5.f, 0.f, -20.f)));
+	}
+
+	steering_.updateSteering(waypointUpdater_.interpolator());
 	waypointUpdater_.updateWaypoints();
 }
