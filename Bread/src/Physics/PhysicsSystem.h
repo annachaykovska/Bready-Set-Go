@@ -66,5 +66,6 @@ private:
 	PxF32 mVehicleModeTimer = 0.0f;
 	PxU32 mVehicleOrderProgress = 0;
 	bool mVehicleOrderComplete = false;
+
 	bool mMimicKeyInputs = false;
 }; 

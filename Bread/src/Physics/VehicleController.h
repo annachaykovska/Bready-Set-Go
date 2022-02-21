@@ -122,8 +122,9 @@ class XboxController {
 public:
 	XboxController(PhysicsSystem* physicsSystem);
 	void setControllers();
-	void setButtonStateFromController();
+	void setButtonStateFromController(int controllerId);
 	_XINPUT_STATE getControllerState(int controllerId);
+	void getDeadZone(float x, float y, float deadzone);
 
 private:
 	PhysicsSystem* physics;

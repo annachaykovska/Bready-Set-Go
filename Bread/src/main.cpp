@@ -140,6 +140,8 @@ int main()
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
+
+	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
 	controllers.setControllers();
 
@@ -156,7 +158,7 @@ int main()
 		glfwPollEvents();
 
 		// READ CONTROLLERS
-		controllers.setButtonStateFromController();
+		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
 
 		// SIMULATE
 		newTime = glfwGetTime();
