@@ -22,10 +22,10 @@ CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
-	0.0f,		0.75f,
-	5.0f,		0.75f,
-	30.0f,		0.125f,
-	120.0f,		0.1f,
+	0.0f,		1.95f,
+	5.0f,		1.95f,
+	30.0f,		1.125f,
+	120.0f,		0.6f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -240,6 +240,8 @@ PhysicsSystem::PhysicsSystem()
 	mVehiclePlayer1->setToRestState();
 	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	
+	//mVehicleInputData.setAnalogBrake(1.0f);
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -279,6 +281,9 @@ void PhysicsSystem::update(const float timestep)
 
 	// Work out if the vehicle is in the air
 	this->mIsVehicleInAir = this->mVehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+
+	PxVec3 ang_vel = mVehiclePlayer1->getRigidDynamicActor()->getAngularVelocity();
+	mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(ang_vel.x / 1.1f, ang_vel.y / 1.1f, ang_vel.z / 1.1f));
 
 	// Set player 1 transform
 	Entity* player1 = g_scene.getEntity("player1");

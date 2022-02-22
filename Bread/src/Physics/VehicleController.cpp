@@ -34,7 +34,7 @@ _XINPUT_STATE XboxController::getControllerState(int controllerId) {
 	return state;
 }
 
-void XboxController::getDeadZone(float x, float y, float deadzone) {
+float XboxController::getDeadZone(float x, float y, float deadzone) {
 	//determine how far the controller is pushed
 	float magnitude = sqrt(x * x + y * y);
 
@@ -62,15 +62,18 @@ void XboxController::getDeadZone(float x, float y, float deadzone) {
 		magnitude = 0.0;
 		normalizedMagnitude = 0.0;
 	}
+
+	return normalizedMagnitude;
 }
 
 void XboxController::setButtonStateFromController(int controllerId) {
+	physx::PxVehicleDrive4WRawInputData* input = &physics->mVehicleInputData;
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
 	float thumbLeftX = state.Gamepad.sThumbLX;
 	float thumbLeftY = state.Gamepad.sThumbLY;
-	// getDeadZone(thumbLeftX, thumbLeftY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+	float thumbLeftDeadZone = getDeadZone(thumbLeftX, thumbLeftY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
 
 	// Left trigger
 	float triggerLeft = state.Gamepad.bLeftTrigger;
@@ -79,12 +82,47 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	float triggerRight = state.Gamepad.bRightTrigger;
 
 	// Other buttons
-	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Enter?
-	bool B_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0); // idk
+	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // UNUSED FOR NOW
 
-	/*printf("A: %d\n", A_button_pressed);
-	printf("Thumb LX: %f\n", thumbLeftX);
-	printf("Thumb LY: %f\n", thumbLeftY);
-	printf("Trigger L: %f\n", triggerLeft);
-	printf("Trigger R: %f\n\n", triggerRight);*/
+	// KEY PRESSED
+	if (triggerRight > 0.1) { // forwards
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
+			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		input->setDigitalAccel(true);
+		//input->setAnalogAccel(1.0f);
+	}
+	if (triggerLeft > 0.1 && triggerRight == 0.0) { // reverse
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		input->setDigitalAccel(true);
+		//input->setAnalogAccel(1.0f);
+	}
+	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
+		input->setDigitalBrake(true);
+		//input->setAnalogBrake(1.0f);
+	}
+	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
+		input->setDigitalSteerRight(true);
+		//input->setAnalogSteer(-1.0f);
+	}
+	if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
+		input->setDigitalSteerLeft(true);
+		//input->setAnalogSteer(-1.0f);
+	}
+
+
+	// KEY RELEASED
+	if (triggerLeft == 0.0 && triggerRight == 0.0) { // accel/reverse/brake
+		input->setDigitalAccel(false);
+		input->setDigitalBrake(false);
+		//input->setAnalogAccel(0.0f);
+	}
+
+	if (thumbLeftDeadZone == 0.0) { // left/right
+		input->setDigitalSteerRight(false);
+		input->setDigitalSteerLeft(false);
+		//input->setAnalogSteer(0.0f);
+	}
 }
+

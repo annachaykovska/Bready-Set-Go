@@ -19,7 +19,7 @@ public:
 	void setControllers();
 	void setButtonStateFromController(int controllerId);
 	_XINPUT_STATE getControllerState(int controllerId);
-	void getDeadZone(float x, float y, float deadzone);
+	float getDeadZone(float x, float y, float deadzone);
 
 private:
 	PhysicsSystem* physics;
