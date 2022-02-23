@@ -36,7 +36,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 PxVehicleKeySmoothingData gKeySmoothingData =
 {
 	{
-		6.0f,	//rise rate eANALOG_INPUT_ACCEL
+		10.0f,	//rise rate eANALOG_INPUT_ACCEL
 		6.0f,	//rise rate eANALOG_INPUT_BRAKE		
 		6.0f,	//rise rate eANALOG_INPUT_HANDBRAKE	
 		2.5f,	//rise rate eANALOG_INPUT_STEER_LEFT
@@ -240,6 +240,8 @@ PhysicsSystem::PhysicsSystem()
 	mVehiclePlayer1->setToRestState();
 	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	
+	//mVehicleInputData.setAnalogBrake(1.0f);
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -255,6 +257,10 @@ void PhysicsSystem::initVehicleSDK()
 	physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 }
 
+void PhysicsSystem::setAnalogInputs(bool input) {
+	this->useAnalogInputs = input;
+}
+
 void PhysicsSystem::update(const float timestep)
 {
 	// Update scene in physics simulation
@@ -262,9 +268,13 @@ void PhysicsSystem::update(const float timestep)
 	this->mScene->fetchResults(true);
 
 	// Update the control inputs for the vehicle
-	PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
-	//PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
-
+	if (useAnalogInputs) {
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	}
+	else {
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	}
+	
 	// Raycasts
 	PxVehicleWheels* vehicles[1] = { this->mVehiclePlayer1 };
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
@@ -279,6 +289,9 @@ void PhysicsSystem::update(const float timestep)
 
 	// Work out if the vehicle is in the air
 	this->mIsVehicleInAir = this->mVehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+
+	PxVec3 ang_vel = mVehiclePlayer1->getRigidDynamicActor()->getAngularVelocity();
+	mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(ang_vel.x / 1.1f, ang_vel.y / 1.1f, ang_vel.z / 1.1f));
 
 	// Set player 1 transform
 	Entity* player1 = g_scene.getEntity("player1");
