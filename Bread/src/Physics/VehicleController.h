@@ -16,7 +16,7 @@ extern Scene g_scene;
 class XboxController {
 public:
 	XboxController(PhysicsSystem* physicsSystem);
-	void setControllers();
+	void checkControllers();
 	void setButtonStateFromController(int controllerId);
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);

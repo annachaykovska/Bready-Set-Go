@@ -9,7 +9,7 @@ XboxController::XboxController(PhysicsSystem* physicsSystem) {
 	this->physics = physicsSystem;
 }
 
-void XboxController::setControllers() {
+void XboxController::checkControllers() {
 	int controllerId = -1;
 
 	for (DWORD i = 0; i < XUSER_MAX_COUNT && controllerId == -1; i++)
@@ -25,6 +25,9 @@ void XboxController::setControllers() {
 	printf("The controller ID: %d", controllerId);
 	if (controllerId != -1) {
 		physics->setAnalogInputs(true);
+	}
+	else {
+		physics->setAnalogInputs(false);
 	}
 }
 

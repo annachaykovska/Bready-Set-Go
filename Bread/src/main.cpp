@@ -143,7 +143,6 @@ int main()
 
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
-	controllers.setControllers();
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
@@ -158,6 +157,7 @@ int main()
 		glfwPollEvents();
 
 		// READ CONTROLLERS
+		controllers.checkControllers(); // sets analog/digital
 		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
 
 		// SIMULATE
