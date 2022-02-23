@@ -12,8 +12,6 @@
 #include "Physics/VehicleController.cpp"
 #include "Inventory.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -63,6 +61,8 @@ int main()
 
 	AudioSystem audio;
 	g_systems.audio = &audio;
+
+	//TODO put UI system here
 
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE TRANSFORMS - will be handled by PhysicsSystem eventually
