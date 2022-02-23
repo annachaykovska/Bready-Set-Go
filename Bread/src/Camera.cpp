@@ -28,9 +28,9 @@ Camera::Camera()
 
 glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 {
-	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(45.0)), 0, sin(glm::radians(45.0)), 0,
+	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(225.0)), 0, sin(glm::radians(225.0)), 0,
 		0, 1.0f, 0, 0,
-		-sin(glm::radians(45.0)), 0, cos(glm::radians(45.0)), 0,
+		-sin(glm::radians(225.0)), 0, cos(glm::radians(225.0)), 0,
 		0, 0, 0, 1.0f);;
 	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
 	float xChange = CAMERA_DISTANCE * positionFromVehicle.x;
