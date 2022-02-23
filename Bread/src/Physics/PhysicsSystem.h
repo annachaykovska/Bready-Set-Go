@@ -24,6 +24,7 @@ public:
 
 	void update(const float timestep);
 	void updateFoodTransforms();
+	void setAnalogInputs(bool input);
 
 	void cleanupPhysics();
 
@@ -53,5 +54,5 @@ private:
 	PxRigidStatic* mGroundPlane;
 
 	bool mIsVehicleInAir = true;
-	bool mMimicKeyInputs = false;
+	bool useAnalogInputs = false;
 }; 

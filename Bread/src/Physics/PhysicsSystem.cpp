@@ -22,10 +22,10 @@ CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
-	0.0f,		1.95f,
-	5.0f,		1.95f,
-	30.0f,		1.125f,
-	120.0f,		0.6f,
+	0.0f,		0.75f,
+	5.0f,		0.75f,
+	30.0f,		0.125f,
+	120.0f,		0.1f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -257,6 +257,10 @@ void PhysicsSystem::initVehicleSDK()
 	physx::PxVehicleSetUpdateMode(physx::PxVehicleUpdateMode::eVELOCITY_CHANGE);
 }
 
+void PhysicsSystem::setAnalogInputs(bool input) {
+	this->useAnalogInputs = input;
+}
+
 void PhysicsSystem::update(const float timestep)
 {
 	// Update scene in physics simulation
@@ -264,9 +268,13 @@ void PhysicsSystem::update(const float timestep)
 	this->mScene->fetchResults(true);
 
 	// Update the control inputs for the vehicle
-	PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
-	//PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
-
+	if (useAnalogInputs) {
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	}
+	else {
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+	}
+	
 	// Raycasts
 	PxVehicleWheels* vehicles[1] = { this->mVehiclePlayer1 };
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);

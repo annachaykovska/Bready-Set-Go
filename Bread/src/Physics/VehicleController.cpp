@@ -23,6 +23,9 @@ void XboxController::setControllers() {
 		}
 	}
 	printf("The controller ID: %d", controllerId);
+	if (controllerId != -1) {
+		physics->setAnalogInputs(true);
+	}
 }
 
 _XINPUT_STATE XboxController::getControllerState(int controllerId) {
@@ -85,44 +88,42 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // UNUSED FOR NOW
 
 	// KEY PRESSED
+	float analogVal;
 	if (triggerRight > 0.1) { // forwards
 		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
 			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
 			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
-		input->setDigitalAccel(true);
-		//input->setAnalogAccel(1.0f);
+		analogVal = triggerRight / 255;
+		input->setAnalogAccel(analogVal);
 	}
 	if (triggerLeft > 0.1 && triggerRight == 0.0) { // reverse
 		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
 			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-		input->setDigitalAccel(true);
-		//input->setAnalogAccel(1.0f);
+		analogVal = triggerLeft / 255;
+		input->setAnalogAccel(analogVal);
 	}
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
-		input->setDigitalBrake(true);
-		//input->setAnalogBrake(1.0f);
+		analogVal = triggerLeft / 255;
+		input->setAnalogBrake(analogVal);
 	}
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
-		input->setDigitalSteerRight(true);
-		//input->setAnalogSteer(-1.0f);
+		input->setAnalogSteer(thumbLeftDeadZone);
 	}
 	if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
-		input->setDigitalSteerLeft(true);
-		//input->setAnalogSteer(-1.0f);
+		analogVal = -1.0 * thumbLeftDeadZone;
+		input->setAnalogSteer(analogVal);
 	}
+
 
 
 	// KEY RELEASED
 	if (triggerLeft == 0.0 && triggerRight == 0.0) { // accel/reverse/brake
-		input->setDigitalAccel(false);
-		input->setDigitalBrake(false);
-		//input->setAnalogAccel(0.0f);
+		input->setAnalogAccel(0.0f);
+		input->setAnalogBrake(0.0f);
 	}
 
 	if (thumbLeftDeadZone == 0.0) { // left/right
-		input->setDigitalSteerRight(false);
-		input->setDigitalSteerLeft(false);
-		//input->setAnalogSteer(0.0f);
+		input->setAnalogSteer(0.0f);
 	}
 }
 
