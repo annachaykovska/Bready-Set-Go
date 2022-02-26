@@ -93,6 +93,11 @@ void RenderingSystem::loadModels()
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
 	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
+
+	// Test
+	std::string testPath = "resources/models/ingredients/untitled.obj";
+	this->models.emplace_back(Model(&testPath[0])); // Dough ingredient
+	g_scene.getEntity("test")->attachComponent(&(this->models[9]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -122,19 +127,27 @@ void RenderingSystem::update()
 	setupCameras(p1Transform);
 
 	// Turn off textures - temporary
-	glUniform1i(texLoc, 0);
-
+	glUniform1i(this->texLoc, 0);
+	
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
 		
 		// TODO Temporary until all objects are attached to physics system
-		if (i >= 1 && i <= 4)
+		if ((i >= 1 && i <= 4) || i >= 9)
 			ownerTransform->update();
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-		models[i].draw(getShader());
+
+		if (i >= 5) 
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(getShader());
+			glUniform1i(texLoc, 0);
+		}
+		else
+			models[i].draw(getShader());
 	}
 }
 

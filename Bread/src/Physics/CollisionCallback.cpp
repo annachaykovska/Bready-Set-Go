@@ -8,12 +8,11 @@
 #include "../Scene/Entity.h"
 #include "../Inventory.h"
 
-
 extern Scene g_scene;
 
 void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader, 
-                                      const physx::PxContactPair* pairs, 
-                                            physx::PxU32 nbPairs)
+                                  const physx::PxContactPair* pairs, 
+                                        physx::PxU32 nbPairs)
 {
     // Get PxRigidActors from the collision pair
     physx::PxRigidActor* actor0 = pairHeader.actors[0];
