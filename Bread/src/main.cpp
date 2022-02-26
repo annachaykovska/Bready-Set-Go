@@ -47,7 +47,6 @@ int main()
 	Entity* tomato = g_scene.getEntity("tomato");
 	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
-	Entity* test = g_scene.getEntity("test");
 
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE SYSTEMS
@@ -69,7 +68,7 @@ int main()
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 9; i++)
 		transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
@@ -82,7 +81,6 @@ int main()
 	tomato->attachComponent(&transforms[6], "transform");
 	dough->attachComponent(&transforms[7], "transform");
 	countertop->attachComponent(&transforms[8], "transform");
-	test->attachComponent(&transforms[9], "transform");
 
 	// Initialize transform components
 	Transform* player1Transform = player1->getTransform();
@@ -129,11 +127,6 @@ int main()
 	counterTransform->position = glm::vec3(0, 0, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
 	counterTransform->scale = glm::vec3(50, 50, 50);
-
-	Transform* testTransform = test->getTransform();
-	testTransform->position = glm::vec3(-10, -10, 0);
-	testTransform->rotation = glm::vec3(0, 0, 0);
-	testTransform->scale = glm::vec3(10);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music

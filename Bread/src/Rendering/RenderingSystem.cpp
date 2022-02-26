@@ -93,11 +93,6 @@ void RenderingSystem::loadModels()
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
 	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
-
-	// Test
-	std::string testPath = "resources/models/ingredients/untitled.obj";
-	this->models.emplace_back(Model(&testPath[0])); // Dough ingredient
-	g_scene.getEntity("test")->attachComponent(&(this->models[9]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
