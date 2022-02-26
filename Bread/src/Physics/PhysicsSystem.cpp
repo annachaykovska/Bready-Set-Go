@@ -7,6 +7,8 @@
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
 
+#include "../SystemManager.h"
+#include "../Rendering/RenderingSystem.h"
 #include "PhysicsSystem.h"
 #include "CollisionCallback.h"
 #include "../Scene/Scene.h"
@@ -17,6 +19,7 @@ using namespace snippetvehicle;
 using namespace physx;
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 CollisionCallback gCollisionCallback;
 
@@ -215,6 +218,7 @@ PhysicsSystem::PhysicsSystem()
 
 	// Cooking
 	this->mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
+	if (!this->mCooking) std::cout << "PxCreateCooking failed!\n";
 
 	// Transmit scene data to PVD
 	PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();
@@ -242,6 +246,32 @@ PhysicsSystem::PhysicsSystem()
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	
 	//mVehicleInputData.setAnalogBrake(1.0f);
+}
+
+physx::PxTriangleMesh* PhysicsSystem::cookKitchen()
+{
+	Model* kitchenModel = g_systems.render->getKitchenModel();
+
+	std::vector<physx::PxVec3> verts = kitchenModel->physicsVerts();
+	std::vector<physx::PxU32> indices = kitchenModel->physicsIndices();
+
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = verts.size(); // PxU32
+	meshDesc.points.stride = sizeof(PxVec3);
+	meshDesc.points.data = verts.data(); // PxVec3 []
+
+	meshDesc.triangles.count = indices.size(); // PxU32
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+	meshDesc.triangles.data = indices.data(); // PxU32 []
+
+	PxDefaultMemoryOutputStream writeBuffer;
+	PxTriangleMeshCookingResult::Enum result;
+	bool status = mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
+	if (!status) std::cout << "Triangle mesh cooking failed!\n";
+
+	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+
+	return mPhysics->createTriangleMesh(readBuffer);
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html

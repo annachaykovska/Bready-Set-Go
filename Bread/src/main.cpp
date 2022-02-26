@@ -57,6 +57,7 @@ int main()
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
+	g_systems.physics->cookKitchen(); // Needs to happen after renderer loads the models
 
 	AudioSystem audio;
 	g_systems.audio = &audio;

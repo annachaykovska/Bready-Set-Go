@@ -137,3 +137,8 @@ void RenderingSystem::update()
 		models[i].draw(getShader());
 	}
 }
+
+Model* RenderingSystem::getKitchenModel()
+{
+	return g_scene.getEntity("countertop")->getModel();
+}

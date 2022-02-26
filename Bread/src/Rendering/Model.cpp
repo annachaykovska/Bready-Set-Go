@@ -271,3 +271,25 @@ unsigned int Model::TextureFromFile(const char* path, const std::string& directo
 
 	return textureID;
 }
+
+std::vector<physx::PxVec3> Model::physicsVerts()
+{
+	std::vector<physx::PxVec3> pVertices;
+
+	for (auto it = meshes.begin(); it != meshes.end(); it++)
+		for (auto it2 = it->vertices.begin(); it2 != it->vertices.end(); it2++)
+			pVertices.emplace_back(physx::PxVec3(it2->position.x, it2->position.y, it2->position.z));
+	
+	return pVertices;
+}
+
+std::vector<physx::PxU32> Model::physicsIndices()
+{
+	std::vector<physx::PxU32> pIndices;
+
+	for (auto it = meshes.begin(); it != meshes.end(); it++)
+		for (auto it2 = it->indices.begin(); it2 != it->indices.end(); it2++)
+			pIndices.emplace_back(physx::PxU32(*it2));
+
+	return pIndices;
+}

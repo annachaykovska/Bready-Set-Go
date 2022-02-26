@@ -16,6 +16,7 @@ class PhysicsSystem
 public:
 
 	PhysicsSystem();
+	physx::PxTriangleMesh* cookKitchen();
 	void initVehicleSDK();
 	void initializeActors();
 
@@ -47,6 +48,8 @@ private:
 	PxCooking* mCooking;
 	PxMaterial* mMaterial;
 	PxPvd* mPvd;
+
+	PxTriangleMesh* kitchenMesh;
 
 	VehicleSceneQueryData* mVehicleSceneQueryData;
 	PxBatchQuery* mBatchQuery;
