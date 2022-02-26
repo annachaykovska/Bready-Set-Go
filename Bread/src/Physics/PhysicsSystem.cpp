@@ -139,14 +139,6 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 
 void PhysicsSystem::initializeActors() 
 {
-	// GROUND ---------------------------------------------------------------------------------------------------------------------
-	// Add the ground plane to drive on
-	//PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	//this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
-	//this->mScene->addActor(*mGroundPlane);
-
-	std::cout << "here\n";
-
 	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
 	// Create shape using the kitchen's mesh
 	PxTriangleMeshGeometry kitchenGeometry = PxTriangleMeshGeometry(kitchenMesh, PxMeshScale());
@@ -159,19 +151,19 @@ void PhysicsSystem::initializeActors()
 
 	// Create the kitchen actor (rigid static)
 	PxTransform kitchenTransform(PxVec3(0, 0, 10), PxQuat(PxIdentity));
-	PxRigidStatic* kitchen = mPhysics->createRigidStatic(kitchenTransform);
-	kitchen->attachShape(*kitchenShape);
+	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
+	this->kitchen->attachShape(*kitchenShape);
 
 	// Set physx actor name
-	kitchen->setName("countertop"); // TODO one or both of these are not working correctly?
+	this->kitchen->setName("countertop"); // TODO one or both of these are not working correctly?
 
 	// Attach the entity to the physx actor
 	void* kitchenVp = static_cast<void*>(new std::string("countertop"));
-	kitchen->userData = kitchenVp;
+	this->kitchen->userData = kitchenVp;
 
 	// Get the kitchen shape so we can set query and simulation filter data
 	PxShape* shapes[1];
-	kitchen->getShapes(shapes, 1);
+	this->kitchen->getShapes(shapes, 1);
 
 	//Set the query filter data of the kitchen so that the vehicle raycasts can hit the ground.
 	PxFilterData qryFilterData;
@@ -182,9 +174,7 @@ void PhysicsSystem::initializeActors()
 	shapes[0]->setSimulationFilterData(kitchenFilter);
 
 	// Add the kitchen to the scene
-	mScene->addActor(*kitchen);
-
-	std::cout << "there\n";
+	mScene->addActor(*(this->kitchen));
 
 	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
 	//Create a vehicle that will drive on the plane.
@@ -377,13 +367,13 @@ void PhysicsSystem::update(const float timestep)
 	updateFoodTransforms();
 
 	// Set the ground's transform
-	//Entity* countertop = g_scene.getEntity("countertop");
-	//Transform* countertopTransform = countertop->getTransform();
-	//physx::PxShape* shapes[1];
-	//mGroundPlane->getShapes(shapes, 1);
-	//physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	//groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
-	//countertopTransform->update(groundTransform);
+	Entity* countertop = g_scene.getEntity("countertop");
+	Transform* countertopTransform = countertop->getTransform();
+	physx::PxShape* shapes[1];
+	this->kitchen->getShapes(shapes, 1);
+	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
+	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
+	countertopTransform->update(groundTransform);
 }
 
 void PhysicsSystem::updateFoodTransforms()
@@ -419,6 +409,8 @@ void PhysicsSystem::cleanupPhysics()
 
 	// PHYSX
 	PX_RELEASE(this->mGroundPlane);
+	PX_RELEASE(this->kitchen);
+	PX_RELEASE(this->kitchenMesh);
 	PX_RELEASE(this->mBatchQuery);
 	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
 	PX_RELEASE(this->mFrictionPairs);

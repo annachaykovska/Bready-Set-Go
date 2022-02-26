@@ -51,6 +51,7 @@ private:
 	PxPvd* mPvd;
 
 	PxTriangleMesh* kitchenMesh;
+	PxRigidStatic* kitchen;
 
 	VehicleSceneQueryData* mVehicleSceneQueryData;
 	PxBatchQuery* mBatchQuery;
