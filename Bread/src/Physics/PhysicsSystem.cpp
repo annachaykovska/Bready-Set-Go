@@ -150,7 +150,7 @@ void PhysicsSystem::initializeActors()
 	kitchenShape->setSimulationFilterData(kitchenFilter);
 
 	// Create the kitchen actor (rigid static)
-	PxTransform kitchenTransform(PxVec3(0, 0, 10), PxQuat(PxIdentity));
+	PxTransform kitchenTransform(PxVec3(0, 0, 0), PxQuat(PxIdentity));
 	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
 	this->kitchen->attachShape(*kitchenShape);
 

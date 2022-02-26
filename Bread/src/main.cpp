@@ -126,7 +126,7 @@ int main()
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, 0, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
-	counterTransform->scale = glm::vec3(50, 50, 50);
+	counterTransform->scale = glm::vec3(1, 1, 1);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
