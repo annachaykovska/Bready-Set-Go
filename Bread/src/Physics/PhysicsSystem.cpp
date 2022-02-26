@@ -119,7 +119,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
+	PxTransform localTm(PxVec3(10, 2, 10) );
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
@@ -141,9 +141,50 @@ void PhysicsSystem::initializeActors()
 {
 	// GROUND ---------------------------------------------------------------------------------------------------------------------
 	// Add the ground plane to drive on
-	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
-	mScene->addActor(*mGroundPlane);
+	//PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	//this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
+	//this->mScene->addActor(*mGroundPlane);
+
+	std::cout << "here\n";
+
+	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
+	// Create shape using the kitchen's mesh
+	PxTriangleMeshGeometry kitchenGeometry = PxTriangleMeshGeometry(kitchenMesh, PxMeshScale());
+
+	PxShape* kitchenShape = mPhysics->createShape(kitchenGeometry, *mMaterial, true);
+
+	// Add filter data for ground
+	PxFilterData kitchenFilter(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	kitchenShape->setSimulationFilterData(kitchenFilter);
+
+	// Create the kitchen actor (rigid static)
+	PxTransform kitchenTransform(PxVec3(0, 0, 10), PxQuat(PxIdentity));
+	PxRigidStatic* kitchen = mPhysics->createRigidStatic(kitchenTransform);
+	kitchen->attachShape(*kitchenShape);
+
+	// Set physx actor name
+	kitchen->setName("countertop"); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* kitchenVp = static_cast<void*>(new std::string("countertop"));
+	kitchen->userData = kitchenVp;
+
+	// Get the kitchen shape so we can set query and simulation filter data
+	PxShape* shapes[1];
+	kitchen->getShapes(shapes, 1);
+
+	//Set the query filter data of the kitchen so that the vehicle raycasts can hit the ground.
+	PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
+	shapes[0]->setQueryFilterData(qryFilterData);
+
+	//Set the simulation filter data of the kitchen so that it collides with the chassis of a vehicle but not the wheels.
+	shapes[0]->setSimulationFilterData(kitchenFilter);
+
+	// Add the kitchen to the scene
+	mScene->addActor(*kitchen);
+
+	std::cout << "there\n";
 
 	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
 	//Create a vehicle that will drive on the plane.
@@ -186,8 +227,6 @@ void PhysicsSystem::initializeActors()
 
 PhysicsSystem::PhysicsSystem()
 {
-	this->mCooking = NULL;
-
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 	if (!mFoundation) { std::cout << "PxCreateFoundation failed!" << std::endl; assert(mFoundation); }
@@ -235,6 +274,12 @@ PhysicsSystem::PhysicsSystem()
 
 	//Create the friction table for each combination of tire and surface type.
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
+}
+
+void PhysicsSystem::initialize()
+{
+	// Create the kitchen environment collision mesh
+	cookKitchen();
 
 	//Set all of the ground/player/object actors
 	initializeActors();
@@ -244,11 +289,11 @@ PhysicsSystem::PhysicsSystem()
 	mVehiclePlayer1->setToRestState();
 	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	
+
 	//mVehicleInputData.setAnalogBrake(1.0f);
 }
 
-physx::PxTriangleMesh* PhysicsSystem::cookKitchen()
+void PhysicsSystem::cookKitchen()
 {
 	Model* kitchenModel = g_systems.render->getKitchenModel();
 
@@ -271,7 +316,7 @@ physx::PxTriangleMesh* PhysicsSystem::cookKitchen()
 
 	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
 
-	return mPhysics->createTriangleMesh(readBuffer);
+	this->kitchenMesh = mPhysics->createTriangleMesh(readBuffer);
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -332,13 +377,13 @@ void PhysicsSystem::update(const float timestep)
 	updateFoodTransforms();
 
 	// Set the ground's transform
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
-	physx::PxShape* shapes[1];
-	mGroundPlane->getShapes(shapes, 1);
-	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
-	countertopTransform->update(groundTransform);
+	//Entity* countertop = g_scene.getEntity("countertop");
+	//Transform* countertopTransform = countertop->getTransform();
+	//physx::PxShape* shapes[1];
+	//mGroundPlane->getShapes(shapes, 1);
+	//physx::PxTransform groundTransform = shapes[0]->getLocalPose();
+	//groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
+	//countertopTransform->update(groundTransform);
 }
 
 void PhysicsSystem::updateFoodTransforms()

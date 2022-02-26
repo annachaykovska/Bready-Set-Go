@@ -16,7 +16,8 @@ class PhysicsSystem
 public:
 
 	PhysicsSystem();
-	physx::PxTriangleMesh* cookKitchen();
+	void initialize();
+	void cookKitchen();
 	void initVehicleSDK();
 	void initializeActors();
 
