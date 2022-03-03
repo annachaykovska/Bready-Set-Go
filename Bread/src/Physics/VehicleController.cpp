@@ -107,7 +107,6 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	}
 
 	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
-
 	
 	float analogVal;
 	if (thumbRightX <= 0) { // left

@@ -11,24 +11,16 @@
 #define CAMERA_GROUND_HEIGHT 5.0
 
 Camera::Camera()
+	: position(glm::vec3(0, 200.0f, 500.0f))
+	, front(glm::vec3(0, 0, -1.f))
+	, up(glm::vec3(0, 1.f, 0))
+	, worldUp(glm::vec3(0, 1.f, 0))
+	, cameraPositionOffset(0.f)
+	, perspective(40.f)
+	, forcedDirection(0.f)
+	, oldForcedDirection(forcedDirection)
+	, recordedForcedDirection(forcedDirection)
 {
-	this->position = glm::vec3(0, 200.0f, 500.0f);
-	this->front = glm::vec3(0, 0, -1.f);
-	this->up = glm::vec3(0, 1.f, 0);
-	this->worldUp = glm::vec3(0, 1.f, 0);	
-	this->yaw = YAW;
-	this->pitch = PITCH;
-	this->movementSpeed = SPEED;
-	this->mouseSensitivity = SENSITIVITY;
-	this->zoom = ZOOM; 
-	this->lastOffset = 0;
-	this->lastSpeed = 0;
-	this->cameraPositionOffset = 0;
-	this->slowDownCounter = 0;
-	this->perspective = 40;
-	this->forcedDirection = 0.f;
-	this->oldForcedDirection = this->forcedDirection;
-	this->recordedForcedDirection = forcedDirection;
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	updateCameraVectors(&transform);
@@ -41,8 +33,6 @@ float Camera::getPerspective()
 
 glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 {
-	glm::vec3 defaultPosition;
-
 	float theta = 225.f;
 	float cameraRotationOffset = 0.f;
 
@@ -89,7 +79,6 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			}
 			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
 			{
-				std::cout << "TESTING" << std::endl;
 				forcedDirection = oldForcedDirection;
 			}
 			else
@@ -117,7 +106,6 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			}
 			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
 			{
-				std::cout << "TESTING" << std::endl;
 				forcedDirection = oldForcedDirection;
 			}
 			else
@@ -171,9 +159,9 @@ void Camera::updateCameraVectors(Transform* playerTransform)
 {
 	// Calculate new front vector using Euler angles
 	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
+	front.y = sin(glm::radians(PITCH));
+	front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
 	this->front = glm::normalize(front);
 
 	// Calculate new right and up vectors using cross product
