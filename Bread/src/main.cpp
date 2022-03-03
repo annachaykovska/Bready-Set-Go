@@ -67,6 +67,8 @@ int main()
 	AudioSystem audio;
 	g_systems.audio = &audio;
 
+	g_scene.init(&physics);
+
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE TRANSFORMS - will be handled by PhysicsSystem eventually
 	//-----------------------------------------------------------------------------------
@@ -150,9 +152,11 @@ int main()
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
 
 	// Set movement control callbacks
-	// TODO: generalize this
-	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics);
+	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
+
+	// Set up controller inputs
+	XboxController controllers = XboxController(&physics);
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
@@ -179,6 +183,10 @@ int main()
 		// INPUT
 		glfwPollEvents();
 
+		// READ CONTROLLERS
+		controllers.checkControllers(); // sets analog/digital
+		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
+
 		// SIMULATE
 		newTime = glfwGetTime();
 		deltaTime = newTime - oldTime;
@@ -200,8 +208,7 @@ int main()
 		p1NavSystem.update();
 
 		// AUDIO
-		// update AudioSource
-
+		// update AudioSource	
 	}
 
 	// Collect garbage
