@@ -145,7 +145,6 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		{
 			thumbLeftDeadZone = 0;
 		}
-		std::cout << thumbLeftDeadZone << std::endl;
 		if (thumbLeftDeadZone > 1)
 		{
 			thumbLeftDeadZone = 1;
