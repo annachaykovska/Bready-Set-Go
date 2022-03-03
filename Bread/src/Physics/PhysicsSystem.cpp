@@ -249,6 +249,8 @@ PhysicsSystem::PhysicsSystem()
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	
 	//mVehicleInputData.setAnalogBrake(1.0f);
+
+	viewDirectionalInfluence = 0.f;
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -266,6 +268,16 @@ void PhysicsSystem::initVehicleSDK()
 
 void PhysicsSystem::setAnalogInputs(bool input) {
 	this->useAnalogInputs = input;
+}
+
+void PhysicsSystem::setViewDirectionalInfluence(float value)
+{
+	viewDirectionalInfluence = value;
+}
+
+float PhysicsSystem::getViewDirectionalInfluence()
+{
+	return viewDirectionalInfluence;
 }
 
 void PhysicsSystem::update(const float timestep)

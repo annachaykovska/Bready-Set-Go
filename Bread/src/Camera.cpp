@@ -26,6 +26,9 @@ Camera::Camera()
 	this->cameraPositionOffset = 0;
 	this->slowDownCounter = 0;
 	this->perspective = 40;
+	this->forcedDirection = 0.f;
+	this->oldForcedDirection = this->forcedDirection;
+	this->recordedForcedDirection = forcedDirection;
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	updateCameraVectors(&transform);
@@ -63,6 +66,90 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		cameraPositionOffset = vehicleSpeed / 16;
 	}
 
+	float stopDegrees = 0;
+	if (physics != nullptr)
+	{
+		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90);
+		if (physics->getViewDirectionalInfluence() < -0.1)
+		{
+			float stepSize = 0;
+			if (forcedDirection < 0)
+			{
+				stepSize = -(1 / (5 * 2.f)) + 1;
+			}
+			else
+			{
+				float functionStep = (2.f / stopDegrees) * abs(forcedDirection);
+				functionStep = 2 - functionStep;
+				stepSize = -(1 / (5 * functionStep)) + 1;
+			}
+			if (forcedDirection < stopDegrees)
+			{
+				forcedDirection += stepSize;
+			}
+			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
+			{
+				std::cout << "TESTING" << std::endl;
+				forcedDirection = oldForcedDirection;
+			}
+			else
+			{
+				oldForcedDirection = forcedDirection;
+			}
+			recordedForcedDirection = forcedDirection;
+		}
+		else if (physics->getViewDirectionalInfluence() > 0.1)
+		{
+			float stepSize = 0;
+			if (forcedDirection > 0)
+			{
+				stepSize = -(1 / (5 * 2.f)) + 1;
+			}
+			else
+			{
+				float functionStep = (2.f / stopDegrees) * abs(forcedDirection);
+				functionStep = 2.f - functionStep;
+				stepSize = -(1 / (5 * functionStep)) + 1;
+			}
+			if (forcedDirection > -stopDegrees)
+			{
+				forcedDirection -= stepSize;
+			}
+			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
+			{
+				std::cout << "TESTING" << std::endl;
+				forcedDirection = oldForcedDirection;
+			}
+			else
+			{
+				oldForcedDirection = forcedDirection;
+			}
+			recordedForcedDirection = forcedDirection;
+		}
+		else
+		{
+			if (abs(forcedDirection) > 0.01)
+			{
+				float functionStep = (5.f / abs(recordedForcedDirection)) * abs(forcedDirection);
+				float stepSize = -(1 / (5 * functionStep)) + 1;
+				if (forcedDirection > 0)
+				{
+					forcedDirection -= stepSize;
+				}
+				else
+				{
+					forcedDirection += stepSize;
+				}
+			}
+			else
+			{
+				forcedDirection = 0;
+			}
+		}
+	}
+	oldForcedDirection = forcedDirection;
+
+	theta += cameraRotationOffset / 16 + forcedDirection;
 	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(theta)), 0, sin(glm::radians(theta)), 0,
 		0, 1.0f, 0, 0,
 		-sin(glm::radians(theta)), 0, cos(glm::radians(theta)), 0,
@@ -71,25 +158,12 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float xChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.x;
 	float zChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.z;
 
-	defaultPosition.x = playerTransform->position.x + xChange;
-	defaultPosition.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
-	defaultPosition.z = playerTransform->position.z + zChange;
-
-	theta += cameraRotationOffset / 16;
-	rotation45 = glm::mat4(cos(glm::radians(theta)), 0, sin(glm::radians(theta)), 0,
-		0, 1.0f, 0, 0,
-		-sin(glm::radians(theta)), 0, cos(glm::radians(theta)), 0,
-		0, 0, 0, 1.0f);;
-	positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
-	xChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.x;
-	zChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.z;
-
 	position.x = playerTransform->position.x + xChange;
 	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
 	position.z = playerTransform->position.z + zChange;
 
 	glm::vec3 positionUp = glm::vec3(0.0f, 4.0f, 0.0f);
-	glm::vec3 lookAhead = defaultPosition + ((playerTransform->position + positionUp) - defaultPosition) * 1.2f;
+	glm::vec3 lookAhead = position + ((playerTransform->position + positionUp) - position) * 1.2f;
 	return glm::lookAt(position, lookAhead, worldUp);
 }
 
