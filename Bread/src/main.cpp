@@ -61,6 +61,8 @@ int main()
 	AudioSystem audio;
 	g_systems.audio = &audio;
 
+	g_scene.init(&physics);
+
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE TRANSFORMS - will be handled by PhysicsSystem eventually
 	//-----------------------------------------------------------------------------------

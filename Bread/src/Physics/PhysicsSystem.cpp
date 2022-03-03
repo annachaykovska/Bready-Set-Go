@@ -22,10 +22,10 @@ CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
-	0.0f,		0.75f,
-	5.0f,		0.75f,
-	30.0f,		0.125f,
-	120.0f,		0.1f,
+	0.0f,		0.2f,
+	5.0f,		0.4f,
+	30.0f,		0.5f,
+	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -74,7 +74,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 1500.0f;
+	const PxF32 chassisMass = 500.0f;
 	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
@@ -84,10 +84,10 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 20.0f;
+	const PxF32 wheelMass = 3000.0f;
 	const PxF32 wheelRadius = 0.5f;
 	const PxF32 wheelWidth = 0.4f;
-	const PxF32 wheelMOI = 0.3f * wheelMass * wheelRadius * wheelRadius;
+	const PxF32 wheelMOI = 2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -95,6 +95,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
+	vehicleDesc.chassisMOI.y *= 0.5;
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -147,6 +148,12 @@ void PhysicsSystem::initializeActors()
 	// PLAYER 1
 	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
 	mVehiclePlayer1 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+
+	PxVehicleEngineData engine;
+	engine.mPeakTorque = 10000.0f;
+	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
+
+	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransform);
 

@@ -22,7 +22,7 @@ void XboxController::checkControllers() {
 			
 		}
 	}
-	printf("The controller ID: %d", controllerId);
+	//printf("The controller ID: %d", controllerId);
 	if (controllerId != -1) {
 		physics->setAnalogInputs(true);
 	}
@@ -88,7 +88,18 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	float triggerRight = state.Gamepad.bRightTrigger;
 
 	// Other buttons
-	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // UNUSED FOR NOW
+	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // UNUSED FOR NOW
+
+	if (X_button_pressed)
+	{
+		input->setAnalogHandbrake(1.0f);
+	}
+	else
+	{
+		input->setAnalogHandbrake(0.0f);
+	}
+
+	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
 
 	// KEY PRESSED
 	float analogVal;
