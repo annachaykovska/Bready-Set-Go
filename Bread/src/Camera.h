@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "Transform.h"
+#include "Physics/PhysicsSystem.h"
 
 
 const float YAW = -90.0f;
@@ -23,13 +24,26 @@ public:
 	glm::mat4 getViewMatrix(Transform* playerTransform);
 	void updateCameraVectors(Transform* playerTransform);
 
+	float getPerspective();
+
+	void initPhysics(PhysicsSystem* physicsSystem);
+
 private:
+
+	PhysicsSystem* physics;
 
 	glm::vec3 front;
 	glm::vec3 up;
 	glm::vec3 right;
 	glm::vec3 worldUp;
 
+	float lastOffset;
+	float lastSpeed;
+
+	float slowDownCounter;
+
+	float perspective;
+	float cameraPositionOffset;
 	float movementSpeed;
 	float mouseSensitivity;
 	float zoom;
