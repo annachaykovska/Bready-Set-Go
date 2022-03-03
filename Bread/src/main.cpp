@@ -12,7 +12,7 @@
 #include "Audio/AudioSystem.h"
 #include "Navigation/NavMesh.h"
 #include "Navigation/NavigationSystem.h"
-#include "Physics/VehicleController.cpp"
+#include "Physics/VehicleController.h"
 #include "Inventory.h"
 #include "DebugSettings.h"
 

@@ -19,6 +19,7 @@ void NavigationSystem::update()
 {
 	if (waypointUpdater_.pathComplete())
 	{
+		std::cout << "FINISHED" << std::endl;
 		waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(95.f, 0.f, -95.f), glm::vec3(5.f, 0.f, -20.f)));
 	}
 

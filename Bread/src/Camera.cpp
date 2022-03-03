@@ -90,7 +90,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 
 	glm::vec3 positionUp = glm::vec3(0.0f, 4.0f, 0.0f);
 	glm::vec3 lookAhead = defaultPosition + ((playerTransform->position + positionUp) - defaultPosition) * 1.2f;
-	return glm::lookAt(position, lookAhead, worldUp);
+	//return glm::lookAt(position, lookAhead, worldUp);
 	return glm::lookAt(glm::vec3(30.f, 150.0f, 50.0f), glm::vec3(30.0f, 0.0f, -30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 

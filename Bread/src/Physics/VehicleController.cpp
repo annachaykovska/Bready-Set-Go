@@ -116,6 +116,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		analogVal = triggerLeft / 255;
 		input->setAnalogAccel(analogVal);
 	}
+	/*
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
 		analogVal = triggerLeft / 255;
 		input->setAnalogBrake(analogVal);
@@ -139,5 +140,6 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	if (thumbLeftDeadZone == 0.0) { // left/right
 		input->setAnalogSteer(0.0f);
 	}
+	*/
 }
 
