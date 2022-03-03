@@ -36,6 +36,8 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float theta = 225.f;
 	float cameraRotationOffset = 0.f;
 
+	float elasticForce = 1.f; // Lower = more resistance
+
 	float vehicleSpeed = 0;
 	float vehicleTurn = 0;
 
@@ -53,7 +55,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	if (vehicleSpeed > 0)
 	{
 		perspective = 40 + (vehicleSpeed / 12);
-		cameraPositionOffset = vehicleSpeed / 16;
+		cameraPositionOffset = (vehicleSpeed / 16);
 	}
 
 	float stopDegrees = 0;
@@ -69,8 +71,8 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			}
 			else
 			{
-				float functionStep = (2.f / stopDegrees) * abs(forcedDirection);
-				functionStep = 2 - functionStep;
+				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+				functionStep = elasticForce - functionStep;
 				stepSize = -(1 / (5 * functionStep)) + 1;
 			}
 			if (forcedDirection < stopDegrees)
@@ -96,8 +98,8 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			}
 			else
 			{
-				float functionStep = (2.f / stopDegrees) * abs(forcedDirection);
-				functionStep = 2.f - functionStep;
+				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+				functionStep = elasticForce - functionStep;
 				stepSize = -(1 / (5 * functionStep)) + 1;
 			}
 			if (forcedDirection > -stopDegrees)

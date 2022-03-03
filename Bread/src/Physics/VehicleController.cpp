@@ -136,9 +136,36 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input->setAnalogBrake(analogVal);
 	}
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
+		float step = thumbLeftDeadZone * 2;
+		if (step > 0.143)
+		{
+			thumbLeftDeadZone = -(1 / (2 * (step - 2.4))) - 0.167;
+		}
+		else
+		{
+			thumbLeftDeadZone = 0;
+		}
+		std::cout << thumbLeftDeadZone << std::endl;
+		if (thumbLeftDeadZone > 1)
+		{
+			thumbLeftDeadZone = 1;
+		}
 		input->setAnalogSteer(thumbLeftDeadZone);
 	}
 	if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
+		float step = thumbLeftDeadZone * 2;
+		if (step > 0.143)
+		{
+			thumbLeftDeadZone = -(1 / (2 * (step - 2.4))) - 0.167;
+		}
+		else
+		{
+			thumbLeftDeadZone = 0;
+		}
+		if (thumbLeftDeadZone > 1)
+		{
+			thumbLeftDeadZone = 1;
+		}
 		analogVal = -1.0 * thumbLeftDeadZone;
 		input->setAnalogSteer(analogVal);
 	}
