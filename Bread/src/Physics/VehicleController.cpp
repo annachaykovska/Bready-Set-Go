@@ -79,7 +79,14 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	// Left Thumb
 	float thumbLeftX = state.Gamepad.sThumbLX;
 	float thumbLeftY = state.Gamepad.sThumbLY;
+
 	float thumbLeftDeadZone = getDeadZone(thumbLeftX, thumbLeftY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+
+	// Right Thumb
+	float thumbRightX = state.Gamepad.sThumbRX;
+	float thumbRightY = state.Gamepad.sThumbRY;
+
+	float thumbRightDeadZone = getDeadZone(thumbRightX, thumbRightY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
 
 	// Left trigger
 	float triggerLeft = state.Gamepad.bLeftTrigger;
@@ -100,9 +107,17 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	}
 
 	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
+	
+	float analogVal;
+	if (thumbRightX <= 0) { // left
+		physics->setViewDirectionalInfluence(thumbRightDeadZone);
+	}
+	if (thumbRightX > 0) { // right
+		analogVal = -1.0 * thumbRightDeadZone;
+		physics->setViewDirectionalInfluence(analogVal);
+	}
 
 	// KEY PRESSED
-	float analogVal;
 	if (triggerRight > 0.1) { // forwards
 		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
 			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)

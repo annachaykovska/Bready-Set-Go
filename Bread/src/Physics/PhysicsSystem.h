@@ -26,6 +26,9 @@ public:
 	void updateFoodTransforms();
 	void setAnalogInputs(bool input);
 
+	void setViewDirectionalInfluence(float value);
+	float getViewDirectionalInfluence();
+
 	void cleanupPhysics();
 
 	PxVehicleDrive4W* mVehiclePlayer1;
@@ -55,4 +58,6 @@ private:
 
 	bool mIsVehicleInAir = true;
 	bool useAnalogInputs = false;
+
+	float viewDirectionalInfluence = 0.f;
 }; 

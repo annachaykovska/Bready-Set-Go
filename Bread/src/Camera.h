@@ -44,6 +44,10 @@ private:
 
 	float perspective;
 	float cameraPositionOffset;
+	float forcedDirection;
+	float recordedForcedDirection;
+	float oldForcedDirection;
+
 	float movementSpeed;
 	float mouseSensitivity;
 	float zoom;
