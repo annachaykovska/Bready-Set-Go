@@ -318,13 +318,13 @@ float PhysicsSystem::getViewDirectionalInfluence()
 	return viewDirectionalInfluence;
 }
 
-void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, std::string entityName, const float timestep) {
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData &inputData, std::string entityName, const float timestep) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
-		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, isVehicleInAir, *player);
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
 	}
 	else {
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, isVehicleInAir, *player);
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
 	}
 
 	// Raycasts
@@ -366,10 +366,10 @@ void PhysicsSystem::update(const float timestep)
 	this->mScene->fetchResults(true);
 
 	// Update the players
-	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, "player1", timestep);
-	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, "player2", timestep);
-	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, "player3", timestep);
-	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, "player4", timestep);
+	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep);
+	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
+	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
+	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
 	
 
 	// Update the food transforms

@@ -24,7 +24,7 @@ public:
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
 	void update(const float timestep);
-	void updateVehicle(PxVehicleDrive4W *player, bool &isVehicleInAir, std::string entityName, const float timestep);
+	void updateVehicle(PxVehicleDrive4W *player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep);
 	void updateFoodTransforms();
 	void setAnalogInputs(bool input);
 
@@ -42,7 +42,10 @@ public:
 	PxRigidDynamic* tomato;
 	PxRigidDynamic* dough;
 
-	PxVehicleDrive4WRawInputData mVehicleInputData;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer2;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
 private:
 

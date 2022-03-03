@@ -167,6 +167,9 @@ int main()
 		// READ CONTROLLERS
 		controllers.checkControllers(); // sets analog/digital
 		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(1); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(2); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(3); // Getting the input from player 1 controller
 
 		// SIMULATE
 		newTime = glfwGetTime();
