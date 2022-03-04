@@ -73,7 +73,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			{
 				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
 				functionStep = elasticForce - functionStep;
-				stepSize = -(1 / (5 * functionStep)) + 1;
+				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
 			}
 			if (forcedDirection < stopDegrees)
 			{
@@ -100,7 +100,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			{
 				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
 				functionStep = elasticForce - functionStep;
-				stepSize = -(1 / (5 * functionStep)) + 1;
+				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
 			}
 			if (forcedDirection > -stopDegrees)
 			{
@@ -121,14 +121,28 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			if (abs(forcedDirection) > 0.01)
 			{
 				float functionStep = (5.f / abs(recordedForcedDirection)) * abs(forcedDirection);
-				float stepSize = -(1 / (5 * functionStep)) + 1;
+				float stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
 				if (forcedDirection > 0)
 				{
-					forcedDirection -= stepSize;
+					if (forcedDirection - stepSize < 0)
+					{
+						forcedDirection = 0;
+					}
+					else
+					{
+						forcedDirection -= stepSize;
+					}
 				}
 				else
 				{
-					forcedDirection += stepSize;
+					if (forcedDirection + stepSize > 0)
+					{
+						forcedDirection = 0;
+					}
+					else
+					{
+						forcedDirection += stepSize;
+					}
 				}
 			}
 			else
