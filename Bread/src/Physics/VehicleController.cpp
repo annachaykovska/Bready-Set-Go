@@ -148,7 +148,8 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		float step = thumbLeftDeadZone * 2;
 		if (step > 0.143)
 		{
-			thumbLeftDeadZone = -(1 / (2 * (step - 2.4))) - 0.167;
+			// Using this trial-and-error found function to make steering more natural
+			thumbLeftDeadZone = -(1 / (10 * (step - 2.1))) - 0.048;
 		}
 		else
 		{
@@ -164,7 +165,8 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		float step = thumbLeftDeadZone * 2;
 		if (step > 0.143)
 		{
-			thumbLeftDeadZone = -(1 / (2 * (step - 2.4))) - 0.167;
+			// Using this trial-and-error found function to make steering more natural
+			thumbLeftDeadZone = -(1 / (10 * (step - 2.1))) - 0.048;
 		}
 		else
 		{
