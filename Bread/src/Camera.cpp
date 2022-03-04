@@ -62,7 +62,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	if (physics != nullptr)
 	{
 		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90);
-		if (physics->getViewDirectionalInfluence() < -0.1)
+		if (physics->getViewDirectionalInfluence() < -0.001)
 		{
 			float stepSize = 0;
 			if (forcedDirection < 0)
@@ -89,7 +89,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			}
 			recordedForcedDirection = forcedDirection;
 		}
-		else if (physics->getViewDirectionalInfluence() > 0.1)
+		else if (physics->getViewDirectionalInfluence() > 0.001)
 		{
 			float stepSize = 0;
 			if (forcedDirection > 0)
