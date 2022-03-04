@@ -73,7 +73,16 @@ float XboxController::getDeadZone(float x, float y, float deadzone) {
 }
 
 void XboxController::setButtonStateFromController(int controllerId) {
-	physx::PxVehicleDrive4WRawInputData* input = &physics->mVehicleInputData;
+	// Get the correct input data for the controller
+	physx::PxVehicleDrive4WRawInputData* input;
+	if (controllerId == 1)
+		input = &physics->mVehicleInputDataPlayer2;
+	else if (controllerId == 2)
+		input = &physics->mVehicleInputDataPlayer3;
+	else if (controllerId == 3)
+		input = &physics->mVehicleInputDataPlayer4;
+	else 
+		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb

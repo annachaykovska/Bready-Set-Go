@@ -34,7 +34,7 @@ public:
 
 	virtual void keyCallback(int key, int scancode, int action, int mods)
 	{
-		physx::PxVehicleDrive4WRawInputData* input = &physics->mVehicleInputData;
+		physx::PxVehicleDrive4WRawInputData* input = &physics->mVehicleInputDataPlayer1; // Default to player 1
 
 		// KEY PRESSED
 		if (action == GLFW_PRESS)

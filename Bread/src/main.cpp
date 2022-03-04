@@ -54,6 +54,9 @@ int main()
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
 	player1->vehicle = physics.mVehiclePlayer1; // Don't think this is needed?
+	player2->vehicle = physics.mVehiclePlayer2; // Don't think this is needed?
+	player3->vehicle = physics.mVehiclePlayer3; // Don't think this is needed?
+	player4->vehicle = physics.mVehiclePlayer4; // Don't think this is needed?
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
@@ -149,8 +152,11 @@ int main()
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
-	Inventory p1Inv;
+	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 	player1->attachComponent(&p1Inv, "inventory");
+	player2->attachComponent(&p2Inv, "inventory");
+	player3->attachComponent(&p3Inv, "inventory");
+	player4->attachComponent(&p4Inv, "inventory");
 
 	// GAME LOOP
 	while (!window.shouldClose())
@@ -161,6 +167,9 @@ int main()
 		// READ CONTROLLERS
 		controllers.checkControllers(); // sets analog/digital
 		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(1); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(2); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(3); // Getting the input from player 1 controller
 
 		// SIMULATE
 		newTime = glfwGetTime();
