@@ -23,6 +23,7 @@ public:
 
 private:
 	PhysicsSystem* physics;
+	bool forwards;
 };
 
 class MovementCallbacks : public CallbackInterface
@@ -110,6 +111,5 @@ public:
 	}
 
 private:
-
 	PhysicsSystem* physics;
 };

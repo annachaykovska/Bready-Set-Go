@@ -131,14 +131,26 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
 			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
 			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		if (forwards == false)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
+		forwards = true;
 		analogVal = triggerRight / 255;
 		input->setAnalogAccel(analogVal);
+		input->setAnalogBrake(0);
 	}
 	if (triggerLeft > 0.1 && triggerRight == 0.0) { // reverse
 		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
 			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		if (forwards == true)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
+		forwards = false;
 		analogVal = triggerLeft / 255;
 		input->setAnalogAccel(analogVal);
+		input->setAnalogBrake(0);
 	}
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
 		analogVal = triggerLeft / 255;
