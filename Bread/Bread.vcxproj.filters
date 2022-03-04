@@ -2786,6 +2786,8 @@
     <Text Include="resources\shaders\fragment.txt" />
     <Text Include="resources\shaders\lightSourceFragment.txt" />
     <Text Include="resources\shaders\lightSourceVertex.txt" />
+    <Text Include="resources\shaders\textFragment.txt" />
+    <Text Include="resources\shaders\textVertex.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bread.rc">

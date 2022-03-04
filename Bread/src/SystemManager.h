@@ -6,6 +6,7 @@
 class AudioSystem;
 class PhysicsSystem;
 class RenderingSystem;
+class UISystem;
 
 class SystemManager
 {
@@ -16,6 +17,7 @@ public:
 		audio = nullptr;
 		physics = nullptr;
 		render = nullptr;
+		ui = nullptr;
 	}
 
 	SystemManager(SystemManager& rhs) = delete; // No copy constructor
@@ -24,6 +26,7 @@ public:
 	AudioSystem* audio;
 	PhysicsSystem* physics;
 	RenderingSystem* render;
+	UISystem* ui;
 
 private:
 };

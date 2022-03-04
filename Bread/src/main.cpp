@@ -8,10 +8,10 @@
 #include "Scene/Entity.h"
 #include "Transform.h"
 #include "Rendering/RenderingSystem.h"
+#include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
 #include "Physics/VehicleController.cpp"
 #include "Inventory.h"
-
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -63,6 +63,8 @@ int main()
 	g_systems.audio = &audio;
 
 	//TODO put UI system here
+	UISystem ui;
+	g_systems.ui = &ui;
 
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE TRANSFORMS - will be handled by PhysicsSystem eventually
@@ -164,12 +166,13 @@ int main()
 		oldTime = newTime;
 
 		// RENDER
-		window.clear();
-		renderer.update();
-		profiler.newFrame();
+		//window.clear();
+		//renderer.update();
+		ui.update();
+		//profiler.newFrame();
 
 		// Update the ImGUI profiler
-		profiler.update();
+		//profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();
