@@ -97,6 +97,7 @@ void UISystem::renderText(Shader& s, std::string text, float x, float y, float s
 {
     // activate corresponding render state	
     s.use();
+    glUniformMatrix4fv(glGetUniformLocation(s.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     glUniform3f(glGetUniformLocation(s.getId(), "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);

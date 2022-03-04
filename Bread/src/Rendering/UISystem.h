@@ -6,6 +6,7 @@
 #include <ft2build.h>
 #include <glad/glad.h>
 #include <glm/ext/vector_int2.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
