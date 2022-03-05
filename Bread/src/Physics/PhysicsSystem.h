@@ -53,6 +53,8 @@ public:
 	
 private:
 
+	float mAccumulator;
+
 	PxDefaultErrorCallback mDefaultErrorCallback;
 	PxDefaultAllocator mDefaultAllocatorCallback;
 	PxFoundation* mFoundation;

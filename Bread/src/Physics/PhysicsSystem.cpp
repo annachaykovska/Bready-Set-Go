@@ -292,7 +292,7 @@ PhysicsSystem::PhysicsSystem()
 	this->mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
 	if (!this->mCooking) std::cout << "PxCreateCooking failed!\n";
 
-	// Triangle Mesh data initialization
+	// Triangle Mesh data initialization for cooking
 	this->kitchenVerts = new std::vector<physx::PxVec3>();
 	this->kitchenIndices = new std::vector<physx::PxU32>;
 	kitchenVerts->reserve(40000);
@@ -313,6 +313,9 @@ PhysicsSystem::PhysicsSystem()
 
 	//Create the friction table for each combination of tire and surface type.
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
+
+	// Initialize time tracking for updates
+	this->mAccumulator = 0;
 }
 
 void PhysicsSystem::initialize()
@@ -342,18 +345,10 @@ void PhysicsSystem::initialize()
 	viewDirectionalInfluence = 0.f;
 }
 
-int filter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
-{
-	if (code == EXCEPTION_ACCESS_VIOLATION)
-	{
-		return EXCEPTION_EXECUTE_HANDLER;
-	}
-	else
-	{
-		return EXCEPTION_CONTINUE_SEARCH;
-	};
-}
-
+// Cooking mesh was creating a read access violation seemingly randomly, it appears to
+// be due to vertex and index data going out of scope before it was copied correctly
+// and read into the triangle mesh. See for more details:
+// https://stackoverflow.com/questions/49268620/issues-creating-meshes-in-nvidia-physx
 void PhysicsSystem::cookKitchen()
 {
 	Model* kitchenModel = g_systems.render->getKitchenModel();
@@ -453,6 +448,13 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 
 void PhysicsSystem::update(const float timestep)
 {
+	// Only update if more than 1/60th of a second has passed since last update
+	this->mAccumulator += timestep;
+	if (this->mAccumulator < 1.0f / 60.0f) 
+		return;
+
+	this->mAccumulator = 0;
+
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
