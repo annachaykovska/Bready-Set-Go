@@ -17,10 +17,6 @@
 #include <Windows.h>
 
 // TODO Add chassis collisions to environment so the breadmobiles can't drive through walls
-// TODO Fix the bug caused by dragging the window while the game is running
-// TODO https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Startup.html#startup
-// TODO https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Threading.html
-// TODO https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Geometry.html#triangle-meshes
 
 using namespace snippetvehicle;
 using namespace physx;
@@ -449,11 +445,11 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 void PhysicsSystem::update(const float timestep)
 {
 	// Only update if more than 1/60th of a second has passed since last update
-	this->mAccumulator += timestep;
-	if (this->mAccumulator < 1.0f / 60.0f) 
-		return;
+	//this->mAccumulator += timestep;
+	//if (this->mAccumulator < 1.0f / 60.0f) 
+		//return;
 
-	this->mAccumulator = 0;
+	//this->mAccumulator = 0;
 
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
