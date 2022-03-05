@@ -14,6 +14,7 @@
 #include "../Scene/Scene.h"
 #include "../Transform.h"
 #include "../Scene/Entity.h"
+#include <Windows.h>
 
 using namespace snippetvehicle;
 using namespace physx;
@@ -193,7 +194,7 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
-	PxTransform startTransformPlayer1(PxVec3(20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 25), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer1(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer2(PxVec3(20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer4(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
@@ -347,6 +348,9 @@ void PhysicsSystem::cookKitchen()
 
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
+
+	Sleep(200); // TODO Find a better fix for this very ugly bandaid
+
 	bool status = mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
 	if (!status) std::cout << "Triangle mesh cooking failed!\n";
 
