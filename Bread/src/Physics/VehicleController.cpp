@@ -5,7 +5,7 @@
 
 using namespace std;
 
-XboxController::XboxController(PhysicsSystem* physicsSystem) {
+XboxController::XboxController(PhysicsSystem* physicsSystem) : forwards(true) {
 	this->physics = physicsSystem;
 }
 
