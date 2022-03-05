@@ -361,9 +361,6 @@ void PhysicsSystem::cookKitchen()
 	meshDesc.triangles.stride = 3 * sizeof(PxU32);
 	meshDesc.triangles.data = kitchenIndices->data(); // PxU32 []
 
-	std::cout << "verts->size() = " << kitchenVerts->size() << std::endl;
-	std::cout << "indices->size() = " << kitchenIndices->size() << std::endl;
-
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
 	
@@ -442,14 +439,15 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 	playerTransform->update(player->getRigidDynamicActor()->getGlobalPose());
 }
 
-void PhysicsSystem::update(const float timestep)
+void PhysicsSystem::update(const float dt)
 {
 	// Only update if more than 1/60th of a second has passed since last update
-	//this->mAccumulator += timestep;
-	//if (this->mAccumulator < 1.0f / 60.0f) 
-		//return;
+	float timestep = 1.0f / 60.0f;
+	this->mAccumulator += dt;
+	if (this->mAccumulator < timestep) 
+		return;
 
-	//this->mAccumulator = 0;
+	this->mAccumulator -= timestep;
 
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
@@ -460,16 +458,9 @@ void PhysicsSystem::update(const float timestep)
 	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
 	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
 	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
-	
 
 	// Update the food transforms
 	updateFoodTransforms();
-
-	// Set the ground's transform
-	//Entity* countertop = g_scene.getEntity("countertop");
-	//Transform* countertopTransform = countertop->getTransform();
-	//PxTransform kitchenTransform(PxVec3(0, -100, 0), PxQuat(PxIdentity));
-	//countertopTransform->update(kitchenTransform);
 }
 
 void PhysicsSystem::updateFoodTransforms()
