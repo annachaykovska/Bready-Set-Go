@@ -150,7 +150,7 @@ void PhysicsSystem::initializeActors()
 	kitchenShape->setSimulationFilterData(kitchenFilter);
 
 	// Create the kitchen actor (rigid static)
-	PxTransform kitchenTransform(PxVec3(0, 0, 0), PxQuat(PxIdentity));
+	PxTransform kitchenTransform(PxVec3(0, -100, 0), PxQuat(PxIdentity));
 	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
 	this->kitchen->attachShape(*kitchenShape);
 
@@ -369,11 +369,8 @@ void PhysicsSystem::update(const float timestep)
 	// Set the ground's transform
 	Entity* countertop = g_scene.getEntity("countertop");
 	Transform* countertopTransform = countertop->getTransform();
-	physx::PxShape* shapes[1];
-	this->kitchen->getShapes(shapes, 1);
-	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
-	countertopTransform->update(groundTransform);
+	PxTransform kitchenTransform(PxVec3(0, -100, 0), PxQuat(PxIdentity));
+	countertopTransform->update(kitchenTransform);
 }
 
 void PhysicsSystem::updateFoodTransforms()

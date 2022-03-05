@@ -130,7 +130,7 @@ void RenderingSystem::update()
 		Transform* ownerTransform = models[i].owner->getTransform();
 		
 		// TODO Temporary until all objects are attached to physics system
-		if ((i >= 1 && i <= 4) || i >= 9)
+		if ((i >= 1 && i <= 3) || i >= 9)
 			ownerTransform->update();
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
