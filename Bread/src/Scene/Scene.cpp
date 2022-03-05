@@ -68,3 +68,8 @@ Entity* Scene::createEntity(std::string name)
 	else
 		return nullptr;
 }
+
+void Scene::init(PhysicsSystem* physics)
+{
+	camera.initPhysics(physics);
+}

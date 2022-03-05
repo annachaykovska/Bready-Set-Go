@@ -7,51 +7,185 @@
 
 #include "Camera.h"
 
-#define CAMERA_DISTANCE 30.0
-#define CAMERA_GROUND_HEIGHT 15.0
+#define CAMERA_DISTANCE 10.0
+#define CAMERA_GROUND_HEIGHT 5.0
 
 Camera::Camera()
+	: position(glm::vec3(0, 200.0f, 500.0f))
+	, front(glm::vec3(0, 0, -1.f))
+	, up(glm::vec3(0, 1.f, 0))
+	, worldUp(glm::vec3(0, 1.f, 0))
+	, cameraPositionOffset(0.f)
+	, perspective(40.f)
+	, forcedDirection(0.f)
+	, oldForcedDirection(forcedDirection)
+	, recordedForcedDirection(forcedDirection)
 {
-	this->position = glm::vec3(0, 200.0f, 500.0f);
-	this->front = glm::vec3(0, 0, -1.f);
-	this->up = glm::vec3(0, 1.f, 0);
-	this->worldUp = glm::vec3(0, 1.f, 0);	
-	this->yaw = YAW;
-	this->pitch = PITCH;
-	this->movementSpeed = SPEED;
-	this->mouseSensitivity = SENSITIVITY;
-	this->zoom = ZOOM; 
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	updateCameraVectors(&transform);
 }
 
+float Camera::getPerspective()
+{
+	return perspective;
+}
+
 glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 {
-	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(225.0)), 0, sin(glm::radians(225.0)), 0,
+	float theta = 225.f;
+	float cameraRotationOffset = 0.f;
+
+	float elasticForce = 1.f; // Lower = more resistance
+
+	float vehicleSpeed = 0;
+	float vehicleTurn = 0;
+
+	perspective = 40;
+	cameraPositionOffset = 0;
+
+	if (physics != nullptr)
+	{
+		vehicleSpeed = physics->mVehiclePlayer1->computeForwardSpeed();
+		vehicleTurn = physics->mVehiclePlayer1->computeSidewaysSpeed();
+
+		cameraRotationOffset = vehicleSpeed * vehicleTurn;
+	}
+
+	if (vehicleSpeed > 0)
+	{
+		perspective = 40 + (vehicleSpeed / 12);
+		cameraPositionOffset = (vehicleSpeed / 16);
+	}
+
+	float stopDegrees = 0;
+	if (physics != nullptr)
+	{
+		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90);
+		if (physics->getViewDirectionalInfluence() < -0.001)
+		{
+			float stepSize = 0;
+			if (forcedDirection < 0)
+			{
+				stepSize = -(1 / (5 * 2.f)) + 1;
+			}
+			else
+			{
+				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+				functionStep = elasticForce - functionStep;
+				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+			}
+			if (forcedDirection < stopDegrees)
+			{
+				forcedDirection += stepSize;
+			}
+			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
+			{
+				forcedDirection = oldForcedDirection;
+			}
+			else
+			{
+				oldForcedDirection = forcedDirection;
+			}
+			recordedForcedDirection = forcedDirection;
+		}
+		else if (physics->getViewDirectionalInfluence() > 0.001)
+		{
+			float stepSize = 0;
+			if (forcedDirection > 0)
+			{
+				stepSize = -(1 / (5 * 2.f)) + 1;
+			}
+			else
+			{
+				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+				functionStep = elasticForce - functionStep;
+				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+			}
+			if (forcedDirection > -stopDegrees)
+			{
+				forcedDirection -= stepSize;
+			}
+			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
+			{
+				forcedDirection = oldForcedDirection;
+			}
+			else
+			{
+				oldForcedDirection = forcedDirection;
+			}
+			recordedForcedDirection = forcedDirection;
+		}
+		else
+		{
+			if (abs(forcedDirection) > 0.01)
+			{
+				float functionStep = (5.f / abs(recordedForcedDirection)) * abs(forcedDirection);
+				float stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				if (forcedDirection > 0)
+				{
+					if (forcedDirection - stepSize < 0)
+					{
+						forcedDirection = 0;
+					}
+					else
+					{
+						forcedDirection -= stepSize;
+					}
+				}
+				else
+				{
+					if (forcedDirection + stepSize > 0)
+					{
+						forcedDirection = 0;
+					}
+					else
+					{
+						forcedDirection += stepSize;
+					}
+				}
+			}
+			else
+			{
+				forcedDirection = 0;
+			}
+		}
+	}
+	oldForcedDirection = forcedDirection;
+
+	theta += cameraRotationOffset / 16 + forcedDirection;
+	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(theta)), 0, sin(glm::radians(theta)), 0,
 		0, 1.0f, 0, 0,
-		-sin(glm::radians(225.0)), 0, cos(glm::radians(225.0)), 0,
+		-sin(glm::radians(theta)), 0, cos(glm::radians(theta)), 0,
 		0, 0, 0, 1.0f);;
 	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
-	float xChange = CAMERA_DISTANCE * positionFromVehicle.x;
-	float zChange = CAMERA_DISTANCE * positionFromVehicle.z;
+	float xChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.x;
+	float zChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.z;
 
 	position.x = playerTransform->position.x + xChange;
 	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
 	position.z = playerTransform->position.z + zChange;
-	return glm::lookAt(position, playerTransform->position, worldUp);
+
+	glm::vec3 positionUp = glm::vec3(0.0f, 4.0f, 0.0f);
+	glm::vec3 lookAhead = position + ((playerTransform->position + positionUp) - position) * 1.2f;
+	return glm::lookAt(position, lookAhead, worldUp);
 }
 
 void Camera::updateCameraVectors(Transform* playerTransform)
 {
 	// Calculate new front vector using Euler angles
 	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
+	front.y = sin(glm::radians(PITCH));
+	front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
 	this->front = glm::normalize(front);
 
 	// Calculate new right and up vectors using cross product
 	this->right = glm::normalize(glm::cross(front, worldUp));
 	this->up = glm::normalize(glm::cross(right, front));
+}
+
+void Camera::initPhysics(PhysicsSystem* physicsSystem)
+{
+	physics = physicsSystem;
 }

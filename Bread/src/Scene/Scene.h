@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include "../Camera.h"
+#include "../Physics/PhysicsSystem.h"
 
 class Entity;
 
@@ -14,6 +15,8 @@ public:
 	void createEntities();
 	Entity* getEntity(std::string name);
 	int count();
+
+	void init(PhysicsSystem* physics);
 	
 private:
 
