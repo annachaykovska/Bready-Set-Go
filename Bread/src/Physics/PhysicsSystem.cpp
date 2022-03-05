@@ -151,7 +151,7 @@ void PhysicsSystem::initializeActors()
 	kitchenShape->setSimulationFilterData(kitchenFilter);
 
 	// Create the kitchen actor (rigid static)
-	PxTransform kitchenTransform(PxVec3(0, -100, 0), PxQuat(PxIdentity));
+	PxTransform kitchenTransform(PxVec3(0, 0, 0), PxQuat(PxIdentity));
 	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
 	this->kitchen->attachShape(*kitchenShape);
 
@@ -193,7 +193,7 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
-	PxTransform startTransformPlayer1(PxVec3(20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer1(PxVec3(20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 25), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer2(PxVec3(20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer4(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
@@ -440,10 +440,10 @@ void PhysicsSystem::update(const float timestep)
 	updateFoodTransforms();
 
 	// Set the ground's transform
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
-	PxTransform kitchenTransform(PxVec3(0, -100, 0), PxQuat(PxIdentity));
-	countertopTransform->update(kitchenTransform);
+	//Entity* countertop = g_scene.getEntity("countertop");
+	//Transform* countertopTransform = countertop->getTransform();
+	//PxTransform kitchenTransform(PxVec3(0, -100, 0), PxQuat(PxIdentity));
+	//countertopTransform->update(kitchenTransform);
 }
 
 void PhysicsSystem::updateFoodTransforms()
