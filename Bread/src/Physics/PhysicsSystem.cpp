@@ -16,8 +16,6 @@
 #include "../Scene/Entity.h"
 #include <Windows.h>
 
-// TODO Add chassis collisions to environment so the breadmobiles can't drive through walls
-
 using namespace snippetvehicle;
 using namespace physx;
 
@@ -129,7 +127,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
 	// Set physx actor name
-	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+	body->setName(name.c_str());
 
 	// Attach the entity to the physx actor
 	void* vp = static_cast<void*>(new std::string(name));
@@ -159,7 +157,7 @@ void PhysicsSystem::initializeActors()
 	this->kitchen->attachShape(*kitchenShape);
 
 	// Set physx actor name
-	this->kitchen->setName("countertop"); // TODO one or both of these are not working correctly?
+	this->kitchen->setName("countertop");
 
 	// Attach the entity to the physx actor
 	void* kitchenVp = static_cast<void*>(new std::string("countertop"));
@@ -206,10 +204,10 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
 
 	// Set physx actor name
-	mVehiclePlayer1->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
-	mVehiclePlayer2->getRigidDynamicActor()->setName("player2"); // TODO one or both of these are not working correctly?
-	mVehiclePlayer3->getRigidDynamicActor()->setName("player3"); // TODO one or both of these are not working correctly?
-	mVehiclePlayer4->getRigidDynamicActor()->setName("player4"); // TODO one or both of these are not working correctly?
+	mVehiclePlayer1->getRigidDynamicActor()->setName("player1");
+	mVehiclePlayer2->getRigidDynamicActor()->setName("player2");
+	mVehiclePlayer3->getRigidDynamicActor()->setName("player3");
+	mVehiclePlayer4->getRigidDynamicActor()->setName("player4");
 
 	// Attach the entity to the physx actor
 	Entity* player1 = g_scene.getEntity("player1");
@@ -277,7 +275,7 @@ PhysicsSystem::PhysicsSystem()
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = this->mDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader
+	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader?
 	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
 	this->mScene = mPhysics->createScene(sceneDesc);
 
