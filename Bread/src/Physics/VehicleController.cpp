@@ -22,11 +22,9 @@ void XboxController::checkControllers() {
 			
 		}
 	}
-<<<<<<< HEAD
-=======
-	//printf("The controller ID: %d", controllerId);
->>>>>>> main
-	if (controllerId != -1) {
+
+	if (controllerId != -1) 
+	{
 		physics->setAnalogInputs(true);
 	}
 	else {

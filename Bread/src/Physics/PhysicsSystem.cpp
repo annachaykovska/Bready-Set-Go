@@ -321,14 +321,9 @@ void PhysicsSystem::initialize()
 	mVehiclePlayer3->mDriveDynData.setUseAutoGears(true);
 	mVehiclePlayer4->mDriveDynData.setUseAutoGears(true);
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-<<<<<<< HEAD
-
-=======
 	mVehiclePlayer2->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehiclePlayer3->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	mVehiclePlayer4->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	
->>>>>>> main
 	//mVehicleInputData.setAnalogBrake(1.0f);
 
 	viewDirectionalInfluence = 0.f;
