@@ -274,26 +274,16 @@ unsigned int Model::TextureFromFile(const char* path, const std::string& directo
 	return textureID;
 }
 
-std::vector<physx::PxVec3> Model::physicsVerts()
+void Model::physicsVerts(std::vector<physx::PxVec3>* verts)
 {
-	std::vector<physx::PxVec3> pVertices;
-
-	std::cout << "meshes.size() = " << meshes.size() << std::endl;
-
 	for (int i = 0; i < meshes.size(); i++)
 		for (int j = 0; j < meshes[i].vertices.size(); j++)
-			pVertices.push_back(physx::PxVec3(meshes[i].vertices[j].position.x, meshes[i].vertices[j].position.y, meshes[i].vertices[j].position.z));
-
-	return pVertices;
+			verts->push_back(physx::PxVec3(meshes[i].vertices[j].position.x, meshes[i].vertices[j].position.y, meshes[i].vertices[j].position.z));
 }
 
-std::vector<physx::PxU32> Model::physicsIndices()
+void Model::physicsIndices(std::vector<physx::PxU32>* indices)
 {
-	std::vector<physx::PxU32> pIndices;
-
 	for (int i = 0; i < meshes.size(); i++)
 		for (int j = 0; j < meshes[i].vertices.size(); j++)
-			pIndices.push_back(physx::PxU32(meshes[i].indices[j]));
-
-	return pIndices;
+			indices->push_back(physx::PxU32(meshes[i].indices[j]));
 }

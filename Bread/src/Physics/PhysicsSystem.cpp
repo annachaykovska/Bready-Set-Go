@@ -16,6 +16,12 @@
 #include "../Scene/Entity.h"
 #include <Windows.h>
 
+// TODO Add chassis collisions to environment so the breadmobiles can't drive through walls
+// TODO Fix the bug caused by dragging the window while the game is running
+// TODO https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Startup.html#startup
+// TODO https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Threading.html
+// TODO https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Geometry.html#triangle-meshes
+
 using namespace snippetvehicle;
 using namespace physx;
 
@@ -286,6 +292,12 @@ PhysicsSystem::PhysicsSystem()
 	this->mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
 	if (!this->mCooking) std::cout << "PxCreateCooking failed!\n";
 
+	// Triangle Mesh data initialization
+	this->kitchenVerts = new std::vector<physx::PxVec3>();
+	this->kitchenIndices = new std::vector<physx::PxU32>;
+	kitchenVerts->reserve(40000);
+	kitchenIndices->reserve(40000);
+
 	// Transmit scene data to PVD
 	PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();
 	if (pvdClient)
@@ -330,29 +342,41 @@ void PhysicsSystem::initialize()
 	viewDirectionalInfluence = 0.f;
 }
 
+int filter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
+{
+	if (code == EXCEPTION_ACCESS_VIOLATION)
+	{
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+	else
+	{
+		return EXCEPTION_CONTINUE_SEARCH;
+	};
+}
+
 void PhysicsSystem::cookKitchen()
 {
 	Model* kitchenModel = g_systems.render->getKitchenModel();
 
-	std::vector<physx::PxVec3> verts = kitchenModel->physicsVerts();
-	std::vector<physx::PxU32> indices = kitchenModel->physicsIndices();
+	kitchenModel->physicsVerts(kitchenVerts);
+	kitchenModel->physicsIndices(kitchenIndices);
 
 	PxTriangleMeshDesc meshDesc;
-	meshDesc.points.count = verts.size(); // PxU32
+	meshDesc.points.count = kitchenVerts->size(); // PxU32
 	meshDesc.points.stride = sizeof(PxVec3);
-	meshDesc.points.data = verts.data(); // PxVec3 []
+	meshDesc.points.data = kitchenVerts->data(); // PxVec3 []
 
-	meshDesc.triangles.count = indices.size(); // PxU32
+	meshDesc.triangles.count = kitchenIndices->size(); // PxU32
 	meshDesc.triangles.stride = 3 * sizeof(PxU32);
-	meshDesc.triangles.data = indices.data(); // PxU32 []
+	meshDesc.triangles.data = kitchenIndices->data(); // PxU32 []
+
+	std::cout << "verts->size() = " << kitchenVerts->size() << std::endl;
+	std::cout << "indices->size() = " << kitchenIndices->size() << std::endl;
 
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
-
-	Sleep(200); // TODO Find a better fix for this very ugly bandaid
-
-	bool status = mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
-	if (!status) std::cout << "Triangle mesh cooking failed!\n";
+	
+	this->mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
 
 	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
 
@@ -471,6 +495,10 @@ void PhysicsSystem::updateFoodTransforms()
 
 void PhysicsSystem::cleanupPhysics()
 {
+	// Triangle Mesh
+	delete kitchenVerts;
+	delete kitchenIndices;
+
 	// Players
 	this->mVehiclePlayer1->getRigidDynamicActor()->release();
 	this->mVehiclePlayer2->getRigidDynamicActor()->release();

@@ -33,6 +33,8 @@ public:
 	void setViewDirectionalInfluence(float value);
 	float getViewDirectionalInfluence();
 
+	void cookieCutter(PxTriangleMesh& meshDesc, PxDefaultMemoryOutputStream& writeBuffer, PxTriangleMeshCookingResult::Enum& result);
+
 	void cleanupPhysics();
 
 	PxVehicleDrive4W* mVehiclePlayer1;
@@ -63,6 +65,8 @@ private:
 
 	PxTriangleMesh* kitchenMesh;
 	PxRigidStatic* kitchen;
+	std::vector<physx::PxVec3>* kitchenVerts;
+	std::vector<physx::PxU32>* kitchenIndices;
 
 	VehicleSceneQueryData* mVehicleSceneQueryData;
 	PxBatchQuery* mBatchQuery;

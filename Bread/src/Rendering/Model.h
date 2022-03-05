@@ -23,8 +23,8 @@ public:
 	Model(Mesh mesh);
 	void draw(Shader& shader);
 	bool isTextured() { return (textures_loaded.size() != 0); }
-	std::vector<physx::PxVec3> physicsVerts();
-	std::vector<physx::PxU32> physicsIndices();
+	void physicsVerts(std::vector<physx::PxVec3>* verts);
+	void physicsIndices(std::vector<physx::PxU32>* indices);
 
 	//Model(Model& rhs) = delete; // No copy constructor
 	//void operator=(const Model&) = delete; // No assignment operator
