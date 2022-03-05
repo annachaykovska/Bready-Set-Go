@@ -29,12 +29,15 @@ public:
 	void update();
 
 private:
+
+
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 
-	FT_Library ft;
-	FT_Face face;
+	//Constants needed to render
 	std::map<char, Character> Characters;
 	glm::mat4 projection;
 	Shader textShader;
 	unsigned int VAO, VBO;
+
+	//Gameplay related variables (Probably not needed)
 };

@@ -3,6 +3,9 @@
 UISystem::UISystem() :
     textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
 {
+    //Variables needed to initialize freetype characters
+    FT_Library ft;
+    FT_Face face;
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
     projection = glm::ortho(0.f, 800.f, 0.f, 600.f); //check if the max limits can be changed
@@ -12,7 +15,10 @@ UISystem::UISystem() :
 		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
 		return;
 	}
-	if (FT_New_Face(ft, "resources/fonts/OpenSans.ttf", 0, &face))
+
+    //Initializing font 
+    //TODO: (perhaps this could be abstracted to use multiple fonts)
+	if (FT_New_Face(ft, "resources/fonts/arial.ttf", 0, &face))
 	{
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
@@ -63,13 +69,15 @@ UISystem::UISystem() :
         Characters.insert(std::pair<char, Character>(c, character));
     }
 
-    // Not sure if this is needed
+    //Cleaning up the freetype variables
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
+
+    // Enabling blending so that characters can have see through parts
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //
 
     // Binding the VAO and VBO
-    // CHECK: what parts need to be done per frame
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -79,18 +87,15 @@ UISystem::UISystem() :
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-	std::cout << "UI initialized" << std::endl;
+	//std::cout << "UI initialized" << std::endl;
 }
 
 UISystem::~UISystem(){
-    FT_Done_Face(face);
-    FT_Done_FreeType(ft);
+
 }
 
 void UISystem::update() {
-    renderText(textShader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-	//std::cout << "Update" << std::endl;
+    renderText(textShader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.0, 0.0f, 0.0f));
 }
 
 void UISystem::renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) 

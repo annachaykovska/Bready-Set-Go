@@ -166,13 +166,13 @@ int main()
 		oldTime = newTime;
 
 		// RENDER
-		//window.clear();
-		//renderer.update();
+		window.clear();
+		renderer.update();
 		ui.update();
-		//profiler.newFrame();
+		profiler.newFrame();
 
 		// Update the ImGUI profiler
-		//profiler.update();
+		profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();
