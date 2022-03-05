@@ -17,6 +17,8 @@ class PhysicsSystem
 public:
 
 	PhysicsSystem();
+	void initialize();
+	void cookKitchen();
 	void initVehicleSDK();
 	void initializeActors();
 
@@ -58,6 +60,9 @@ private:
 	PxCooking* mCooking;
 	PxMaterial* mMaterial;
 	PxPvd* mPvd;
+
+	PxTriangleMesh* kitchenMesh;
+	PxRigidStatic* kitchen;
 
 	VehicleSceneQueryData* mVehicleSceneQueryData;
 	PxBatchQuery* mBatchQuery;

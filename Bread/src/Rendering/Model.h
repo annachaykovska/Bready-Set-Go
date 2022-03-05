@@ -5,6 +5,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <PxPhysicsAPI.h>
 
 #include "Mesh.h"
 
@@ -13,6 +14,7 @@ class Model : public Component
 public:
 
 	std::vector<Mesh> meshes;
+	std::vector<Texture> textures_loaded;
 	bool visible;
 
 	Model();
@@ -21,6 +23,8 @@ public:
 	Model(Mesh mesh);
 	void draw(Shader& shader);
 	bool isTextured() { return (textures_loaded.size() != 0); }
+	std::vector<physx::PxVec3> physicsVerts();
+	std::vector<physx::PxU32> physicsIndices();
 
 	//Model(Model& rhs) = delete; // No copy constructor
 	//void operator=(const Model&) = delete; // No assignment operator
@@ -28,7 +32,6 @@ public:
 private:
 
 	std::string directory;
-	std::vector<Texture> textures_loaded;
 	
 	void loadModel(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);

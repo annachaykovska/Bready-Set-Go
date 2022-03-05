@@ -22,7 +22,10 @@ void XboxController::checkControllers() {
 			
 		}
 	}
+<<<<<<< HEAD
+=======
 	//printf("The controller ID: %d", controllerId);
+>>>>>>> main
 	if (controllerId != -1) {
 		physics->setAnalogInputs(true);
 	}
@@ -191,8 +194,6 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		analogVal = -1.0 * thumbLeftDeadZone;
 		input->setAnalogSteer(analogVal);
 	}
-
-
 
 	// KEY RELEASED
 	if (triggerLeft == 0.0 && triggerRight == 0.0) { // accel/reverse/brake

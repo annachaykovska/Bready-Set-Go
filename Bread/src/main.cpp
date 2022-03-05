@@ -37,7 +37,7 @@ int main()
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
 
-	// Get references to Entities for easy use and set vehicle physx objects
+	// Get references to Entities for easy use
 	Entity* player1 = g_scene.getEntity("player1");
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
@@ -60,6 +60,7 @@ int main()
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
+	g_systems.physics->initialize(); // Needs to happen after renderer loads the models
 
 	AudioSystem audio;
 	g_systems.audio = &audio;
@@ -130,7 +131,7 @@ int main()
 	Transform* counterTransform = countertop->getTransform();
 	counterTransform->position = glm::vec3(0, 0, 0);
 	counterTransform->rotation = glm::vec3(0, 0, 0);
-	counterTransform->scale = glm::vec3(50, 50, 50);
+	counterTransform->scale = glm::vec3(1, 1, 1);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music

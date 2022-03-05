@@ -15,6 +15,7 @@ void Scene::createEntities()
 	createEntity("tomato");
 	createEntity("dough");
 	createEntity("countertop");
+	createEntity("test");
 }
 
 /// <summary>

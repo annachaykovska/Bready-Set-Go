@@ -23,6 +23,7 @@ ipch/
 *.ilk
 *.lastbuildstate
 *.tlog
+*.exe
 
 !/resources/*.obj
 !Bread/resources/models/*/*.obj

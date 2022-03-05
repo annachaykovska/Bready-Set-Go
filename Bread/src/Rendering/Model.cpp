@@ -174,10 +174,12 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		newMesh.material.refractionIndex = refractionIndex;
 
 		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		for (auto it = diffuseMaps.begin(); it < diffuseMaps.end(); it++)
+			newMesh.textures.push_back(*it);
 
 		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+		for(auto it = diffuseMaps.begin(); it < diffuseMaps.end(); it++)
+			newMesh.textures.push_back(*it);
 	}
 
 	return newMesh;
@@ -270,4 +272,28 @@ unsigned int Model::TextureFromFile(const char* path, const std::string& directo
 	}
 
 	return textureID;
+}
+
+std::vector<physx::PxVec3> Model::physicsVerts()
+{
+	std::vector<physx::PxVec3> pVertices;
+
+	std::cout << "meshes.size() = " << meshes.size() << std::endl;
+
+	for (int i = 0; i < meshes.size(); i++)
+		for (int j = 0; j < meshes[i].vertices.size(); j++)
+			pVertices.push_back(physx::PxVec3(meshes[i].vertices[j].position.x, meshes[i].vertices[j].position.y, meshes[i].vertices[j].position.z));
+
+	return pVertices;
+}
+
+std::vector<physx::PxU32> Model::physicsIndices()
+{
+	std::vector<physx::PxU32> pIndices;
+
+	for (int i = 0; i < meshes.size(); i++)
+		for (int j = 0; j < meshes[i].vertices.size(); j++)
+			pIndices.push_back(physx::PxU32(meshes[i].indices[j]));
+
+	return pIndices;
 }

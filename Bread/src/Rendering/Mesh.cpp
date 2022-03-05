@@ -100,38 +100,36 @@ void Mesh::draw(Shader &shader)
 
 		glActiveTexture(GL_TEXTURE0);
 	}
-	else
-	{
-		unsigned int ambientLoc = glGetUniformLocation(shader.getId(), "material.ambient");
-		glUniform3f(ambientLoc, material.ambient.r, material.ambient.g, material.ambient.b);
 
-		unsigned int diffuseLoc = glGetUniformLocation(shader.getId(), "material.diffuse");
-		glUniform3f(diffuseLoc, material.diffuse.r, material.diffuse.g, material.diffuse.b);
+	unsigned int ambientLoc = glGetUniformLocation(shader.getId(), "material.ambient");
+	glUniform3f(ambientLoc, material.ambient.r, material.ambient.g, material.ambient.b);
 
-		unsigned int specularLoc = glGetUniformLocation(shader.getId(), "material.specular");
-		glUniform3f(specularLoc, material.specular.r, material.specular.g, material.specular.b);
+	unsigned int diffuseLoc = glGetUniformLocation(shader.getId(), "material.diffuse");
+	glUniform3f(diffuseLoc, material.diffuse.r, material.diffuse.g, material.diffuse.b);
 
-		unsigned int shinyLoc = glGetUniformLocation(shader.getId(), "material.shininess");
-		glUniform1f(shinyLoc, this->material.shininess);
+	unsigned int specularLoc = glGetUniformLocation(shader.getId(), "material.specular");
+	glUniform3f(specularLoc, material.specular.r, material.specular.g, material.specular.b);
 
-		unsigned int opaqueLoc = glGetUniformLocation(shader.getId(), "material.opacity");
-		glUniform1f(opaqueLoc, this->material.opacity);
+	unsigned int shinyLoc = glGetUniformLocation(shader.getId(), "material.shininess");
+	glUniform1f(shinyLoc, this->material.shininess);
 
-		unsigned int lightColorLoc = glGetUniformLocation(shader.getId(), "light.color");
-		glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
+	unsigned int opaqueLoc = glGetUniformLocation(shader.getId(), "material.opacity");
+	glUniform1f(opaqueLoc, this->material.opacity);
 
-		unsigned int lightDirLoc = glGetUniformLocation(shader.getId(), "light.direction");
-		glUniform3f(lightDirLoc, 0.1f, -1.f, 0.1f);
+	unsigned int lightColorLoc = glGetUniformLocation(shader.getId(), "light.color");
+	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
 
-		unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
-		glUniform3f(aIntensityLoc, 0.1f, 0.1f, 0.1f);
+	unsigned int lightDirLoc = glGetUniformLocation(shader.getId(), "light.direction");
+	glUniform3f(lightDirLoc, 0.1f, -1.f, 0.1f);
 
-		unsigned int dIntensityLoc = glGetUniformLocation(shader.getId(), "light.diffuse");
-		glUniform3f(dIntensityLoc, 1.0f, 1.0f, 1.0f);
+	unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
+	glUniform3f(aIntensityLoc, 0.1f, 0.1f, 0.1f);
 
-		unsigned int sIntensityLoc = glGetUniformLocation(shader.getId(), "light.specular");
-		glUniform3f(sIntensityLoc, 0.5f, 0.5f, 0.5f);
-	}
+	unsigned int dIntensityLoc = glGetUniformLocation(shader.getId(), "light.diffuse");
+	glUniform3f(dIntensityLoc, 1.0f, 1.0f, 1.0f);
+
+	unsigned int sIntensityLoc = glGetUniformLocation(shader.getId(), "light.specular");
+	glUniform3f(sIntensityLoc, 0.5f, 0.5f, 0.5f);
 
 	glBindVertexArray(VAO);
 	if (wireframe)
