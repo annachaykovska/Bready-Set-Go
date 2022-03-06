@@ -441,8 +441,9 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 
 void PhysicsSystem::update(const float dt)
 {
-	// Only update if more than 1/60th of a second has passed since last update
-	float timestep = 1.0f / 60.0f;
+	// Only update if more than 1/120th of a second has passed since last update
+	// Making the constant much larger than 1/120th causes a significant jitter
+	float timestep = 1.0f / 120.0f;
 	this->mAccumulator += dt;
 	if (this->mAccumulator < timestep) 
 		return;
