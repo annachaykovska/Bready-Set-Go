@@ -7,6 +7,7 @@
 #include <snippetvehiclecommon/SnippetVehicleSceneQuery.h>
 
 #include "PhysicsEnums.h"
+#include <string.h>
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -16,37 +17,44 @@ class PhysicsSystem
 public:
 
 	PhysicsSystem();
+	void initialize();
+	void cookKitchen();
 	void initVehicleSDK();
 	void initializeActors();
+
 	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
-	void update(const float timestep);
-	void updateFoodTransforms();
-	void startAccelerateForwardsMode();
-	void startAccelerateReverseMode();
-	void startBrakeMode();
-	void startTurnHardLeftMode();
-	void startTurnHardRightMode();
-	void startHandbrakeTurnLeftMode();
-	void startHandbrakeTurnRightMode();
-	void releaseGas();
-	void releaseSteering();
-	void releaseAllControls();
-	void cleanupPhysics();
-	void keyPress(unsigned char key);
-	void keyRelease(unsigned char key);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 
-	// Public Entities
-	PxVehicleDrive4W* mVehiclePlayer1; // TODO: Rename this?
+	void update(const float timestep);
+	void updateVehicle(PxVehicleDrive4W *player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep);
+	void updateFoodTransforms();
+	void setAnalogInputs(bool input);
+
+	void setViewDirectionalInfluence(float value);
+	float getViewDirectionalInfluence();
+
+	void cookieCutter(PxTriangleMesh& meshDesc, PxDefaultMemoryOutputStream& writeBuffer, PxTriangleMeshCookingResult::Enum& result);
+
+	void cleanupPhysics();
+
+	PxVehicleDrive4W* mVehiclePlayer1;
+	PxVehicleDrive4W* mVehiclePlayer2;
+	PxVehicleDrive4W* mVehiclePlayer3;
+	PxVehicleDrive4W* mVehiclePlayer4;
 	PxRigidDynamic* cheese;
 	PxRigidDynamic* sausage;
 	PxRigidDynamic* tomato;
 	PxRigidDynamic* dough;
 
-	ButtonState buttonState;
-	
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer2;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
+	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
 private:
+
+	float mAccumulator;
+
 	PxDefaultErrorCallback mDefaultErrorCallback;
 	PxDefaultAllocator mDefaultAllocatorCallback;
 	PxFoundation* mFoundation;
@@ -56,15 +64,22 @@ private:
 	PxCooking* mCooking;
 	PxMaterial* mMaterial;
 	PxPvd* mPvd;
+
+	PxTriangleMesh* kitchenMesh;
+	PxRigidStatic* kitchen;
+	std::vector<physx::PxVec3>* kitchenVerts;
+	std::vector<physx::PxU32>* kitchenIndices;
+
 	VehicleSceneQueryData* mVehicleSceneQueryData;
 	PxBatchQuery* mBatchQuery;
 	PxVehicleDrivableSurfaceToTireFrictionPairs* mFrictionPairs;
 	PxRigidStatic* mGroundPlane;
-	bool mIsVehicleInAir = true;
-	PxVehicleDrive4WRawInputData mVehicleInputData;
-	PxF32 mVehicleModeLifetime = 0.2f;
-	PxF32 mVehicleModeTimer = 0.0f;
-	PxU32 mVehicleOrderProgress = 0;
-	bool mVehicleOrderComplete = false;
-	bool mMimicKeyInputs = false;
+
+	bool mIsVehicleInAirPlayer1 = true;
+	bool mIsVehicleInAirPlayer2 = true;
+	bool mIsVehicleInAirPlayer3 = true;
+	bool mIsVehicleInAirPlayer4 = true;
+	bool useAnalogInputs = false;
+
+	float viewDirectionalInfluence = 0.f;
 }; 
