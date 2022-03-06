@@ -158,7 +158,8 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		0, 1.0f, 0, 0,
 		-sin(glm::radians(theta)), 0, cos(glm::radians(theta)), 0,
 		0, 0, 0, 1.0f);;
-	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
+	//glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
+	glm::vec4 positionFromVehicle = rotation45 * playerTransform->worldRotationMat * glm::vec4(1.0);
 	float xChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.x;
 	float zChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.z;
 
@@ -173,8 +174,9 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 
 void Camera::updateCameraVectors(Transform* playerTransform)
 {
+	/*
 	// Calculate new front vector using Euler angles
-	glm::vec3 front;
+	glm::vec3 front = playerTransform->heading;
 	front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
 	front.y = sin(glm::radians(PITCH));
 	front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
@@ -183,6 +185,7 @@ void Camera::updateCameraVectors(Transform* playerTransform)
 	// Calculate new right and up vectors using cross product
 	this->right = glm::normalize(glm::cross(front, worldUp));
 	this->up = glm::normalize(glm::cross(right, front));
+	*/
 }
 
 void Camera::initPhysics(PhysicsSystem* physicsSystem)
