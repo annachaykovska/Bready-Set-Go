@@ -99,7 +99,7 @@ int main()
 	doughTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* testTransform = test->getTransform();
-	testTransform->position = glm::vec3(0, 10, 0);
+	testTransform->position = glm::vec3(0, -50, 0);
 	testTransform->scale = glm::vec3(1, 1, 1);
 	//-----------------------------------------------------------------------------------
 

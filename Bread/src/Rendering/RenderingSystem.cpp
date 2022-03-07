@@ -155,7 +155,7 @@ void RenderingSystem::update()
 
 			glBindVertexArray(models[i].meshes[0].VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
 			// Load the indice data into the EBO
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].EBO);
