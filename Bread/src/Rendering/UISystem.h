@@ -2,6 +2,7 @@
 
 #include "ImageTexture.h"
 #include "Shader.h"
+#include "../Transform.h"
 #include <iostream>
 #include <map>
 #include <ft2build.h>
@@ -28,12 +29,17 @@ public:
 	~UISystem();
 
 	void update();
+	void updateMiniMap(Transform& p1Transform);
 
 private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY);
 
 	ImageTexture speedometer;
+	ImageTexture miniMap;
+	ImageTexture locationIcon;
+
+	glm::vec2 p1Location;
 
 	FT_Library ft;
 	FT_Face face;

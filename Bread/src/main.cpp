@@ -186,11 +186,12 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
+		ui.updateMiniMap(*player1->getTransform());
 		ui.update();
-		profiler.newFrame();
+		//profiler.newFrame();
 
 		// Update the ImGUI profiler
-		profiler.update();
+		//profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();

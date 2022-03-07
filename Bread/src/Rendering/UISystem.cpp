@@ -4,6 +4,9 @@ UISystem::UISystem()
     : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speed.png", GL_NEAREST)
+    , miniMap("resources/textures/map.png", GL_NEAREST)
+    , locationIcon("resources/textures/locationIcon.png", GL_NEAREST)
+    , p1Location(glm::vec2(0))
 {
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
@@ -91,10 +94,26 @@ UISystem::~UISystem(){
 }
 
 void UISystem::update() {
-    renderText(textShader, "Bready Set Go", 25.0f, 540.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    //renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     float height = speedometer.height;
     float width = speedometer.width;
     renderImage(imageShader, speedometer, 560.0f, 5.0f, 200.0f * (width / height), 200.0f * (height / width));
+    height = locationIcon.height;
+    width = locationIcon.width;
+    renderImage(imageShader, locationIcon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    height = miniMap.height;
+    width = miniMap.width;
+    renderImage(imageShader, miniMap, 25.0f, 380.0f, 200.0f * (width / height), 200.0f * (height / width));
+}
+
+void UISystem::updateMiniMap(Transform& p1Transform)
+{
+    // TODO: Clean up these hardcoded numbers
+    float x = ((200.f) / (150.f + 310.f)) * (p1Transform.position.x + 310.f);
+    float z = ((200.f) / (220.f + 235.f)) * (p1Transform.position.z + 235.f);
+    p1Location = glm::vec2(x, z);
+    p1Location.y = 200.f - p1Location.y;
+    p1Location += glm::vec2(25.f, 380.f);
 }
 
 void UISystem::renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) 
