@@ -25,5 +25,8 @@ public:
 	PhysicsSystem* physics;
 	RenderingSystem* render;
 
+	int height;
+	int width;
+
 private:
 };

@@ -1,18 +1,23 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 
+#include "../SystemManager.h"
 #include "RenderingSystem.h"
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
 #include "GroundModel.h"
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
 									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
 									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
 								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt")
 {
+	this->screenWidth = 0;
+	this->screenHeight = 0;
+
 	this->models.reserve(g_scene.count()); // Create space for models
 
 	// Rendering uniforms
@@ -41,7 +46,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 
 	glGenTextures(1, &this->textureColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, this->textureColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width, g_systems.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -52,7 +57,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// Renderbuffer
 	glGenRenderbuffers(1, &RBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	// Attach RBO to framebuffer's depth and stencil attachment 
@@ -178,6 +183,17 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 void RenderingSystem::update()
 {
+	if (this->screenWidth != g_systems.width || this->screenHeight != g_systems.height)
+	{
+		glBindTexture(GL_TEXTURE_2D, this->textureColorBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width, g_systems.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
+
 	// Bind to FBO to render scene to texture
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 	glEnable(GL_DEPTH_TEST);

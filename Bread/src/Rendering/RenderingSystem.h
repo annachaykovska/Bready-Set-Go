@@ -38,4 +38,7 @@ private:
 
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
+
+	int screenWidth;
+	int screenHeight;
 };

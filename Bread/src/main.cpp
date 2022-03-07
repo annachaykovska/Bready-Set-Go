@@ -23,8 +23,12 @@ int main()
 	// Initialize GLFW library
 	glfwInit();
 
+	// Set window size
+	g_systems.width = 800;
+	g_systems.height = 600;
+
 	// Create viewport window
-	Window window(800, 600, "Bready Set Go!!!");
+	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	// ImGui profiler for debugging
@@ -133,6 +137,7 @@ int main()
 	{
 		// INPUT
 		glfwPollEvents();
+		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
 
 		// READ CONTROLLERS
 		controllers.checkControllers(); // sets analog/digital
