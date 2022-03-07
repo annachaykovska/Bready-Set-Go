@@ -134,13 +134,13 @@ void Mesh::draw(Shader &shader)
 	glUniform3f(lightDirLoc, 0.1f, -1.f, 0.1f);
 
 	unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
-	glUniform3f(aIntensityLoc, 0.1f, 0.1f, 0.1f);
+	glUniform3f(aIntensityLoc, 0.3f, 0.3f, 0.3f);
 
 	unsigned int dIntensityLoc = glGetUniformLocation(shader.getId(), "light.diffuse");
 	glUniform3f(dIntensityLoc, 1.0f, 1.0f, 1.0f);
 
 	unsigned int sIntensityLoc = glGetUniformLocation(shader.getId(), "light.specular");
-	glUniform3f(sIntensityLoc, 0.5f, 0.5f, 0.5f);
+	glUniform3f(sIntensityLoc, 1.0f, 1.0f, 1.0f);
 
 	unsigned int constantLoc = glGetUniformLocation(shader.getId(), "light.constant");
 	glUniform1f(constantLoc, 1.0f);
