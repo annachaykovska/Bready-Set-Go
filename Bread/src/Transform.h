@@ -38,7 +38,7 @@ public:
 
 	glm::mat4 getModelMatrix()
 	{
-		return model;
+		return this->model;
 	}
 
 	void update()

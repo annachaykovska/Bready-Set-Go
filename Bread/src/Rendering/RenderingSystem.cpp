@@ -8,7 +8,8 @@
 
 extern Scene g_scene;
 
-RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
+RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
+									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt")
 {
 	this->models.reserve(g_scene.count()); // Create space for models
 
@@ -93,6 +94,13 @@ void RenderingSystem::loadModels()
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
 	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
+
+	//-----------------------------------------------------------------------------------
+	// Debug models
+	//-----------------------------------------------------------------------------------
+	std::string testPath = "resources/models/ball/ball.obj";
+	this->models.emplace_back(Model(&testPath[0]));
+	g_scene.getEntity("test")->attachComponent(&(this->models[9]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -128,21 +136,50 @@ void RenderingSystem::update()
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
-		
-		// TODO Temporary until all objects are attached to physics system
-		if ((i >= 1 && i <= 3) || i >= 9)
-			ownerTransform->update();
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
-		if (i >= 5) 
+		if (i <= 4)
+		{
+			glUniform1i(texLoc, 0);
+			models[i].draw(this->shader);
+		}
+		else if (i > 4 && i <= 8) // Use textures images for ingredients
 		{
 			glUniform1i(texLoc, 1);
-			models[i].draw(getShader());
-			glUniform1i(texLoc, 0);
+			models[i].draw(this->shader);
 		}
-		else
-			models[i].draw(getShader());
+		else if (i > 8)
+		{
+			lightShader.use();
+
+			glBindVertexArray(models[i].meshes[0].VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+			// Load the indice data into the EBO
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].indices.size() * sizeof(unsigned int), &models[i].meshes[0].indices[0], GL_STATIC_DRAW);
+
+			// Rendering uniforms
+			unsigned int modelLoc = glGetUniformLocation(this->lightShader.getId(), "model");
+			unsigned int viewLoc = glGetUniformLocation(this->lightShader.getId(), "view");
+			unsigned int projLoc = glGetUniformLocation(this->lightShader.getId(), "projection");
+
+			ownerTransform->update();
+			//std::cout << "Ball pos: " << "(" << ownerTransform->position.x << ", " << ownerTransform->position.y << ", " << ownerTransform->position.z << ")";
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+			glm::mat4 view = g_scene.camera.getViewMatrix(p1Transform);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+			glm::mat4 proj = glm::mat4(1.0f);
+			proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
+			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+			
+			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
 	}
 }
 

@@ -26,6 +26,7 @@ private:
 	unsigned int viewLoc;
 	unsigned int projLoc;
 	Shader shader;
+	Shader lightShader;
 	std::vector<Model> models;
 	
 };
