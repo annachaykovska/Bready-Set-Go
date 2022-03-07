@@ -21,6 +21,8 @@ Camera::Camera()
 	, oldForcedDirection(forcedDirection)
 	, recordedForcedDirection(forcedDirection)
 	, counter(0)
+	, oldCameraRotationOffset(0.f)
+	, predictedCameraDelta(0.f)
 {
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
@@ -50,7 +52,12 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		vehicleSpeed = physics->mVehiclePlayer1->computeForwardSpeed();
 		vehicleTurn = physics->mVehiclePlayer1->computeSidewaysSpeed();
 
-		cameraRotationOffset = vehicleSpeed * vehicleTurn;
+		if (vehicleSpeed > 25)
+		{
+			vehicleSpeed = 25;
+		}
+
+		cameraRotationOffset = vehicleSpeed * vehicleTurn * 2;
 	}
 
 	if (vehicleSpeed > 0)
