@@ -52,9 +52,9 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		vehicleSpeed = physics->mVehiclePlayer1->computeForwardSpeed();
 		vehicleTurn = physics->mVehiclePlayer1->computeSidewaysSpeed();
 
-		if (vehicleSpeed > 25)
+		if (vehicleSpeed > 20)
 		{
-			vehicleSpeed = 25;
+			vehicleSpeed = 20;
 		}
 
 		cameraRotationOffset = vehicleSpeed * vehicleTurn * 2;
