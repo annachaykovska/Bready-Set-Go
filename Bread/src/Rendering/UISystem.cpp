@@ -106,6 +106,10 @@ void UISystem::update() {
     float width = speedometer.width;
     renderImage(imageShader, speedometer, 560.0f, 5.0f, 200.0f * (width / height), 200.0f * (height / width));
 
+    height = miniMap.height;
+    width = miniMap.width;
+    renderImage(imageShader, miniMap, 25.0f, 430.0f, 150.0f * (width / height), 150.0f * (height / width));
+
     height = p1Icon.height;
     width = p1Icon.width;
     renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width));
@@ -119,13 +123,9 @@ void UISystem::update() {
     width = p4Icon.width;
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width));
 
-    height = miniMap.height;
-    width = miniMap.width;
-    renderImage(imageShader, miniMap, 25.0f, 430.0f, 150.0f * (width / height), 150.0f * (height / width));
-
     height = inventory.height;
     width = inventory.width;
-    renderImage(imageShader, inventory, 40.0f, 40.0f, 400.0f * (width / height), 80.0f * (height / width));
+    renderImage(imageShader, inventory, 50.0f, 40.0f, 400.0f * (width / height), 80.0f * (height / width));
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
