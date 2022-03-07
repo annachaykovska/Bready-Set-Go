@@ -10,7 +10,8 @@ extern Scene g_scene;
 
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
 									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
-									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt")
+									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
+								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt")
 {
 	this->models.reserve(g_scene.count()); // Create space for models
 
@@ -33,6 +34,56 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	setupCameras(&transform); // Setup the camera
+
+	// Framebuffer
+	glGenFramebuffers(1, &this->FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+	glGenTextures(1, &this->textureColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, this->textureColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Attach textureColorBuffer to FBO
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->textureColorBuffer, 0);
+
+	// Renderbuffer
+	glGenRenderbuffers(1, &RBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	// Attach RBO to framebuffer's depth and stencil attachment 
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER::Framebuffer is not complete!\n";
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Create quad VAO for final default framebuffer image render
+	float quadVerts[] = {
+		// Position   // Tex Coords
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+			
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+	};
+
+	glGenVertexArrays(1, &this->quadVAO);
+	glGenBuffers(1, &this->quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
 RenderingSystem::~RenderingSystem() { }
@@ -127,6 +178,12 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 void RenderingSystem::update()
 {
+	// Bind to FBO to render scene to texture
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glEnable(GL_DEPTH_TEST);
+
+	// Clear frame
+	glClearColor(0.6784f, 0.8471f, 0.902f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Stencil buffer
@@ -236,6 +293,17 @@ void RenderingSystem::update()
 			glBindVertexArray(0);
 		}
 	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	simpleShader.use();
+	glBindVertexArray(this->quadVAO);
+	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
 }
 
 Model* RenderingSystem::getKitchenModel()

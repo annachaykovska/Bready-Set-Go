@@ -28,6 +28,14 @@ private:
 	Shader shader;
 	Shader lightShader;
 	Shader borderShader;
+	Shader simpleShader;
 	std::vector<Model> models;
-	
+	unsigned int FBO;
+	unsigned int textureColorBuffer;
+	unsigned int RBO;
+	unsigned int quadVAO;
+	unsigned int quadVBO;
+
+	unsigned int depthMapFBO;
+	unsigned int depthMap;
 };
