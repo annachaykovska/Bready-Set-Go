@@ -17,6 +17,7 @@ public:
 	void loadModels();
 	void setupCameras(Transform* playerTransform);
 	void update();
+	Model* getKitchenModel();
 
 private:
 

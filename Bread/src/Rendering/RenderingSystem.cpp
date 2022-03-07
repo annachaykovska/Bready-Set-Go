@@ -67,7 +67,7 @@ void RenderingSystem::loadModels()
 	// Environment models
 	//-----------------------------------------------------------------------------------
 	// Ground
-	std::string groundPath = "resources/models/ground/roughGround.obj";
+	std::string groundPath = "resources/models/kitchen/kitchen.obj";
 	this->models.emplace_back(Model(&groundPath[0])); 
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
@@ -107,7 +107,7 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 	// Projection matrix will be handled by the Camera class in the future
 	glm::mat4 proj = glm::mat4(1.0f);
-	proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
+	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
@@ -122,18 +122,31 @@ void RenderingSystem::update()
 	setupCameras(p1Transform);
 
 	// Turn off textures - temporary
-	glUniform1i(texLoc, 0);
-
+	glUniform1i(this->texLoc, 0);
+	
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
 		
 		// TODO Temporary until all objects are attached to physics system
-		if (i >= 1 && i <= 4)
+		if ((i >= 1 && i <= 3) || i >= 9)
 			ownerTransform->update();
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-		models[i].draw(getShader());
+
+		if (i >= 5) 
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(getShader());
+			glUniform1i(texLoc, 0);
+		}
+		else
+			models[i].draw(getShader());
 	}
+}
+
+Model* RenderingSystem::getKitchenModel()
+{
+	return g_scene.getEntity("countertop")->getModel();
 }

@@ -95,7 +95,9 @@ UISystem::~UISystem(){
 }
 
 void UISystem::update() {
-    renderText(textShader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.0, 0.0f, 0.0f));
+    renderText(textShader, "Bready Set Go!!!", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	//std::cout << "Update" << std::endl;
+	//std::cout << "Update" << std::endl;
 }
 
 void UISystem::renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) 

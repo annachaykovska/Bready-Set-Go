@@ -33,42 +33,47 @@ uniform sampler2D texture_specular2;
 uniform sampler2D texture_specular3;
 uniform int textured;
 
-uniform vec4 color;
+//uniform vec4 color;
 uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
 
 void main()
 {
-	if (textured == 1)
+	vec3 diffuseColor;
+	
+	if (textured > 0)
 	{
-		fragColor = texture(texture_diffuse1, ourTexCoord);
+		vec4 texColor = texture(texture_diffuse1, ourTexCoord);
+		diffuseColor = vec3(texColor.x, texColor.y, texColor.z);
 	}
 	else
 	{
-		// Ambient light
-		vec3 ambient = light.ambient *  material.ambient;
-
-		// Diffuse light
-		vec3 norm = normalize(ourNormal);
-		vec3 lightDir = normalize(-light.direction);
-		float diff = max(dot(norm, lightDir), 0.0);
-		vec3 diffuse = light.diffuse * diff * material.diffuse;
-
-		// Specular light
-		vec3 specular = vec3(0, 0, 0);
-		if (material.shininess >= 100) 
-		{
-			vec3 viewDir = normalize(viewPos - fragPos);
-			vec3 reflectDir = reflect(-lightDir, norm);
-			float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-			specular = spec * material.specular;
-		}
-
-		// Phong light
-		vec3 phong = ambient + 2.f * diffuse;// + specular;
-
-		// Final
-		fragColor = vec4(phong, material.opacity);
+		diffuseColor = material.diffuse;
 	}
+
+	// Ambient light
+	vec3 ambient = light.ambient *  material.ambient;
+
+	// Diffuse light
+	vec3 norm = normalize(ourNormal);
+	vec3 lightDir = normalize(-light.direction);
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = light.diffuse * diff * diffuseColor;
+
+	// Specular light
+	vec3 specular = vec3(0, 0, 0);
+	if (material.shininess >= 100) 
+	{
+		vec3 viewDir = normalize(viewPos - fragPos);
+		vec3 reflectDir = reflect(-lightDir, norm);
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+		specular = spec * material.specular;
+	}
+
+	// Phong light
+	vec3 phong = ambient + 2.f * diffuse + specular;
+
+	// Final
+	fragColor = vec4(phong, material.opacity);
 }

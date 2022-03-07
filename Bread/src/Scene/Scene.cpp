@@ -15,6 +15,7 @@ void Scene::createEntities()
 	createEntity("tomato");
 	createEntity("dough");
 	createEntity("countertop");
+	createEntity("test");
 }
 
 /// <summary>
@@ -66,4 +67,9 @@ Entity* Scene::createEntity(std::string name)
 		return &result->second;
 	else
 		return nullptr;
+}
+
+void Scene::init(PhysicsSystem* physics)
+{
+	camera.initPhysics(physics);
 }
