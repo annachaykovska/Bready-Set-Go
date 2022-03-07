@@ -41,6 +41,7 @@ private:
 	float lastSpeed;
 
 	float slowDownCounter;
+	int counter;
 
 	float perspective;
 	float cameraPositionOffset;

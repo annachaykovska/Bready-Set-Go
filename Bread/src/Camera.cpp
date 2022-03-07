@@ -20,6 +20,7 @@ Camera::Camera()
 	, forcedDirection(0.f)
 	, oldForcedDirection(forcedDirection)
 	, recordedForcedDirection(forcedDirection)
+	, counter(0)
 {
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
@@ -61,58 +62,68 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float stopDegrees = 0;
 	if (physics != nullptr)
 	{
-		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90);
-		if (physics->getViewDirectionalInfluence() < -0.001)
+		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90.0);
+		if (physics->getViewDirectionalInfluence() < 0)
 		{
 			float stepSize = 0;
-			if (forcedDirection < 0)
+			if (forcedDirection < stopDegrees)
 			{
-				stepSize = -(1 / (5 * 2.f)) + 1;
+				if (forcedDirection < 0)
+				{
+					stepSize = -(1 / (5 * 2.f)) + 1;
+				}
+				else
+				{
+					float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+					functionStep = elasticForce - functionStep;
+					stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				}
+				if (forcedDirection + stepSize < stopDegrees)
+				{
+					forcedDirection += stepSize;
+				}
 			}
 			else
 			{
 				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
-				functionStep = elasticForce - functionStep;
+				functionStep -= elasticForce;
 				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
-			}
-			if (forcedDirection < stopDegrees)
-			{
-				forcedDirection += stepSize;
-			}
-			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
-			{
-				forcedDirection = oldForcedDirection;
-			}
-			else
-			{
-				oldForcedDirection = forcedDirection;
+				if (forcedDirection - stepSize > stopDegrees)
+				{
+					forcedDirection -= stepSize;
+				}
 			}
 			recordedForcedDirection = forcedDirection;
 		}
-		else if (physics->getViewDirectionalInfluence() > 0.001)
+		else if (physics->getViewDirectionalInfluence() > 0)
 		{
 			float stepSize = 0;
-			if (forcedDirection > 0)
+			if (abs(forcedDirection) < stopDegrees)
 			{
-				stepSize = -(1 / (5 * 2.f)) + 1;
+				if (forcedDirection > 0)
+				{
+					stepSize = -(1 / (5 * 2.f)) + 1;
+				}
+				else
+				{
+					float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+					functionStep = elasticForce - functionStep;
+					stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				}
+				if (forcedDirection > -stopDegrees)
+				{
+					forcedDirection -= stepSize;
+				}
 			}
 			else
 			{
 				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
-				functionStep = elasticForce - functionStep;
+				functionStep -= elasticForce;
 				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
-			}
-			if (forcedDirection > -stopDegrees)
-			{
-				forcedDirection -= stepSize;
-			}
-			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
-			{
-				forcedDirection = oldForcedDirection;
-			}
-			else
-			{
-				oldForcedDirection = forcedDirection;
+				if (forcedDirection + stepSize < stopDegrees)
+				{
+					forcedDirection += stepSize;
+				}
 			}
 			recordedForcedDirection = forcedDirection;
 		}
