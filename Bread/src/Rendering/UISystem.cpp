@@ -1,7 +1,9 @@
 #include "UISystem.h"
 
-UISystem::UISystem() :
-    textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
+UISystem::UISystem() 
+    : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
+    , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
+    , speedometer("resources/textures/speed.png", GL_NEAREST)
 {
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
@@ -89,7 +91,10 @@ UISystem::~UISystem(){
 }
 
 void UISystem::update() {
-    renderText(textShader, "Bready Set Go!!!", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+    renderText(textShader, "Bready Set Go", 25.0f, 540.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    float height = speedometer.height;
+    float width = speedometer.width;
+    renderImage(imageShader, speedometer, 560.0f, 5.0f, 200.0f * (width / height), 200.0f * (height / width));
 }
 
 void UISystem::renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) 
@@ -139,5 +144,31 @@ void UISystem::renderText(Shader& s, std::string text, float x, float y, float s
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    
+}
+
+void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY)
+{
+    s.use();
+    glUniformMatrix4fv(glGetUniformLocation(s.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(VAO);
+
+    float vertices[6][4] = {
+            { x,     y + scaleY,   0.0f, 1.0f },
+            { x,     y,       0.0f, 0.f },
+            { x + scaleX, y,       1.f, 0.f },
+
+            { x,     y + scaleY,   0.0f, 1.0f },
+            { x + scaleX, y,       1.f, 0.f },
+            { x + scaleX, y + scaleY,   1.f, 1.0f }
+    };
+
+    // render glyph texture over quad
+    image.bind();
+    // update content of VBO memory
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // render quad
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }

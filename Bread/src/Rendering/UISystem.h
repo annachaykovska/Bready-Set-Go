@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ImageTexture.h"
 #include "Shader.h"
 #include <iostream>
 #include <map>
@@ -30,11 +31,15 @@ public:
 
 private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
+	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY);
+
+	ImageTexture speedometer;
 
 	FT_Library ft;
 	FT_Face face;
 	std::map<char, Character> Characters;
 	glm::mat4 projection;
 	Shader textShader;
+	Shader imageShader;
 	unsigned int VAO, VBO;
 };
