@@ -9,7 +9,8 @@
 extern Scene g_scene;
 
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
-									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt")
+									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
+									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt")
 {
 	this->models.reserve(g_scene.count()); // Create space for models
 
@@ -20,6 +21,11 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
 	glEnable(GL_DEPTH_TEST); // Turn on depth testing
+	glDepthFunc(GL_LESS);
+
+	glEnable(GL_STENCIL_TEST); // Turn on stencil testing
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	loadModels(); // Load model files into the models vector
 
@@ -121,6 +127,11 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 void RenderingSystem::update()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	// Stencil buffer
+	glStencilMask(0x00); // Turn off writing to stencil buffer
+
 	// Declare shader to use
 	shader.use();
 
@@ -151,6 +162,12 @@ void RenderingSystem::update()
 		}
 		else if (i > 8)
 		{
+			// DRAW LIGHT BALL
+			
+			// Stencil buffer
+			glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass stencil test, ref value, AND stencil buffer with 1
+			glStencilMask(0xFF); // Allow writing to stencil buffer
+
 			lightShader.use();
 
 			glBindVertexArray(models[i].meshes[0].VAO);
@@ -166,8 +183,8 @@ void RenderingSystem::update()
 			unsigned int viewLoc = glGetUniformLocation(this->lightShader.getId(), "view");
 			unsigned int projLoc = glGetUniformLocation(this->lightShader.getId(), "projection");
 
+			Transform* t = g_scene.getEntity("test")->getTransform();
 			ownerTransform->update();
-			//std::cout << "Ball pos: " << "(" << ownerTransform->position.x << ", " << ownerTransform->position.y << ", " << ownerTransform->position.z << ")";
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
 			glm::mat4 view = g_scene.camera.getViewMatrix(p1Transform);
@@ -178,6 +195,44 @@ void RenderingSystem::update()
 			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 			
 			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
+
+			// DRAW OUTLINE FOR LIGHT BALL
+
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // Pass if not equal to 1, AND stencil buffer with 1
+			glStencilMask(0x00); //	Sets passing 
+			glDisable(GL_DEPTH_TEST);
+			
+			borderShader.use();
+			
+			glBindVertexArray(models[i].meshes[0].VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+			modelLoc = glGetUniformLocation(this->borderShader.getId(), "model");
+			viewLoc = glGetUniformLocation(this->borderShader.getId(), "view");
+			projLoc = glGetUniformLocation(this->borderShader.getId(), "projection");
+
+			t = g_scene.getEntity("test")->getTransform();
+			t->scale = glm::vec3(1.2f);
+			ownerTransform->update();
+
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+			view = g_scene.camera.getViewMatrix(p1Transform);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+			proj = glm::mat4(1.0f);
+			proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
+			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+			
+			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
+
+			glStencilMask(0xFF);
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glEnable(GL_DEPTH_TEST);
+
+			t->scale = glm::vec3(1.0f);
+
 			glBindVertexArray(0);
 		}
 	}
