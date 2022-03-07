@@ -16,8 +16,6 @@
 #include "../Scene/Entity.h"
 #include <Windows.h>
 
-// TODO Add chassis collisions to environment so the breadmobiles can't drive through walls
-
 using namespace snippetvehicle;
 using namespace physx;
 
@@ -29,7 +27,7 @@ CollisionCallback gCollisionCallback;
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.2f,
-	5.0f,		0.4f,
+	5.0f,		0.3f,
 	30.0f,		0.5f,
 	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
@@ -80,7 +78,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 500.0f;
+	const PxF32 chassisMass = 400.0f;
 	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
@@ -90,9 +88,9 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 3000.0f;
-	const PxF32 wheelRadius = 0.5f;
-	const PxF32 wheelWidth = 0.4f;
+	const PxF32 wheelMass = 800.0f;
+	const PxF32 wheelRadius = 1.f;
+	const PxF32 wheelWidth = 0.6f;
 	const PxF32 wheelMOI = 2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
@@ -101,7 +99,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
-	vehicleDesc.chassisMOI.y *= 0.5;
+	vehicleDesc.chassisMOI.y *= 0.4;
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -129,7 +127,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
 	// Set physx actor name
-	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+	body->setName(name.c_str());
 
 	// Attach the entity to the physx actor
 	void* vp = static_cast<void*>(new std::string(name));
@@ -159,7 +157,7 @@ void PhysicsSystem::initializeActors()
 	this->kitchen->attachShape(*kitchenShape);
 
 	// Set physx actor name
-	this->kitchen->setName("countertop"); // TODO one or both of these are not working correctly?
+	this->kitchen->setName("countertop");
 
 	// Attach the entity to the physx actor
 	void* kitchenVp = static_cast<void*>(new std::string("countertop"));
@@ -189,7 +187,7 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
 	PxVehicleEngineData engine;
-	engine.mPeakTorque = 10000.0f;
+	engine.mPeakTorque = 5000.0f;
 	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
 
 	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
@@ -197,8 +195,8 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 	PxTransform startTransformPlayer1(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer2(PxVec3(20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer2(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
 	PxTransform startTransformPlayer4(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
 	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
@@ -206,10 +204,10 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
 
 	// Set physx actor name
-	mVehiclePlayer1->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
-	mVehiclePlayer2->getRigidDynamicActor()->setName("player2"); // TODO one or both of these are not working correctly?
-	mVehiclePlayer3->getRigidDynamicActor()->setName("player3"); // TODO one or both of these are not working correctly?
-	mVehiclePlayer4->getRigidDynamicActor()->setName("player4"); // TODO one or both of these are not working correctly?
+	mVehiclePlayer1->getRigidDynamicActor()->setName("player1");
+	mVehiclePlayer2->getRigidDynamicActor()->setName("player2");
+	mVehiclePlayer3->getRigidDynamicActor()->setName("player3");
+	mVehiclePlayer4->getRigidDynamicActor()->setName("player4");
 
 	// Attach the entity to the physx actor
 	Entity* player1 = g_scene.getEntity("player1");
@@ -234,7 +232,6 @@ void PhysicsSystem::initializeActors()
 	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
-	
 	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
@@ -275,9 +272,9 @@ PhysicsSystem::PhysicsSystem()
 
 	// Physx scene
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, -30.f, 0.0f);
 	sceneDesc.cpuDispatcher = this->mDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader
+	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader?
 	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
 	this->mScene = mPhysics->createScene(sceneDesc);
 
@@ -339,6 +336,7 @@ void PhysicsSystem::initialize()
 	//mVehicleInputData.setAnalogBrake(1.0f);
 
 	viewDirectionalInfluence = 0.f;
+	turnDirectionalInfluence = 0.f;
 }
 
 // Cooking mesh was creating a read access violation seemingly randomly, it appears to
@@ -353,11 +351,13 @@ void PhysicsSystem::cookKitchen()
 	kitchenModel->physicsIndices(kitchenIndices);
 
 	PxTriangleMeshDesc meshDesc;
+	meshDesc.setToDefault();
+
 	meshDesc.points.count = kitchenVerts->size(); // PxU32
 	meshDesc.points.stride = sizeof(PxVec3);
 	meshDesc.points.data = kitchenVerts->data(); // PxVec3 []
 
-	meshDesc.triangles.count = kitchenIndices->size(); // PxU32
+	meshDesc.triangles.count = kitchenIndices->size() / 3; // PxU32
 	meshDesc.triangles.stride = 3 * sizeof(PxU32);
 	meshDesc.triangles.data = kitchenIndices->data(); // PxU32 []
 
@@ -396,6 +396,16 @@ void PhysicsSystem::setViewDirectionalInfluence(float value)
 float PhysicsSystem::getViewDirectionalInfluence()
 {
 	return viewDirectionalInfluence;
+}
+
+void PhysicsSystem::setTurnDirectionalInfluence(float value)
+{
+	turnDirectionalInfluence = value;
+}
+
+float PhysicsSystem::getTurnDirectionalInfluence()
+{
+	return turnDirectionalInfluence;
 }
 
 void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData &inputData, std::string entityName, const float timestep) {

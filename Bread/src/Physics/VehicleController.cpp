@@ -173,6 +173,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 			thumbLeftDeadZone = 1;
 		}
 		input->setAnalogSteer(thumbLeftDeadZone);
+		physics->setTurnDirectionalInfluence(thumbLeftDeadZone);
 	}
 	if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
 		float step = thumbLeftDeadZone * 2;
@@ -191,6 +192,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		}
 		analogVal = -1.0 * thumbLeftDeadZone;
 		input->setAnalogSteer(analogVal);
+		physics->setTurnDirectionalInfluence(analogVal);
 	}
 
 	// KEY RELEASED

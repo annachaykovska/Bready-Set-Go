@@ -39,9 +39,11 @@ public:
 	void setWireframe(bool drawWireframe);
 	void draw(Shader& shader); // Render mesh
 
+	unsigned int VAO, VBO, EBO; // Rendering data
+
 private:
 
-	unsigned int VAO, VBO, EBO; // Rendering data
+	
 	bool wireframe = false;
 	//void setupMesh();			// Initialization
 
