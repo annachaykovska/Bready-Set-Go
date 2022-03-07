@@ -37,6 +37,7 @@ private:
 
 	ImageTexture speedometer;
 	ImageTexture miniMap;
+	ImageTexture inventory;
 
 	ImageTexture p1Icon;
 	ImageTexture p2Icon;

@@ -5,6 +5,7 @@ UISystem::UISystem()
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speed.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
+    , inventory("resources/textures/inventory.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
     , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
@@ -120,7 +121,11 @@ void UISystem::update() {
 
     height = miniMap.height;
     width = miniMap.width;
-    renderImage(imageShader, miniMap, 25.0f, 380.0f, 200.0f * (width / height), 200.0f * (height / width));
+    renderImage(imageShader, miniMap, 25.0f, 430.0f, 150.0f * (width / height), 150.0f * (height / width));
+
+    height = inventory.height;
+    width = inventory.width;
+    renderImage(imageShader, inventory, 40.0f, 40.0f, 400.0f * (width / height), 80.0f * (height / width));
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
@@ -128,26 +133,26 @@ void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Tra
     // TODO: Clean up these hardcoded numbers
     float x;
     float z;
-    x = ((200.f) / (150.f + 310.f)) * (p1Transform.position.x + 310.f);
-    z = ((200.f) / (220.f + 235.f)) * (p1Transform.position.z + 235.f);
+    x = ((150.f) / (150.f + 310.f)) * (p1Transform.position.x + 310.f);
+    z = ((150.f) / (220.f + 235.f)) * (p1Transform.position.z + 235.f);
     p1Location = glm::vec2(x, z);
     p1Location.y = 200.f - p1Location.y;
     p1Location += glm::vec2(25.f, 380.f);
 
-    x = ((200.f) / (150.f + 310.f)) * (p2Transform.position.x + 310.f);
-    z = ((200.f) / (220.f + 235.f)) * (p2Transform.position.z + 235.f);
+    x = ((150.f) / (150.f + 310.f)) * (p2Transform.position.x + 310.f);
+    z = ((150.f) / (220.f + 235.f)) * (p2Transform.position.z + 235.f);
     p2Location = glm::vec2(x, z);
     p2Location.y = 200.f - p2Location.y;
     p2Location += glm::vec2(25.f, 380.f);
 
-    x = ((200.f) / (150.f + 310.f)) * (p3Transform.position.x + 310.f);
-    z = ((200.f) / (220.f + 235.f)) * (p3Transform.position.z + 235.f);
+    x = ((150.f) / (150.f + 310.f)) * (p3Transform.position.x + 310.f);
+    z = ((150.f) / (220.f + 235.f)) * (p3Transform.position.z + 235.f);
     p3Location = glm::vec2(x, z);
     p3Location.y = 200.f - p3Location.y;
     p3Location += glm::vec2(25.f, 380.f);
 
-    x = ((200.f) / (150.f + 310.f)) * (p4Transform.position.x + 310.f);
-    z = ((200.f) / (220.f + 235.f)) * (p4Transform.position.z + 235.f);
+    x = ((150.f) / (150.f + 310.f)) * (p4Transform.position.x + 310.f);
+    z = ((150.f) / (220.f + 235.f)) * (p4Transform.position.z + 235.f);
     p4Location = glm::vec2(x, z);
     p4Location.y = 200.f - p4Location.y;
     p4Location += glm::vec2(25.f, 380.f);
