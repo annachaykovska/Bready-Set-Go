@@ -232,7 +232,6 @@ void PhysicsSystem::initializeActors()
 	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
-	
 	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;

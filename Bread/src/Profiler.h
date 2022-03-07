@@ -17,6 +17,7 @@ public:
 	void player3Transform();
 	void player4Transform();
 	void cameraTransform();
+	void testTransform();
 	void update();
 
 private:
