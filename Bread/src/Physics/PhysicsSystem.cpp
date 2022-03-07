@@ -350,11 +350,13 @@ void PhysicsSystem::cookKitchen()
 	kitchenModel->physicsIndices(kitchenIndices);
 
 	PxTriangleMeshDesc meshDesc;
+	meshDesc.setToDefault();
+
 	meshDesc.points.count = kitchenVerts->size(); // PxU32
 	meshDesc.points.stride = sizeof(PxVec3);
 	meshDesc.points.data = kitchenVerts->data(); // PxVec3 []
 
-	meshDesc.triangles.count = kitchenIndices->size(); // PxU32
+	meshDesc.triangles.count = kitchenIndices->size() / 3; // PxU32
 	meshDesc.triangles.stride = 3 * sizeof(PxU32);
 	meshDesc.triangles.data = kitchenIndices->data(); // PxU32 []
 
