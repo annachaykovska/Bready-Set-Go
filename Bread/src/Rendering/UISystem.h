@@ -29,7 +29,7 @@ public:
 	~UISystem();
 
 	void update();
-	void updateMiniMap(Transform& p1Transform);
+	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
 
 private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
@@ -37,9 +37,16 @@ private:
 
 	ImageTexture speedometer;
 	ImageTexture miniMap;
-	ImageTexture locationIcon;
+
+	ImageTexture p1Icon;
+	ImageTexture p2Icon;
+	ImageTexture p3Icon;
+	ImageTexture p4Icon;
 
 	glm::vec2 p1Location;
+	glm::vec2 p2Location;
+	glm::vec2 p3Location;
+	glm::vec2 p4Location;
 
 	FT_Library ft;
 	FT_Face face;

@@ -5,8 +5,14 @@ UISystem::UISystem()
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speed.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
-    , locationIcon("resources/textures/locationIcon.png", GL_NEAREST)
+    , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
+    , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
+    , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
+    , p4Icon("resources/textures/p4Icon.png", GL_NEAREST)
     , p1Location(glm::vec2(0))
+    , p2Location(glm::vec2(0))
+    , p3Location(glm::vec2(0))
+    , p4Location(glm::vec2(0))
 {
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
@@ -98,22 +104,53 @@ void UISystem::update() {
     float height = speedometer.height;
     float width = speedometer.width;
     renderImage(imageShader, speedometer, 560.0f, 5.0f, 200.0f * (width / height), 200.0f * (height / width));
-    height = locationIcon.height;
-    width = locationIcon.width;
-    renderImage(imageShader, locationIcon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width));
+
+    height = p1Icon.height;
+    width = p1Icon.width;
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    height = p2Icon.height;
+    width = p2Icon.width;
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    height = p3Icon.height;
+    width = p3Icon.width;
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    height = p4Icon.height;
+    width = p4Icon.width;
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width));
+
     height = miniMap.height;
     width = miniMap.width;
     renderImage(imageShader, miniMap, 25.0f, 380.0f, 200.0f * (width / height), 200.0f * (height / width));
 }
 
-void UISystem::updateMiniMap(Transform& p1Transform)
+void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
 {
     // TODO: Clean up these hardcoded numbers
-    float x = ((200.f) / (150.f + 310.f)) * (p1Transform.position.x + 310.f);
-    float z = ((200.f) / (220.f + 235.f)) * (p1Transform.position.z + 235.f);
+    float x;
+    float z;
+    x = ((200.f) / (150.f + 310.f)) * (p1Transform.position.x + 310.f);
+    z = ((200.f) / (220.f + 235.f)) * (p1Transform.position.z + 235.f);
     p1Location = glm::vec2(x, z);
     p1Location.y = 200.f - p1Location.y;
     p1Location += glm::vec2(25.f, 380.f);
+
+    x = ((200.f) / (150.f + 310.f)) * (p2Transform.position.x + 310.f);
+    z = ((200.f) / (220.f + 235.f)) * (p2Transform.position.z + 235.f);
+    p2Location = glm::vec2(x, z);
+    p2Location.y = 200.f - p2Location.y;
+    p2Location += glm::vec2(25.f, 380.f);
+
+    x = ((200.f) / (150.f + 310.f)) * (p3Transform.position.x + 310.f);
+    z = ((200.f) / (220.f + 235.f)) * (p3Transform.position.z + 235.f);
+    p3Location = glm::vec2(x, z);
+    p3Location.y = 200.f - p3Location.y;
+    p3Location += glm::vec2(25.f, 380.f);
+
+    x = ((200.f) / (150.f + 310.f)) * (p4Transform.position.x + 310.f);
+    z = ((200.f) / (220.f + 235.f)) * (p4Transform.position.z + 235.f);
+    p4Location = glm::vec2(x, z);
+    p4Location.y = 200.f - p4Location.y;
+    p4Location += glm::vec2(25.f, 380.f);
 }
 
 void UISystem::renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) 

@@ -186,7 +186,7 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
-		ui.updateMiniMap(*player1->getTransform());
+		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 		ui.update();
 		//profiler.newFrame();
 
