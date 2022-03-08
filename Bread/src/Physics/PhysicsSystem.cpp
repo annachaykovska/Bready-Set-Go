@@ -430,26 +430,56 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
 
 	// Work out if the vehicle is in the air, add an opposing force if in air
-	float horizontalFactor = -500.0f;
-	float verticalFactor = -25.0f;
+	float horizontalFactor = -400.0f;
+	float verticalFactor = -55.0f;
 	if (entityName == "player1") {
 		this->mIsVehicleInAirPlayer1 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 		if (this->mIsVehicleInAirPlayer1 && !this->mImpulseAppliedPlayer1) {
 			this->mImpulseAppliedPlayer1 = true;
-			this->mStoredVelocityPlayer1 = player->getRigidDynamicActor()->getLinearVelocity();
-			player->getRigidDynamicActor()->addForce(PxVec3(horizontalFactor * this->mStoredVelocityPlayer1.x, verticalFactor, horizontalFactor * this->mStoredVelocityPlayer1.z), PxForceMode::eIMPULSE, true);
+			PxVec3 velocity = player->getRigidDynamicActor()->getLinearVelocity();
+			player->getRigidDynamicActor()->setLinearVelocity(PxVec3(velocity.x, velocity.y / 4, velocity.z));
+			player->getRigidDynamicActor()->addForce(PxVec3(0.0, verticalFactor, 0.0), PxForceMode::eIMPULSE, true);
 		}
 		else if (!this->mIsVehicleInAirPlayer1 && this->mImpulseAppliedPlayer1) {
 			this->mImpulseAppliedPlayer1 = false;
-			player->getRigidDynamicActor()->setLinearVelocity(this->mStoredVelocityPlayer1);
 		}
 	}
-	else if (entityName == "player2")
+	else if (entityName == "player2") {
 		this->mIsVehicleInAirPlayer2 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
-	else if (entityName == "player3")
+		if (this->mIsVehicleInAirPlayer2 && !this->mImpulseAppliedPlayer2) {
+			this->mImpulseAppliedPlayer2 = true;
+			PxVec3 velocity = player->getRigidDynamicActor()->getLinearVelocity();
+			player->getRigidDynamicActor()->setLinearVelocity(PxVec3(velocity.x, velocity.y / 4, velocity.z));
+			player->getRigidDynamicActor()->addForce(PxVec3(0.0, verticalFactor, 0.0), PxForceMode::eIMPULSE, true);
+		}
+		else if (!this->mIsVehicleInAirPlayer2 && this->mImpulseAppliedPlayer2) {
+			this->mImpulseAppliedPlayer2 = false;
+		}
+	}
+	else if (entityName == "player3") {
 		this->mIsVehicleInAirPlayer3 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
-	else if (entityName == "player4")
+		if (this->mIsVehicleInAirPlayer3 && !this->mImpulseAppliedPlayer3) {
+			this->mImpulseAppliedPlayer3 = true;
+			PxVec3 velocity = player->getRigidDynamicActor()->getLinearVelocity();
+			player->getRigidDynamicActor()->setLinearVelocity(PxVec3(velocity.x, velocity.y / 4, velocity.z));
+			player->getRigidDynamicActor()->addForce(PxVec3(0.0, verticalFactor, 0.0), PxForceMode::eIMPULSE, true);
+		}
+		else if (!this->mIsVehicleInAirPlayer3 && this->mImpulseAppliedPlayer3) {
+			this->mImpulseAppliedPlayer3 = false;
+		}
+	}
+	else if (entityName == "player4") {
 		this->mIsVehicleInAirPlayer4 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+		if (this->mIsVehicleInAirPlayer4 && !this->mImpulseAppliedPlayer4) {
+			this->mImpulseAppliedPlayer4 = true;
+			PxVec3 velocity = player->getRigidDynamicActor()->getLinearVelocity();
+			player->getRigidDynamicActor()->setLinearVelocity(PxVec3(velocity.x, velocity.y / 4, velocity.z));
+			player->getRigidDynamicActor()->addForce(PxVec3(0.0, verticalFactor, 0.0), PxForceMode::eIMPULSE, true);
+		}
+		else if (!this->mIsVehicleInAirPlayer4 && this->mImpulseAppliedPlayer4) {
+			this->mImpulseAppliedPlayer4 = false;
+		}
+	}
 
 	// Set the angular velocity
 	PxVec3 ang_vel = player->getRigidDynamicActor()->getAngularVelocity();

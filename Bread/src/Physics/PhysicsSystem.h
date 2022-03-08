@@ -87,6 +87,8 @@ private:
 	float turnDirectionalInfluence;
 
 	bool mImpulseAppliedPlayer1 = false;
-	PxVec3 mStoredVelocityPlayer1 = PxVec3(0.0f);
+	bool mImpulseAppliedPlayer2 = false;
+	bool mImpulseAppliedPlayer3 = false;
+	bool mImpulseAppliedPlayer4 = false;
 }; 
 
