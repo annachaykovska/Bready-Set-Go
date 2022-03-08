@@ -1,6 +1,6 @@
 #include "UISystem.h"
 
-extern SystemManager g_system;
+extern SystemManager g_systems;
 
 UISystem::UISystem() 
     : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
@@ -120,7 +120,9 @@ void UISystem::update() {
 
     height = needle.height;
     width = needle.width;
-    renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 0.f);
+    
+    renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
+        lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f));
 
     //height = miniMap.height;
     //width = miniMap.width;
@@ -263,4 +265,8 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // render quad
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+float UISystem::lerp(float p, float a, float b) {
+    return (1 - p) * a + p * b;
 }
