@@ -223,6 +223,9 @@ void RenderingSystem::update()
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
+		if (i == 4)
+			ownerTransform->update();
+
 		if (i <= 4)
 		{
 			glUniform1i(texLoc, 0);

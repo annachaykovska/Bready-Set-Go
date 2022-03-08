@@ -117,6 +117,8 @@
     <ClCompile Include="src\Physics\CollisionCallback.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Rendering\GLHandles.cpp" />
+    <ClCompile Include="src\Rendering\ImageTexture.cpp" />
     <ClCompile Include="src\Rendering\RenderingSystem.cpp" />
     <ClCompile Include="src\Physics\VehicleController.cpp" />
     <ClCompile Include="src\Rendering\UISystem.cpp" />
@@ -839,6 +841,8 @@
     <ClInclude Include="src\Inventory.h" />
     <ClInclude Include="src\Physics\CollisionCallback.h" />
     <ClInclude Include="src\Physics\PhysicsEnums.h" />
+    <ClInclude Include="src\Rendering\GLHandles.h" />
+    <ClInclude Include="src\Rendering\ImageTexture.h" />
     <ClInclude Include="src\Rendering\LightSource.h" />
     <ClInclude Include="src\Rendering\Material.h" />
     <ClInclude Include="src\Rendering\RenderingSystem.h" />
