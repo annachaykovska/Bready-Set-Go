@@ -25,11 +25,16 @@ private:
 	unsigned int texLoc;
 	unsigned int viewLoc;
 	unsigned int projLoc;
+	
 	Shader shader;
 	Shader lightShader;
 	Shader borderShader;
 	Shader simpleShader;
+	Shader depthShader;
+	Shader debugShader;
+
 	std::vector<Model> models;
+
 	unsigned int FBO;
 	unsigned int textureColorBuffer;
 	unsigned int RBO;
@@ -37,7 +42,8 @@ private:
 	unsigned int quadVBO;
 
 	unsigned int depthMapFBO;
-	unsigned int depthMap;
+	unsigned int dpethMapVAO;
+	unsigned int depthMapTex;
 
 	int screenWidth;
 	int screenHeight;

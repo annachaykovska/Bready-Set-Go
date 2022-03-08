@@ -287,3 +287,9 @@ void Model::physicsIndices(std::vector<physx::PxU32>* indices)
 		for (int j = 0; j < meshes[i].vertices.size(); j++)
 			indices->push_back(physx::PxU32(meshes[i].indices[j]));
 }
+
+void Model::drawDepthMap(Shader& shader)
+{
+	for (unsigned int i = 0; i < meshes.size(); i++)
+		meshes[i].drawDepthMap(shader);
+}

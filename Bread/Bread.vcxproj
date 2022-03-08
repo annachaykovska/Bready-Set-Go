@@ -977,6 +977,10 @@
     <None Include="src\assimp-vc142-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="resources\shaders\debugFragment.txt" />
+    <Text Include="resources\shaders\debugVertex.txt" />
+    <Text Include="resources\shaders\depthFragment.txt" />
+    <Text Include="resources\shaders\depthVertex.txt" />
     <Text Include="resources\shaders\fragment.txt" />
     <Text Include="resources\shaders\lightSourceFragment.txt" />
     <Text Include="resources\shaders\lightSourceVertex.txt" />

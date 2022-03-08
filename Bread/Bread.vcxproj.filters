@@ -2545,6 +2545,10 @@
     <Text Include="resources\shaders\borderFragment.txt" />
     <Text Include="resources\shaders\simpleVertex.txt" />
     <Text Include="resources\shaders\simpleFragment.txt" />
+    <Text Include="resources\shaders\debugFragment.txt" />
+    <Text Include="resources\shaders\debugVertex.txt" />
+    <Text Include="resources\shaders\depthFragment.txt" />
+    <Text Include="resources\shaders\depthVertex.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bread.rc">

@@ -13,13 +13,17 @@ extern SystemManager g_systems;
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
 									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
 									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
-								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt")
+								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
+									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
+									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt")
 {
 	this->screenWidth = 0;
 	this->screenHeight = 0;
 
 	this->models.reserve(g_scene.count()); // Create space for models
+	loadModels(); // Load model files into the models vector
 
+	/*
 	// Rendering uniforms
 	this->modelLoc = glGetUniformLocation(getShaderId(), "model");
 	this->texLoc = glGetUniformLocation(getShaderId(), "textured");
@@ -29,11 +33,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glEnable(GL_DEPTH_TEST); // Turn on depth testing
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_STENCIL_TEST); // Turn on stencil testing
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-	loadModels(); // Load model files into the models vector
+	//glEnable(GL_STENCIL_TEST); // Turn on stencil testing
+	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	// Camera
 	Transform transform = Transform();
@@ -41,6 +43,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	setupCameras(&transform); // Setup the camera
 
 	// Framebuffer
+	/*
 	glGenFramebuffers(1, &this->FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
@@ -54,6 +57,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// Attach textureColorBuffer to FBO
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->textureColorBuffer, 0);
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	*/
+	/*
 	// Renderbuffer
 	glGenRenderbuffers(1, &RBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
@@ -89,6 +95,25 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	// SHADOWS
+	glGenFramebuffers(1, &this->depthMapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
+
+	glGenTextures(1, &this->depthMapTex);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMapTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	*/
 }
 
 RenderingSystem::~RenderingSystem() { }
@@ -183,6 +208,51 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 void RenderingSystem::update()
 {
+	// Draw to shadow framebuffer
+	//glViewport(0, 0, 1024, 1024);
+	//glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO); // Bind depthMap framebuffer
+	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+	depthShader.use();
+
+	// Setup light space matrix for shadow detection
+	float nearPlane = 0.1f, farPlane = 10000.0f;
+	glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, nearPlane, farPlane);
+	Transform* lightTrans = g_scene.getEntity("test")->getTransform();
+	glm::mat4 lightView = glm::lookAt(lightTrans->position, glm::vec3(0), glm::vec3(0, 1, 0));
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+	// Update light space matrix in shader
+	unsigned int lightSpaceMatrixLoc = glGetUniformLocation(this->depthShader.getId(), "lightSpaceMatrix");
+	glUniformMatrix4fv(lightSpaceMatrixLoc, 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+	
+	// Get model unfirom location in shader
+	unsigned int modelLoc = glGetUniformLocation(this->depthShader.getId(), "model");
+
+	// Render scene to depthMapFBO
+	for (auto it = models.begin(); it < models.end(); it++)
+	{
+		// Update model matrix
+		Transform* ownerTransform = it->owner->getTransform();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		it->drawDepthMap(this->depthShader);
+	}
+	
+	/*
+	// Draw to default framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Render scene to viewport by applying depthMap as texture to 2D quad
+	this->debugShader.use();
+	glBindVertexArray(this->quadVAO);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+		
 	if (this->screenWidth != g_systems.width || this->screenHeight != g_systems.height)
 	{
 		glBindTexture(GL_TEXTURE_2D, this->textureColorBuffer);
@@ -200,7 +270,7 @@ void RenderingSystem::update()
 
 	// Clear frame
 	glClearColor(0.6784f, 0.8471f, 0.902f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Stencil buffer
 	glStencilMask(0x00); // Turn off writing to stencil buffer
@@ -320,6 +390,7 @@ void RenderingSystem::update()
 	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+	*/
 }
 
 Model* RenderingSystem::getKitchenModel()

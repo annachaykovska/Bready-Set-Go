@@ -156,6 +156,7 @@ void Mesh::draw(Shader &shader)
 	glUniform3f(viewPosLoc, g_scene.camera.position.x, g_scene.camera.position.y, g_scene.camera.position.z);
 
 	glBindVertexArray(VAO);
+
 	if (wireframe)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -165,6 +166,13 @@ void Mesh::draw(Shader &shader)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void Mesh::drawDepthMap(Shader& shader)
+{
+	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
