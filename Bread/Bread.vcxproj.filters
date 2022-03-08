@@ -114,6 +114,7 @@
     <ClCompile Include="src\Rendering\UISystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="src\Navigation\LocationTracker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -129,6 +130,8 @@
     <ClCompile Include="src\Navigation\WaypointUpdater.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+=======
+>>>>>>> ccd343974ce3d67b673be7fd5d7561e788c8dda4
     <ClCompile Include="src\Rendering\GLHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2312,6 +2315,7 @@
     <ClInclude Include="dependencies\include\FTGL\FTTriangleExtractorGlyph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="src\Navigation\LocationTracker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2327,6 +2331,8 @@
     <ClInclude Include="src\Navigation\WaypointUpdater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+=======
+>>>>>>> ccd343974ce3d67b673be7fd5d7561e788c8dda4
     <ClInclude Include="src\Rendering\GLHandles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
