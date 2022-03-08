@@ -36,6 +36,7 @@ private:
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY);
 
 	ImageTexture speedometer;
+	ImageTexture needle;
 	ImageTexture miniMap;
 	ImageTexture inventory;
 

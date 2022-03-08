@@ -3,7 +3,8 @@
 UISystem::UISystem() 
     : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
-    , speedometer("resources/textures/speed.png", GL_NEAREST)
+    , speedometer("resources/textures/speedometer.png", GL_NEAREST)
+    , needle("resources/textures/speedNeedle.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
@@ -102,9 +103,15 @@ UISystem::~UISystem(){
 
 void UISystem::update() {
     //renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
-    float height = speedometer.height;
-    float width = speedometer.width;
-    renderImage(imageShader, speedometer, 560.0f, 5.0f, 200.0f * (width / height), 200.0f * (height / width));
+    float height, width;
+
+    height = speedometer.height;
+    width = speedometer.width;
+    renderImage(imageShader, speedometer, 600.0f, 40.0f, 180.0f * (width / height), 180.0f * (height / width));
+
+    height = needle.height;
+    width = needle.width;
+    renderImage(imageShader, needle, 685.0f, -5.0f, 200.0f * (width / height), 8.0f * (height / width));
 
     height = miniMap.height;
     width = miniMap.width;
@@ -178,6 +185,9 @@ void UISystem::renderText(Shader& s, std::string text, float x, float y, float s
 
         float w = ch.Size.x * scale;
         float h = ch.Size.y * scale;
+
+
+
         // update VBO for each character
         float vertices[6][4] = {
             { xpos,     ypos + h,   0.0f, 0.0f },
