@@ -17,9 +17,6 @@ void Scene::createEntities()
 	createEntity("dough");
 	createEntity("countertop");
 
-	// Prototype Entities
-	createEntity("demoObstacle");
-
 	// Debug Entities
 	createEntity("navmesh-debug");
 	createEntity("test");

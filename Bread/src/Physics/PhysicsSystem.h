@@ -47,7 +47,6 @@ public:
 	PxRigidDynamic* sausage;
 	PxRigidDynamic* tomato;
 	PxRigidDynamic* dough;
-	PxRigidDynamic* demoObstacle;
 
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer2;

@@ -19,11 +19,11 @@ void XboxController::checkControllers() {
 
 		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
 			controllerId = i;
-			
+
 		}
 	}
 
-	if (controllerId != -1) 
+	if (controllerId != -1)
 	{
 		physics->setAnalogInputs(true);
 	}
@@ -82,7 +82,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input = &physics->mVehicleInputDataPlayer3;
 	else if (controllerId == 3)
 		input = &physics->mVehicleInputDataPlayer4;
-	else 
+	else
 		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
 	XINPUT_STATE state = getControllerState(controllerId);
 
@@ -117,7 +117,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	}
 
 	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
-	
+
 	float analogVal;
 	if (thumbRightX <= 0) { // left
 		physics->setViewDirectionalInfluence(thumbRightDeadZone);
@@ -153,7 +153,6 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input->setAnalogAccel(analogVal);
 		input->setAnalogBrake(0);
 	}
-	/*
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
 		analogVal = triggerLeft / 255;
 		input->setAnalogBrake(analogVal);
@@ -205,6 +204,4 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	if (thumbLeftDeadZone == 0.0) { // left/right
 		input->setAnalogSteer(0.0f);
 	}
-	*/
 }
-

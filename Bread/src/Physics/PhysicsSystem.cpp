@@ -164,11 +164,9 @@ PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfE
 }
 
 void PhysicsSystem::initializeActors() {
-	// GROUND ---------------------------------------------------------------------------------------------------------------------
-	// Add the ground plane to drive on
-	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
-	mScene->addActor(*mGroundPlane);
+	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
+	// Create shape using the kitchen's mesh
+	PxTriangleMeshGeometry kitchenGeometry = PxTriangleMeshGeometry(kitchenMesh, PxMeshScale());
 
 	PxShape* kitchenShape = mPhysics->createShape(kitchenGeometry, *mMaterial, true);
 
@@ -273,10 +271,6 @@ void PhysicsSystem::initializeActors() {
 	// DOUGH
 	PxTransform doughTransform(PxVec3(-30, 0, 0));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
-
-	// DEMO OBSTACLE
-	PxTransform demoObstacleTransform(PxVec3(30, 0, -30));
-	this->demoObstacle = createObstacle(demoObstacleTransform, 10.f, "demoObstacle");
 }
 
 PhysicsSystem::PhysicsSystem()
@@ -483,7 +477,7 @@ void PhysicsSystem::update(const float dt)
 	// Making the constant much larger than 1/120th causes a significant jitter
 	float timestep = 1.0f / 120.0f;
 	this->mAccumulator += dt;
-	if (this->mAccumulator < timestep) 
+	if (this->mAccumulator < timestep)
 		return;
 
 	this->mAccumulator -= timestep;
@@ -500,15 +494,6 @@ void PhysicsSystem::update(const float dt)
 
 	// Update the food transforms
 	updateFoodTransforms();
-
-	// Set the ground's transform
-	Entity* countertop = g_scene.getEntity("countertop");
-	Transform* countertopTransform = countertop->getTransform();
-	physx::PxShape* shapes[1];
-	mGroundPlane->getShapes(shapes, 1);
-	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
-	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
-	countertopTransform->update(groundTransform);
 }
 
 void PhysicsSystem::updateFoodTransforms()

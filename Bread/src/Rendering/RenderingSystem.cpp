@@ -10,11 +10,12 @@
 extern Scene g_scene;
 extern SystemManager g_systems;
 
-RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
-									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
-									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
-								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
-									 debugOverlay(debug)
+RenderingSystem::RenderingSystem(DebugOverlay& debug)
+	: shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
+	, lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt")
+	, borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt")
+	, simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt")
+	, debugOverlay(debug)
 {
 	this->screenWidth = 0;
 	this->screenHeight = 0;
@@ -158,14 +159,6 @@ void RenderingSystem::loadModels()
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
 	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
-
-	//-----------------------------------------------------------------------------------
-	// Prototype models
-	//-----------------------------------------------------------------------------------
-	// Demo Obstacle
-	std::string demoObstaclePath = "resources/models/prototype/demoObstacle.obj";
-	this->models.emplace_back(Model(&demoObstaclePath[0])); // Prototype obstacle
-	g_scene.getEntity("demoObstacle")->attachComponent(&(this->models[9]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Debug models

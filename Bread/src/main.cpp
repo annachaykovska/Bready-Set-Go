@@ -57,7 +57,6 @@ int main()
 	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
 	Entity* test = g_scene.getEntity("test");
-	Entity* demoObstacle = g_scene.getEntity("demoObstacle");
 
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE SYSTEMS
@@ -99,23 +98,10 @@ int main()
 	dough->attachComponent(&transforms[7], "transform");
 	countertop->attachComponent(&transforms[8], "transform");
 	test->attachComponent(&transforms[9], "transform");
-	demoObstacle->attachComponent(&transforms[9], "transform");
 
 	// Initialize transform components
-	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(2.f, 2.3f, -3.f);
-	player1Transform->rotation = glm::vec3(0, 0, 0);
-	player1Transform->scale = glm::vec3(2, 2, 2);
-
-	Transform* player2Transform = player2->getTransform();
-	player2Transform->position = glm::vec3(100, 2.3f, 0);
-	player2Transform->rotation = glm::vec3(0, 0, 0);
-	player2Transform->scale = glm::vec3(1, 1, 1);
-
-	Transform* player3Transform = player3->getTransform();
-	player3Transform->position = glm::vec3(-100, 2.3f, 0);
-	player3Transform->rotation = glm::vec3(0, 0, 0);
-	player3Transform->scale = glm::vec3(1, 1, 1);
+	Transform* counterTrans = countertop->getTransform();
+	counterTrans->position.y = 3.1f;
 
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
@@ -129,15 +115,6 @@ int main()
 	Transform* doughTransform = dough->getTransform();
 	doughTransform->scale = glm::vec3(30, 30, 30);
 
-	Transform* counterTransform = countertop->getTransform();
-	counterTransform->position = glm::vec3(0, 0, 0);
-	counterTransform->rotation = glm::vec3(0, 0, 0);
-	counterTransform->scale = glm::vec3(50, 50, 50);
-
-	Transform* demoObstacleTransform = demoObstacle->getTransform();
-	demoObstacleTransform->position = glm::vec3(0, 0, 0);
-	demoObstacleTransform->rotation = glm::vec3(0, 0, 0);
-	demoObstacleTransform->scale = glm::vec3(10, 10, 10);
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
 	testTransform->scale = glm::vec3(1, 1, 1);
@@ -162,22 +139,17 @@ int main()
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
-	Inventory p1Inv;
 	NavMesh navMesh;
-	NavigationSystem p1NavSystem(*player1, physics, navMesh);
+	//NavigationSystem p1NavSystem(*player1, physics, navMesh);
 
 	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 	player1->attachComponent(&p1Inv, "inventory");
-	player1->attachComponent(&p1NavSystem, "navigation");
+	//player1->attachComponent(&p1NavSystem, "navigation");
 
 	// TODO: Dynamically pick the target and plan path
-	p1NavSystem.planPath(glm::vec3(95.f, 0.f, -95.f));
-
-	Shader shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt");
-	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
-	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
+	//p1NavSystem.planPath(glm::vec3(95.f, 0.f, -95.f));
 	player2->attachComponent(&p2Inv, "inventory");
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
@@ -216,7 +188,8 @@ int main()
 		window.swapBuffer();
 
 		// AI
-		p1NavSystem.update();
+		std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
+		//p1NavSystem.update();
 
 		// AUDIO
 		// update AudioSource	
