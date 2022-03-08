@@ -82,4 +82,9 @@ private:
 	bool useAnalogInputs = false;
 
 	float viewDirectionalInfluence = 0.f;
+
+
+	bool mImpulseAppliedPlayer1 = false;
+	PxVec3 mStoredVelocityPlayer1 = PxVec3(0.0f);
 }; 
+
