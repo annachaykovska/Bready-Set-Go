@@ -119,16 +119,16 @@ void UISystem::update() {
 
     height = p1Icon.height;
     width = p1Icon.width;
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 10.0f * (width / height), 10.0f * (height / width));
     height = p2Icon.height;
     width = p2Icon.width;
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 10.0f * (width / height), 10.0f * (height / width));
     height = p3Icon.height;
     width = p3Icon.width;
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 10.0f * (width / height), 10.0f * (height / width));
     height = p4Icon.height;
     width = p4Icon.width;
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 10.0f * (width / height), 10.0f * (height / width));
 
     height = inventory.height;
     width = inventory.width;
