@@ -1,10 +1,12 @@
 #include "UISystem.h"
 
+extern SystemManager g_system;
+
 UISystem::UISystem() 
     : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
-    , needle("resources/textures/speedNeedle.png", GL_NEAREST)
+    , needle("resources/textures/needle.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
@@ -22,6 +24,7 @@ UISystem::UISystem()
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
     projection = glm::ortho(0.f, 800.f, 0.f, 600.f); //check if the max limits can be changed
+    imageProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
 	//Freetype initialization
 	if (FT_Init_FreeType(&ft))
 	{
@@ -108,37 +111,37 @@ UISystem::~UISystem(){
 }
 
 void UISystem::update() {
-    //renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     float height, width;
 
     height = speedometer.height;
     width = speedometer.width;
-    renderImage(imageShader, speedometer, 600.0f, 40.0f, 180.0f * (width / height), 180.0f * (height / width));
+    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f);
 
     height = needle.height;
     width = needle.width;
-    renderImage(imageShader, needle, 685.0f, -5.0f, 200.0f * (width / height), 8.0f * (height / width));
+    renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 0.f);
 
-    height = miniMap.height;
-    width = miniMap.width;
-    renderImage(imageShader, miniMap, 25.0f, 430.0f, 150.0f * (width / height), 150.0f * (height / width));
+    //height = miniMap.height;
+    //width = miniMap.width;
+    //renderImage(imageShader, miniMap, 25.0f, 430.0f, 150.0f * (width / height), 150.0f * (height / width), 0);
 
-    height = p1Icon.height;
-    width = p1Icon.width;
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width));
-    height = p2Icon.height;
-    width = p2Icon.width;
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width));
-    height = p3Icon.height;
-    width = p3Icon.width;
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width));
-    height = p4Icon.height;
-    width = p4Icon.width;
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width));
+    //height = p1Icon.height;
+    //width = p1Icon.width;
+    //renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    //height = p2Icon.height;
+    //width = p2Icon.width;
+    //renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    //height = p3Icon.height;
+    //width = p3Icon.width;
+    //renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    //height = p4Icon.height;
+    //width = p4Icon.width;
+    //renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
 
-    height = inventory.height;
-    width = inventory.width;
-    renderImage(imageShader, inventory, 50.0f, 40.0f, 400.0f * (width / height), 80.0f * (height / width));
+    //height = inventory.height;
+    //width = inventory.width;
+    //renderImage(imageShader, inventory, 50.0f, 40.0f, 400.0f * (width / height), 80.0f * (height / width), 0);
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
@@ -214,8 +217,6 @@ void UISystem::renderText(Shader& s, std::string text, float x, float y, float s
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        //std::cout << "print character";
-
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
         x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
     }
@@ -223,22 +224,36 @@ void UISystem::renderText(Shader& s, std::string text, float x, float y, float s
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY)
+void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta)
 {
     s.use();
-    glUniformMatrix4fv(glGetUniformLocation(s.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(s.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(imageProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
+    // THIS SHOULD PROBABLY BE CHANGED EVENTUALLY
     float vertices[6][4] = {
-            { x,     y + scaleY,   0.0f, 1.0f },
-            { x,     y,       0.0f, 0.f },
-            { x + scaleX, y,       1.f, 0.f },
+            //{ x,     y + scaleY,    0.0f, 1.0f },
+            //{ x,     y,             0.0f, 0.f },
+            //{ x + scaleX, y,        1.f, 0.f },
 
-            { x,     y + scaleY,   0.0f, 1.0f },
-            { x + scaleX, y,       1.f, 0.f },
-            { x + scaleX, y + scaleY,   1.f, 1.0f }
+            //{ x,     y + scaleY,    0.0f, 1.0f },
+            //{ x + scaleX, y,        1.f, 0.f },
+            //{ x + scaleX, y + scaleY,1.f, 1.0f }
+        {-1., 1., 0., 1.},
+        {-1., -1., 0., 0.},
+        {1., -1., 1., 0.},
+
+        {-1., 1., 0., 1.},
+        {1., -1., 1., 0.},
+        {1., 1., 1., 1.}
     };
+    glm::mat4 rotate = glm::rotate(glm::mat4(1.f), theta, glm::vec3(0.f,0.f,1.f));
+    glm::mat4 scale = glm::scale(glm::mat4(1.f), glm::vec3(scaleX/800.f, scaleY/600.f, 1.f));
+    glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3((x - 400.f) / 400.f, (y - 300.f) / 300.f, 0.f));
+    glm::mat4 modelMat = translation * scale * rotate;
+
+    glUniformMatrix4fv(glGetUniformLocation(s.getId(), "model"), 1, GL_FALSE, glm::value_ptr(modelMat));
 
     // render glyph texture over quad
     image.bind();
