@@ -32,6 +32,8 @@ public:
 
 	void setViewDirectionalInfluence(float value);
 	float getViewDirectionalInfluence();
+	void setTurnDirectionalInfluence(float value);
+	float getTurnDirectionalInfluence();
 
 	void cookieCutter(PxTriangleMesh& meshDesc, PxDefaultMemoryOutputStream& writeBuffer, PxTriangleMeshCookingResult::Enum& result);
 
@@ -81,5 +83,6 @@ private:
 	bool mIsVehicleInAirPlayer4 = true;
 	bool useAnalogInputs = false;
 
-	float viewDirectionalInfluence = 0.f;
+	float viewDirectionalInfluence;
+	float turnDirectionalInfluence;
 }; 

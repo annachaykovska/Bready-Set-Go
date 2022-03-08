@@ -28,5 +28,8 @@ public:
 	RenderingSystem* render;
 	UISystem* ui;
 
+	int height;
+	int width;
+
 private:
 };

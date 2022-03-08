@@ -20,6 +20,9 @@ Camera::Camera()
 	, forcedDirection(0.f)
 	, oldForcedDirection(forcedDirection)
 	, recordedForcedDirection(forcedDirection)
+	, counter(0)
+	, oldCameraRotationOffset(0.f)
+	, predictedCameraDelta(0.f)
 {
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
@@ -36,7 +39,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float theta = 225.f;
 	float cameraRotationOffset = 0.f;
 
-	float elasticForce = 1.f; // Lower = more resistance
+	float elasticForce = 0.1f; // Lower = more resistance
 
 	float vehicleSpeed = 0;
 	float vehicleTurn = 0;
@@ -49,7 +52,12 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		vehicleSpeed = physics->mVehiclePlayer1->computeForwardSpeed();
 		vehicleTurn = physics->mVehiclePlayer1->computeSidewaysSpeed();
 
-		cameraRotationOffset = vehicleSpeed * vehicleTurn;
+		if (vehicleSpeed > 20)
+		{
+			vehicleSpeed = 20;
+		}
+
+		cameraRotationOffset = vehicleSpeed * vehicleTurn * 2;
 	}
 
 	if (vehicleSpeed > 0)
@@ -61,66 +69,76 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float stopDegrees = 0;
 	if (physics != nullptr)
 	{
-		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90);
-		if (physics->getViewDirectionalInfluence() < -0.001)
+		stopDegrees = abs(physics->getViewDirectionalInfluence() * 90.0);
+		if (physics->getViewDirectionalInfluence() < 0)
 		{
 			float stepSize = 0;
-			if (forcedDirection < 0)
+			if (forcedDirection < stopDegrees)
 			{
-				stepSize = -(1 / (5 * 2.f)) + 1;
+				if (forcedDirection < 0)
+				{
+					stepSize = -(1 / (5 * 2.f)) + 1;
+				}
+				else
+				{
+					float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+					functionStep = elasticForce - functionStep;
+					stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				}
+				if (forcedDirection + stepSize < stopDegrees)
+				{
+					forcedDirection += stepSize;
+				}
 			}
 			else
 			{
 				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
-				functionStep = elasticForce - functionStep;
+				functionStep -= elasticForce;
 				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
-			}
-			if (forcedDirection < stopDegrees)
-			{
-				forcedDirection += stepSize;
-			}
-			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
-			{
-				forcedDirection = oldForcedDirection;
-			}
-			else
-			{
-				oldForcedDirection = forcedDirection;
+				if (forcedDirection - stepSize > stopDegrees)
+				{
+					forcedDirection -= stepSize;
+				}
 			}
 			recordedForcedDirection = forcedDirection;
 		}
-		else if (physics->getViewDirectionalInfluence() > 0.001)
+		else if (physics->getViewDirectionalInfluence() > 0)
 		{
 			float stepSize = 0;
-			if (forcedDirection > 0)
+			if (abs(forcedDirection) < stopDegrees)
 			{
-				stepSize = -(1 / (5 * 2.f)) + 1;
+				if (forcedDirection > 0)
+				{
+					stepSize = -(1 / (5 * 2.f)) + 1;
+				}
+				else
+				{
+					float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
+					functionStep = elasticForce - functionStep;
+					stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				}
+				if (forcedDirection > -stopDegrees)
+				{
+					forcedDirection -= stepSize;
+				}
 			}
 			else
 			{
 				float functionStep = (elasticForce / stopDegrees) * abs(forcedDirection);
-				functionStep = elasticForce - functionStep;
+				functionStep -= elasticForce;
 				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
-			}
-			if (forcedDirection > -stopDegrees)
-			{
-				forcedDirection -= stepSize;
-			}
-			if (abs(forcedDirection - recordedForcedDirection) > 1.f)
-			{
-				forcedDirection = oldForcedDirection;
-			}
-			else
-			{
-				oldForcedDirection = forcedDirection;
+				if (forcedDirection + stepSize < stopDegrees)
+				{
+					forcedDirection += stepSize;
+				}
 			}
 			recordedForcedDirection = forcedDirection;
 		}
 		else
 		{
-			if (abs(forcedDirection) > 0.01)
+			if (abs(forcedDirection) > 0.001)
 			{
-				float functionStep = (5.f / abs(recordedForcedDirection)) * abs(forcedDirection);
+				float functionStep = (0.3f / abs(recordedForcedDirection)) * abs(forcedDirection);
 				float stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
 				if (forcedDirection > 0)
 				{
@@ -158,7 +176,8 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		0, 1.0f, 0, 0,
 		-sin(glm::radians(theta)), 0, cos(glm::radians(theta)), 0,
 		0, 0, 0, 1.0f);;
-	glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
+	//glm::vec4 positionFromVehicle = rotation45 * playerTransform->rotationMat * glm::vec4(1.0);
+	glm::vec4 positionFromVehicle = rotation45 * playerTransform->worldRotationMat * glm::vec4(1.0);
 	float xChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.x;
 	float zChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.z;
 
@@ -173,8 +192,9 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 
 void Camera::updateCameraVectors(Transform* playerTransform)
 {
+	/*
 	// Calculate new front vector using Euler angles
-	glm::vec3 front;
+	glm::vec3 front = playerTransform->heading;
 	front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
 	front.y = sin(glm::radians(PITCH));
 	front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
@@ -183,6 +203,7 @@ void Camera::updateCameraVectors(Transform* playerTransform)
 	// Calculate new right and up vectors using cross product
 	this->right = glm::normalize(glm::cross(front, worldUp));
 	this->up = glm::normalize(glm::cross(right, front));
+	*/
 }
 
 void Camera::initPhysics(PhysicsSystem* physicsSystem)

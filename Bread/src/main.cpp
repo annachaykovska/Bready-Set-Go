@@ -24,8 +24,12 @@ int main()
 	// Initialize GLFW library
 	glfwInit();
 
+	// Set window size
+	g_systems.width = 800;
+	g_systems.height = 600;
+
 	// Create viewport window
-	Window window(800, 600, "Bready Set Go!!!");
+	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	// ImGui profiler for debugging
@@ -48,16 +52,13 @@ int main()
 	Entity* tomato = g_scene.getEntity("tomato");
 	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* test = g_scene.getEntity("test");
 
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE SYSTEMS
 	//-----------------------------------------------------------------------------------
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
-	player1->vehicle = physics.mVehiclePlayer1; // Don't think this is needed?
-	player2->vehicle = physics.mVehiclePlayer2; // Don't think this is needed?
-	player3->vehicle = physics.mVehiclePlayer3; // Don't think this is needed?
-	player4->vehicle = physics.mVehiclePlayer4; // Don't think this is needed?
 
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
@@ -78,7 +79,7 @@ int main()
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i++)
 		transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
@@ -91,52 +92,24 @@ int main()
 	tomato->attachComponent(&transforms[6], "transform");
 	dough->attachComponent(&transforms[7], "transform");
 	countertop->attachComponent(&transforms[8], "transform");
+	test->attachComponent(&transforms[9], "transform");
 
 	// Initialize transform components
-	Transform* player1Transform = player1->getTransform();
-	player1Transform->position = glm::vec3(-10, 2.3f, 3);
-	player1Transform->rotation = glm::vec3(0, 0, 0);
-	player1Transform->scale = glm::vec3(1, 1, 1);
-
-	Transform* player2Transform = player2->getTransform();
-	player2Transform->position = glm::vec3(100, 2.3f, 0);
-	player2Transform->rotation = glm::vec3(0, 0, 0);
-	player2Transform->scale = glm::vec3(1, 1, 1);
-
-	Transform* player3Transform = player3->getTransform();
-	player3Transform->position = glm::vec3(-100, 2.3f, 0);
-	player3Transform->rotation = glm::vec3(0, 0, 0);
-	player3Transform->scale = glm::vec3(1, 1, 1);
-
-	Transform* player4Transform = player4->getTransform();
-	player4Transform->position = glm::vec3(0, 2.3f, -100);
-	player4Transform->rotation = glm::vec3(0, 0, 0);
-	player4Transform->scale = glm::vec3(1, 1, 1);
-
 	Transform* cheeseTransform = cheese->getTransform();
-	cheeseTransform->position = glm::vec3(20, 5, 20);
-	cheeseTransform->rotation = glm::vec3(0, 0, 0);
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* sausageTransform = sausage->getTransform();
-	sausageTransform->position = glm::vec3(-20, 5, 20);
-	sausageTransform->rotation = glm::vec3(0, 0, 0);
 	sausageTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* tomatoTransform = tomato->getTransform();
-	tomatoTransform->position = glm::vec3(20, 5, -20);
-	tomatoTransform->rotation = glm::vec3(0, 0, 0);
 	tomatoTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* doughTransform = dough->getTransform();
-	doughTransform->position = glm::vec3(-20, 5, -20);
-	doughTransform->rotation = glm::vec3(0, 0, 0);
 	doughTransform->scale = glm::vec3(30, 30, 30);
 
-	Transform* counterTransform = countertop->getTransform();
-	counterTransform->position = glm::vec3(0, 0, 0);
-	counterTransform->rotation = glm::vec3(0, 0, 0);
-	counterTransform->scale = glm::vec3(1, 1, 1);
+	Transform* testTransform = test->getTransform();
+	testTransform->position = glm::vec3(0, 3, 30);
+	testTransform->scale = glm::vec3(1, 1, 1);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
@@ -169,6 +142,7 @@ int main()
 	{
 		// INPUT
 		glfwPollEvents();
+		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
 
 		// READ CONTROLLERS
 		controllers.checkControllers(); // sets analog/digital
@@ -186,11 +160,12 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
+		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 		ui.update();
-		profiler.newFrame();
+		//profiler.newFrame();
 
 		// Update the ImGUI profiler
-		profiler.update();
+		//profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();

@@ -174,6 +174,24 @@ void Profiler::cameraTransform()
 	}
 }
 
+void Profiler::testTransform()
+{
+	Entity* test = g_scene.getEntity("test");
+	Transform* testTransform = test->getTransform();
+
+	if (ImGui::CollapsingHeader("Test"))
+	{
+		ImGui::InputFloat("test.pos.x", &(testTransform->position.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("test.pos.y", &(testTransform->position.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("test.pos.z", &(testTransform->position.z), 1.f, 10.f, " % .3f");
+
+		ImGui::SliderFloat("test.rot.x", &(testTransform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
+		ImGui::SliderFloat("test.rot.y", &(testTransform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
+		ImGui::SliderFloat("test.rot.z", &(testTransform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
+	}
+
+}
+
 void Profiler::update()
 {
 	begin();
@@ -184,5 +202,6 @@ void Profiler::update()
 	player3Transform();
 	player4Transform();
 	cameraTransform();
+	testTransform();
 	end();
 }

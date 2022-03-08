@@ -1,6 +1,8 @@
 #pragma once
 
+#include "ImageTexture.h"
 #include "Shader.h"
+#include "../Transform.h"
 #include <iostream>
 #include <map>
 #include <ft2build.h>
@@ -27,16 +29,34 @@ public:
 	~UISystem();
 
 	void update();
+	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
 
 private:
 
 
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
+	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY);
+
+	ImageTexture speedometer;
+	ImageTexture needle;
+	ImageTexture miniMap;
+	ImageTexture inventory;
+
+	ImageTexture p1Icon;
+	ImageTexture p2Icon;
+	ImageTexture p3Icon;
+	ImageTexture p4Icon;
+
+	glm::vec2 p1Location;
+	glm::vec2 p2Location;
+	glm::vec2 p3Location;
+	glm::vec2 p4Location;
 
 	//Constants needed to render
 	std::map<char, Character> Characters;
 	glm::mat4 projection;
 	Shader textShader;
+	Shader imageShader;
 	unsigned int VAO, VBO;
 
 	//Gameplay related variables (Probably not needed)
