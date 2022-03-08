@@ -117,7 +117,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent * 3, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
@@ -224,7 +224,6 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer2->getRigidDynamicActor()->userData = vp2;
 	mVehiclePlayer3->getRigidDynamicActor()->userData = vp3;
 	mVehiclePlayer4->getRigidDynamicActor()->userData = vp4;
-
 
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer2->getRigidDynamicActor());
