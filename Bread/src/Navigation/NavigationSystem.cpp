@@ -12,15 +12,17 @@ NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavM
 
 void NavigationSystem::planPath(position target)
 {
-	waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position -glm::vec3(1.f, 2.f, 1.f), target));
+	waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(-90.f, -1.f, 95.f), target));
+	//std::cout << "Planned Path Length" << std::endl;
+	//std::cout << waypointUpdater_.numWaypoints() << std::endl;
 }
 
 void NavigationSystem::update()
 {
 	if (waypointUpdater_.pathComplete())
 	{
-		std::cout << "FINISHED" << std::endl;
-		waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(95.f, 0.f, -95.f), glm::vec3(5.f, 0.f, -20.f)));
+		//std::cout << "Finished Path" << std::endl;
+		waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position, glm::vec3(-90.f, 0.f, 95.f)));
 	}
 
 	steering_.updateSteering(waypointUpdater_.interpolator());

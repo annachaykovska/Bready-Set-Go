@@ -140,16 +140,16 @@ int main()
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
 	NavMesh navMesh;
-	//NavigationSystem p1NavSystem(*player1, physics, navMesh);
+	NavigationSystem p1NavSystem(*player1, physics, navMesh);
 
 	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 	player1->attachComponent(&p1Inv, "inventory");
-	//player1->attachComponent(&p1NavSystem, "navigation");
+	player1->attachComponent(&p1NavSystem, "navigation");
 
 	// TODO: Dynamically pick the target and plan path
-	//p1NavSystem.planPath(glm::vec3(95.f, 0.f, -95.f));
+	p1NavSystem.planPath(glm::vec3(-35.f, 5.f, 55.f));
 	player2->attachComponent(&p2Inv, "inventory");
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
@@ -188,8 +188,8 @@ int main()
 		window.swapBuffer();
 
 		// AI
-		std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
-		//p1NavSystem.update();
+		//std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
+		p1NavSystem.update();
 
 		// AUDIO
 		// update AudioSource	

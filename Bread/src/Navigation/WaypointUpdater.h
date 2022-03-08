@@ -14,6 +14,7 @@ public:
 	void setWaypoints(std::vector<position> waypoints);
 	void updateWaypoints();
 	bool pathComplete();
+	int numWaypoints();
 	position currentWaypoint();
 	position futureWaypoint(int iter);
 	position interpolator();

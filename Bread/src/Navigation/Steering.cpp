@@ -32,15 +32,15 @@ void Steering::updateSteering(position target)
 	{
 		if (upVector.y < 0)
 		{
-			//physics_.mVehicleInputData.setAnalogSteer(1.f);
+			physics_.mVehicleInputDataPlayer1.setAnalogSteer(1.f);
 		}
 		else
 		{
-			//physics_.mVehicleInputData.setAnalogSteer(-1.f);
+			physics_.mVehicleInputDataPlayer1.setAnalogSteer(-1.f);
 		}
 	}
 	else
 	{
-		//physics_.mVehicleInputData.setAnalogSteer(0.f);
+		physics_.mVehicleInputDataPlayer1.setAnalogSteer(0.f);
 	}
 }

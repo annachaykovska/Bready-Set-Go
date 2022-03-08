@@ -157,6 +157,9 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		analogVal = triggerLeft / 255;
 		input->setAnalogBrake(analogVal);
 	}
+
+	// TODO:NAV
+	/*
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
 		float step = thumbLeftDeadZone * 2;
 		if (step > 0.143)
@@ -194,6 +197,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input->setAnalogSteer(analogVal);
 		physics->setTurnDirectionalInfluence(analogVal);
 	}
+	*/
 
 	// KEY RELEASED
 	if (triggerLeft == 0.0 && triggerRight == 0.0) { // accel/reverse/brake
@@ -201,7 +205,10 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input->setAnalogBrake(0.0f);
 	}
 
+	// TODO:NAV
+	/*
 	if (thumbLeftDeadZone == 0.0) { // left/right
 		input->setAnalogSteer(0.0f);
 	}
+	*/
 }

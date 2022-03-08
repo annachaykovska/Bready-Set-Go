@@ -57,6 +57,11 @@ bool WaypointUpdater::pathComplete()
 	return replanFlag_;
 }
 
+int WaypointUpdater::numWaypoints()
+{
+	return waypoints_.size();
+}
+
 position WaypointUpdater::currentWaypoint()
 {
 	return waypoints_.back();
