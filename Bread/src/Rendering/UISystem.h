@@ -46,6 +46,8 @@ private:
 	ImageTexture miniMap;
 	ImageTexture inventory;
 
+	ImageTexture tomato;
+
 	ImageTexture p1Icon;
 	ImageTexture p2Icon;
 	ImageTexture p3Icon;

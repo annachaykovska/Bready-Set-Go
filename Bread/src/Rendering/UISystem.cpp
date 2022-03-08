@@ -2,13 +2,14 @@
 
 extern SystemManager g_systems;
 
-UISystem::UISystem() 
-    : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt") 
+UISystem::UISystem()
+    : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
+    , tomato("resources/textures/tomato.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
     , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
@@ -111,39 +112,62 @@ UISystem::~UISystem(){
 }
 
 void UISystem::update() {
-    renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    //renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     float height, width;
 
+    // Player 1 UI (eventually abstract to a draw player UI method)
+    // Drawing speedometer
     height = speedometer.height;
     width = speedometer.width;
     renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f);
 
     height = needle.height;
     width = needle.width;
-    
     renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
         lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f));
 
-    //height = miniMap.height;
-    //width = miniMap.width;
-    //renderImage(imageShader, miniMap, 25.0f, 430.0f, 150.0f * (width / height), 150.0f * (height / width), 0);
+    // Drawing minimap
+    height = miniMap.height;
+    width = miniMap.width;
+    renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0);
 
-    //height = p1Icon.height;
-    //width = p1Icon.width;
-    //renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
-    //height = p2Icon.height;
-    //width = p2Icon.width;
-    //renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
-    //height = p3Icon.height;
-    //width = p3Icon.width;
-    //renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
-    //height = p4Icon.height;
-    //width = p4Icon.width;
-    //renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    height = p1Icon.height;
+    width = p1Icon.width;
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    height = p2Icon.height;
+    width = p2Icon.width;
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    height = p3Icon.height;
+    width = p3Icon.width;
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    height = p4Icon.height;
+    width = p4Icon.width;
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
 
-    //height = inventory.height;
-    //width = inventory.width;
-    //renderImage(imageShader, inventory, 50.0f, 40.0f, 400.0f * (width / height), 80.0f * (height / width), 0);
+    // Drawing Inventory
+    height = inventory.height;
+    width = inventory.width;
+    renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0);
+    if (true) { // Change this to check if the ingredient has been gathered
+        height = tomato.height;
+        width = tomato.width;
+        renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0);
+    }
+    if (true) { // Change this to check if the ingredient has been gathered
+        height = tomato.height;
+        width = tomato.width;
+        renderImage(imageShader, tomato, 60.0f, 290.0f - (1 * 58.f), 70.f, 70.f, 0);
+    }
+    if (true) { // Change this to check if the ingredient has been gathered
+        height = tomato.height;
+        width = tomato.width;
+        renderImage(imageShader, tomato, 60.0f, 290.0f - (2 * 58.f), 70.f, 70.f, 0);
+    }
+    if (true) { // Change this to check if the ingredient has been gathered
+        height = tomato.height;
+        width = tomato.width;
+        renderImage(imageShader, tomato, 60.0f, 290.0f - (3 * 58.f), 70.f, 70.f, 0);
+    }
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
