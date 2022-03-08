@@ -1,7 +1,7 @@
 #version 330
 layout (location = 0) in vec3 aPos;
 
-unifrom mat4 model;
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 

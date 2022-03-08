@@ -9,6 +9,7 @@
 #include "Transform.h"
 #include "Rendering/DebugOverlay.h"
 #include "Rendering/RenderingSystem.h"
+#include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
 #include "Navigation/NavMesh.h"
 #include "Navigation/NavigationSystem.h"
@@ -27,8 +28,12 @@ int main()
 	// Initialize GLFW library
 	glfwInit();
 
+	// Set window size
+	g_systems.width = 800;
+	g_systems.height = 600;
+
 	// Create viewport window
-	Window window(800, 600, "Bready Set Go!!!");
+	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	// ImGui profiler for debugging
@@ -41,7 +46,7 @@ int main()
 	// This happens all at once to avoid dangling pointers in the future
 	g_scene.createEntities();
 
-	// Get references to Entities for easy use and set vehicle physx objects
+	// Get references to Entities for easy use
 	Entity* player1 = g_scene.getEntity("player1");
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
@@ -51,6 +56,7 @@ int main()
 	Entity* tomato = g_scene.getEntity("tomato");
 	Entity* dough = g_scene.getEntity("dough");
 	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* test = g_scene.getEntity("test");
 	Entity* demoObstacle = g_scene.getEntity("demoObstacle");
 
 	//-----------------------------------------------------------------------------------
@@ -58,14 +64,18 @@ int main()
 	//-----------------------------------------------------------------------------------
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
-	player1->vehicle = physics.mVehiclePlayer1; // Don't think this is needed?
 
 	DebugOverlay debugOverlay;
 	RenderingSystem renderer(debugOverlay);
 	g_systems.render = &renderer;
+	g_systems.physics->initialize(); // Needs to happen after renderer loads the models
 
 	AudioSystem audio;
 	g_systems.audio = &audio;
+
+	//TODO put UI system here
+	UISystem ui;
+	g_systems.ui = &ui;
 
 	g_scene.init(&physics);
 
@@ -88,6 +98,7 @@ int main()
 	tomato->attachComponent(&transforms[6], "transform");
 	dough->attachComponent(&transforms[7], "transform");
 	countertop->attachComponent(&transforms[8], "transform");
+	test->attachComponent(&transforms[9], "transform");
 	demoObstacle->attachComponent(&transforms[9], "transform");
 
 	// Initialize transform components
@@ -106,29 +117,16 @@ int main()
 	player3Transform->rotation = glm::vec3(0, 0, 0);
 	player3Transform->scale = glm::vec3(1, 1, 1);
 
-	Transform* player4Transform = player4->getTransform();
-	player4Transform->position = glm::vec3(0, 2.3f, -100);
-	player4Transform->rotation = glm::vec3(0, 0, 0);
-	player4Transform->scale = glm::vec3(1, 1, 1);
-
 	Transform* cheeseTransform = cheese->getTransform();
-	cheeseTransform->position = glm::vec3(20, 5, 20);
-	cheeseTransform->rotation = glm::vec3(0, 0, 0);
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* sausageTransform = sausage->getTransform();
-	sausageTransform->position = glm::vec3(-20, 5, 20);
-	sausageTransform->rotation = glm::vec3(0, 0, 0);
 	sausageTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* tomatoTransform = tomato->getTransform();
-	tomatoTransform->position = glm::vec3(20, 5, -20);
-	tomatoTransform->rotation = glm::vec3(0, 0, 0);
 	tomatoTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* doughTransform = dough->getTransform();
-	doughTransform->position = glm::vec3(-20, 5, -20);
-	doughTransform->rotation = glm::vec3(0, 0, 0);
 	doughTransform->scale = glm::vec3(30, 30, 30);
 
 	Transform* counterTransform = countertop->getTransform();
@@ -140,6 +138,9 @@ int main()
 	demoObstacleTransform->position = glm::vec3(0, 0, 0);
 	demoObstacleTransform->rotation = glm::vec3(0, 0, 0);
 	demoObstacleTransform->scale = glm::vec3(10, 10, 10);
+	Transform* testTransform = test->getTransform();
+	testTransform->position = glm::vec3(0, 3, 30);
+	testTransform->scale = glm::vec3(1, 1, 1);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
@@ -167,6 +168,7 @@ int main()
 
 	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 
+	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 	player1->attachComponent(&p1Inv, "inventory");
 	player1->attachComponent(&p1NavSystem, "navigation");
 
@@ -176,16 +178,23 @@ int main()
 	Shader shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt");
 	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
 	unsigned int texLoc = glGetUniformLocation(shader.getId(), "textured");
+	player2->attachComponent(&p2Inv, "inventory");
+	player3->attachComponent(&p3Inv, "inventory");
+	player4->attachComponent(&p4Inv, "inventory");
 
 	// GAME LOOP
 	while (!window.shouldClose())
 	{
 		// INPUT
 		glfwPollEvents();
+		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
 
 		// READ CONTROLLERS
 		controllers.checkControllers(); // sets analog/digital
 		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(1); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(2); // Getting the input from player 1 controller
+		//controllers.setButtonStateFromController(3); // Getting the input from player 1 controller
 
 		// SIMULATE
 		newTime = glfwGetTime();
@@ -196,6 +205,8 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
+		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+		ui.update();
 		profiler.newFrame();
 
 		// Update the ImGUI profiler

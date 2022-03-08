@@ -41,9 +41,17 @@ private:
 	float lastSpeed;
 
 	float slowDownCounter;
+	int counter;
 
 	float perspective;
 	float cameraPositionOffset;
+	float forcedDirection;
+	float recordedForcedDirection;
+	float oldForcedDirection;
+	float oldCameraRotationOffset;
+
+	float predictedCameraDelta;
+
 	float movementSpeed;
 	float mouseSensitivity;
 	float zoom;

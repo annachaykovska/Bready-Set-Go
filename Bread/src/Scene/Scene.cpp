@@ -22,6 +22,7 @@ void Scene::createEntities()
 
 	// Debug Entities
 	createEntity("navmesh-debug");
+	createEntity("test");
 }
 
 /// <summary>

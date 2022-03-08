@@ -7,23 +7,27 @@
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
 
+#include "../SystemManager.h"
+#include "../Rendering/RenderingSystem.h"
 #include "PhysicsSystem.h"
 #include "CollisionCallback.h"
 #include "../Scene/Scene.h"
 #include "../Transform.h"
 #include "../Scene/Entity.h"
+#include <Windows.h>
 
 using namespace snippetvehicle;
 using namespace physx;
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 CollisionCallback gCollisionCallback;
 
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.2f,
-	5.0f,		0.4f,
+	5.0f,		0.3f,
 	30.0f,		0.5f,
 	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
@@ -74,7 +78,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 500.0f;
+	const PxF32 chassisMass = 400.0f;
 	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
@@ -84,9 +88,9 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 3000.0f;
-	const PxF32 wheelRadius = 0.5f;
-	const PxF32 wheelWidth = 0.4f;
+	const PxF32 wheelMass = 800.0f;
+	const PxF32 wheelRadius = 1.f;
+	const PxF32 wheelWidth = 0.6f;
 	const PxF32 wheelMOI = 2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
@@ -95,7 +99,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
-	vehicleDesc.chassisMOI.y *= 0.5;
+	vehicleDesc.chassisMOI.y *= 0.4;
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -113,17 +117,17 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent * 3, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(10, 2, 10) * halfExtent);
+	PxTransform localTm(PxVec3(10, 2, 10) );
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
 	// Set physx actor name
-	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+	body->setName(name.c_str());
 
 	// Attach the entity to the physx actor
 	void* vp = static_cast<void*>(new std::string(name));
@@ -166,32 +170,92 @@ void PhysicsSystem::initializeActors() {
 	this->mGroundPlane = createDrivablePlane(groundPlaneSimFilterData, mMaterial, mPhysics);
 	mScene->addActor(*mGroundPlane);
 
+	PxShape* kitchenShape = mPhysics->createShape(kitchenGeometry, *mMaterial, true);
+
+	// Add filter data for ground
+	PxFilterData kitchenFilter(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	kitchenShape->setSimulationFilterData(kitchenFilter);
+
+	// Create the kitchen actor (rigid static)
+	PxTransform kitchenTransform(PxVec3(0, 0, 0), PxQuat(PxIdentity));
+	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
+	this->kitchen->attachShape(*kitchenShape);
+
+	// Set physx actor name
+	this->kitchen->setName("countertop");
+
+	// Attach the entity to the physx actor
+	void* kitchenVp = static_cast<void*>(new std::string("countertop"));
+	this->kitchen->userData = kitchenVp;
+
+	// Get the kitchen shape so we can set query and simulation filter data
+	PxShape* shapes[1];
+	this->kitchen->getShapes(shapes, 1);
+
+	//Set the query filter data of the kitchen so that the vehicle raycasts can hit the ground.
+	PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
+	shapes[0]->setQueryFilterData(qryFilterData);
+
+	//Set the simulation filter data of the kitchen so that it collides with the chassis of a vehicle but not the wheels.
+	shapes[0]->setSimulationFilterData(kitchenFilter);
+
+	// Add the kitchen to the scene
+	mScene->addActor(*(this->kitchen));
+
 	// PLAYERS ---------------------------------------------------------------------------------------------------------------------
 	//Create a vehicle that will drive on the plane.
-	// PLAYER 1
 	VehicleDesc vehicleDesc = initVehicleDesc(this->mMaterial);
 	mVehiclePlayer1 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	mVehiclePlayer2 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
+	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
 	PxVehicleEngineData engine;
-	engine.mPeakTorque = 10000.0f;
+	engine.mPeakTorque = 5000.0f;
 	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
 
 	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransform);
+	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
+	PxTransform startTransformPlayer1(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer2(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
+	PxTransform startTransformPlayer4(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
+	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+	mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+	mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
 
 	// Set physx actor name
-	mVehiclePlayer1->getRigidDynamicActor()->setName("player1"); // TODO one or both of these are not working correctly?
-	
+	mVehiclePlayer1->getRigidDynamicActor()->setName("player1");
+	mVehiclePlayer2->getRigidDynamicActor()->setName("player2");
+	mVehiclePlayer3->getRigidDynamicActor()->setName("player3");
+	mVehiclePlayer4->getRigidDynamicActor()->setName("player4");
+
 	// Attach the entity to the physx actor
 	Entity* player1 = g_scene.getEntity("player1");
-	void* vp = static_cast<void*>(new std::string("player1"));
-	mVehiclePlayer1->getRigidDynamicActor()->userData = vp;
+	Entity* player2 = g_scene.getEntity("player2");
+	Entity* player3 = g_scene.getEntity("player3");
+	Entity* player4 = g_scene.getEntity("player4");
+
+	void* vp1 = static_cast<void*>(new std::string("player1"));
+	void* vp2 = static_cast<void*>(new std::string("player2"));
+	void* vp3 = static_cast<void*>(new std::string("player3"));
+	void* vp4 = static_cast<void*>(new std::string("player4"));
+
+	mVehiclePlayer1->getRigidDynamicActor()->userData = vp1;
+	mVehiclePlayer2->getRigidDynamicActor()->userData = vp2;
+	mVehiclePlayer3->getRigidDynamicActor()->userData = vp3;
+	mVehiclePlayer4->getRigidDynamicActor()->userData = vp4;
 
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
+	mScene->addActor(*mVehiclePlayer2->getRigidDynamicActor());
+	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
+	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
-	
 	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
@@ -217,8 +281,6 @@ void PhysicsSystem::initializeActors() {
 
 PhysicsSystem::PhysicsSystem()
 {
-	this->mCooking = NULL;
-
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 	if (!mFoundation) { std::cout << "PxCreateFoundation failed!" << std::endl; assert(mFoundation); }
@@ -238,9 +300,9 @@ PhysicsSystem::PhysicsSystem()
 
 	// Physx scene
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, -30.f, 0.0f);
 	sceneDesc.cpuDispatcher = this->mDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader
+	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader?
 	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
 	this->mScene = mPhysics->createScene(sceneDesc);
 
@@ -249,6 +311,13 @@ PhysicsSystem::PhysicsSystem()
 
 	// Cooking
 	this->mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
+	if (!this->mCooking) std::cout << "PxCreateCooking failed!\n";
+
+	// Triangle Mesh data initialization for cooking
+	this->kitchenVerts = new std::vector<physx::PxVec3>();
+	this->kitchenIndices = new std::vector<physx::PxU32>;
+	kitchenVerts->reserve(40000);
+	kitchenIndices->reserve(40000);
 
 	// Transmit scene data to PVD
 	PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();
@@ -266,16 +335,68 @@ PhysicsSystem::PhysicsSystem()
 	//Create the friction table for each combination of tire and surface type.
 	this->mFrictionPairs = createFrictionPairs(mMaterial);
 
+	// Initialize time tracking for updates
+	this->mAccumulator = 0;
+}
+
+void PhysicsSystem::initialize()
+{
+	// Create the kitchen environment collision mesh
+	cookKitchen();
+
 	//Set all of the ground/player/object actors
 	initializeActors();
 
 	//Set the vehicle to rest in first gear.
 	//Set the vehicle to use auto-gears.
 	mVehiclePlayer1->setToRestState();
+	mVehiclePlayer2->setToRestState();
+	mVehiclePlayer3->setToRestState();
+	mVehiclePlayer4->setToRestState();
 	mVehiclePlayer1->mDriveDynData.setUseAutoGears(true);
+	mVehiclePlayer2->mDriveDynData.setUseAutoGears(true);
+	mVehiclePlayer3->mDriveDynData.setUseAutoGears(true);
+	mVehiclePlayer4->mDriveDynData.setUseAutoGears(true);
 	mVehiclePlayer1->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	
+	mVehiclePlayer2->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	mVehiclePlayer3->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	mVehiclePlayer4->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	//mVehicleInputData.setAnalogBrake(1.0f);
+
+	viewDirectionalInfluence = 0.f;
+	turnDirectionalInfluence = 0.f;
+}
+
+// Cooking mesh was creating a read access violation seemingly randomly, it appears to
+// be due to vertex and index data going out of scope before it was copied correctly
+// and read into the triangle mesh. See for more details:
+// https://stackoverflow.com/questions/49268620/issues-creating-meshes-in-nvidia-physx
+void PhysicsSystem::cookKitchen()
+{
+	Model* kitchenModel = g_systems.render->getKitchenModel();
+
+	kitchenModel->physicsVerts(kitchenVerts);
+	kitchenModel->physicsIndices(kitchenIndices);
+
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.setToDefault();
+
+	meshDesc.points.count = kitchenVerts->size(); // PxU32
+	meshDesc.points.stride = sizeof(PxVec3);
+	meshDesc.points.data = kitchenVerts->data(); // PxVec3 []
+
+	meshDesc.triangles.count = kitchenIndices->size() / 3; // PxU32
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+	meshDesc.triangles.data = kitchenIndices->data(); // PxU32 []
+
+	PxDefaultMemoryOutputStream writeBuffer;
+	PxTriangleMeshCookingResult::Enum result;
+	
+	this->mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
+
+	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+
+	this->kitchenMesh = mPhysics->createTriangleMesh(readBuffer);
 }
 
 // See: https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html
@@ -295,22 +416,37 @@ void PhysicsSystem::setAnalogInputs(bool input) {
 	this->useAnalogInputs = input;
 }
 
-void PhysicsSystem::update(const float timestep)
+void PhysicsSystem::setViewDirectionalInfluence(float value)
 {
-	// Update scene in physics simulation
-	this->mScene->simulate(timestep);
-	this->mScene->fetchResults(true);
+	viewDirectionalInfluence = value;
+}
 
+float PhysicsSystem::getViewDirectionalInfluence()
+{
+	return viewDirectionalInfluence;
+}
+
+void PhysicsSystem::setTurnDirectionalInfluence(float value)
+{
+	turnDirectionalInfluence = value;
+}
+
+float PhysicsSystem::getTurnDirectionalInfluence()
+{
+	return turnDirectionalInfluence;
+}
+
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData &inputData, std::string entityName, const float timestep) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
-		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
 	}
 	else {
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, this->mVehicleInputData, timestep, this->mIsVehicleInAir, *this->mVehiclePlayer1);
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
 	}
-	
+
 	// Raycasts
-	PxVehicleWheels* vehicles[1] = { this->mVehiclePlayer1 };
+	PxVehicleWheels* vehicles[1] = { player };
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
@@ -318,19 +454,49 @@ void PhysicsSystem::update(const float timestep)
 	// Vehicle update
 	const PxVec3 grav = this->mScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, this->mVehiclePlayer1->mWheelsSimData.getNbWheels()} };
+	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, player->mWheelsSimData.getNbWheels()} };
 	PxVehicleUpdates(timestep, grav, *this->mFrictionPairs, 1, vehicles, vehicleQueryResults);
 
 	// Work out if the vehicle is in the air
-	this->mIsVehicleInAir = this->mVehiclePlayer1->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+	if (entityName == "player 1") 
+		this->mIsVehicleInAirPlayer1 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+	else if (entityName == "player2")
+		this->mIsVehicleInAirPlayer2 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+	else if (entityName == "player3")
+		this->mIsVehicleInAirPlayer3 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
+	else if (entityName == "player4")
+		this->mIsVehicleInAirPlayer4 = player->getRigidDynamicActor()->isSleeping() ? false : PxVehicleIsInAir(vehicleQueryResults[0]);
 
-	PxVec3 ang_vel = mVehiclePlayer1->getRigidDynamicActor()->getAngularVelocity();
-	mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(ang_vel.x / 1.1f, ang_vel.y / 1.1f, ang_vel.z / 1.1f));
+	// Set the angular velocity
+	PxVec3 ang_vel = player->getRigidDynamicActor()->getAngularVelocity();
+	player->getRigidDynamicActor()->setAngularVelocity(PxVec3(ang_vel.x / 1.1f, ang_vel.y / 1.1f, ang_vel.z / 1.1f));
 
 	// Set player 1 transform
-	Entity* player1 = g_scene.getEntity("player1");
-	Transform* player1Transform = player1->getTransform();
-	player1Transform->update(this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose());
+	Entity* playerEntity = g_scene.getEntity(entityName);
+	Transform* playerTransform = playerEntity->getTransform();
+	playerTransform->update(player->getRigidDynamicActor()->getGlobalPose());
+}
+
+void PhysicsSystem::update(const float dt)
+{
+	// Only update if more than 1/120th of a second has passed since last update
+	// Making the constant much larger than 1/120th causes a significant jitter
+	float timestep = 1.0f / 120.0f;
+	this->mAccumulator += dt;
+	if (this->mAccumulator < timestep) 
+		return;
+
+	this->mAccumulator -= timestep;
+
+	// Update scene in physics simulation
+	this->mScene->simulate(timestep);
+	this->mScene->fetchResults(true);
+
+	// Update the players
+	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep);
+	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
+	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
+	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
 
 	// Update the food transforms
 	updateFoodTransforms();
@@ -343,9 +509,6 @@ void PhysicsSystem::update(const float timestep)
 	physx::PxTransform groundTransform = shapes[0]->getLocalPose();
 	groundTransform.p.y -= 5; // lower the ground to not clip through the surface? slightly??
 	countertopTransform->update(groundTransform);
-
-	Transform* demoObstacle = g_scene.getEntity("demoObstacle")->getTransform();
-	demoObstacle->update(this->demoObstacle->getGlobalPose());
 }
 
 void PhysicsSystem::updateFoodTransforms()
@@ -369,9 +532,19 @@ void PhysicsSystem::updateFoodTransforms()
 
 void PhysicsSystem::cleanupPhysics()
 {
+	// Triangle Mesh
+	delete kitchenVerts;
+	delete kitchenIndices;
+
 	// Players
 	this->mVehiclePlayer1->getRigidDynamicActor()->release();
+	this->mVehiclePlayer2->getRigidDynamicActor()->release();
+	this->mVehiclePlayer3->getRigidDynamicActor()->release();
+	this->mVehiclePlayer4->getRigidDynamicActor()->release();
 	this->mVehiclePlayer1->free();
+	this->mVehiclePlayer2->free();
+	this->mVehiclePlayer3->free();
+	this->mVehiclePlayer4->free();
 
 	// Ingredients
 	this->cheese->release();
@@ -381,6 +554,8 @@ void PhysicsSystem::cleanupPhysics()
 
 	// PHYSX
 	PX_RELEASE(this->mGroundPlane);
+	PX_RELEASE(this->kitchen);
+	PX_RELEASE(this->kitchenMesh);
 	PX_RELEASE(this->mBatchQuery);
 	this->mVehicleSceneQueryData->free(this->mDefaultAllocatorCallback);
 	PX_RELEASE(this->mFrictionPairs);
@@ -409,4 +584,29 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 	dynamic->setLinearVelocity(velocity);
 	this->mScene->addActor(*dynamic);
 	return dynamic;
+}
+
+float PhysicsSystem::getPlayerSpeed(int playerNumber)
+{
+	float result;
+
+	switch (playerNumber)
+	{
+		case (1):
+			result = (float) mVehiclePlayer1->computeForwardSpeed();
+			return result;
+			break;
+		case (2):
+			result = (float)mVehiclePlayer2->computeForwardSpeed();
+			return result;
+			break;
+		case (3):
+			result = (float)mVehiclePlayer3->computeForwardSpeed();
+			return result;
+			break;
+		case (4):
+			result = (float)mVehiclePlayer4->computeForwardSpeed();
+			return result;
+			break;
+	}
 }
