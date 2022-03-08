@@ -548,3 +548,28 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 	this->mScene->addActor(*dynamic);
 	return dynamic;
 }
+
+float PhysicsSystem::getPlayerSpeed(int playerNumber)
+{
+	float result;
+
+	switch (playerNumber)
+	{
+		case (1):
+			result = (float) mVehiclePlayer1->computeForwardSpeed();
+			return result;
+			break;
+		case (2):
+			result = (float)mVehiclePlayer2->computeForwardSpeed();
+			return result;
+			break;
+		case (3):
+			result = (float)mVehiclePlayer3->computeForwardSpeed();
+			return result;
+			break;
+		case (4):
+			result = (float)mVehiclePlayer4->computeForwardSpeed();
+			return result;
+			break;
+	}
+}

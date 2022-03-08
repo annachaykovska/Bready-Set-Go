@@ -35,7 +35,7 @@ public:
 	void setTurnDirectionalInfluence(float value);
 	float getTurnDirectionalInfluence();
 
-	void cookieCutter(PxTriangleMesh& meshDesc, PxDefaultMemoryOutputStream& writeBuffer, PxTriangleMeshCookingResult::Enum& result);
+	float getPlayerSpeed(int playerNumber);
 
 	void cleanupPhysics();
 
