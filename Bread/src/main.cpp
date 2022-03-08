@@ -167,9 +167,6 @@ int main()
 		ui.update();
 		profiler.newFrame();
 
-		std::cout << g_systems.physics->getPlayerSpeed(1) << std::endl;
-
-
 		// Update the ImGUI profiler
 		profiler.update();
 
