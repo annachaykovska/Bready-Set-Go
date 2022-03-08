@@ -8,6 +8,7 @@
 #include "Scene/Entity.h"
 #include "Transform.h"
 #include "Rendering/RenderingSystem.h"
+#include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
 #include "Physics/VehicleController.h"
 #include "Inventory.h"
@@ -65,6 +66,10 @@ int main()
 
 	AudioSystem audio;
 	g_systems.audio = &audio;
+
+	//TODO put UI system here
+	UISystem ui;
+	g_systems.ui = &ui;
 
 	g_scene.init(&physics);
 
@@ -155,10 +160,12 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
+		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+		ui.update();
+		//profiler.newFrame();
 
 		// Update the ImGUI profiler
-		profiler.newFrame();
-		profiler.update();
+		//profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();
