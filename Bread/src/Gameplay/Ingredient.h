@@ -9,7 +9,7 @@ public:
 	int quantity;
 	Entity entity;
 
-	Ingredient(int, int, Entity);
+	Ingredient(int, int);
 	Ingredient();
 
 };
