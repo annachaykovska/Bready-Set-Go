@@ -183,7 +183,7 @@ int main()
 
 		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 		ui.update();
-		profiler.newFrame();
+		//profiler.newFrame();
 
 		// TODO: Move this out of main
 		if (p1Inv.cheese)
@@ -204,7 +204,7 @@ int main()
 		}
 
 		// Update the ImGUI profiler
-		profiler.update();
+		//profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();
