@@ -54,6 +54,8 @@ Note: Works only when controller is unplugged
 - **AI:**
   - Navigation mesh set over the map
   - Possible for the AI to win the game
+  - AI handle shortest path planning to static and dynamic targets
+  - AI handles decision making about which ingredient to target next
 - **Rendering:**
   - Improved lighting model
   - Multiple light casters (point and directional lighting)
@@ -61,16 +63,27 @@ Note: Works only when controller is unplugged
 - **Other Changes:**
   - Bugfix for objects flying when window is moved
 
+## Top Priority Upcoming Features:
+- Offscreen indicators + minimap integration with ingredients
+- Finalized kitchen level layout
+- Varied + unique recipes per player
+- Ingredient respawning
+- Recipe delivery area
+- Simple powerups
+- Improved AI path smoothing
+
 ## Known Feature Limitations Identified While Testing (To Be Addressed In Next Milestone):
 - Collision positioning/speed prescedence not implemented to decide who loses/gains ingredients (currently AI always gains).
 - A perfect balance in braking has not yet been reached. The reaction is slightly too slow, and the punchiness of the gear change feels rather abrupt.
 - Only one AI is active to ensure that a win state can always be achieved.
 - Level mesh has cracks and bumps that are unpleasant to drive over.
 - AI can become stuck against a wall if strategically bumped by the player.
+- Camera clips through walls.
 
 ## Known Bugs Identified While Testing (To Be Addressed In Next Milestone):
 - Player collision spams warnings (that don't break things yet).
 - Player collisions do not have an adequate cooldown (full inventory becomes depleted upon collision).
 - Physx bumpiness causes a perceived camera jitter when accelerating.
 - Speedometer goes beyond range when falling.
+- Camera becomes obscured when going down a ramp.
 
