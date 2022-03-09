@@ -194,10 +194,10 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
-	PxTransform startTransformPlayer1(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer2(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer4(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), 20), PxQuat(PxIdentity));
+	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -20), PxQuat(PxIdentity));
+	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10), PxQuat(PxIdentity));
+	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), 20), PxQuat(PxIdentity));
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
 	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
 	mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
@@ -611,6 +611,30 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 		case (4):
 			result = (float)mVehiclePlayer4->computeForwardSpeed();
 			return result;
+			break;
+	}
+}
+
+void PhysicsSystem::respawnPlayer(int playerNumber) {
+	switch (playerNumber)
+	{
+		case (1):
+			mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
+			//mVehiclePlayer1->getRigidDynamicActor()->setLinearVelocity(PxVec3(0.0), false);
+			//mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(0.0), false);
+			mVehiclePlayer1->setToRestState();
+			break;
+		case (2):
+			mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+			mVehiclePlayer2->setToRestState();
+			break;
+		case (3):
+			mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+			mVehiclePlayer3->setToRestState();
+			break;
+		case (4):
+			mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
+			mVehiclePlayer4->setToRestState();
 			break;
 	}
 }

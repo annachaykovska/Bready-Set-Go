@@ -106,6 +106,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 
 	// Other buttons
 	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // UNUSED FOR NOW
+	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 
 	if (X_button_pressed)
 	{
@@ -116,6 +117,11 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input->setAnalogHandbrake(0.0f);
 	}
 
+	// Respawn player
+	if (START_button_pressed)
+	{
+		physics->respawnPlayer(controllerId + 1);
+	}
 	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
 
 	float analogVal;
