@@ -180,8 +180,8 @@ int main()
 		renderer.update();
 
 		// TODO:NAV
-		//ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-		//ui.update();
+		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+		ui.update();
 		profiler.newFrame();
 
 		// Update the ImGUI profiler
@@ -192,7 +192,7 @@ int main()
 
 		// AI
 		//std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
-		p1NavSystem.update();
+		//p1NavSystem.update();
 
 		// AUDIO
 		// update AudioSource	
