@@ -223,12 +223,16 @@ void RenderingSystem::update()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Debug code for rendering the depthMap to viewport
-	//renderDebugShadowMap();
+	if (g_systems.renderDebug)
+		renderDebugShadowMap();
 
 	// 3. Render scene as normal using the generated depth/shadow map
-	this->shader.use();
-	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-	renderScene();
+	if (!g_systems.renderDebug)
+	{
+		this->shader.use();
+		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		renderScene();
+	}
 }
 
 void RenderingSystem::renderDebugShadowMap()

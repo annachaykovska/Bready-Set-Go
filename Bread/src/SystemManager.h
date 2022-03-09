@@ -18,6 +18,7 @@ public:
 		physics = nullptr;
 		render = nullptr;
 		ui = nullptr;
+		renderDebug = false;
 	}
 
 	SystemManager(SystemManager& rhs) = delete; // No copy constructor
@@ -30,6 +31,7 @@ public:
 
 	int height;
 	int width;
+	bool renderDebug;
 
 private:
 };

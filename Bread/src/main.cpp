@@ -103,7 +103,8 @@ int main()
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = 3.1f;
+	counterTrans->position.y = 4.1f;
+	counterTrans->update();
 
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
