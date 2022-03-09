@@ -180,6 +180,13 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		}
 		input->setAnalogBrake(0);
 	}
+	else
+	{
+		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 8)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
+	}
 
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
 		float step = thumbLeftDeadZone * 2;
