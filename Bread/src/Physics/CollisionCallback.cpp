@@ -65,7 +65,10 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         if (entity1->name == "player2" || entity1->name == "player3" || entity1->name == "player4")
         {
             entity0->getAudioSource()->play("thump.wav");
-            printf("%s collided with %s\n", entity0->name.c_str(), entity1->name.c_str());
+            Inventory* opponentInv = (Inventory*)entity1->getComponent("inventory");
+            int ingredient = p1Inv->getRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
+            opponentInv->setIngredientFromId(ingredient);
+            printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
         }
     }
     else if (entity1->name == "player1")
