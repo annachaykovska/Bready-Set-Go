@@ -153,7 +153,6 @@ void RenderingSystem::loadModels()
 	this->models.emplace_back(Model(&groundPath[0])); 
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
-
 	//-----------------------------------------------------------------------------------
 	// Ingredient models
 	//-----------------------------------------------------------------------------------
@@ -279,8 +278,11 @@ void RenderingSystem::renderScene()
 			glUniform1i(texLoc, 0);
 			models[i].draw(this->shader);
 		}
-		else if (i >= 4 && i <= 8) // Use textures images for ingredients
+		else if (i >= 4 && i <= 8) // Use textures images for ingredients and kitchen
 		{
+			if (i == 4)
+				ownerTransform->update();
+
 			glUniform1i(texLoc, 1);
 			models[i].draw(this->shader);
 		}
