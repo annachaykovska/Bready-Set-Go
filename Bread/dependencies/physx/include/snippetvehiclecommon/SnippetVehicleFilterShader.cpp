@@ -37,24 +37,34 @@ namespace snippetvehicle
 using namespace physx;
 
 PxFilterFlags VehicleFilterShader
-(PxFilterObjectAttributes attributes0, PxFilterData filterData0, 
- PxFilterObjectAttributes attributes1, PxFilterData filterData1,
- PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
 	PX_UNUSED(attributes0);
 	PX_UNUSED(attributes1);
 	PX_UNUSED(constantBlock);
 	PX_UNUSED(constantBlockSize);
-
-	if ( (0 == (filterData0.word0 & filterData1.word1)) && (0 == (filterData1.word0 & filterData0.word1)) )
-		return PxFilterFlag::eSUPPRESS;
-
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+
+
+	if ((0 == (filterData0.word0 & filterData1.word1)) && (0 == (filterData1.word0 & filterData0.word1)))
+		if (PxGetFilterObjectType(attributes0) == PxFilterObjectType::eRIGID_DYNAMIC && PxGetFilterObjectType(attributes0) == PxFilterObjectType::eRIGID_DYNAMIC)
+		{
+			pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+			pairFlags |= PxPairFlags(PxU16(filterData0.word2 | filterData1.word2));
+			return PxFilterFlags();
+		}
+		else {
+			return PxFilterFlag::eSUPPRESS;
+		}
+		
+
 	
 	if ((filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_WHEEL) ||
 		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_WHEEL) ||
 		(filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_CHASSIS) ||
-		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_CHASSIS)) 
+		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_CHASSIS))
 	{
 		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 	}

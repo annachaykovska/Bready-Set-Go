@@ -3,6 +3,9 @@
 #include "ImageTexture.h"
 #include "Shader.h"
 #include "../Transform.h"
+#include "../SystemManager.h"
+#include "../Scene/Scene.h"
+#include "../Physics/PhysicsSystem.h"
 #include <iostream>
 #include <map>
 #include <ft2build.h>
@@ -32,13 +35,19 @@ public:
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
 
 private:
+
+
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
-	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY);
+	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
+
+	float lerp(float p, float a, float b);
 
 	ImageTexture speedometer;
 	ImageTexture needle;
 	ImageTexture miniMap;
 	ImageTexture inventory;
+
+	ImageTexture tomato;
 
 	ImageTexture p1Icon;
 	ImageTexture p2Icon;
@@ -50,10 +59,10 @@ private:
 	glm::vec2 p3Location;
 	glm::vec2 p4Location;
 
-	FT_Library ft;
-	FT_Face face;
+	//Constants needed to render
 	std::map<char, Character> Characters;
 	glm::mat4 projection;
+	glm::mat4 imageProjection;
 	Shader textShader;
 	Shader imageShader;
 	unsigned int VAO, VBO;
