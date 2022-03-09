@@ -54,8 +54,12 @@ Note: Works only when controller is unplugged
 - **AI:**
   - Navigation mesh set over the map
   - Possible for the AI to win the game
-  - AI handle shortest path planning to static and dynamic targets
-  - AI handles decision making about which ingredient to target next
+  - Handles shortest path planning to static and dynamic targets
+  - Picks the best available target (closest position)
+  - Recognizes when a player has picked up an ingredient and replans its path to chase the player accordingly
+  - Briefly parks and tries to retarget an ingredient if it is near it, but not being collected (driving circles around the target)
+  - Handles basic navigation to return to the navmesh if the current location falls outside the mesh area
+  - Handles automatic respawn and replan when falling off the level
 - **Rendering:**
   - Improved lighting model
   - Directional light shadow-mapping
@@ -76,7 +80,7 @@ Note: Works only when controller is unplugged
 - Improved AI path smoothing
 
 ## Known Feature Limitations Identified While Testing (To Be Addressed In Next Milestone):
-- Collision positioning/speed prescedence not implemented to decide who loses/gains ingredients (currently AI always gains).
+- Collision positioning/speed prescedence not implemented to decide who loses/gains ingredients (currently AI always gains). Currently the player has to strategically beat the AI to all ingredients without getting bumped. It is possible, but a little bit tricky.
 - A perfect balance in braking has not yet been reached. The reaction is slightly too slow, and the punchiness of the gear change feels rather abrupt.
 - Only one AI is active to ensure that a win state can always be achieved.
 - Level mesh has cracks and bumps that are unpleasant to drive over.
