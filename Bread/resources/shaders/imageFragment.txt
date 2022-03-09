@@ -4,9 +4,11 @@ out vec4 color;
 in vec2 TexCoords;
 
 uniform sampler2D sampler;
+uniform float alpha;
 
 void main() {
 	vec4 d = texture(sampler, TexCoords);
+	d.a = d.a * alpha;
 	if(d.a < 0.01)
         discard; // If the texture is transparent, don't draw the fragment
 	color = d;
