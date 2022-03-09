@@ -186,7 +186,7 @@ void Profiler::testTransform()
 	{
 		ImGui::InputFloat("test.pos.x", &(testTransform->position.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("test.pos.y", &(testTransform->position.y), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("test.pos.z", &(testTransform->position.z), 1.f, 10.f, " % .3f");
+		ImGui::InputFloat("test.pos.z", &(testTransform->position.z), 1.f, 10.f, "%.3f");
 
 		ImGui::SliderFloat("test.rot.x", &(testTransform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
 		ImGui::SliderFloat("test.rot.y", &(testTransform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
@@ -194,6 +194,7 @@ void Profiler::testTransform()
 	}
 }
 
+<<<<<<< HEAD
 void Profiler::shadows()
 {
 	Orthogonal& ort = g_systems.render->ort;
@@ -216,6 +217,20 @@ void Profiler::shadows()
 		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
+=======
+void Profiler::meshScale()
+{
+	Transform* kitchenTrans = g_scene.getEntity("countertop")->getTransform();
+
+	if (ImGui::CollapsingHeader("Mesh Scaler"))
+	{
+		ImGui::InputFloat("kitchen.pos.x", &(kitchenTrans->position.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("kitchen.pos.y", &(kitchenTrans->position.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("kitchen.pos.z", &(kitchenTrans->position.z), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("kitchen.scale.x", &(kitchenTrans->scale.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("kitchen.scale.y", &(kitchenTrans->scale.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("kitchen.scale.z", &(kitchenTrans->scale.z), 1.f, 10.f, "%.3f");
+>>>>>>> main
 
 	}
 }
@@ -231,6 +246,10 @@ void Profiler::update()
 	player4Transform();
 	cameraTransform();
 	testTransform();
+<<<<<<< HEAD
 	shadows();
+=======
+	meshScale();
+>>>>>>> main
 	end();
 }

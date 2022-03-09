@@ -18,6 +18,7 @@ public:
 	void player4Transform();
 	void cameraTransform();
 	void testTransform();
+	void meshScale();
 	void update();
 	void shadows();
 

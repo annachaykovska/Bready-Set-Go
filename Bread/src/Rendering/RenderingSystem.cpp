@@ -211,8 +211,134 @@ void RenderingSystem::update()
 	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	lightSpaceMatrix = lightProjection * lightView;
 
+<<<<<<< HEAD
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+=======
+		glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
+
+	// Bind to FBO to render scene to texture
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glEnable(GL_DEPTH_TEST);
+
+	// Clear frame
+	glClearColor(0.6784f, 0.8471f, 0.902f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	// Stencil buffer
+	glStencilMask(0x00); // Turn off writing to stencil buffer
+
+	// Declare shader to use
+	shader.use();
+
+	// Update camera
+	Transform* p1Transform = g_scene.getEntity("player1")->getTransform();
+	g_scene.camera.updateCameraVectors(p1Transform);
+	setupCameras(p1Transform);
+
+	// Turn off textures - temporary
+	glUniform1i(this->texLoc, 0);
+	
+	// Iterate through all the models in the scene and render them at their new transforms
+	for (int i = 0; i < models.size(); i++)
+	{
+		Transform* ownerTransform = models[i].owner->getTransform();
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		if (i == 4)
+			ownerTransform->update();
+
+		if (i <= 4)
+		{
+			glUniform1i(texLoc, 0);
+			models[i].draw(this->shader);
+		}
+		else if (i > 4 && i <= 8) // Use textures images for ingredients
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(this->shader);
+		}
+		else if (i > 8)
+		{
+			// DRAW LIGHT BALL
+			
+			// Stencil buffer
+			glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass stencil test, ref value, AND stencil buffer with 1
+			glStencilMask(0xFF); // Allow writing to stencil buffer
+
+			lightShader.use();
+
+			glBindVertexArray(models[i].meshes[0].VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+			// Load the indice data into the EBO
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].indices.size() * sizeof(unsigned int), &models[i].meshes[0].indices[0], GL_STATIC_DRAW);
+
+			// Rendering uniforms
+			unsigned int modelLoc = glGetUniformLocation(this->lightShader.getId(), "model");
+			unsigned int viewLoc = glGetUniformLocation(this->lightShader.getId(), "view");
+			unsigned int projLoc = glGetUniformLocation(this->lightShader.getId(), "projection");
+
+			Transform* t = g_scene.getEntity("test")->getTransform();
+			ownerTransform->update();
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+			glm::mat4 view = g_scene.camera.getViewMatrix(p1Transform);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+			glm::mat4 proj = glm::mat4(1.0f);
+			proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
+			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+			
+			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
+
+			// DRAW OUTLINE FOR LIGHT BALL
+
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // Pass if not equal to 1, AND stencil buffer with 1
+			glStencilMask(0x00); //	Sets passing 
+			glDisable(GL_DEPTH_TEST);
+			
+			borderShader.use();
+			
+			glBindVertexArray(models[i].meshes[0].VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+			modelLoc = glGetUniformLocation(this->borderShader.getId(), "model");
+			viewLoc = glGetUniformLocation(this->borderShader.getId(), "view");
+			projLoc = glGetUniformLocation(this->borderShader.getId(), "projection");
+
+			t = g_scene.getEntity("test")->getTransform();
+			t->scale = glm::vec3(1.2f);
+			ownerTransform->update();
+
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+			view = g_scene.camera.getViewMatrix(p1Transform);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+			proj = glm::mat4(1.0f);
+			proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
+			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+			
+			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
+
+			glStencilMask(0xFF);
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glEnable(GL_DEPTH_TEST);
+
+			t->scale = glm::vec3(1.0f);
+
+			glBindVertexArray(0);
+		}
+	}
+>>>>>>> main
 
 	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);

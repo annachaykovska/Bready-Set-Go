@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -7,6 +8,8 @@
 #include <glfw/glfw3.h>
 #include <glm/glm.hpp>
 
+=======
+>>>>>>> main
 #include "Shader.h"
 
 void Shader::use() { glUseProgram(shaderProgram); }

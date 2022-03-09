@@ -27,7 +27,7 @@ CollisionCallback gCollisionCallback;
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.2f,
-	5.0f,		0.4f,
+	5.0f,		0.3f,
 	30.0f,		0.5f,
 	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
@@ -78,7 +78,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 500.0f;
+	const PxF32 chassisMass = 400.0f;
 	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
@@ -88,9 +88,9 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 3000.0f;
-	const PxF32 wheelRadius = 0.5f;
-	const PxF32 wheelWidth = 0.4f;
+	const PxF32 wheelMass = 800.0f;
+	const PxF32 wheelRadius = 1.f;
+	const PxF32 wheelWidth = 0.6f;
 	const PxF32 wheelMOI = 2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
@@ -99,7 +99,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
-	vehicleDesc.chassisMOI.y *= 0.5;
+	vehicleDesc.chassisMOI.y *= 0.4;
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -117,7 +117,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent * 3, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
@@ -187,7 +187,7 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
 	PxVehicleEngineData engine;
-	engine.mPeakTorque = 10000.0f;
+	engine.mPeakTorque = 5000.0f;
 	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
 
 	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
@@ -224,7 +224,6 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer2->getRigidDynamicActor()->userData = vp2;
 	mVehiclePlayer3->getRigidDynamicActor()->userData = vp3;
 	mVehiclePlayer4->getRigidDynamicActor()->userData = vp4;
-
 
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer2->getRigidDynamicActor());
@@ -272,7 +271,7 @@ PhysicsSystem::PhysicsSystem()
 
 	// Physx scene
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, -30.f, 0.0f);
 	sceneDesc.cpuDispatcher = this->mDispatcher;
 	sceneDesc.filterShader = VehicleFilterShader; // TODO Make our own filter shader?
 	sceneDesc.simulationEventCallback = &gCollisionCallback; // Need to put this before createScene()
@@ -336,6 +335,7 @@ void PhysicsSystem::initialize()
 	//mVehicleInputData.setAnalogBrake(1.0f);
 
 	viewDirectionalInfluence = 0.f;
+	turnDirectionalInfluence = 0.f;
 }
 
 // Cooking mesh was creating a read access violation seemingly randomly, it appears to
@@ -395,6 +395,16 @@ void PhysicsSystem::setViewDirectionalInfluence(float value)
 float PhysicsSystem::getViewDirectionalInfluence()
 {
 	return viewDirectionalInfluence;
+}
+
+void PhysicsSystem::setTurnDirectionalInfluence(float value)
+{
+	turnDirectionalInfluence = value;
+}
+
+float PhysicsSystem::getTurnDirectionalInfluence()
+{
+	return turnDirectionalInfluence;
 }
 
 void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData &inputData, std::string entityName, const float timestep) {
@@ -536,4 +546,29 @@ PxRigidDynamic* PhysicsSystem::createDynamic(const PxTransform& t, const PxGeome
 	dynamic->setLinearVelocity(velocity);
 	this->mScene->addActor(*dynamic);
 	return dynamic;
+}
+
+float PhysicsSystem::getPlayerSpeed(int playerNumber)
+{
+	float result;
+
+	switch (playerNumber)
+	{
+		case (1):
+			result = (float) mVehiclePlayer1->computeForwardSpeed();
+			return result;
+			break;
+		case (2):
+			result = (float)mVehiclePlayer2->computeForwardSpeed();
+			return result;
+			break;
+		case (3):
+			result = (float)mVehiclePlayer3->computeForwardSpeed();
+			return result;
+			break;
+		case (4):
+			result = (float)mVehiclePlayer4->computeForwardSpeed();
+			return result;
+			break;
+	}
 }
