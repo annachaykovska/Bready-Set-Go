@@ -23,6 +23,8 @@ public:
 	AudioSource* getAudioSource();
 
 	bool removeFlag;
+	float speed;
+	glm::vec3 orientation;
 
 private:
 

@@ -537,6 +537,17 @@ void PhysicsSystem::update(const float dt)
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -100.0)
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
 
+	trans = this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose();
+	g_scene.getEntity("player1")->speed = (float)mVehiclePlayer1->computeForwardSpeed();
+	glm::quat newQuat = glm::quat(trans.q.w, trans.q.x, trans.q.y, trans.q.z);
+	glm::mat4 rotationMat = toMat4(newQuat);
+	g_scene.getEntity("player1")->orientation = rotationMat * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
+	g_scene.getEntity("player2")->speed = (float)mVehiclePlayer2->computeForwardSpeed();
+	g_scene.getEntity("player3")->speed = (float)mVehiclePlayer3->computeForwardSpeed();
+	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
+
+	mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
+	
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
@@ -633,7 +644,7 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 	switch (playerNumber)
 	{
 		case (1):
-			result = (float) mVehiclePlayer1->computeForwardSpeed();
+			result = (float)mVehiclePlayer1->computeForwardSpeed();
 			return result;
 			break;
 		case (2):
@@ -647,6 +658,8 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 		case (4):
 			result = (float)mVehiclePlayer4->computeForwardSpeed();
 			return result;
+			break;
+		default:
 			break;
 	}
 }
@@ -671,6 +684,8 @@ void PhysicsSystem::respawnPlayer(int playerNumber) {
 		case (4):
 			mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
 			mVehiclePlayer4->setToRestState();
+			break;
+		default:
 			break;
 	}
 }
