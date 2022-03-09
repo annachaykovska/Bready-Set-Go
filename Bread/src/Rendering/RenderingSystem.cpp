@@ -21,20 +21,20 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->screenHeight = 0;
 
 	// Orthographic projection for shadow map settings
-	this->ort.x = -171.0f;
+	this->ort.x = -162.0f;
 	this->ort.y = 314.0f;
-	this->ort.z = -255.0f;
-	this->ort.w = 196.0f;
+	this->ort.z = -236.0f;
+	this->ort.w = 165.0f;
 	this->ort.nearPlane = 1.0f;
-	this->ort.farPlane = 450.0f;
+	this->ort.farPlane = 600.0f;
 
 	// Directional light position
-	this->lightPos = glm::vec3(0.0f, 210.0f, -125.0f);
+	this->lightPos = glm::vec3(0.0f, 200.0f, -200.0f);
 	this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
 
 	// Shadow map viewport size
-	this->shadowWidth = 1024;
-	this->shadowHeight = 1024;
+	this->shadowWidth = 2048;
+	this->shadowHeight = 2048;
 
 	this->models.reserve(g_scene.count()); // Create space for models
 	loadModels(); // Load model files into the models vector
@@ -68,7 +68,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glGenTextures(1, &this->depthMapTex);
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -85,7 +85,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 
 	// Shader configuration
 	debugShader.use();
-	debugShader.setInt("depthMap", 0);
+	debugShader.setInt("depthMap", 25);
 
 	// Create quad VAO for final default framebuffer image render
 	float quadVerts[] = {
@@ -214,6 +214,8 @@ void RenderingSystem::update()
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
+	g_scene.getEntity("countertop")->getTransform()->update();
+
 	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -225,10 +227,9 @@ void RenderingSystem::update()
 	// Debug code for rendering the depthMap to viewport
 	if (g_systems.renderDebug)
 		renderDebugShadowMap();
-
-	// 3. Render scene as normal using the generated depth/shadow map
-	if (!g_systems.renderDebug)
+	else
 	{
+		// 3. Render scene as normal using the generated depth/shadow map
 		this->shader.use();
 		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		renderScene();
@@ -243,6 +244,7 @@ void RenderingSystem::renderDebugShadowMap()
 	this->depthShader.use();
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
 	renderTexturedQuad();
 }
 
@@ -320,8 +322,6 @@ void RenderingSystem::renderTexturedQuad()
 	// Render scene to viewport by applying depthMap as texture to 2D quad
 	this->debugShader.use();
 	glBindVertexArray(this->quadVAO);
-	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 }

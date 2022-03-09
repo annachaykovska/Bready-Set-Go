@@ -182,11 +182,14 @@ int main()
 		window.clear();
 		renderer.update();
 
-		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-		ui.update();
-		profiler.newFrame();
-
+		if (!g_systems.renderDebug)
+		{
+			ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+			ui.update();
+		}
+		
 		// Update the ImGUI profiler
+		profiler.newFrame();
 		profiler.update();
 
 		// Swap the frame buffers
