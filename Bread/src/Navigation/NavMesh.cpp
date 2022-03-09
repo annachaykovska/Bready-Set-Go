@@ -6,7 +6,7 @@ NavMesh::NavMesh()
 	vert n17, n18, n19, n20, n21, n22, n23, n24, n25, n26, n27, n28, n29, n30, n31, n32;
 	vert n33, n34, n35, n36, n37, n38, n39, n40, n41, n42, n43, n44, n45, n46, n47, n48;
 	vert n49, n50, n51, n52, n53, n54, n55, n56, n57, n58, n59, n60, n61, n62, n63, n64;
-	vert n65, n66, n67, n68, n69, n70, n71, n72, n73, n74, n75, n76;
+	vert n65, n66, n67, n68, n69, n70, n71, n72, n73, n74, n75, n76, n77, n78, n79, n80;
 
 	n1 = vert(140.0f, 5.0f, 210.0f);
 	n2 = vert(140.0f, 5.0f, 170.0f);
@@ -99,6 +99,10 @@ NavMesh::NavMesh()
 	n75 = vert(-220.0f, 5.0f, 120.0f);
 
 	n76 = vert(-240.0f, 5.0f, 90.0f);
+	n77 = vert(36.0f, 25.0f, -85.0f);
+	n78 = vert(60.0f, 25.0f, -85.0f);
+	n79 = vert(50.0f, 45.0f, -134.0f);
+	n80 = vert(25.0f, 45.0f, -134.0f);
 
 	MeshSegment* m1 = new MeshSegment(n1, n2, n4);
 	MeshSegment* m2 = new MeshSegment(n4, n2, n3);
@@ -199,6 +203,12 @@ NavMesh::NavMesh()
 	MeshSegment* m81 = new MeshSegment(n74, n75, n76);
 	MeshSegment* m82 = new MeshSegment(n76, n75, n33);
 	MeshSegment* m83 = new MeshSegment(n76, n33, n34);
+	MeshSegment* m84 = new MeshSegment(n15, n16, n78);
+	MeshSegment* m85 = new MeshSegment(n15, n78, n77);
+
+	MeshSegment* m86 = new MeshSegment(n77, n78, n80);
+	MeshSegment* m87 = new MeshSegment(n80, n78, n79);
+
 
 	m1->id_ = 1;
 	m2->id_ = 2;
@@ -283,6 +293,10 @@ NavMesh::NavMesh()
 	m81->id_ = 81;
 	m82->id_ = 82;
 	m83->id_ = 83;
+	m84->id_ = 84;
+	m85->id_ = 85;
+	m86->id_ = 86;
+	m87->id_ = 87;
 
 	mesh_.push_back(m1);
 	mesh_.push_back(m2);
@@ -367,6 +381,10 @@ NavMesh::NavMesh()
 	mesh_.push_back(m81);
 	mesh_.push_back(m82);
 	mesh_.push_back(m83);
+	mesh_.push_back(m84);
+	mesh_.push_back(m85);
+	mesh_.push_back(m86);
+	mesh_.push_back(m87);
 
 	setupVisualizer();
 	connectMesh();

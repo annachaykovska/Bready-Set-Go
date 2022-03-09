@@ -149,7 +149,8 @@ int main()
 	player1->attachComponent(&p1NavSystem, "navigation");
 
 	// TODO: Dynamically pick the target and plan path
-	p1NavSystem.planPath(glm::vec3(70.f, 5.f, -215.f));
+	//p1NavSystem.planPath(glm::vec3(70.f, 5.f, -215.f));
+	p1NavSystem.planPath(glm::vec3(40.f, 45.f, -125.f));
 	player2->attachComponent(&p2Inv, "inventory");
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");

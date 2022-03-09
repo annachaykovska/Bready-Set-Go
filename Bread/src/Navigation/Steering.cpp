@@ -30,13 +30,18 @@ void Steering::updateSteering(position target)
 
 	if (abs(theta) > TURN_THRESHOLD)
 	{
+		std::cout << theta << std::endl;;
+		if (abs(theta) > PI / 4.0f)
+		{
+			theta = PI / 4.0f;
+		}
 		if (upVector.y < 0)
 		{
-			physics_.mVehicleInputDataPlayer1.setAnalogSteer(1.f);
+			physics_.mVehicleInputDataPlayer1.setAnalogSteer(theta / (PI / 4.0f));
 		}
 		else
 		{
-			physics_.mVehicleInputDataPlayer1.setAnalogSteer(-1.f);
+			physics_.mVehicleInputDataPlayer1.setAnalogSteer(-theta / (PI / 4.0f));
 		}
 	}
 	else
