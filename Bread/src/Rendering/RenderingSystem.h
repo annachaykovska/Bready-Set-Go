@@ -4,6 +4,7 @@
 
 #include "Shader.h"
 #include "Model.h"
+#include "DebugOverlay.h"
 #include "../Transform.h"
 
 struct Orthogonal
@@ -44,6 +45,8 @@ public:
 
 
 private:
+
+	//DebugOverlay& debugOverlay;
 
 	unsigned int modelLoc;
 	unsigned int texLoc;

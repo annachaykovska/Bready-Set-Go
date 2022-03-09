@@ -113,6 +113,71 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
             printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
         }
     }
+
+    if (entity0->name == "player2")
+    {
+        Inventory* p1Inv = (Inventory*)entity0->getComponent("inventory");
+
+        if (entity1->name == "tomato" && p1Inv->tomato == 0)
+        {
+            p1Inv->tomato = 1;
+            entity1->getModel()->visible = false;
+        }
+        if (entity1->name == "cheese" && p1Inv->cheese == 0)
+        {
+            p1Inv->cheese = 1;
+            entity1->getModel()->visible = false;
+        }
+        if (entity1->name == "dough" && p1Inv->dough == 0)
+        {
+            p1Inv->dough = 1;
+            entity1->getModel()->visible = false;
+        }
+        if (entity1->name == "sausage" && p1Inv->sausage == 0) {
+            p1Inv->sausage = 1;
+            entity1->getModel()->visible = false;
+        }
+
+        // OTHER PLAYERS
+        if (entity1->name == "player1" || entity1->name == "player3" || entity1->name == "player4")
+        {
+            //entity0->getAudioSource()->play("thump.wav");
+            printf("%s collided with %s\n", entity0->name.c_str(), entity1->name.c_str());
+        }
+    }
+    else if (entity1->name == "player2")
+    {
+        Inventory* p1Inv = (Inventory*)entity1->getComponent("inventory");
+
+        // FOOD 
+        if (entity0->name == "tomato" && p1Inv->tomato == 0)
+        {
+            p1Inv->tomato = 1;
+            entity0->getModel()->visible = false;
+        }
+        if (entity0->name == "cheese" && p1Inv->cheese == 0)
+        {
+            p1Inv->cheese = 1;
+            entity0->getModel()->visible = false;
+        }
+        if (entity0->name == "dough" && p1Inv->dough == 0)
+        {
+            p1Inv->dough = 1;
+            entity0->getModel()->visible = false;
+        }
+        if (entity0->name == "sausage" && p1Inv->sausage == 0)
+        {
+            p1Inv->sausage = 1;
+            entity0->getModel()->visible = false;
+        }
+
+        // OTHER PLAYERS
+        if (entity0->name == "player1" || entity0->name == "player3" || entity0->name == "player4")
+        {
+            //entity1->getAudioSource()->play("thump.wav");
+            printf("%s collided with %s\n", entity1->name.c_str(), entity0->name.c_str());
+        }
+    }
 }
 
 void CollisionCallback::onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) 

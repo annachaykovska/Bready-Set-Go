@@ -153,6 +153,7 @@ void RenderingSystem::loadModels()
 	this->models.emplace_back(Model(&groundPath[0])); 
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
+
 	//-----------------------------------------------------------------------------------
 	// Ingredient models
 	//-----------------------------------------------------------------------------------

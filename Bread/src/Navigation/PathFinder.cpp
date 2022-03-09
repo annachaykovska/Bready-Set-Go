@@ -3,7 +3,7 @@
 namespace
 {
 	double PI = 3.141592653589;
-	double EPSILON = 0.00001;
+	double EPSILON = 0.001;
 }
 
 PathFinder::PathFinder(NavMesh& navMesh) : navMesh_(navMesh)
@@ -20,45 +20,55 @@ void PathFinder::updateTraversablePathSteps()
 		NavMesh::MeshSegment* segment = navMesh_.getSegments().at(i);
 		if (segment->traversable_)
 		{
-			PathStep* step1 = new PathStep();
-			PathStep* step2 = new PathStep();
-			PathStep* step3 = new PathStep();
+			PathStep* step = new PathStep();
 
-			step1->segment.second = segment;
-			step2->segment.second = segment;
-			step3->segment.second = segment;
+			step->segment.second = segment;
 
-			step1->segment.first = segment->v0_;
-			step2->segment.first = segment->v1_;
-			step3->segment.first = segment->v2_;
+			step->segment.first = segment->meshStep_;
 
-			traversablePathSteps_.push_back(step1);
-			traversablePathSteps_.push_back(step2);
-			traversablePathSteps_.push_back(step3);
+			traversablePathSteps_.push_back(step);
 		}
 	}
 }
 
 NavMesh::MeshSegment* PathFinder::findStartingSegment(position start)
 {
+	start.y = 0;
+	float lowestDistance = 99999999.f;
+	NavMesh::MeshSegment* candidateStart = nullptr;
 	for (int i = 0; i < navMesh_.getSegments().size(); i++)
 	{
+		//std::cout << start.x << ", " << start.y << ", " << start.z << std::endl;
+		//std::cout << navMesh_.getSegments().at(i)->meshStep_->position_.x << ", " << navMesh_.getSegments().at(i)->meshStep_->position_.y << ", " << navMesh_.getSegments().at(i)->meshStep_->position_.z << std::endl;
+		//std::cout << "Distance from " << navMesh_.getSegments().at(i)->id_ << " " << length(start - navMesh_.getSegments().at(i)->meshStep_->position_) << std::endl;
+		if (length(start - navMesh_.getSegments().at(i)->meshStep_->position_) < lowestDistance)
+		{
+			candidateStart = navMesh_.getSegments().at(i);
+			lowestDistance = length(start - navMesh_.getSegments().at(i)->meshStep_->position_);
+		}
+		/*
 		float summedAngle = 0;
 
-		glm::vec3 vectorA = navMesh_.getSegments().at(i)->v0_->position_ - start;
-		glm::vec3 vectorB = navMesh_.getSegments().at(i)->v1_->position_ - start;
-		glm::vec3 vectorC = navMesh_.getSegments().at(i)->v2_->position_ - start;
+		glm::vec3 vectorA = navMesh_.getSegments().at(i)->v0_ - start;
+		glm::vec3 vectorB = navMesh_.getSegments().at(i)->v1_ - start;
+		glm::vec3 vectorC = navMesh_.getSegments().at(i)->v2_ - start;
 
 		summedAngle += acos(dot(vectorA, vectorB) / (length(vectorA) * length(vectorB)));
 		summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));
 		summedAngle += acos(dot(vectorB, vectorC) / (length(vectorB) * length(vectorC)));
 
+		std::cout << abs(summedAngle - 2 * PI) << std::endl;
+
 		if (abs(summedAngle - 2 * PI) < EPSILON)
 		{
+			std::cout << "Good Start" << std::endl;
 			return navMesh_.getSegments().at(i);
 		}
+		*/
 	}
-	return nullptr;
+	//std::cout << "Bad Start" << std::endl;
+	//return nullptr;
+	return candidateStart;
 }
 
 PathStep* PathFinder::lowestFCost()
@@ -99,10 +109,26 @@ int PathFinder::indexOfPathStep(PathStep* step)
 
 bool PathFinder::stepContainsTarget(position target, PathStep* step)
 {
+	float lowestDistance = 99999999.f;
+	NavMesh::MeshSegment* candidateTarget = nullptr;
+	for (int i = 0; i < navMesh_.getSegments().size(); i++)
+	{
+		if (length(target - navMesh_.getSegments().at(i)->meshStep_->position_) < lowestDistance)
+		{
+			candidateTarget = navMesh_.getSegments().at(i);
+			lowestDistance = length(target - navMesh_.getSegments().at(i)->meshStep_->position_);
+		}
+	}
+	if (candidateTarget == step->segment.second)
+	{
+		return true;
+	}
+	return false;
+	/*
 	float summedAngle = 0;
-	glm::vec3 vectorA = step->segment.second->v0_->position_ - target;
-	glm::vec3 vectorB = step->segment.second->v1_->position_ - target;
-	glm::vec3 vectorC = step->segment.second->v2_->position_ - target;
+	glm::vec3 vectorA = step->segment.second->v0_ - target;
+	glm::vec3 vectorB = step->segment.second->v1_ - target;
+	glm::vec3 vectorC = step->segment.second->v2_ - target;
 
 	summedAngle += acos(dot(vectorA, vectorB) / (length(vectorA) * length(vectorB)));
 	summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));
@@ -113,10 +139,12 @@ bool PathFinder::stepContainsTarget(position target, PathStep* step)
 		return true;
 	}
 	return false;
+	*/
 }
 
 std::vector<position> PathFinder::findPath(position start, position end)
 {
+	updateTraversablePathSteps();
 	open_.clear();
 	closed_.clear();
 
@@ -151,6 +179,7 @@ std::vector<position> PathFinder::findPath(position start, position end)
 
 		if (current == nullptr)
 		{
+			std::cout << "Not What we want" << std::endl;
 			printPath(previous);
 			std::vector<position> empty;
 			return empty;
@@ -159,8 +188,7 @@ std::vector<position> PathFinder::findPath(position start, position end)
 		// if current is the target node // path has been found
 		if (stepContainsTarget(end, current))
 		{
-			std::cout << "Done" << std::endl;
-			printPath(current);
+			//printPath(current);
 
 			std::vector<position> finalPath;
 

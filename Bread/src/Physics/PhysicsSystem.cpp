@@ -139,8 +139,31 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	return body;
 }
 
-void PhysicsSystem::initializeActors() 
+PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfExtent, std::string name)
 {
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
+	shape->setSimulationFilterData(cheeseFilter);
+
+	PxTransform localTm(PxVec3(0, 2, 0) * halfExtent);
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	body->attachShape(*shape);
+	PxRigidBodyExt::updateMassAndInertia(*body, 100.f);
+
+	// Set physx actor name
+	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
+
+	// Attach the entity to the physx actor
+	void* vp = static_cast<void*>(new std::string(name));
+	body->userData = vp;
+
+	mScene->addActor(*body);
+	shape->release();
+
+	return body;
+}
+
+void PhysicsSystem::initializeActors() {
 	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
 	// Create shape using the kitchen's mesh
 	PxTriangleMeshGeometry kitchenGeometry = PxTriangleMeshGeometry(kitchenMesh, PxMeshScale());
@@ -194,10 +217,10 @@ void PhysicsSystem::initializeActors()
 	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
-	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), 20), PxQuat(PxIdentity));
-	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -20), PxQuat(PxIdentity));
-	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10), PxQuat(PxIdentity));
-	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), 20), PxQuat(PxIdentity));
+	startTransformPlayer1 = PxTransform(PxVec3(130, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 190), PxQuat(PxIdentity));
+	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
+	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
+	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
 	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
 	mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
@@ -234,19 +257,19 @@ void PhysicsSystem::initializeActors()
 	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
-	PxTransform cheeseTransform(PxVec3(0, 0, 30));
+	PxTransform cheeseTransform(PxVec3(-270, 0, -220));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
 	// SAUSAGE
-	PxTransform sausageTransform(PxVec3(0, 0, -30));
+	PxTransform sausageTransform(PxVec3(-145, 0, 175));
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
-	PxTransform tomatoTransform(PxVec3(30, 0, 0));
+	PxTransform tomatoTransform(PxVec3(95, 0, 170));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH
-	PxTransform doughTransform(PxVec3(-30, 0, 0));
+	PxTransform doughTransform(PxVec3(-150, 0, -8));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 
@@ -496,7 +519,7 @@ void PhysicsSystem::update(const float dt)
 	// Making the constant much larger than 1/120th causes a significant jitter
 	float timestep = 1.0f / 120.0f;
 	this->mAccumulator += dt;
-	if (this->mAccumulator < timestep) 
+	if (this->mAccumulator < timestep)
 		return;
 
 	this->mAccumulator -= timestep;

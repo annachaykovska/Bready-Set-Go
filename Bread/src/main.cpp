@@ -7,11 +7,17 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 #include "Transform.h"
+#include "Rendering/DebugOverlay.h"
 #include "Rendering/RenderingSystem.h"
 #include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
+#include "Navigation/NavMesh.h"
+#include "Navigation/NavigationSystem.h"
 #include "Physics/VehicleController.h"
 #include "Inventory.h"
+#include "DebugSettings.h"
+#include "Navigation/IngredientTracker.h"
+#include "Navigation/AIBrain.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -60,6 +66,7 @@ int main()
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
 
+	//DebugOverlay debugOverlay;
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
 	g_systems.physics->initialize(); // Needs to happen after renderer loads the models
@@ -128,15 +135,25 @@ int main()
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
 
+	// Track Ingredient Locations
+	IngredientTracker ingredientTracker(*cheeseTransform, *tomatoTransform, *doughTransform, *sausageTransform);
+
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
+	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
+
+	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
+	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
+
+	//debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 	player1->attachComponent(&p1Inv, "inventory");
 	player2->attachComponent(&p2Inv, "inventory");
+	player2->attachComponent(&p2NavSystem, "navigation");
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
@@ -163,6 +180,7 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
+
 		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 		ui.update();
 		profiler.newFrame();
@@ -172,6 +190,10 @@ int main()
 
 		// Swap the frame buffers
 		window.swapBuffer();
+
+		// AI
+		//std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
+		p2Brain.update();
 
 		// AUDIO
 		// update AudioSource	

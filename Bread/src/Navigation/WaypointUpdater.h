@@ -9,10 +9,15 @@ typedef glm::vec3 position;
 class WaypointUpdater
 {
 public:
-	WaypointUpdater(Entity& entity, std::vector<position> waypoints);
+	WaypointUpdater(Entity& entity);
 
+	void setWaypoints(std::vector<position> waypoints);
+	void setTarget(position target);
 	void updateWaypoints();
+	bool pathComplete();
+	int numWaypoints();
 	position currentWaypoint();
+	position futureWaypoint(int iter);
 	position interpolator();
 
 private:
@@ -20,4 +25,7 @@ private:
 	std::vector<position> waypoints_;
 	
 	position interpolator_;
+	bool replanFlag_;
+
+	position currentTarget_;
 };
