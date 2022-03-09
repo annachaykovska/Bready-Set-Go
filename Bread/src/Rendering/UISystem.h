@@ -32,6 +32,7 @@ public:
 	~UISystem();
 
 	void update();
+	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
 
 private:
