@@ -20,6 +20,11 @@ void WaypointUpdater::setWaypoints(std::vector<position> waypoints)
 	waypoints_ = waypoints;
 }
 
+void WaypointUpdater::setTarget(position target)
+{
+	waypoints_.insert(waypoints_.begin(), target);
+}
+
 void WaypointUpdater::updateWaypoints()
 {
 	if (waypoints_.size() > 0)

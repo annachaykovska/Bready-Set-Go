@@ -217,10 +217,10 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
-	PxTransform startTransformPlayer1(PxVec3(130, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 190), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer2(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer3(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
-	PxTransform startTransformPlayer4(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	startTransformPlayer1 = PxTransform(PxVec3(130, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 190), PxQuat(PxIdentity));
+	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
+	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
+	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
 	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
 	mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
@@ -265,7 +265,7 @@ void PhysicsSystem::initializeActors() {
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
-	PxTransform tomatoTransform(PxVec3(120, 0, 190));
+	PxTransform tomatoTransform(PxVec3(95, 0, 180));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH

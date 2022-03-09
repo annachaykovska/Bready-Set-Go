@@ -38,9 +38,9 @@ NavMesh::MeshSegment* PathFinder::findStartingSegment(position start)
 	NavMesh::MeshSegment* candidateStart = nullptr;
 	for (int i = 0; i < navMesh_.getSegments().size(); i++)
 	{
-		std::cout << start.x << ", " << start.y << ", " << start.z << std::endl;
-		std::cout << navMesh_.getSegments().at(i)->meshStep_->position_.x << ", " << navMesh_.getSegments().at(i)->meshStep_->position_.y << ", " << navMesh_.getSegments().at(i)->meshStep_->position_.z << std::endl;
-		std::cout << "Distance from " << navMesh_.getSegments().at(i)->id_ << " " << length(start - navMesh_.getSegments().at(i)->meshStep_->position_) << std::endl;
+		//std::cout << start.x << ", " << start.y << ", " << start.z << std::endl;
+		//std::cout << navMesh_.getSegments().at(i)->meshStep_->position_.x << ", " << navMesh_.getSegments().at(i)->meshStep_->position_.y << ", " << navMesh_.getSegments().at(i)->meshStep_->position_.z << std::endl;
+		//std::cout << "Distance from " << navMesh_.getSegments().at(i)->id_ << " " << length(start - navMesh_.getSegments().at(i)->meshStep_->position_) << std::endl;
 		if (length(start - navMesh_.getSegments().at(i)->meshStep_->position_) < lowestDistance)
 		{
 			candidateStart = navMesh_.getSegments().at(i);

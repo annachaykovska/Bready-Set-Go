@@ -12,6 +12,7 @@ public:
 	WaypointUpdater(Entity& entity);
 
 	void setWaypoints(std::vector<position> waypoints);
+	void setTarget(position target);
 	void updateWaypoints();
 	bool pathComplete();
 	int numWaypoints();

@@ -12,6 +12,7 @@ class Steering
 public:
 	Steering(Entity& entity, PhysicsSystem& physics);
 
+	void park();
 	void updateSteering(position target);
 
 private:

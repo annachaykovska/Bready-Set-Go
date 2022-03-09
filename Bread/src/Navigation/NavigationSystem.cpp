@@ -12,19 +12,44 @@ NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavM
 
 void NavigationSystem::planPath(position target)
 {
-	waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(130, 0.f, 190), target));
+	if (vehicle_.getTransform()->position != glm::vec3(0.f, 0.f, 0.f))
+	{
+		waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position, target));
+		waypointUpdater_.setTarget(target);
+	}
 	//std::cout << "Planned Path Length" << std::endl;
 	//std::cout << waypointUpdater_.numWaypoints() << std::endl;
 }
 
 void NavigationSystem::update()
 {
+	if (hasPath())
+	{
+		steering_.updateSteering(waypointUpdater_.interpolator());
+		waypointUpdater_.updateWaypoints();
+	}
+	else
+	{
+		std::cout << "PATH COMPLETE" << std::endl;
+		steering_.park();
+	}
+	if (vehicle_.getTransform()->position.y < -30)
+	{
+		// TODO:NAV
+		physics_.respawnPlayer(1);
+	}
+}
+
+float NavigationSystem::distanceFromVehicle(position target)
+{
+	return length(vehicle_.getTransform()->position - target);
+}
+
+bool NavigationSystem::hasPath()
+{
 	if (waypointUpdater_.pathComplete())
 	{
-		//std::cout << "Finished Path" << std::endl;
-		waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position, glm::vec3(-90.f, 0.f, 95.f)));
+		return false;
 	}
-
-	steering_.updateSteering(waypointUpdater_.interpolator());
-	waypointUpdater_.updateWaypoints();
+	return true;
 }

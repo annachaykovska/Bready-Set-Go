@@ -16,6 +16,8 @@
 #include "Physics/VehicleController.h"
 #include "Inventory.h"
 #include "DebugSettings.h"
+#include "Navigation/IngredientTracker.h"
+#include "Navigation/AIBrain.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -133,6 +135,9 @@ int main()
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
 
+	// Track Ingredient Locations
+	IngredientTracker ingredientTracker(*cheeseTransform, *tomatoTransform, *doughTransform, *sausageTransform);
+
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
 
@@ -140,11 +145,12 @@ int main()
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
 	NavMesh navMesh;
+	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
+
 	NavigationSystem p1NavSystem(*player1, physics, navMesh);
+	AIBrain p1Brain(p1Inv, ingredientTracker, p1NavSystem);
 
 	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
-
-	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 	player1->attachComponent(&p1Inv, "inventory");
 	player1->attachComponent(&p1NavSystem, "navigation");
 
@@ -192,6 +198,7 @@ int main()
 
 		// AI
 		//std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
+		p1Brain.update();
 		//p1NavSystem.update();
 
 		// AUDIO

@@ -16,6 +16,9 @@ public:
 	void planPath(position target);
 	void update();
 
+	float distanceFromVehicle(position target);
+	bool hasPath();
+
 private:
 	PhysicsSystem& physics_;
 	Entity& vehicle_;

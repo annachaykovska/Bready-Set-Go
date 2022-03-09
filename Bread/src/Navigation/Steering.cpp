@@ -12,9 +12,13 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics)
 {
 }
 
+void Steering::park()
+{
+	physics_.mVehiclePlayer1->mWheelsDynData.setToRestState();
+}
+
 void Steering::updateSteering(position target)
 {
-	//std::cout << target.x << ", " << target.y << ", " << target.z << std::endl;
 	glm::vec3 vectorA = target - entity_.getTransform()->position;
 	float distance = length(vectorA);
 	distance /= 20;
@@ -28,9 +32,16 @@ void Steering::updateSteering(position target)
 	float theta = acos(dot(vectorB, vectorA) / (length(vectorA) * length(vectorB)));
 	glm::vec3 upVector = cross(vectorB, vectorA);
 
+	if (physics_.mVehiclePlayer1->computeForwardSpeed() < 22)
+	{
+		physics_.mVehicleInputDataPlayer1.setAnalogAccel(1.f);
+	}
+	else
+	{
+		physics_.mVehicleInputDataPlayer1.setAnalogAccel(0.f);
+	}
 	if (abs(theta) > TURN_THRESHOLD)
 	{
-		std::cout << theta << std::endl;;
 		if (abs(theta) > PI / 4.0f)
 		{
 			theta = PI / 4.0f;

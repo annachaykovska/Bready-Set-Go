@@ -134,6 +134,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	}
 
 	// KEY PRESSED
+	/*
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
 		physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
 		analogVal = triggerLeft / 255;
@@ -193,7 +194,8 @@ void XboxController::setButtonStateFromController(int controllerId) {
 			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
 		}
 	}
-
+	*/
+	/*
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
 		float step = thumbLeftDeadZone * 2;
 		if (step > 0.143)
@@ -241,5 +243,6 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	if (thumbLeftDeadZone == 0.0) { // left/right
 		input->setAnalogSteer(0.0f);
 	}
+	*/
 }
 
