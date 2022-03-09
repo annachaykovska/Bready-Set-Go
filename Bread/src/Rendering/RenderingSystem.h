@@ -22,7 +22,7 @@ class RenderingSystem
 {
 public:
 
-	RenderingSystem(DebugOverlay& debug);
+	RenderingSystem();
 	~RenderingSystem();
 	unsigned int getShaderId();
 	Shader& getShader();
@@ -46,7 +46,7 @@ public:
 
 private:
 
-	DebugOverlay& debugOverlay;
+	//DebugOverlay& debugOverlay;
 
 	unsigned int modelLoc;
 	unsigned int texLoc;
