@@ -152,9 +152,15 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		{
 			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
 		}
-		forwards = true;
-		analogVal = triggerRight / 255;
-		input->setAnalogAccel(analogVal);
+		if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
+		{
+			analogVal = triggerRight / 255;
+			input->setAnalogAccel(analogVal);
+		}
+		else
+		{
+			input->setAnalogAccel(0);
+		}
 		input->setAnalogBrake(0);
 	}
 	else if (triggerLeft > 0.1 && triggerRight == 0.0) { // reverse
@@ -169,10 +175,23 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		{
 			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
 		}
-		forwards = false;
-		analogVal = triggerLeft / 255;
-		input->setAnalogAccel(analogVal);
+		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 20)
+		{
+			analogVal = triggerLeft / 255;
+			input->setAnalogAccel(analogVal);
+		}
+		else
+		{
+			input->setAnalogAccel(0);
+		}
 		input->setAnalogBrake(0);
+	}
+	else
+	{
+		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 8)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
 	}
 
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
