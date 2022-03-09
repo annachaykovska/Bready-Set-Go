@@ -121,6 +121,7 @@ void UISystem::update() {
     // Drawing speedometer
     height = needle.height;
     width = needle.width;
+
     renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
         lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
 
@@ -158,7 +159,7 @@ void UISystem::update() {
     alpha = (p1Inv->tomato) ? opaque : faded;
     height = tomato.height;
     width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0, 1.0);
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0, alpha);
 
     alpha = (p1Inv->cheese) ? opaque : faded;
     height = tomato.height;
