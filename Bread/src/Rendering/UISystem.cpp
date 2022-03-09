@@ -13,6 +13,10 @@ UISystem::UISystem()
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , tomato("resources/textures/tomato.png", GL_NEAREST)
+    , cheese("resources/textures/cheese.png", GL_NEAREST)
+    , sausage("resources/textures/sausage.png", GL_NEAREST)
+    , dough("resources/textures/dough.png", GL_NEAREST)
+    , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
     , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
@@ -159,22 +163,27 @@ void UISystem::update() {
     alpha = (p1Inv->tomato) ? opaque : faded;
     height = tomato.height;
     width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0, alpha);
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 40.f, 40.f, 0, alpha);
 
     alpha = (p1Inv->cheese) ? opaque : faded;
-    height = tomato.height;
-    width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (1 * 58.f), 70.f, 70.f, 0, alpha);
+    height = cheese.height;
+    width = cheese.width;
+    renderImage(imageShader, cheese, 60.0f, 290.0f - (1 * 58.f), 40.f, 40.f, 0, alpha);
     
     alpha = (p1Inv->dough) ? opaque : faded;
-    height = tomato.height;
-    width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (2 * 58.f), 70.f, 70.f, 0, alpha);
+    height = dough.height;
+    width = dough.width;
+    renderImage(imageShader, dough, 60.0f, 290.0f - (2 * 58.f), 40.f, 20.f, 0, alpha);
 
     alpha = (p1Inv->sausage) ? opaque : faded;
-    height = tomato.height;
-    width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (3 * 58.f), 70.f, 70.f, 0, alpha);
+    height = sausage.height;
+    width = sausage.width;
+    renderImage(imageShader, sausage, 60.0f, 290.0f - (3 * 58.f), 40.f, 20.f, 0, alpha);
+
+    alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
+    height = pizza.height;
+    width = pizza.width;
+    renderImage(imageShader, pizza, 60.0f, 375.f, 60.f, 50.f, 0, alpha);
 
     height = inventory.height;
     width = inventory.width;

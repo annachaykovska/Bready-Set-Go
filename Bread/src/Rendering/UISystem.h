@@ -48,6 +48,11 @@ private:
 	ImageTexture inventory;
 
 	ImageTexture tomato;
+	ImageTexture cheese;
+	ImageTexture sausage;
+	ImageTexture dough;
+
+	ImageTexture pizza;
 
 	ImageTexture p1Icon;
 	ImageTexture p2Icon;
