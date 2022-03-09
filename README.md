@@ -58,14 +58,17 @@ Note: Works only when controller is unplugged
   - AI handles decision making about which ingredient to target next
 - **Rendering:**
   - Improved lighting model
-  - Multiple light casters (point and directional lighting)
   - Directional light shadow-mapping
+- **Audio:**
+  - 3D engine noises of other players
+  - Doppler-shifting using player's speed
 - **Other Changes:**
   - Bugfix for objects flying when window is moved
 
 ## Top Priority Upcoming Features:
 - Offscreen indicators + minimap integration with ingredients
-- Finalized kitchen level layout
+- Finalized kitchen level layout with additional obstacles
+- Multiple vehicle models
 - Varied + unique recipes per player
 - Ingredient respawning
 - Recipe delivery area
@@ -81,9 +84,8 @@ Note: Works only when controller is unplugged
 - Camera clips through walls.
 
 ## Known Bugs Identified While Testing (To Be Addressed In Next Milestone):
-- Player collision spams warnings (that don't break things yet).
 - Player collisions do not have an adequate cooldown (full inventory becomes depleted upon collision).
 - Physx bumpiness causes a perceived camera jitter when accelerating.
 - Speedometer goes beyond range when falling.
 - Camera becomes obscured when going down a ramp.
-
+- Rendered position of a vehicle on a ramp appears floating.
