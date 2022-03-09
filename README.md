@@ -72,6 +72,8 @@ Note: Works only when controller is unplugged
 ## Top Priority Upcoming Features:
 - Offscreen indicators + minimap integration with ingredients
 - Finalized kitchen level layout with additional obstacles
+- Intelligent Collision Prescendence
+- 3 AI players (each can win)
 - Multiple vehicle models
 - Varied + unique recipes per player
 - Ingredient respawning
