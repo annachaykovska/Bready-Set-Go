@@ -71,11 +71,18 @@ public:
 
 				break;
 
+			case GLFW_KEY_R:
+				// RESET ALL PLAYERS (since keyboard is a single player mode)
+				physics->respawnPlayer(1);
+				break;
+
 			case GLFW_KEY_SPACE:
 				input->setDigitalBrake(true);
 				//input->setAnalogBrake(1.0f);
 				break;
 			}
+
+
 		}
 
 		// KEY RELEASED

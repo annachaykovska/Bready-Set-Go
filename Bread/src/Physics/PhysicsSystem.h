@@ -36,6 +36,7 @@ public:
 	float getTurnDirectionalInfluence();
 
 	float getPlayerSpeed(int playerNumber);
+	void respawnPlayer(int playerNumber);
 
 	void cleanupPhysics();
 
@@ -76,6 +77,11 @@ private:
 	PxBatchQuery* mBatchQuery;
 	PxVehicleDrivableSurfaceToTireFrictionPairs* mFrictionPairs;
 	PxRigidStatic* mGroundPlane;
+
+	PxTransform startTransformPlayer1;
+	PxTransform startTransformPlayer2;
+	PxTransform startTransformPlayer3;
+	PxTransform startTransformPlayer4;
 
 	bool mIsVehicleInAirPlayer1 = true;
 	bool mIsVehicleInAirPlayer2 = true;
