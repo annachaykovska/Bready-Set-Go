@@ -103,21 +103,25 @@ public:
 		}
 	}
 
-	int getRandomPizzaIngredient(int opponentCheese, int opponentDough, int opponentSausage, int opponentTomato) {
+	int removeRandomPizzaIngredient(int opponentCheese, int opponentDough, int opponentSausage, int opponentTomato) {
 		// TODO add randomizer
 		if (this->cheese == 0 && this->dough == 0 && this->sausage == 0 && this->tomato == 0)
 			return -1;
 		else {
-			if (opponentCheese == 0 && cheese == 1) {
+			if (opponentCheese == 0 && this->cheese == 1) {
+				this->cheese = 0;
 				return 0;
 			}
-			else if (opponentDough == 0 && dough == 1) {
+			else if (opponentDough == 0 && this->dough == 1) {
+				this->dough = 0;
 				return 1;
 			}
-			else if (opponentSausage == 0 && sausage == 1) {
+			else if (opponentSausage == 0 && this->sausage == 1) {
+				this->sausage = 0;
 				return 2;
 			}
-			else if (opponentTomato == 0 && tomato == 1) {
+			else if (opponentTomato == 0 && this->tomato == 1) {
+				this->tomato = 0;
 				return 3;
 			}
 		}
