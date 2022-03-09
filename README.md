@@ -95,3 +95,4 @@ Note: Works only when controller is unplugged
 - Speedometer goes beyond range when falling.
 - Camera becomes obscured when going down a ramp.
 - Rendered position of a vehicle on a ramp appears floating.
+- Some distant objects are not rendered correctly
