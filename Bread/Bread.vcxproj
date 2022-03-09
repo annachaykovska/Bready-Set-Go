@@ -859,14 +859,12 @@
     <ClInclude Include="src\Physics\PhysicsEnums.h" />
     <ClInclude Include="src\Rendering\GLHandles.h" />
     <ClInclude Include="src\Rendering\ImageTexture.h" />
-    <ClInclude Include="src\Rendering\LightSource.h" />
     <ClInclude Include="src\Rendering\Material.h" />
     <ClInclude Include="src\Rendering\RenderingSystem.h" />
     <ClInclude Include="src\Physics\VehicleController.h" />
     <ClInclude Include="src\Rendering\UISystem.h" />
     <ClInclude Include="src\Scene\Component.h" />
     <ClInclude Include="src\Scene\Entity.h" />
-    <ClInclude Include="src\Rendering\GroundModel.h" />
     <ClInclude Include="src\Rendering\Mesh.h" />
     <ClInclude Include="src\Rendering\Model.h" />
     <ClInclude Include="src\Physics\PhysicsSystem.h" />
@@ -1079,6 +1077,10 @@
     <None Include="src\assimp-vc142-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="resources\shaders\debugFragment.txt" />
+    <Text Include="resources\shaders\debugVertex.txt" />
+    <Text Include="resources\shaders\depthFragment.txt" />
+    <Text Include="resources\shaders\depthVertex.txt" />
     <Text Include="resources\shaders\borderFragment.txt" />
     <Text Include="resources\shaders\fragment.txt" />
     <Text Include="resources\shaders\imageFragment.txt" />

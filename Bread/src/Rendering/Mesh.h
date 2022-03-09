@@ -38,12 +38,12 @@ public:
 	void setupMesh();		   // Initialization
 	void setWireframe(bool drawWireframe);
 	void draw(Shader& shader); // Render mesh
+	void drawDepthMap(Shader& shader);
 
 	unsigned int VAO, VBO, EBO; // Rendering data
 
 private:
 
-	
 	bool wireframe = false;
 	//void setupMesh();			// Initialization
 

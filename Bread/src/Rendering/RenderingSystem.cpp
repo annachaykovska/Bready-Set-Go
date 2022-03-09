@@ -5,70 +5,87 @@
 #include "RenderingSystem.h"
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
-#include "GroundModel.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
 
-RenderingSystem::RenderingSystem(DebugOverlay& debug)
-	: shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt")
-	, lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt")
-	, borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt")
-	, simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt")
-	, debugOverlay(debug)
+RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
+									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
+									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
+								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
+									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
+									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt")
 {
+	// Viewport settings
 	this->screenWidth = 0;
 	this->screenHeight = 0;
 
+	// Orthographic projection for shadow map settings
+	this->ort.x = -171.0f;
+	this->ort.y = 314.0f;
+	this->ort.z = -255.0f;
+	this->ort.w = 196.0f;
+	this->ort.nearPlane = 1.0f;
+	this->ort.farPlane = 450.0f;
+
+	// Directional light position
+	this->lightPos = glm::vec3(0.0f, 210.0f, -125.0f);
+	this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
+
+	// Shadow map viewport size
+	this->shadowWidth = 1024;
+	this->shadowHeight = 1024;
+
 	this->models.reserve(g_scene.count()); // Create space for models
+	loadModels(); // Load model files into the models vector
+
+	glEnable(GL_DEPTH_TEST); // Turn on depth testing
+	glDepthFunc(GL_LESS); // Should be default but make it explicit
 
 	// Rendering uniforms
+	shader.use();
 	this->modelLoc = glGetUniformLocation(getShaderId(), "model");
 	this->texLoc = glGetUniformLocation(getShaderId(), "textured");
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
-	glEnable(GL_DEPTH_TEST); // Turn on depth testing
-	glDepthFunc(GL_LESS);
-
-	glEnable(GL_STENCIL_TEST); // Turn on stencil testing
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-	loadModels(); // Load model files into the models vector
+	//glEnable(GL_STENCIL_TEST); // Turn on stencil testing
+	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	// Camera
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	setupCameras(&transform); // Setup the camera
+	
+	// --------------------------------------------------------------------------------------------
+	// SHADOWS
+	// --------------------------------------------------------------------------------------------
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->depthMapFBO);
+	
+	// Create depth texture
+	glGenTextures(1, &this->depthMapTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-	// Framebuffer
-	glGenFramebuffers(1, &this->FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-	glGenTextures(1, &this->textureColorBuffer);
-	glBindTexture(GL_TEXTURE_2D, this->textureColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width, g_systems.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Attach textureColorBuffer to FBO
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->textureColorBuffer, 0);
-
-	// Renderbuffer
-	glGenRenderbuffers(1, &RBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	// Attach RBO to framebuffer's depth and stencil attachment 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "ERROR::FRAMEBUFFER::Framebuffer is not complete!\n";
-
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMapTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Shader configuration
+	debugShader.use();
+	debugShader.setInt("depthMap", 0);
 
 	// Create quad VAO for final default framebuffer image render
 	float quadVerts[] = {
@@ -76,7 +93,7 @@ RenderingSystem::RenderingSystem(DebugOverlay& debug)
 		-1.0f,  1.0f, 0.0f, 1.0f,
 		-1.0f, -1.0f, 0.0f, 0.0f,
 		 1.0f, -1.0f, 1.0f, 0.0f,
-			
+
 		-1.0f,  1.0f, 0.0f, 1.0f,
 		 1.0f, -1.0f, 1.0f, 0.0f,
 		 1.0f,  1.0f, 1.0f, 1.0f,
@@ -176,171 +193,129 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 	// Tell shader about camera position
 	unsigned int viewPosLoc = glGetUniformLocation(getShaderId(), "viewPos");
-	glUniform3f(viewPosLoc, 0, 10.0f, -50.0f);
+	glm::vec3 cameraPos = g_scene.camera.position;
+	glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
 	// Projection matrix will be handled by the Camera class in the future
 	glm::mat4 proj = glm::mat4(1.0f);
-	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
+	float screenWidth = g_systems.width;
+	float screenHeight = g_systems.height;
+	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 500.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
 void RenderingSystem::update()
 {
-	if (this->screenWidth != g_systems.width || this->screenHeight != g_systems.height)
-	{
-		glBindTexture(GL_TEXTURE_2D, this->textureColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width, g_systems.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glBindTexture(GL_TEXTURE_2D, 0);
+	// Render depthMap to texture (from light's perspective)
+	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
+	lightProjection = glm::ortho(ort.x, ort.y, ort.z, ort.w, ort.nearPlane, ort.farPlane);
+	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	lightSpaceMatrix = lightProjection * lightView;
 
-		glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	}
+	depthShader.use();
+	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-	// Bind to FBO to render scene to texture
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-	glEnable(GL_DEPTH_TEST);
-
-	// Clear frame
-	glClearColor(0.6784f, 0.8471f, 0.902f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	// Stencil buffer
-	glStencilMask(0x00); // Turn off writing to stencil buffer
-
-	// Declare shader to use
-	shader.use();
-
-	// Update camera
-	Transform* p1Transform = g_scene.getEntity("player1")->getTransform();
-	g_scene.camera.updateCameraVectors(p1Transform);
-	setupCameras(p1Transform);
-
-	// Turn off textures - temporary
-	glUniform1i(texLoc, 0);
-	for (toggleDebugView view : debugOverlay.debugMeshes())
-	{
-		if (view.second)
-		{
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
-			glUniform1i(texLoc, 0); // Turn textures off
-			view.first.setWireframe(true);
-			view.first.draw(getShader());
-		}
-	}
-
-	glUniform1i(this->texLoc, 0);
-	
-	// Iterate through all the models in the scene and render them at their new transforms
-	for (int i = 0; i < models.size(); i++)
-	{
-		Transform* ownerTransform = models[i].owner->getTransform();
-
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-
-		if (i == 4)
-			ownerTransform->update();
-
-		if (i <= 4)
-		{
-			glUniform1i(texLoc, 0);
-			models[i].draw(this->shader);
-		}
-		else if (i > 4 && i <= 8) // Use textures images for ingredients
-		{
-			glUniform1i(texLoc, 1);
-			models[i].draw(this->shader);
-		}
-		else if (i > 8)
-		{
-			// DRAW LIGHT BALL
-			
-			// Stencil buffer
-			glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass stencil test, ref value, AND stencil buffer with 1
-			glStencilMask(0xFF); // Allow writing to stencil buffer
-
-			lightShader.use();
-
-			glBindVertexArray(models[i].meshes[0].VAO);
-			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-			// Load the indice data into the EBO
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, models[i].meshes[0].indices.size() * sizeof(unsigned int), &models[i].meshes[0].indices[0], GL_STATIC_DRAW);
-
-			// Rendering uniforms
-			unsigned int modelLoc = glGetUniformLocation(this->lightShader.getId(), "model");
-			unsigned int viewLoc = glGetUniformLocation(this->lightShader.getId(), "view");
-			unsigned int projLoc = glGetUniformLocation(this->lightShader.getId(), "projection");
-
-			Transform* t = g_scene.getEntity("test")->getTransform();
-			ownerTransform->update();
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-
-			glm::mat4 view = g_scene.camera.getViewMatrix(p1Transform);
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-			glm::mat4 proj = glm::mat4(1.0f);
-			proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
-			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-			
-			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
-
-			// DRAW OUTLINE FOR LIGHT BALL
-
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // Pass if not equal to 1, AND stencil buffer with 1
-			glStencilMask(0x00); //	Sets passing 
-			glDisable(GL_DEPTH_TEST);
-			
-			borderShader.use();
-			
-			glBindVertexArray(models[i].meshes[0].VAO);
-			glBindBuffer(GL_ARRAY_BUFFER, models[i].meshes[0].VBO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-			modelLoc = glGetUniformLocation(this->borderShader.getId(), "model");
-			viewLoc = glGetUniformLocation(this->borderShader.getId(), "view");
-			projLoc = glGetUniformLocation(this->borderShader.getId(), "projection");
-
-			t = g_scene.getEntity("test")->getTransform();
-			t->scale = glm::vec3(1.2f);
-			ownerTransform->update();
-
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-
-			view = g_scene.camera.getViewMatrix(p1Transform);
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-			proj = glm::mat4(1.0f);
-			proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
-			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-			
-			glDrawElements(GL_TRIANGLES, models[i].meshes[0].indices.size(), GL_UNSIGNED_INT, 0);
-
-			glStencilMask(0xFF);
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glEnable(GL_DEPTH_TEST);
-
-			t->scale = glm::vec3(1.0f);
-
-			glBindVertexArray(0);
-		}
-	}
-
+	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	renderShadowMap();
+	glCullFace(GL_BACK);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
 
-	simpleShader.use();
-	glBindVertexArray(this->quadVAO);
-	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	// Debug code for rendering the depthMap to viewport
+	//renderDebugShadowMap();
+
+	// 3. Render scene as normal using the generated depth/shadow map
+	this->shader.use();
+	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	renderScene();
+}
+
+void RenderingSystem::renderDebugShadowMap()
+{
+	// Debug code for rendering the depthMap to viewport
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	this->depthShader.use();
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	renderTexturedQuad();
 }
 
 Model* RenderingSystem::getKitchenModel()
 {
 	return g_scene.getEntity("countertop")->getModel();
+}
+
+void RenderingSystem::renderScene()
+{
+	// Reset viewport
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Update camera (MVP matrices)
+	Transform* p1Transform = g_scene.getEntity("player1")->getTransform();
+	g_scene.camera.updateCameraVectors(p1Transform);
+	setupCameras(p1Transform);
+
+	// Bind shadow map
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE, 0);
+
+	glUniform1i(texLoc, 1);
+
+	// Iterate through all the models in the scene and render them at their new transforms
+	for (int i = 0; i < models.size(); i++)
+	{
+		Transform* ownerTransform = models[i].owner->getTransform();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		if (i < 4)
+		{
+			glUniform1i(texLoc, 0);
+			models[i].draw(this->shader);
+		}
+		else if (i >= 4 && i <= 8) // Use textures images for ingredients
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(this->shader);
+		}
+	}
+}
+
+void RenderingSystem::renderShadowMap()
+{	
+	// Get model unfirom location in shader
+	unsigned int modelLoc = glGetUniformLocation(this->depthShader.getId(), "model");
+
+	// Render scene to depthMapFBO
+	for (auto it = this->models.begin(); it < this->models.end(); it++)
+	{
+		// Update model matrix
+		Transform* ownerTransform = it->owner->getTransform();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		it->drawDepthMap(this->depthShader);
+	}
+}
+
+void RenderingSystem::renderTexturedQuad()
+{
+	// Draw to default framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Render scene to viewport by applying depthMap as texture to 2D quad
+	this->debugShader.use();
+	glBindVertexArray(this->quadVAO);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
 }
