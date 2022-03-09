@@ -16,11 +16,11 @@ Note: Works only when controller is unplugged
 - **LT**: Brake/Reverse
 - **RT**: Accelerate
 - **L Thumb**: Steering
-- **X**: Handbrake
+- **R Thumb**: Camera Directional Influence (Rocket League Style)
 - **START**: Reset position to start
 
 ## New Features and Changes Included
-- Level Design:
+- **Level Design:**
   - Custom 3D kitchen-themed level mesh
   - Recipes:
     - Array of 3 recipes per player, can be specifically initialized
@@ -30,7 +30,7 @@ Note: Works only when controller is unplugged
   - Collision detection between players
     - Random item transfer between players (collision roles are not handled yet, no way to figure out who hit who)
   - Boolean to set breadmobile as AI or player
-- Driving:
+- **Driving:**
   - XBox controller compatible
   - Faster engine
   - Better turning
@@ -41,25 +41,36 @@ Note: Works only when controller is unplugged
   - Wheel inertia dampened for faster collision to acceleration transition
   - Other players set up as physx vehicles
   - Position respawn button set
-- Camera:
+- **Camera:**
   - Perceived speed (changing perspective and distance from vehicle)
   - Rocket League Style camera directional influence with elastic force (right joystick when using controller)
   - Intuitive camera follow (exaggerates turning by variably offsetting the rotation)
-- UI:
+- **UI:**
   - Minimap
   - Image rendering
-  - Recipe item tracking
+  - Recipe progress tracking
+  - Recipe completion identification
   - Speedometer
-- AI:
+- **AI:**
   - Navigation mesh set over the map
   - Possible for the AI to win the game
-- Rendering:
+- **Rendering:**
   - Improved lighting model
   - Multiple light casters (point and directional lighting)
   - Directional light shadow-mapping
-- Other Changes:
+- **Other Changes:**
   - Bugfix for objects flying when window is moved
 
-<!-- ## IMPORTANT NOTES AND KNOWN BUGS:
-- Player collision spams warnings (that don't break things yet) -->
+## Known Feature Limitations Identified While Testing (To Be Addressed In Next Milestone):
+- Collision positioning/speed prescedence not implemented to decide who loses/gains ingredients (currently AI always gains).
+- A perfect balance in braking has not yet been reached. The reaction is slightly too slow, and the punchiness of the gear change feels rather abrupt.
+- Only one AI is active to ensure that a win state can always be achieved.
+- Level mesh has cracks and bumps that are unpleasant to drive over.
+- AI can become stuck against a wall if strategically bumped by the player.
+
+## Known Bugs Identified While Testing (To Be Addressed In Next Milestone):
+- Player collision spams warnings (that don't break things yet).
+- Player collisions do not have an adequate cooldown (full inventory becomes depleted upon collision).
+- Physx bumpiness causes a perceived camera jitter when accelerating.
+- Speedometer goes beyond range when falling.
 
