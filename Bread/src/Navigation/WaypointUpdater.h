@@ -26,4 +26,6 @@ private:
 	
 	position interpolator_;
 	bool replanFlag_;
+
+	position currentTarget_;
 };

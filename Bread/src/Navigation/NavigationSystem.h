@@ -11,13 +11,16 @@
 class NavigationSystem : public Component
 {
 public:
-	NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavMesh& navmesh);
+	NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavMesh& navmesh, int id);
 
 	void planPath(position target);
+	void pause();
 	void update();
 
 	float distanceFromVehicle(position target);
 	bool hasPath();
+
+	bool queryReset();
 
 private:
 	PhysicsSystem& physics_;
@@ -27,5 +30,10 @@ private:
 	//LocationTracker locationTracker_;
 	WaypointUpdater waypointUpdater_;
 	PathFinder pathFinder_;
+
+	int id_;
+	bool resetFlag_;
 	Steering steering_;
+
+	position currentTarget_;
 };

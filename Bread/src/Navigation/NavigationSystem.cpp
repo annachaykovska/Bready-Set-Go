@@ -1,12 +1,14 @@
 #include "NavigationSystem.h"
 
-NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavMesh& navmesh)
+NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavMesh& navmesh, int id)
 	: vehicle_(vehicle)
 	, physics_(physics)
 	, navmesh_(navmesh)
 	, pathFinder_(navmesh_)
-	, steering_(vehicle_, physics_)
+	, id_(id)
+	, steering_(vehicle_, physics_, id_)
 	, waypointUpdater_(vehicle_)
+	, resetFlag_(false)
 {
 }
 
@@ -16,27 +18,29 @@ void NavigationSystem::planPath(position target)
 	{
 		waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position, target));
 		waypointUpdater_.setTarget(target);
+
+		currentTarget_ = target;
 	}
 	//std::cout << "Planned Path Length" << std::endl;
 	//std::cout << waypointUpdater_.numWaypoints() << std::endl;
 }
 
+void NavigationSystem::pause()
+{
+	steering_.park();
+}
+
 void NavigationSystem::update()
 {
-	if (hasPath())
-	{
-		steering_.updateSteering(waypointUpdater_.interpolator());
-		waypointUpdater_.updateWaypoints();
-	}
-	else
-	{
-		std::cout << "PATH COMPLETE" << std::endl;
-		steering_.park();
-	}
+	//steering_.updateSteering(waypointUpdater_.interpolator());
+	steering_.updateSteering(waypointUpdater_.currentWaypoint());
+	//std::cout << waypointUpdater_.interpolator().x << " " << waypointUpdater_.interpolator().y << " " << waypointUpdater_.interpolator().z << std::endl;
+	//std::cout << waypointUpdater_.currentWaypoint().x << " " << waypointUpdater_.currentWaypoint().y << " " << waypointUpdater_.currentWaypoint().z << std::endl;
+	waypointUpdater_.updateWaypoints();
 	if (vehicle_.getTransform()->position.y < -30)
 	{
-		// TODO:NAV
-		physics_.respawnPlayer(1);
+		resetFlag_ = true;
+		physics_.respawnPlayer(id_);
 	}
 }
 
@@ -52,4 +56,14 @@ bool NavigationSystem::hasPath()
 		return false;
 	}
 	return true;
+}
+
+bool NavigationSystem::queryReset()
+{
+	bool resetState = resetFlag_;
+	if (resetFlag_)
+	{
+		resetFlag_ = false;
+	}
+	return resetState;
 }

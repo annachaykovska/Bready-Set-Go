@@ -447,7 +447,7 @@ void NavMesh::connectMesh()
 				
 				if (!alreadyContainsNeighbor(mesh_.at(i), mesh_.at(j)) && sharesNodes == 2)
 				{
-					std::cout << mesh_.at(i)->id_ << " " << mesh_.at(j)->id_ << std::endl;
+					//std::cout << mesh_.at(i)->id_ << " " << mesh_.at(j)->id_ << std::endl;
 					mesh_.at(i)->neighbors.push_back(std::pair <Node*, MeshSegment*> (mesh_.at(j)->meshStep_, mesh_.at(j)));
 				}
 			}

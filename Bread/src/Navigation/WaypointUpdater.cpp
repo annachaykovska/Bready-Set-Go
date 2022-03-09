@@ -4,7 +4,7 @@ namespace
 {
 	const float THRESHOLD = 9.0f;
 	const float INTERPOLATOR_THRESHOLD = 1.0f;
-	const float LEAD_DISTANCE = 25.0f;
+	const float LEAD_DISTANCE = 5.0f;
 
 	position INVALID_POS = position(0.f, -99999999.f, 0.f);
 }
@@ -22,6 +22,7 @@ void WaypointUpdater::setWaypoints(std::vector<position> waypoints)
 
 void WaypointUpdater::setTarget(position target)
 {
+	currentTarget_ = target;
 	waypoints_.insert(waypoints_.begin(), target);
 }
 
@@ -32,7 +33,6 @@ void WaypointUpdater::updateWaypoints()
 		//std::cout << entity_.getTransform()->position.x << ", " << entity_.getTransform()->position.y << ", " << entity_.getTransform()->position.z << std::endl;
 		if (length(entity_.getTransform()->position - currentWaypoint()) < THRESHOLD)
 		{
-			std::cout << "Reached waypoint" << std::endl;
 			waypoints_.pop_back();
 		}
 		for (int i = 1; i < waypoints_.size(); i++)
@@ -41,7 +41,6 @@ void WaypointUpdater::updateWaypoints()
 			{
 				if (length(entity_.getTransform()->position - futureWaypoint(i)) < length(entity_.getTransform()->position - currentWaypoint()))
 				{
-					std::cout << "Reached waypoint" << std::endl;
 					waypoints_.pop_back();
 				}
 			}

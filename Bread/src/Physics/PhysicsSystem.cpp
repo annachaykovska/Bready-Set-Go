@@ -257,19 +257,19 @@ void PhysicsSystem::initializeActors() {
 	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
-	PxTransform cheeseTransform(PxVec3(-260, 0, -210));
+	PxTransform cheeseTransform(PxVec3(-270, 0, -220));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
 	// SAUSAGE
-	PxTransform sausageTransform(PxVec3(-140, 0, 190));
+	PxTransform sausageTransform(PxVec3(-145, 0, 175));
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
-	PxTransform tomatoTransform(PxVec3(95, 0, 180));
+	PxTransform tomatoTransform(PxVec3(95, 0, 170));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH
-	PxTransform doughTransform(PxVec3(-135, 0, 0));
+	PxTransform doughTransform(PxVec3(-150, 0, -8));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 

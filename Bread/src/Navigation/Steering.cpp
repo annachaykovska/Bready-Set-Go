@@ -6,15 +6,36 @@ namespace
 	const double PI = 3.1415926535;
 }
 
-Steering::Steering(Entity& entity, PhysicsSystem& physics)
+Steering::Steering(Entity& entity, PhysicsSystem& physics, int id)
 	: entity_(entity)
 	, physics_(physics)
+	, id_(id)
+	, finalApproach_(false)
 {
+	switch (id_)
+	{
+	case 1:
+		vehicle_ = physics_.mVehiclePlayer1;
+		input_ = &physics_.mVehicleInputDataPlayer1;
+		break;
+	case 2:
+		vehicle_ = physics_.mVehiclePlayer2;
+		input_ = &physics_.mVehicleInputDataPlayer2;
+		break;
+	case 3:
+		vehicle_ = physics_.mVehiclePlayer3;
+		input_ = &physics_.mVehicleInputDataPlayer3;
+		break;
+	case 4:
+		vehicle_ = physics_.mVehiclePlayer4;
+		input_ =&physics_.mVehicleInputDataPlayer4;
+		break;
+	}
 }
 
 void Steering::park()
 {
-	physics_.mVehiclePlayer1->mWheelsDynData.setToRestState();
+	vehicle_->mWheelsDynData.setToRestState();
 }
 
 void Steering::updateSteering(position target)
@@ -32,31 +53,37 @@ void Steering::updateSteering(position target)
 	float theta = acos(dot(vectorB, vectorA) / (length(vectorA) * length(vectorB)));
 	glm::vec3 upVector = cross(vectorB, vectorA);
 
-	if (physics_.mVehiclePlayer1->computeForwardSpeed() < 22)
+	int max = 25;
+	if (vehicle_->computeForwardSpeed() < max)
 	{
-		physics_.mVehicleInputDataPlayer1.setAnalogAccel(1.f);
+		input_->setAnalogAccel(1.f);
 	}
 	else
 	{
-		physics_.mVehicleInputDataPlayer1.setAnalogAccel(0.f);
+		input_->setAnalogAccel(0.f);
 	}
-	if (abs(theta) > TURN_THRESHOLD)
-	{
+	//if (abs(theta) > TURN_THRESHOLD)
+	//{
+		/*
 		if (abs(theta) > PI / 4.0f)
 		{
 			theta = PI / 4.0f;
 		}
+		*/
 		if (upVector.y < 0)
 		{
-			physics_.mVehicleInputDataPlayer1.setAnalogSteer(theta / (PI / 4.0f));
+			//input_->setAnalogSteer(theta / (PI / 4.0f));
+			input_->setAnalogSteer(1.0f);
 		}
 		else
 		{
-			physics_.mVehicleInputDataPlayer1.setAnalogSteer(-theta / (PI / 4.0f));
+			//input_->setAnalogSteer(-theta / (PI / 4.0f));
+			input_->setAnalogSteer(-1.0f);
 		}
-	}
-	else
-	{
-		physics_.mVehicleInputDataPlayer1.setAnalogSteer(0.f);
-	}
+	//}
+	//else
+	//{
+	//	std::cout << "Shouldn't stay here long" << std::endl;
+	//	input_->setAnalogSteer(0.f);
+	//}
 }

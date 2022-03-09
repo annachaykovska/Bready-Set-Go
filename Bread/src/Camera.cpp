@@ -189,11 +189,10 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	glm::vec3 lookAhead = position + ((playerTransform->position + positionUp) - position) * 1.2f;
 	return glm::lookAt(position, lookAhead, worldUp);
 
-	// TODO:NAV
 	//Right
-	return glm::lookAt(glm::vec3(500.f, 10.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//return glm::lookAt(glm::vec3(500.f, 10.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	//Top-Down
-	return glm::lookAt(glm::vec3(-50.f, 900.0f, 200.0f), glm::vec3(-50.0f, 0.0f, 50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//return glm::lookAt(glm::vec3(-50.f, 900.0f, 200.0f), glm::vec3(-50.0f, 0.0f, 50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Camera::updateCameraVectors(Transform* playerTransform)

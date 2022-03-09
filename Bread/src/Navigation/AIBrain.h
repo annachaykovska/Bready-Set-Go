@@ -10,6 +10,7 @@ class AIBrain
 public:
 	AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSystem& navigation);
 
+	void pause();
 	void update();
 
 private:
@@ -21,4 +22,7 @@ private:
 	NavigationSystem& navigation;
 
 	int oldInventoryCount;
+
+	int panicCounter_;
+	float distance_;
 };

@@ -5,37 +5,45 @@ AIBrain::AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSys
 	, tracker(tracker)
 	, navigation(navigation)
 	, oldInventoryCount(0)
+	, panicCounter_(0)
+	, distance_(0)
 {
 
 }
 
 void AIBrain::update()
 {
-	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount())
+	findClosestTarget();
+	if (distance_ < 30)
 	{
+		panicCounter_++;
+		if (panicCounter_ > 3000)
+		{
+			navigation.pause();
+			panicCounter_ = 0;
+		}
+	}
+	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset())
+	{
+		panicCounter_ = 0;
 		oldInventoryCount = getInventoryCount();
 		target newTarget = findClosestTarget();
 		position targetPosition;
 		switch (newTarget)
 		{
 		case CHEESE:
-			std::cout << "GETTING CHEESE" << std::endl;
 			targetPosition = tracker.getCheeseLocation().position;
 			break;
 		case TOMATO:
-			std::cout << "GETTING TOMATO" << std::endl;
 			targetPosition = tracker.getTomatoLocation().position;
 			break;
 		case DOUGH:
-			std::cout << "GETTING DOUGH" << std::endl;
 			targetPosition = tracker.getDoughLocation().position;
 			break;
 		case SAUSAGE:
-			std::cout << "GETTING SAUSAGE" << std::endl;
 			targetPosition = tracker.getSausageLocation().position;
 			break;
 		default:
-			std::cout << "ALL DONE" << std::endl;
 			targetPosition = glm::vec3(-80.f, 0.f, 60.f);
 			break;
 		}
@@ -46,27 +54,27 @@ void AIBrain::update()
 
 target AIBrain::findClosestTarget()
 {
-	float shortestDistance = 999999;
+	distance_ = 999999;
 	target bestTarget = NONE;
-	if (inventory.cheese == 0 && navigation.distanceFromVehicle(tracker.getCheeseLocation().position) < shortestDistance)
+	if (inventory.cheese == 0 && navigation.distanceFromVehicle(tracker.getCheeseLocation().position) < distance_)
 	{
 		bestTarget = CHEESE;
-		shortestDistance = navigation.distanceFromVehicle(tracker.getCheeseLocation().position);
+		distance_ = navigation.distanceFromVehicle(tracker.getCheeseLocation().position);
 	}
-	if (inventory.tomato == 0 && navigation.distanceFromVehicle(tracker.getTomatoLocation().position) < shortestDistance)
+	if (inventory.tomato == 0 && navigation.distanceFromVehicle(tracker.getTomatoLocation().position) < distance_)
 	{
 		bestTarget = TOMATO;
-		shortestDistance = navigation.distanceFromVehicle(tracker.getTomatoLocation().position);
+		distance_ = navigation.distanceFromVehicle(tracker.getTomatoLocation().position);
 	}
-	if (inventory.dough == 0 && navigation.distanceFromVehicle(tracker.getDoughLocation().position) < shortestDistance)
+	if (inventory.dough == 0 && navigation.distanceFromVehicle(tracker.getDoughLocation().position) < distance_)
 	{
 		bestTarget = DOUGH;
-		shortestDistance = navigation.distanceFromVehicle(tracker.getDoughLocation().position);
+		distance_ = navigation.distanceFromVehicle(tracker.getDoughLocation().position);
 	}
-	if (inventory.sausage == 0 && navigation.distanceFromVehicle(tracker.getSausageLocation().position) < shortestDistance)
+	if (inventory.sausage == 0 && navigation.distanceFromVehicle(tracker.getSausageLocation().position) < distance_)
 	{
 		bestTarget = SAUSAGE;
-		shortestDistance = navigation.distanceFromVehicle(tracker.getSausageLocation().position);
+		distance_ = navigation.distanceFromVehicle(tracker.getSausageLocation().position);
 	}
 
 	return bestTarget;

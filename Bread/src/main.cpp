@@ -147,17 +147,13 @@ int main()
 	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 
-	NavigationSystem p1NavSystem(*player1, physics, navMesh);
-	AIBrain p1Brain(p1Inv, ingredientTracker, p1NavSystem);
+	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
+	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
 
 	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 	player1->attachComponent(&p1Inv, "inventory");
-	player1->attachComponent(&p1NavSystem, "navigation");
-
-	// TODO: Dynamically pick the target and plan path
-	//p1NavSystem.planPath(glm::vec3(70.f, 5.f, -215.f));
-	p1NavSystem.planPath(glm::vec3(40.f, 45.f, -125.f));
 	player2->attachComponent(&p2Inv, "inventory");
+	player2->attachComponent(&p2NavSystem, "navigation");
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
@@ -185,7 +181,6 @@ int main()
 		window.clear();
 		renderer.update();
 
-		// TODO:NAV
 		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 		ui.update();
 		profiler.newFrame();
@@ -198,8 +193,7 @@ int main()
 
 		// AI
 		//std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
-		p1Brain.update();
-		//p1NavSystem.update();
+		p2Brain.update();
 
 		// AUDIO
 		// update AudioSource	

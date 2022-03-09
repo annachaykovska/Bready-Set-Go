@@ -144,7 +144,6 @@ bool PathFinder::stepContainsTarget(position target, PathStep* step)
 
 std::vector<position> PathFinder::findPath(position start, position end)
 {
-	std::cout << "Finding Path";
 	updateTraversablePathSteps();
 	open_.clear();
 	closed_.clear();
@@ -189,11 +188,9 @@ std::vector<position> PathFinder::findPath(position start, position end)
 		// if current is the target node // path has been found
 		if (stepContainsTarget(end, current))
 		{
-			printPath(current);
+			//printPath(current);
 
 			std::vector<position> finalPath;
-			std::cout << "Path Length" << std::endl;
-			std::cout << finalPath.size() << std::endl;
 
 			while (current->parent != nullptr)
 			{
