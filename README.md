@@ -56,7 +56,7 @@ Note: Works only when controller is unplugged
 - Rendering:
   - Improved lighting model
   - Multiple light casters (point and directional lighting)
-  - Directional light shadow-mapping (if I can get it to make more sense)
+  - Directional light shadow-mapping
 - Other Changes:
   - Bugfix for objects flying when window is moved
 
