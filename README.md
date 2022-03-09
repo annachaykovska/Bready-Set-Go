@@ -70,6 +70,7 @@ Note: Works only when controller is unplugged
   - Bugfix for objects flying when window is moved
 
 ## Top Priority Upcoming Features:
+- Local multiplayer for up to 4 players
 - Offscreen indicators + minimap integration with ingredients
 - Finalized kitchen level layout with additional obstacles
 - Intelligent Collision Prescendence
@@ -80,6 +81,8 @@ Note: Works only when controller is unplugged
 - Recipe delivery area
 - Simple powerups
 - Improved AI path smoothing
+- Full level reset
+- Main menu
 
 ## Known Feature Limitations Identified While Testing (To Be Addressed In Next Milestone):
 - Collision positioning/speed prescedence not implemented to decide who loses/gains ingredients (currently AI always gains). Currently the player has to strategically beat the AI to all ingredients without getting bumped. It is possible, but a little bit tricky.
