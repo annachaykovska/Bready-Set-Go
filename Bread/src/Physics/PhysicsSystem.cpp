@@ -524,6 +524,19 @@ void PhysicsSystem::update(const float dt)
 
 	this->mAccumulator -= timestep;
 
+	PxTransform trans = PxTransform(PxVec3(0, -100, 0));
+	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
+	if (g_scene.getEntity("tomato")->removeFlag)
+		this->tomato->setGlobalPose(trans);
+	if (g_scene.getEntity("cheese")->removeFlag)
+		this->cheese->setGlobalPose(trans);
+	if (g_scene.getEntity("sausage")->removeFlag)
+		this->sausage->setGlobalPose(trans);
+	if (g_scene.getEntity("dough")->removeFlag)
+		this->dough->setGlobalPose(trans);
+	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -100.0)
+		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
+
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);

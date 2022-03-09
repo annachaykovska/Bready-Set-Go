@@ -22,6 +22,8 @@ public:
 	Model* getModel();
 	AudioSource* getAudioSource();
 
+	bool removeFlag;
+
 private:
 
 	std::unordered_map<std::string, Component*> components;

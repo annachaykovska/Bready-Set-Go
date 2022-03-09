@@ -38,24 +38,28 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         {
             p1Inv->tomato = 1;
             entity0->getAudioSource()->play("pickup.wav");
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
         if (entity1->name == "cheese" && p1Inv->cheese == 0)
         {
             p1Inv->cheese = 1;
             entity0->getAudioSource()->play("pickup.wav");
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
         if (entity1->name == "dough" && p1Inv->dough == 0) 
         {
             p1Inv->dough = 1;
             entity0->getAudioSource()->play("pickup.wav");
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
         if (entity1->name == "sausage" && p1Inv->sausage == 0) {
             p1Inv->sausage = 1;
             entity0->getAudioSource()->play("pickup.wav");
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
 
         if (p1Inv->checkPizza())
@@ -68,7 +72,7 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
             Inventory* opponentInv = (Inventory*)entity1->getComponent("inventory");
             int ingredient = p1Inv->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
             opponentInv->setIngredientFromId(ingredient);
-            printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
+            //printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
         }
     }
     else if (entity1->name == "player1")
@@ -80,25 +84,29 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         {
             p1Inv->tomato = 1;
             entity1->getAudioSource()->play("pickup.wav");
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
         }
         if (entity0->name == "cheese" && p1Inv->cheese == 0)
         {
             p1Inv->cheese = 1;
             entity1->getAudioSource()->play("pickup.wav");
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
         }
         if (entity0->name == "dough" && p1Inv->dough == 0)
         {
             p1Inv->dough = 1;
             entity1->getAudioSource()->play("pickup.wav");
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
         }
         if (entity0->name == "sausage" && p1Inv->sausage == 0)
         {
             p1Inv->sausage = 1;
             entity1->getAudioSource()->play("pickup.wav");
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
         }
         if (p1Inv->checkPizza())
             entity1->getAudioSource()->play("ding.wav");
@@ -110,7 +118,7 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
             Inventory* opponentInv = (Inventory*)entity0->getComponent("inventory");
             int ingredient = p1Inv->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
             opponentInv->setIngredientFromId(ingredient);
-            printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
+            //printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
         }
     }
 
@@ -121,28 +129,32 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         if (entity1->name == "tomato" && p1Inv->tomato == 0)
         {
             p1Inv->tomato = 1;
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
         if (entity1->name == "cheese" && p1Inv->cheese == 0)
         {
             p1Inv->cheese = 1;
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
         if (entity1->name == "dough" && p1Inv->dough == 0)
         {
             p1Inv->dough = 1;
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
         if (entity1->name == "sausage" && p1Inv->sausage == 0) {
             p1Inv->sausage = 1;
-            entity1->getModel()->visible = false;
+            //entity1->getModel()->visible = false;
+            entity1->removeFlag = true;
         }
 
         // OTHER PLAYERS
         if (entity1->name == "player1" || entity1->name == "player3" || entity1->name == "player4")
         {
             //entity0->getAudioSource()->play("thump.wav");
-            printf("%s collided with %s\n", entity0->name.c_str(), entity1->name.c_str());
+            //printf("%s collided with %s\n", entity0->name.c_str(), entity1->name.c_str());
         }
     }
     else if (entity1->name == "player2")
@@ -153,29 +165,36 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         if (entity0->name == "tomato" && p1Inv->tomato == 0)
         {
             p1Inv->tomato = 1;
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
+
         }
         if (entity0->name == "cheese" && p1Inv->cheese == 0)
         {
             p1Inv->cheese = 1;
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
+
         }
         if (entity0->name == "dough" && p1Inv->dough == 0)
         {
             p1Inv->dough = 1;
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
+
         }
         if (entity0->name == "sausage" && p1Inv->sausage == 0)
         {
             p1Inv->sausage = 1;
-            entity0->getModel()->visible = false;
+            //entity0->getModel()->visible = false;
+            entity0->removeFlag = true;
         }
 
         // OTHER PLAYERS
         if (entity0->name == "player1" || entity0->name == "player3" || entity0->name == "player4")
         {
             //entity1->getAudioSource()->play("thump.wav");
-            printf("%s collided with %s\n", entity1->name.c_str(), entity0->name.c_str());
+            //printf("%s collided with %s\n", entity1->name.c_str(), entity0->name.c_str());
         }
     }
 }

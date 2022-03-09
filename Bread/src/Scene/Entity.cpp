@@ -3,10 +3,12 @@
 Entity::Entity(std::string name)
 {
 	this->name = name;
+	this->removeFlag = false;
 }
 
 Entity::Entity(){
 	this->name = "default";
+	this->removeFlag = false;
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)

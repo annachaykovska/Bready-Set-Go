@@ -117,7 +117,10 @@
     <ClCompile Include="src\Gameplay\Breadmobile.cpp" />
     <ClCompile Include="src\Gameplay\Ingredient.cpp" />
     <ClCompile Include="src\Gameplay\Recipe.cpp" />
+    <ClCompile Include="src\Navigation\AIBrain.cpp" />
+    <ClCompile Include="src\Navigation\IngredientTracker.cpp" />
     <ClCompile Include="src\Navigation\LocationTracker.cpp" />
+    <ClCompile Include="src\Navigation\NavigationSystem.cpp" />
     <ClCompile Include="src\Navigation\NavMesh.cpp" />
     <ClCompile Include="src\Navigation\PathFinder.cpp" />
     <ClCompile Include="src\Navigation\Steering.cpp" />
@@ -850,7 +853,10 @@
     <ClInclude Include="src\Gameplay\Ingredient.h" />
     <ClInclude Include="src\Gameplay\Recipe.h" />
     <ClInclude Include="src\Inventory.h" />
+    <ClInclude Include="src\Navigation\AIBrain.h" />
+    <ClInclude Include="src\Navigation\IngredientTracker.h" />
     <ClInclude Include="src\Navigation\LocationTracker.h" />
+    <ClInclude Include="src\Navigation\NavigationSystem.h" />
     <ClInclude Include="src\Navigation\NavMesh.h" />
     <ClInclude Include="src\Navigation\PathFinder.h" />
     <ClInclude Include="src\Navigation\Steering.h" />
