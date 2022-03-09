@@ -19,6 +19,7 @@ public:
 	void cameraTransform();
 	void testTransform();
 	void update();
+	void shadows();
 
 private:
 

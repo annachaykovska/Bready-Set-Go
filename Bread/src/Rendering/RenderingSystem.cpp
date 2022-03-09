@@ -16,30 +16,38 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
 									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt")
 {
+	// Viewport settings
 	this->screenWidth = 0;
 	this->screenHeight = 0;
 
-	this->ort.x = -100.0f;
-	this->ort.y = 100.0f;
-	this->ort.z = -100.0f;
-	this->ort.w = 100.0f;
-	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 600.0f;
+	// Orthographic projection for shadow map settings
+	this->ort.x = -171.0f;
+	this->ort.y = 314.0f;
+	this->ort.z = -255.0f;
+	this->ort.w = 196.0f;
+	this->ort.nearPlane = 1.0f;
+	this->ort.farPlane = 450.0f;
+
+	// Directional light position
+	this->lightPos = glm::vec3(0.0f, 210.0f, -125.0f);
+	this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
+
+	// Shadow map viewport size
+	this->shadowWidth = 1024;
+	this->shadowHeight = 1024;
 
 	this->models.reserve(g_scene.count()); // Create space for models
 	loadModels(); // Load model files into the models vector
 
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST); // Turn on depth testing
+	glDepthFunc(GL_LESS); // Should be default but make it explicit
 
-	/*
 	// Rendering uniforms
+	shader.use();
 	this->modelLoc = glGetUniformLocation(getShaderId(), "model");
 	this->texLoc = glGetUniformLocation(getShaderId(), "textured");
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
-
-	glEnable(GL_DEPTH_TEST); // Turn on depth testing
-	glDepthFunc(GL_LESS);
 
 	//glEnable(GL_STENCIL_TEST); // Turn on stencil testing
 	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -49,22 +57,24 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	setupCameras(&transform); // Setup the camera
-	*/
 	
+	// --------------------------------------------------------------------------------------------
 	// SHADOWS
-
+	// --------------------------------------------------------------------------------------------
 	// Configure depth map FBO
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	glGenFramebuffers(1, &this->depthMapFBO);
 	
 	// Create depth texture
 	glGenTextures(1, &this->depthMapTex);
+	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	// Attach depth texture as FBO's depth buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
@@ -182,44 +192,54 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 	// Tell shader about camera position
 	unsigned int viewPosLoc = glGetUniformLocation(getShaderId(), "viewPos");
-	glUniform3f(viewPosLoc, 0, 10.0f, -50.0f);
+	glm::vec3 cameraPos = g_scene.camera.position;
+	glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
 	// Projection matrix will be handled by the Camera class in the future
 	glm::mat4 proj = glm::mat4(1.0f);
-	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), 800.0f / 600.0f, 0.1f, 1000.0f);
+	float screenWidth = g_systems.width;
+	float screenHeight = g_systems.height;
+	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 500.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
 void RenderingSystem::update()
 {
-	// 1. Render depth of scene to texture (from light's perspective)
+	// Render depthMap to texture (from light's perspective)
 	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
 	lightProjection = glm::ortho(ort.x, ort.y, ort.z, ort.w, ort.nearPlane, ort.farPlane);
-	Transform* lightTrans = g_scene.getEntity("test")->getTransform();
-	lightView = glm::lookAt(lightTrans->position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	lightSpaceMatrix = lightProjection * lightView;
 
-	// Render scene from light's point of view
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	renderScene(depthShader);
+	glCullFace(GL_FRONT);
+	renderShadowMap();
+	glCullFace(GL_BACK);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Reset viewport
+	// Debug code for rendering the depthMap to viewport
+	//renderDebugShadowMap();
+
+	// 3. Render scene as normal using the generated depth/shadow map
+	this->shader.use();
+	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	renderScene();
+}
+
+void RenderingSystem::renderDebugShadowMap()
+{
+	// Debug code for rendering the depthMap to viewport
 	glViewport(0, 0, g_systems.width, g_systems.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Render depthMap to quad for visual debugging
-	depthShader.use();
-	glActiveTexture(GL_TEXTURE0);
+	this->depthShader.use();
+	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	renderQuad();
+	renderTexturedQuad();
 }
 
 Model* RenderingSystem::getKitchenModel()
@@ -227,10 +247,49 @@ Model* RenderingSystem::getKitchenModel()
 	return g_scene.getEntity("countertop")->getModel();
 }
 
-void RenderingSystem::renderScene(Shader &shader)
+void RenderingSystem::renderScene()
 {
+	// Reset viewport
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Update camera (MVP matrices)
+	Transform* p1Transform = g_scene.getEntity("player1")->getTransform();
+	g_scene.camera.updateCameraVectors(p1Transform);
+	setupCameras(p1Transform);
+
+	// Bind shadow map
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE, 0);
+
+	glUniform1i(texLoc, 1);
+
+	// Iterate through all the models in the scene and render them at their new transforms
+	for (int i = 0; i < models.size(); i++)
+	{
+		Transform* ownerTransform = models[i].owner->getTransform();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		if (i < 4)
+		{
+			glUniform1i(texLoc, 0);
+			models[i].draw(this->shader);
+		}
+		else if (i >= 4 && i <= 8) // Use textures images for ingredients
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(this->shader);
+		}
+	}
+}
+
+void RenderingSystem::renderShadowMap()
+{	
 	// Get model unfirom location in shader
-	unsigned int modelLoc = glGetUniformLocation(shader.getId(), "model");
+	unsigned int modelLoc = glGetUniformLocation(this->depthShader.getId(), "model");
 
 	// Render scene to depthMapFBO
 	for (auto it = this->models.begin(); it < this->models.end(); it++)
@@ -239,11 +298,11 @@ void RenderingSystem::renderScene(Shader &shader)
 		Transform* ownerTransform = it->owner->getTransform();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
-		it->drawDepthMap(shader);
+		it->drawDepthMap(this->depthShader);
 	}
 }
 
-void RenderingSystem::renderQuad()
+void RenderingSystem::renderTexturedQuad()
 {
 	// Draw to default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -254,6 +313,7 @@ void RenderingSystem::renderQuad()
 	// Render scene to viewport by applying depthMap as texture to 2D quad
 	this->debugShader.use();
 	glBindVertexArray(this->quadVAO);
+	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

@@ -24,8 +24,8 @@ int main()
 	glfwInit();
 
 	// Set window size
-	g_systems.width = 800;
-	g_systems.height = 600;
+	g_systems.width = 1024;
+	g_systems.height = 1024;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");

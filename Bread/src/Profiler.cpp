@@ -8,8 +8,11 @@
 #include "Transform.h"
 #include "Scene/Entity.h"
 #include "Inventory.h"
+#include "SystemManager.h"
+#include "Rendering/RenderingSystem.h"
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 Profiler::Profiler(Window& window)
 {
@@ -189,7 +192,32 @@ void Profiler::testTransform()
 		ImGui::SliderFloat("test.rot.y", &(testTransform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
 		ImGui::SliderFloat("test.rot.z", &(testTransform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
 	}
+}
 
+void Profiler::shadows()
+{
+	Orthogonal& ort = g_systems.render->ort;
+	glm::vec3& lightDir = g_systems.render->lightDir;
+	glm::vec3& lightPos = g_systems.render->lightPos;
+
+	if (ImGui::CollapsingHeader("Shadows"))
+	{
+		ImGui::InputFloat("orthoProj.x", &(ort.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.y", &(ort.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.z", &(ort.z), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.w", &(ort.w), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.near", &(ort.nearPlane), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.far", &(ort.farPlane), 1.f, 10.f, "%.3f");
+
+		ImGui::InputFloat("lightDir.x", &(lightDir.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("lightDir.y", &(lightDir.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("lightDir.z", &(lightDir.z), 1.f, 10.f, "%.3f");
+
+		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
+
+	}
 }
 
 void Profiler::update()
@@ -203,5 +231,6 @@ void Profiler::update()
 	player4Transform();
 	cameraTransform();
 	testTransform();
+	shadows();
 	end();
 }

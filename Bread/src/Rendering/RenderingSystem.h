@@ -29,10 +29,19 @@ public:
 	void setupCameras(Transform* playerTransform);
 	void update();
 	Model* getKitchenModel();
-	void renderScene(Shader& shader);
-	void renderQuad();
+	void renderScene();
+	void renderShadowMap();
+	void renderTexturedQuad();
+	void renderDebugShadowMap();
 
 	Orthogonal ort;
+	glm::vec3 lightPos;
+	glm::vec3 lightDir;
+	float shadowWidth;
+	float shadowHeight;
+
+	unsigned int depthMapTex;
+
 
 private:
 
@@ -58,7 +67,6 @@ private:
 
 	unsigned int depthMapFBO;
 	unsigned int dpethMapVAO;
-	unsigned int depthMapTex;
 
 	int screenWidth;
 	int screenHeight;

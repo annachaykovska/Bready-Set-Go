@@ -6,8 +6,11 @@
 #include "Mesh.h"
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
+#include "../SystemManager.h"
+#include "../Rendering/RenderingSystem.h"
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 /// <summary>
 /// Initializes a Mesh object with the provided lists of vertices, indices, and textures
@@ -82,6 +85,9 @@ void Mesh::draw(Shader &shader)
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE, 0);
+
 	if (textures.size() > 0)
 	{
 		// Loop through each texture in the mesh to determine its type (diffuse or specular)
@@ -105,6 +111,9 @@ void Mesh::draw(Shader &shader)
 		glActiveTexture(GL_TEXTURE0);
 	}
 
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, g_systems.render->depthMapTex);
+
 	// Material uniforms
 	unsigned int ambientLoc = glGetUniformLocation(shader.getId(), "material.ambient");
 	glUniform3f(ambientLoc, material.ambient.r, material.ambient.g, material.ambient.b);
@@ -125,13 +134,15 @@ void Mesh::draw(Shader &shader)
 	Transform* t = g_scene.getEntity("test")->getTransform();
 
 	unsigned int lightPosLoc = glGetUniformLocation(shader.getId(), "light.position");
-	glUniform3f(lightPosLoc, t->position.x, t->position.y, t->position.z);
+	glm::vec3 lightPos = g_systems.render->lightPos;
+	glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 
 	unsigned int lightColorLoc = glGetUniformLocation(shader.getId(), "light.color");
 	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
 
 	unsigned int lightDirLoc = glGetUniformLocation(shader.getId(), "light.direction");
-	glUniform3f(lightDirLoc, 0.1f, -1.f, 0.1f);
+	glm::vec3 lightDir = g_systems.render->lightDir;
+	glUniform3f(lightDirLoc, lightDir.x, lightDir.y, lightDir.z);
 
 	unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
 	glUniform3f(aIntensityLoc, 0.3f, 0.3f, 0.3f);
