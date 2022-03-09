@@ -3,14 +3,14 @@
 ## To Run
 Double click the file in the Bread/ directory called "BreadySetGo!!!.exe" 
 
-## Controls (Keyboard)
+## Controls (Keyboard, it's broken)
 - **W**: Drive forwards
 - **A**: Drive left
 - **S**: Drive backwards
 - **D**: Drive right
 - **R**: Reset position to spawn
 
-Note: Works only when controller is unplugged
+Note: Keyboard controls were broken sometime during the merge-fest of this milestone. The functionnality is not important as it was meant for debug purposes for the most part.
 
 ## Controls (XBox Controller, plug-n-play)
 - **LT**: Brake/Reverse
@@ -99,3 +99,4 @@ Note: Works only when controller is unplugged
 - Camera becomes obscured when going down a ramp.
 - Rendered position of a vehicle on a ramp appears floating.
 - Some distant objects are not rendered correctly
+- Keyboard controls no longer entirely work
