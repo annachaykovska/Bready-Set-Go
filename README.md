@@ -24,6 +24,11 @@ Note: Works only when controller is unplugged
   - Custom 3D kitchen-themed level mesh
   - Collision detection for level mesh
   - Collision detection between players
+  - Recipes:
+    - Array of 3 recipes per player, can be specifically initialized
+    - Keep track of completed recipes and check progress
+    - Track player's inventory
+  - Boolean to set breadmobile as AI or player
 - Driving:
   - XBox controller compatible
   - Faster engine
