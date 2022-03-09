@@ -22,12 +22,13 @@ Note: Works only when controller is unplugged
 ## New Features and Changes Included
 - Level Design:
   - Custom 3D kitchen-themed level mesh
-  - Collision detection for level mesh
-  - Collision detection between players
   - Recipes:
     - Array of 3 recipes per player, can be specifically initialized
     - Keep track of completed recipes and check progress
     - Track player's inventory
+  - Collision detection for level mesh
+  - Collision detection between players
+    - Random item transfer between players (collision roles are not handled yet, no way to figure out who hit who)
   - Boolean to set breadmobile as AI or player
 - Driving:
   - XBox controller compatible
@@ -50,7 +51,8 @@ Note: Works only when controller is unplugged
   - Recipe item tracking
   - Speedometer
 - AI:
-  - TODO
+  - Navigation mesh set over the map
+  - Possible for the AI to win the game
 - Rendering:
   - Improved lighting model
   - Multiple light casters (point and directional lighting)
@@ -58,6 +60,6 @@ Note: Works only when controller is unplugged
 - Other Changes:
   - Bugfix for objects flying when window is moved
 
-## IMPORTANT NOTES AND KNOWN BUGS:
-- Player collision spams warnings (that don't break things yet)
+<!-- ## IMPORTANT NOTES AND KNOWN BUGS:
+- Player collision spams warnings (that don't break things yet) -->
 
