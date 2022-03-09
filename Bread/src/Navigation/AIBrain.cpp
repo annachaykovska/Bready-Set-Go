@@ -7,6 +7,8 @@ AIBrain::AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSys
 	, oldInventoryCount(0)
 	, panicCounter_(0)
 	, distance_(0)
+	, trackedTargetDelta(position(0.f, 0.f, 0.f))
+	, currentTarget(NONE)
 {
 
 }
@@ -23,13 +25,34 @@ void AIBrain::update()
 			panicCounter_ = 0;
 		}
 	}
-	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset())
+	bool movingTarget = false;
+
+	switch (currentTarget)
+	{
+	case CHEESE:
+		if (length(tracker.getCheeseLocation().position - trackedTargetDelta) > 5)
+			movingTarget = true;
+		break;
+	case TOMATO:
+		if (length(tracker.getTomatoLocation().position - trackedTargetDelta) > 5)
+			movingTarget = true;
+		break;
+	case DOUGH:
+		if (length(tracker.getDoughLocation().position - trackedTargetDelta) > 5)
+			movingTarget = true;
+		break;
+	case SAUSAGE:
+		if (length(tracker.getSausageLocation().position - trackedTargetDelta) > 5)
+			movingTarget = true;
+		break;
+	}
+	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || movingTarget)
 	{
 		panicCounter_ = 0;
 		oldInventoryCount = getInventoryCount();
-		target newTarget = findClosestTarget();
+		currentTarget = findClosestTarget();
 		position targetPosition;
-		switch (newTarget)
+		switch (currentTarget)
 		{
 		case CHEESE:
 			targetPosition = tracker.getCheeseLocation().position;
@@ -47,6 +70,7 @@ void AIBrain::update()
 			targetPosition = glm::vec3(-80.f, 0.f, 60.f);
 			break;
 		}
+		trackedTargetDelta = targetPosition;
 		navigation.planPath(targetPosition);
 	}
 	navigation.update();

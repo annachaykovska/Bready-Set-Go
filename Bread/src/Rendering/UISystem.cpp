@@ -118,7 +118,12 @@ UISystem::~UISystem(){
 }
 
 void UISystem::update() {
-    //renderText(textShader, "Bready Set Go", 25.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    
+    if (checkForWin() != 0)
+    {
+        std::string winText = "Player " + std::to_string(checkForWin()) + " Wins!";
+        renderText(textShader, winText, 250.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    }
     float height, width;
 
     // Player 1 UI (eventually abstract to a draw player UI method)
@@ -189,6 +194,43 @@ void UISystem::update() {
     width = inventory.width;
     renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0, 1.f);
 
+}
+
+int UISystem::checkForWin()
+{
+    Entity* player1 = g_scene.getEntity("player1");
+    Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
+
+    if (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage)
+    {
+        return 1;
+    }
+
+    Entity* player2 = g_scene.getEntity("player2");
+    Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
+
+    if (p2Inv->tomato && p2Inv->cheese && p2Inv->dough && p2Inv->sausage)
+    {
+        return 2;
+    }
+
+    Entity* player3 = g_scene.getEntity("player3");
+    Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
+
+    if (p3Inv->tomato && p3Inv->cheese && p3Inv->dough && p3Inv->sausage)
+    {
+        return 3;
+    }
+
+    Entity* player4 = g_scene.getEntity("player4");
+    Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
+
+    if (p4Inv->tomato && p4Inv->cheese && p4Inv->dough && p4Inv->sausage)
+    {
+        return 4;
+    }
+
+    return 0;
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)

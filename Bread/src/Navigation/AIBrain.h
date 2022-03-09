@@ -17,6 +17,10 @@ private:
 	target findClosestTarget();
 	int getInventoryCount();
 
+	target currentTarget;
+
+	position trackedTargetDelta;
+
 	Inventory& inventory;
 	IngredientTracker& tracker;
 	NavigationSystem& navigation;

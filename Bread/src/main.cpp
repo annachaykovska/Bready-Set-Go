@@ -201,6 +201,28 @@ int main()
 			ui.update();
 		}
 		
+		//ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+		//ui.update();
+		//profiler.newFrame();
+
+		// TODO: Move this out of main
+		if (p1Inv.cheese)
+		{
+			ingredientTracker.updateCheeseTransformSource(*player1->getTransform());
+		}
+		if (p1Inv.tomato)
+		{
+			ingredientTracker.updateTomatoTransformSource(*player1->getTransform());
+		}
+		if (p1Inv.sausage)
+		{
+			ingredientTracker.updateSausageTransformSource(*player1->getTransform());
+		}
+		if (p1Inv.dough)
+		{
+			ingredientTracker.updateDoughTransformSource(*player1->getTransform());
+		}
+
 		// Update the ImGUI profiler
 		profiler.newFrame();
 		profiler.update();
