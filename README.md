@@ -3,7 +3,14 @@
 ## To Run
 Double click the file in the Bread/ directory called "BreadySetGo!!!.exe" 
 
-## Controls (Keyboard, it's broken)
+## Controls (XBox Controller, plug-n-play)
+- **LT**: Brake/Reverse
+- **RT**: Accelerate
+- **L Thumb**: Steering
+- **R Thumb**: Camera Directional Influence (Rocket League Style)
+- **START**: Reset position to start
+
+## Controls (Keyboard, not fully connected)
 - **W**: Drive forwards
 - **A**: Drive left
 - **S**: Drive backwards
@@ -11,13 +18,6 @@ Double click the file in the Bread/ directory called "BreadySetGo!!!.exe"
 - **R**: Reset position to spawn
 
 Note: Keyboard controls were broken sometime during the merge-fest of this milestone. The functionnality is not important as it was meant for debug purposes for the most part.
-
-## Controls (XBox Controller, plug-n-play)
-- **LT**: Brake/Reverse
-- **RT**: Accelerate
-- **L Thumb**: Steering
-- **R Thumb**: Camera Directional Influence (Rocket League Style)
-- **START**: Reset position to start
 
 ## New Features and Changes Included
 - **Level Design:**
