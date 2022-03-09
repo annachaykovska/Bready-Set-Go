@@ -81,6 +81,7 @@ Note: Keyboard controls were broken sometime during the merge-fest of this miles
 - Recipe delivery area
 - Simple powerups
 - Improved AI path smoothing
+- Re-Integrate keyboard controls
 - Full level reset
 - Main menu
 
