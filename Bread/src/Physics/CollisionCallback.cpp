@@ -64,7 +64,7 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         // OTHER PLAYERS
         if (entity1->name == "player2" || entity1->name == "player3" || entity1->name == "player4")
         {
-            entity0->getAudioSource()->play("ding.wav");
+            entity0->getAudioSource()->play("thump.wav");
             printf("%s collided with %s\n", entity0->name.c_str(), entity1->name.c_str());
         }
     }
@@ -103,7 +103,7 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         // OTHER PLAYERS
         if (entity0->name == "player2" || entity0->name == "player3" || entity0->name == "player4")
         {
-            entity1->getAudioSource()->play("ding.wav");
+            entity1->getAudioSource()->play("thump.wav");
             printf("%s collided with %s\n", entity1->name.c_str(), entity0->name.c_str());
         }
     }
