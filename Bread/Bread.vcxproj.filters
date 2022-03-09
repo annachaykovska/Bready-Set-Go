@@ -47,6 +47,7 @@
     <ClCompile Include="src\Navigation\AIBrain.cpp" />
     <ClCompile Include="src\Navigation\IngredientTracker.cpp" />
     <ClCompile Include="src\Navigation\NavigationSystem.cpp" />
+    <ClCompile Include="src\Rendering\DebugOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\AL\al.h" />
@@ -785,6 +786,7 @@
     <ClInclude Include="src\Navigation\AIBrain.h" />
     <ClInclude Include="src\Navigation\IngredientTracker.h" />
     <ClInclude Include="src\Navigation\NavigationSystem.h" />
+    <ClInclude Include="src\Rendering\DebugOverlay.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />
