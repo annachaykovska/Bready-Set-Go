@@ -119,20 +119,17 @@ void UISystem::update() {
 
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
-    height = speedometer.height;
-    width = speedometer.width;
-    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f, 1.f);
-
     height = needle.height;
     width = needle.width;
     renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
         lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
 
-    // Drawing minimap
-    height = miniMap.height;
-    width = miniMap.width;
-    renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0, 1.f);
+    height = speedometer.height;
+    width = speedometer.width;
+    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f, 1.f);
 
+
+    // Drawing minimap
     height = p1Icon.height;
     width = p1Icon.width;
     renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
@@ -146,11 +143,12 @@ void UISystem::update() {
     width = p4Icon.width;
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
 
+    height = miniMap.height;
+    width = miniMap.width;
+    renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0, 1.f);
+
+
     // Drawing Inventory
-    height = inventory.height;
-    width = inventory.width;
-    renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0, 1.f);
-    
     Entity* player1 = g_scene.getEntity("player1");
     Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
     float alpha;
@@ -160,7 +158,7 @@ void UISystem::update() {
     alpha = (p1Inv->tomato) ? opaque : faded;
     height = tomato.height;
     width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0, alpha);
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0, 1.0);
 
     alpha = (p1Inv->cheese) ? opaque : faded;
     height = tomato.height;
@@ -176,6 +174,11 @@ void UISystem::update() {
     height = tomato.height;
     width = tomato.width;
     renderImage(imageShader, tomato, 60.0f, 290.0f - (3 * 58.f), 70.f, 70.f, 0, alpha);
+
+    height = inventory.height;
+    width = inventory.width;
+    renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0, 1.f);
+
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
