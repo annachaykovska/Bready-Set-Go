@@ -135,6 +135,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
 	Mesh newMesh(vertices, indices, textures);
 
+	/*
 	// If the mesh has texture image files associated with it, get those too
 	if (mesh->mMaterialIndex >= 0)
 	{
@@ -181,7 +182,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		for(auto it = diffuseMaps.begin(); it < diffuseMaps.end(); it++)
 			newMesh.textures.push_back(*it);
 	}
-
+	*/
 	return newMesh;
 }
 

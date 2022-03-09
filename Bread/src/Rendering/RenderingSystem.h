@@ -6,6 +6,17 @@
 #include "Model.h"
 #include "../Transform.h"
 
+struct Orthogonal
+{
+	float x;
+	float y;
+	float z;
+	float w;
+
+	float nearPlane;
+	float farPlane;
+};
+
 class RenderingSystem
 {
 public:
@@ -18,6 +29,10 @@ public:
 	void setupCameras(Transform* playerTransform);
 	void update();
 	Model* getKitchenModel();
+	void renderScene(Shader& shader);
+	void renderQuad();
+
+	Orthogonal ort;
 
 private:
 
