@@ -85,4 +85,10 @@ private:
 
 	float viewDirectionalInfluence;
 	float turnDirectionalInfluence;
+
+	bool mImpulseAppliedPlayer1 = false;
+	bool mImpulseAppliedPlayer2 = false;
+	bool mImpulseAppliedPlayer3 = false;
+	bool mImpulseAppliedPlayer4 = false;
 }; 
+
