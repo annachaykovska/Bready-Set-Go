@@ -5,6 +5,10 @@ Entity::Entity(std::string name)
 	this->name = name;
 }
 
+Entity::Entity() {
+	this->name = "default";
+}
+
 bool Entity::attachComponent(Component* newComponent, std::string name)
 {
 	if ((components.emplace(name, newComponent)).second)

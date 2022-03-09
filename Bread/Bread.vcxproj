@@ -114,6 +114,9 @@
     <ClCompile Include="dependencies\physx\include\snippetvehiclecommon\SnippetVehicleTireFriction.cpp" />
     <ClCompile Include="src\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Audio\AudioSource.cpp" />
+    <ClCompile Include="src\Gameplay\Ingredient.cpp" />
+    <ClCompile Include="src\Gameplay\Breadmobile.cpp" />
+    <ClCompile Include="src\Gameplay\Recipe.cpp" />
     <ClCompile Include="src\Physics\CollisionCallback.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\Camera.cpp" />
@@ -756,6 +759,9 @@
     <ClInclude Include="src\Audio\AudioEvent.h" />
     <ClInclude Include="src\Audio\AudioSource.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Gameplay\Ingredient.h" />
+    <ClInclude Include="src\Gameplay\Breadmobile.h" />
+    <ClInclude Include="src\Gameplay\Recipe.h" />
     <ClInclude Include="src\Inventory.h" />
     <ClInclude Include="src\Physics\CollisionCallback.h" />
     <ClInclude Include="src\Physics\PhysicsEnums.h" />
