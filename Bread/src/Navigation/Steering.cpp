@@ -10,7 +10,7 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics)
 	: entity_(entity)
 	, physics_(physics)
 {
-	physics_.startAccelerateForwardsMode();
+	//physics_.startAccelerateForwardsMode();
 }
 
 void Steering::updateSteering(position target)
@@ -33,16 +33,16 @@ void Steering::updateSteering(position target)
 		//std::cout << "Correcting" << std::endl;
 		if (upVector.y < 0)
 		{
-			physics_.startTurnHardRightMode();
+			//physics_.startTurnHardRightMode();
 		}
 		else
 		{
-			physics_.startTurnHardLeftMode();
+			//physics_.startTurnHardLeftMode();
 		}
 	}
 	else
 	{
 		//std::cout << "Stay on Target" << std::endl;
-		physics_.releaseSteering();
+		//physics_.releaseSteering();
 	}
 }
