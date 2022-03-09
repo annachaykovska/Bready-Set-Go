@@ -55,4 +55,76 @@ public:
 		else
 			return false;
 	}
+
+	void setIngredientFromId(int ingredient) {
+		switch (ingredient)
+		{
+		case (0):
+			this->cheese = 1;
+			break;
+		case (1):
+			this->dough = 1;
+			break;
+		case (2):
+			this->sausage = 1;
+			break;
+		case (3):
+			this->tomato = 1;
+			break;
+		case (4):
+			this->carrot = 1;
+			break;
+		case (5):
+			this->lettuce = 1;
+			break;
+		case (6):
+			this->parsnip = 1;
+			break;
+		case (7):
+			this->rice = 1;
+			break;
+		case (8):
+			this->egg = 1;
+			break;
+		case (9):
+			this->chicken = 1;
+			break;
+		case (10):
+			this->peas = 1;
+			break;
+		case (11):
+			this->soupbase = 1;
+			break;
+		case (12):
+			this->pumpkin = 1;
+			break;
+		default:
+			break;
+		}
+	}
+
+	int removeRandomPizzaIngredient(int opponentCheese, int opponentDough, int opponentSausage, int opponentTomato) {
+		// TODO add randomizer
+		if (this->cheese == 0 && this->dough == 0 && this->sausage == 0 && this->tomato == 0)
+			return -1;
+		else {
+			if (opponentCheese == 0 && this->cheese == 1) {
+				this->cheese = 0;
+				return 0;
+			}
+			else if (opponentDough == 0 && this->dough == 1) {
+				this->dough = 0;
+				return 1;
+			}
+			else if (opponentSausage == 0 && this->sausage == 1) {
+				this->sausage = 0;
+				return 2;
+			}
+			else if (opponentTomato == 0 && this->tomato == 1) {
+				this->tomato = 0;
+				return 3;
+			}
+		}
+		return -1;
+	}
 };
