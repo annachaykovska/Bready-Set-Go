@@ -1,6 +1,9 @@
 #include "UISystem.h"
+#include "../Inventory.h"
+#include "../Scene/Entity.h"
 
 extern SystemManager g_systems;
+extern Scene g_scene;
 
 UISystem::UISystem()
     : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
@@ -104,7 +107,6 @@ UISystem::UISystem()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-	//std::cout << "UI initialized" << std::endl;
 }
 
 UISystem::~UISystem(){
@@ -119,55 +121,61 @@ void UISystem::update() {
     // Drawing speedometer
     height = speedometer.height;
     width = speedometer.width;
-    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f);
+    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f, 1.f);
 
     height = needle.height;
     width = needle.width;
     renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
-        lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f));
+        lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
 
     // Drawing minimap
     height = miniMap.height;
     width = miniMap.width;
-    renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0);
+    renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0, 1.f);
 
     height = p1Icon.height;
     width = p1Icon.width;
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
     height = p2Icon.height;
     width = p2Icon.width;
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
     height = p3Icon.height;
     width = p3Icon.width;
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
     height = p4Icon.height;
     width = p4Icon.width;
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0);
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
 
     // Drawing Inventory
     height = inventory.height;
     width = inventory.width;
-    renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0);
-    if (true) { // Change this to check if the ingredient has been gathered
-        height = tomato.height;
-        width = tomato.width;
-        renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0);
-    }
-    if (true) { // Change this to check if the ingredient has been gathered
-        height = tomato.height;
-        width = tomato.width;
-        renderImage(imageShader, tomato, 60.0f, 290.0f - (1 * 58.f), 70.f, 70.f, 0);
-    }
-    if (true) { // Change this to check if the ingredient has been gathered
-        height = tomato.height;
-        width = tomato.width;
-        renderImage(imageShader, tomato, 60.0f, 290.0f - (2 * 58.f), 70.f, 70.f, 0);
-    }
-    if (true) { // Change this to check if the ingredient has been gathered
-        height = tomato.height;
-        width = tomato.width;
-        renderImage(imageShader, tomato, 60.0f, 290.0f - (3 * 58.f), 70.f, 70.f, 0);
-    }
+    renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0, 1.f);
+    
+    Entity* player1 = g_scene.getEntity("player1");
+    Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
+    float alpha;
+    float faded = 0.2f;
+    float opaque = 1.f;
+
+    alpha = (p1Inv->tomato) ? opaque : faded;
+    height = tomato.height;
+    width = tomato.width;
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 70.f, 70.f, 0, alpha);
+
+    alpha = (p1Inv->cheese) ? opaque : faded;
+    height = tomato.height;
+    width = tomato.width;
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (1 * 58.f), 70.f, 70.f, 0, alpha);
+    
+    alpha = (p1Inv->dough) ? opaque : faded;
+    height = tomato.height;
+    width = tomato.width;
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (2 * 58.f), 70.f, 70.f, 0, alpha);
+
+    alpha = (p1Inv->sausage) ? opaque : faded;
+    height = tomato.height;
+    width = tomato.width;
+    renderImage(imageShader, tomato, 60.0f, 290.0f - (3 * 58.f), 70.f, 70.f, 0, alpha);
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
@@ -250,22 +258,16 @@ void UISystem::renderText(Shader& s, std::string text, float x, float y, float s
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta)
+void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha)
 {
     s.use();
     glUniformMatrix4fv(glGetUniformLocation(s.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(imageProjection));
+    glUniform1f(glGetUniformLocation(s.getId(), "alpha"), alpha);    
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
     // THIS SHOULD PROBABLY BE CHANGED EVENTUALLY
     float vertices[6][4] = {
-            //{ x,     y + scaleY,    0.0f, 1.0f },
-            //{ x,     y,             0.0f, 0.f },
-            //{ x + scaleX, y,        1.f, 0.f },
-
-            //{ x,     y + scaleY,    0.0f, 1.0f },
-            //{ x + scaleX, y,        1.f, 0.f },
-            //{ x + scaleX, y + scaleY,1.f, 1.0f }
         {-1., 1., 0., 1.},
         {-1., -1., 0., 0.},
         {1., -1., 1., 0.},

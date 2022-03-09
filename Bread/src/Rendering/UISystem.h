@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "../Transform.h"
 #include "../SystemManager.h"
+#include "../Scene/Scene.h"
 #include "../Physics/PhysicsSystem.h"
 #include <iostream>
 #include <map>
@@ -37,7 +38,7 @@ private:
 
 
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
-	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta);
+	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
 	float lerp(float p, float a, float b);
 
