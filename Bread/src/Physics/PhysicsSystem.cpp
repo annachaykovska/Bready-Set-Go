@@ -217,7 +217,7 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
 	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
-	startTransformPlayer1 = PxTransform(PxVec3(130, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 190), PxQuat(PxIdentity));
+	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
 	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));

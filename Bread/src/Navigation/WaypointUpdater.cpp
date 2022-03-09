@@ -68,7 +68,14 @@ int WaypointUpdater::numWaypoints()
 
 position WaypointUpdater::currentWaypoint()
 {
-	return waypoints_.back();
+	if (waypoints_.size() > 0)
+	{
+		return waypoints_.back();
+	}
+	else
+	{
+		return glm::vec3(0.f, 0.f, 0.f);
+	}
 }
 
 position WaypointUpdater::futureWaypoint(int iter)
