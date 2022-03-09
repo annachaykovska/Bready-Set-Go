@@ -20,7 +20,7 @@ AudioSystem::AudioSystem()
 	float orientation[] = { 0, 0, 1, 0, 1, 0 };
 
 	alListeneri(AL_DISTANCE_MODEL, AL_INVERSE_DISTANCE_CLAMPED);
-	alListenerf(AL_GAIN, 0.5f);
+	alListenerf(AL_GAIN, 1.0f);
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListenerfv(AL_ORIENTATION, orientation);
@@ -40,19 +40,28 @@ AudioSystem::AudioSystem()
 	load("ding.wav");
 	load("pickup.wav");
 	load("thump.wav");
+	load("idle.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
 	// Create AudioSource Components
 	AudioSource* countertopAudioSource = createAudioSource();
 	AudioSource* p1AudioSource = createAudioSource();
+	AudioSource* p2AudioSource = createAudioSource();
+	AudioSource* p3AudioSource = createAudioSource();
+	AudioSource* p4AudioSource = createAudioSource();
 
 	// Attach AudioSource Components to Entities
 	Entity* countertop = g_scene.getEntity("countertop");
 	countertop->attachComponent(countertopAudioSource, "audio");
-
 	Entity* player1 = g_scene.getEntity("player1");
 	player1->attachComponent(p1AudioSource, "audio");
+	Entity* player2 = g_scene.getEntity("player2");
+	player2->attachComponent(p2AudioSource, "audio");
+	Entity* player3 = g_scene.getEntity("player3");
+	player3->attachComponent(p3AudioSource, "audio");
+	Entity* player4 = g_scene.getEntity("player4");
+	player4->attachComponent(p4AudioSource, "audio");
 }
 
 AudioSystem::~AudioSystem()
@@ -192,4 +201,27 @@ AudioSource* AudioSystem::createAudioSource()
 		return &audioSources.back();
 	else
 		return nullptr;
+}
+
+void AudioSystem::update()
+{
+	for (auto it = this->audioSources.begin(); it < this->audioSources.end(); it++)
+	{
+		if (it->owner->name == "player1")
+		{
+			Transform* trans = it->owner->getTransform();
+			glm::vec3 pos = trans->position;
+			alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+			glm::vec3 heading = glm::normalize(it->owner->orientation);
+			float orientation[] = { -heading.x, -heading.y, -heading.z, 0, 1, 0 };
+			alListenerfv(AL_ORIENTATION, orientation);
+			glm::vec3 velocity = heading * it->owner->speed;
+			alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+		}
+		else
+		{
+			it->update();
+			it->play("idle.wav");
+		}
+	}
 }

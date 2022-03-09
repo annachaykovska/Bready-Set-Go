@@ -128,6 +128,19 @@ int main()
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
 	countertopAudioSource->gain = 0.01f; // Volume control
 	countertopAudioSource->play("bg.wav"); // Comment this out to turn off the music on load
+	
+	AudioSource* p2Audio = player2->getAudioSource();
+	AudioSource* p3Audio = player3->getAudioSource();
+	AudioSource* p4Audio = player4->getAudioSource();
+	p2Audio->gain = 1.0f;
+	//p2Audio->loop = true;
+	//p2Audio->play("idle.wav");
+	p3Audio->gain = 1.0f;
+	//p3Audio->loop = true;
+	//p3Audio->play("idle.wav");
+	p4Audio->gain = 1.0f;
+	//p4Audio->loop = true;
+	//p4Audio->play("idle.wav");
 
 	// Track time
 	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
@@ -200,7 +213,7 @@ int main()
 		p2Brain.update();
 
 		// AUDIO
-		// update AudioSource	
+		audio.update();
 	}
 
 	// Collect garbage

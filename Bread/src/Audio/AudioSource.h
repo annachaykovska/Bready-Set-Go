@@ -22,7 +22,10 @@ public:
 
 	void setSource();
 	bool play(std::string clipName);
+	bool isPlaying();
 	bool stop();
+
+	void update();
 
 private:
 

@@ -96,3 +96,20 @@ bool AudioSource::stop()
 	else
 		return false;
 }
+
+void AudioSource::update()
+{
+	glm::vec3 pos = this->owner->getTransform()->position;
+	alSource3f(this->source, AL_POSITION, pos.x, pos.y, pos.z);
+}
+
+bool AudioSource::isPlaying()
+{
+	ALint value;
+	alGetSourcei(source, AL_SOURCE_STATE, &value);
+
+	if (value == AL_PLAYING)
+		return true;
+	else
+		return false;
+}

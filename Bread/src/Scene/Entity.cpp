@@ -4,11 +4,13 @@ Entity::Entity(std::string name)
 {
 	this->name = name;
 	this->removeFlag = false;
+	this->orientation = glm::vec3(1.0f);
 }
 
 Entity::Entity(){
 	this->name = "default";
 	this->removeFlag = false;
+	this->orientation = glm::vec3(1.0f);
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)

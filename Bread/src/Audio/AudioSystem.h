@@ -30,6 +30,8 @@ public:
 	bool load(std::string filePath);
 	AudioSource* createAudioSource();
 
+	void update();
+
 private:
 
 	std::unordered_map<std::string, AudioClip> audioClips;
