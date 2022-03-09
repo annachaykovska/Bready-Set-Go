@@ -32,7 +32,7 @@ public:
 			meshStep_ = new Node(vert((v0_.x + v1_.x + v2_.x) / 3.f, (v0_.y + v1_.y + v2_.y) / 3.f, (v0_.z + v1_.z + v2_.z) / 3.f));
 		}
 
-		char id_;
+		int id_;
 		bool traversable_ = true;
 		vert v0_;
 		vert v1_;

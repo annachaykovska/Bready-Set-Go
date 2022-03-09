@@ -12,7 +12,7 @@ NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavM
 
 void NavigationSystem::planPath(position target)
 {
-	waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(-90.f, -1.f, 95.f), target));
+	waypointUpdater_.setWaypoints(pathFinder_.findPath(glm::vec3(130, 0.f, 190), target));
 	//std::cout << "Planned Path Length" << std::endl;
 	//std::cout << waypointUpdater_.numWaypoints() << std::endl;
 }
