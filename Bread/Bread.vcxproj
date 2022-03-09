@@ -1073,9 +1073,14 @@
     <None Include="src\assimp-vc142-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="resources\shaders\borderFragment.txt" />
     <Text Include="resources\shaders\fragment.txt" />
+    <Text Include="resources\shaders\imageFragment.txt" />
+    <Text Include="resources\shaders\imageVertex.txt" />
     <Text Include="resources\shaders\lightSourceFragment.txt" />
     <Text Include="resources\shaders\lightSourceVertex.txt" />
+    <Text Include="resources\shaders\simpleFragment.txt" />
+    <Text Include="resources\shaders\simpleVertex.txt" />
     <Text Include="resources\shaders\textFragment.txt" />
     <Text Include="resources\shaders\textVertex.txt" />
     <Text Include="resources\shaders\vertex.txt" />
@@ -1085,7 +1090,18 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\rat.ico" />
+    <Image Include="resources\textures\coolpicture.png" />
     <Image Include="resources\textures\diffuse.jpg" />
+    <Image Include="resources\textures\inventory.png" />
+    <Image Include="resources\textures\map.png" />
+    <Image Include="resources\textures\needle.png" />
+    <Image Include="resources\textures\p1Icon.png" />
+    <Image Include="resources\textures\p2Icon.png" />
+    <Image Include="resources\textures\p3Icon.png" />
+    <Image Include="resources\textures\p4Icon.png" />
+    <Image Include="resources\textures\PandaMat.png" />
+    <Image Include="resources\textures\speedometer.png" />
+    <Image Include="resources\textures\testtexture.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\audio\bg.wav" />

@@ -2836,6 +2836,11 @@
     <Text Include="resources\shaders\lightSourceVertex.txt" />
     <Text Include="resources\shaders\textFragment.txt" />
     <Text Include="resources\shaders\textVertex.txt" />
+    <Text Include="resources\shaders\borderFragment.txt" />
+    <Text Include="resources\shaders\imageFragment.txt" />
+    <Text Include="resources\shaders\imageVertex.txt" />
+    <Text Include="resources\shaders\simpleFragment.txt" />
+    <Text Include="resources\shaders\simpleVertex.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bread.rc">
@@ -2847,6 +2852,39 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="resources\textures\diffuse.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\coolpicture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\inventory.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\map.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\needle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\p1Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\p2Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\p3Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\p4Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\PandaMat.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\speedometer.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\testtexture.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
