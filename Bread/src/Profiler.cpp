@@ -27,6 +27,8 @@ Profiler::Profiler(Window& window)
 	t0 = glfwGetTime();
 	msPerFrame = 0;
 	framesPerSecond = 0;
+
+	depthMap = 0;
 }
 
 void Profiler::newFrame()
@@ -202,6 +204,13 @@ void Profiler::shadows()
 
 	if (ImGui::CollapsingHeader("Shadows"))
 	{
+		ImGui::InputInt("DepthMap Render", &depthMap);
+
+		if (depthMap == 0)
+			g_systems.renderDebug = false;
+		if (depthMap == 1)
+			g_systems.renderDebug = true;
+
 		ImGui::InputFloat("orthoProj.x", &(ort.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.y", &(ort.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.z", &(ort.z), 1.f, 10.f, "%.3f");

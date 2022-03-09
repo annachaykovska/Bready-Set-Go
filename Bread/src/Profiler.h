@@ -28,4 +28,5 @@ private:
 	double t0;
 	double msPerFrame;
 	double framesPerSecond;
+	int depthMap;
 };

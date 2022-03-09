@@ -103,7 +103,8 @@ int main()
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = 3.1f;
+	counterTrans->position.y = 4.1f;
+	counterTrans->update();
 
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
@@ -181,8 +182,14 @@ int main()
 		window.clear();
 		renderer.update();
 
-		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-		ui.update();
+		if (!g_systems.renderDebug)
+		{
+			ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+			ui.update();
+		}
+		
+		//ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+		//ui.update();
 		//profiler.newFrame();
 
 		// TODO: Move this out of main
@@ -204,7 +211,8 @@ int main()
 		}
 
 		// Update the ImGUI profiler
-		//profiler.update();
+		profiler.newFrame();
+		profiler.update();
 
 		// Swap the frame buffers
 		window.swapBuffer();
