@@ -8,6 +8,7 @@
 #include "Scene/Entity.h"
 #include "Transform.h"
 #include "Rendering/RenderingSystem.h"
+#include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
 #include "Physics/VehicleController.h"
 #include "Inventory.h"
@@ -66,6 +67,10 @@ int main()
 	AudioSystem audio;
 	g_systems.audio = &audio;
 
+	//TODO put UI system here
+	UISystem ui;
+	g_systems.ui = &ui;
+
 	g_scene.init(&physics);
 
 	//-----------------------------------------------------------------------------------
@@ -90,6 +95,9 @@ int main()
 	test->attachComponent(&transforms[9], "transform");
 
 	// Initialize transform components
+	Transform* counterTrans = countertop->getTransform();
+	counterTrans->position.y = 3.1f;
+
 	Transform* cheeseTransform = cheese->getTransform();
 	cheeseTransform->scale = glm::vec3(30, 30, 30);
 
@@ -155,9 +163,11 @@ int main()
 		// RENDER
 		window.clear();
 		renderer.update();
+		ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+		ui.update();
+		profiler.newFrame();
 
 		// Update the ImGUI profiler
-		profiler.newFrame();
 		profiler.update();
 
 		// Swap the frame buffers

@@ -39,6 +39,9 @@ AudioSystem::AudioSystem()
 	load("tone.wav");
 	load("ding.wav");
 	load("pickup.wav");
+	load("thump.wav");
+	//load("thumpdull.wav");
+	//load("thump2.wav");
 
 	// Create AudioSource Components
 	AudioSource* countertopAudioSource = createAudioSource();

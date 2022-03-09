@@ -32,8 +32,11 @@ public:
 
 	void setViewDirectionalInfluence(float value);
 	float getViewDirectionalInfluence();
+	void setTurnDirectionalInfluence(float value);
+	float getTurnDirectionalInfluence();
 
-	void cookieCutter(PxTriangleMesh& meshDesc, PxDefaultMemoryOutputStream& writeBuffer, PxTriangleMeshCookingResult::Enum& result);
+	float getPlayerSpeed(int playerNumber);
+	void respawnPlayer(int playerNumber);
 
 	void cleanupPhysics();
 
@@ -75,11 +78,23 @@ private:
 	PxVehicleDrivableSurfaceToTireFrictionPairs* mFrictionPairs;
 	PxRigidStatic* mGroundPlane;
 
+	PxTransform startTransformPlayer1;
+	PxTransform startTransformPlayer2;
+	PxTransform startTransformPlayer3;
+	PxTransform startTransformPlayer4;
+
 	bool mIsVehicleInAirPlayer1 = true;
 	bool mIsVehicleInAirPlayer2 = true;
 	bool mIsVehicleInAirPlayer3 = true;
 	bool mIsVehicleInAirPlayer4 = true;
 	bool useAnalogInputs = false;
 
-	float viewDirectionalInfluence = 0.f;
+	float viewDirectionalInfluence;
+	float turnDirectionalInfluence;
+
+	bool mImpulseAppliedPlayer1 = false;
+	bool mImpulseAppliedPlayer2 = false;
+	bool mImpulseAppliedPlayer3 = false;
+	bool mImpulseAppliedPlayer4 = false;
 }; 
+

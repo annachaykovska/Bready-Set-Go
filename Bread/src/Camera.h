@@ -48,6 +48,9 @@ private:
 	float forcedDirection;
 	float recordedForcedDirection;
 	float oldForcedDirection;
+	float oldCameraRotationOffset;
+
+	float predictedCameraDelta;
 
 	float movementSpeed;
 	float mouseSensitivity;

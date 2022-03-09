@@ -19,11 +19,11 @@ void XboxController::checkControllers() {
 
 		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
 			controllerId = i;
-			
+
 		}
 	}
 
-	if (controllerId != -1) 
+	if (controllerId != -1)
 	{
 		physics->setAnalogInputs(true);
 	}
@@ -82,7 +82,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input = &physics->mVehicleInputDataPlayer3;
 	else if (controllerId == 3)
 		input = &physics->mVehicleInputDataPlayer4;
-	else 
+	else
 		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
 	XINPUT_STATE state = getControllerState(controllerId);
 
@@ -106,6 +106,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 
 	// Other buttons
 	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // UNUSED FOR NOW
+	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 
 	if (X_button_pressed)
 	{
@@ -116,8 +117,13 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		input->setAnalogHandbrake(0.0f);
 	}
 
+	// Respawn player
+	if (START_button_pressed)
+	{
+		physics->respawnPlayer(controllerId + 1);
+	}
 	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
-	
+
 	float analogVal;
 	if (thumbRightX <= 0) { // left
 		physics->setViewDirectionalInfluence(thumbRightDeadZone);
@@ -128,35 +134,66 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	}
 
 	// KEY PRESSED
-	if (triggerRight > 0.1) { // forwards
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
-			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
-		if (forwards == false)
-		{
-			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
-		}
-		forwards = true;
-		analogVal = triggerRight / 255;
-		input->setAnalogAccel(analogVal);
-		input->setAnalogBrake(0);
-	}
-	if (triggerLeft > 0.1 && triggerRight == 0.0) { // reverse
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-		if (forwards == true)
-		{
-			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
-		}
-		forwards = false;
-		analogVal = triggerLeft / 255;
-		input->setAnalogAccel(analogVal);
-		input->setAnalogBrake(0);
-	}
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
+		physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
 		analogVal = triggerLeft / 255;
 		input->setAnalogBrake(analogVal);
 	}
+	else if (triggerRight > 0.1) { // forwards
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
+			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		if (physics->mVehiclePlayer1->computeForwardSpeed() < -30)
+		{
+			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
+			input->setAnalogBrake(1.f);
+		}
+		else if (physics->mVehiclePlayer1->computeForwardSpeed() > -30 && physics->mVehiclePlayer1->computeForwardSpeed() < -2)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
+		if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
+		{
+			analogVal = triggerRight / 255;
+			input->setAnalogAccel(analogVal);
+		}
+		else
+		{
+			input->setAnalogAccel(0);
+		}
+		input->setAnalogBrake(0);
+	}
+	else if (triggerLeft > 0.1 && triggerRight == 0.0) { // reverse
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		if (physics->mVehiclePlayer1->computeForwardSpeed() > 30)
+		{
+			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
+			input->setAnalogBrake(1.f);
+		}
+		else if (physics->mVehiclePlayer1->computeForwardSpeed() < 30 && physics->mVehiclePlayer1->computeForwardSpeed() > 2)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
+		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 20)
+		{
+			analogVal = triggerLeft / 255;
+			input->setAnalogAccel(analogVal);
+		}
+		else
+		{
+			input->setAnalogAccel(0);
+		}
+		input->setAnalogBrake(0);
+	}
+	else
+	{
+		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 8)
+		{
+			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		}
+	}
+
 	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
 		float step = thumbLeftDeadZone * 2;
 		if (step > 0.143)
@@ -173,6 +210,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 			thumbLeftDeadZone = 1;
 		}
 		input->setAnalogSteer(thumbLeftDeadZone);
+		physics->setTurnDirectionalInfluence(thumbLeftDeadZone);
 	}
 	if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
 		float step = thumbLeftDeadZone * 2;
@@ -191,6 +229,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		}
 		analogVal = -1.0 * thumbLeftDeadZone;
 		input->setAnalogSteer(analogVal);
+		physics->setTurnDirectionalInfluence(analogVal);
 	}
 
 	// KEY RELEASED
