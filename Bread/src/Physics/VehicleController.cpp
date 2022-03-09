@@ -169,7 +169,7 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		{
 			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
 		}
-		if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
+		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 20)
 		{
 			analogVal = triggerLeft / 255;
 			input->setAnalogAccel(analogVal);
