@@ -20,6 +20,7 @@ public:
 	void testTransform();
 	void meshScale();
 	void update();
+	void shadows();
 
 private:
 

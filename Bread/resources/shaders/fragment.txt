@@ -32,6 +32,7 @@ out vec4 fragColor;
 in vec2 ourTexCoord;
 in vec3 ourNormal;
 in vec3 fragPos;
+in vec4 fragPosLightSpace;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
@@ -39,6 +40,7 @@ uniform sampler2D texture_diffuse3;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_specular2;
 uniform sampler2D texture_specular3;
+uniform sampler2D shadowMap;
 uniform int textured;
 
 uniform vec3 viewPos;
@@ -48,12 +50,12 @@ uniform Light light;
 vec3 dirLight()
 {
 	// Ambient light
-	float ambientStrength = 0.1;
+	float ambientStrength = 0.3;
 	vec3 ambient = light.ambient * material.ambient;
 
 	// Diffuse light
 	vec3 norm = normalize(ourNormal);
-	vec3 lightDir = normalize(-light.direction);
+	vec3 lightDir = normalize(light.position - fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = light.diffuse * diff * material.diffuse;
 
@@ -64,7 +66,22 @@ vec3 dirLight()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 	vec3 specular = light.specular * spec * material.specular;
 
-	return ambient + diffuse + specular;
+	// Shadow
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	projCoords = projCoords * 0.5 + 0.5;
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	float currentDepth = projCoords.z;
+	float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
+	float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
+
+	if (projCoords.z > 1.0)
+		shadow = 0.0;
+	
+	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse +	 specular));
+
+	//vec3 lighting = ambient + diffuse + specular;
+
+	return lighting;
 }
 
 vec3 pointLight()
@@ -106,7 +123,7 @@ void main()
 		objectColor = material.diffuse;
 	}
 
-	vec3 result = dirLight() + pointLight();
+	vec3 result = dirLight();// + pointLight();
 
 	// Phong light model
 	vec3 phong = result * objectColor;

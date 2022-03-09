@@ -22,6 +22,7 @@ public:
 	Model(char* path) { loadModel(path); }
 	Model(Mesh mesh);
 	void draw(Shader& shader);
+	void drawDepthMap(Shader& shader);
 	bool isTextured() { return (textures_loaded.size() != 0); }
 	void physicsVerts(std::vector<physx::PxVec3>* verts);
 	void physicsIndices(std::vector<physx::PxU32>* indices);
