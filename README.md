@@ -10,7 +10,7 @@ Double click the file in the Bread/ directory called "BreadySetGo!!!.exe"
 - **R Thumb**: Camera Directional Influence (Rocket League Style)
 - **START**: Reset position to start
 
-## Controls (Keyboard, not fully connected)
+## Controls (Keyboard - *Currently disconnected*)
 - **W**: Drive forwards
 - **A**: Drive left
 - **S**: Drive backwards
