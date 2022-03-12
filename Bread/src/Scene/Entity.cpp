@@ -53,3 +53,21 @@ AudioSource* Entity::getAudioSource()
 {
 	return (AudioSource*)(this->getComponent("audio"));
 }
+
+std::vector<std::string> Entity::getOtherPlayers() {
+	std::vector<std::string> result = {};
+	if (this->name == "player1") {
+		result = { "player2", "player3", "player4" };
+	}
+	else if (this->name == "player2") {
+		result = { "player1", "player3", "player4" };
+	}
+	else if (this->name == "player3") {
+		result = { "player1", "player2", "player4" };
+	}
+	else if (this->name == "player4") {
+		result = { "player1", "player2", "player3" };
+	}
+
+	return result;
+}

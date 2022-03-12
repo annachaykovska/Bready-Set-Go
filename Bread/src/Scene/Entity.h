@@ -6,6 +6,7 @@
 #include "../Audio/AudioSource.h"
 #include <PxPhysicsAPI.h>
 #include "../Rendering/Model.h"
+#include <vector>
 
 class Entity {
 
@@ -21,6 +22,7 @@ public:
 	Transform* getTransform();
 	Model* getModel();
 	AudioSource* getAudioSource();
+	std::vector<std::string> getOtherPlayers();
 
 	bool removeFlag;
 	float speed;

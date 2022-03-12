@@ -8,7 +8,10 @@
 #include "../Scene/Entity.h"
 #include "../Inventory.h"
 
+using namespace std;
+
 extern Scene g_scene;
+
 
 void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader, 
                                   const physx::PxContactPair* pairs, 
@@ -26,178 +29,97 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
     Entity* entity0 = g_scene.getEntity(a0name);
     Entity* entity1 = g_scene.getEntity(a1name);
 
-    //std::cout << "entity0->name = " << entity0->name << std::endl;
-    //std::cout << "entity1->name = " << entity1->name << std::endl;
-
-    // TODO make this better and part of GameLogic in the future
-    if (entity0->name == "player1")
+    if (entity0->name == "player1" || entity0->name == "player2" || entity0->name == "player3" || entity0->name == "player4")
     {
-        Inventory* p1Inv = (Inventory*)entity0->getComponent("inventory");
+        Inventory* playerInventory = (Inventory*)entity0->getComponent("inventory");
         
-        if (entity1->name == "tomato" && p1Inv->tomato == 0)
+        if (entity1->name == "tomato" && playerInventory->tomato == 0)
         {
-            p1Inv->tomato = 1;
+            playerInventory->tomato = 1;
             entity0->getAudioSource()->play("pickup.wav");
             //entity1->getModel()->visible = false;
             entity1->removeFlag = true;
         }
-        if (entity1->name == "cheese" && p1Inv->cheese == 0)
+        if (entity1->name == "cheese" && playerInventory->cheese == 0)
         {
-            p1Inv->cheese = 1;
+            playerInventory->cheese = 1;
             entity0->getAudioSource()->play("pickup.wav");
             //entity1->getModel()->visible = false;
             entity1->removeFlag = true;
         }
-        if (entity1->name == "dough" && p1Inv->dough == 0) 
+        if (entity1->name == "dough" && playerInventory->dough == 0)
         {
-            p1Inv->dough = 1;
+            playerInventory->dough = 1;
             entity0->getAudioSource()->play("pickup.wav");
             //entity1->getModel()->visible = false;
             entity1->removeFlag = true;
         }
-        if (entity1->name == "sausage" && p1Inv->sausage == 0) {
-            p1Inv->sausage = 1;
+        if (entity1->name == "sausage" && playerInventory->sausage == 0) {
+            playerInventory->sausage = 1;
             entity0->getAudioSource()->play("pickup.wav");
             //entity1->getModel()->visible = false;
             entity1->removeFlag = true;
         }
 
-        if (p1Inv->checkPizza())
+        if (playerInventory->checkPizza())
             entity0->getAudioSource()->play("ding.wav");
 
         // OTHER PLAYERS
-        if (entity1->name == "player2" || entity1->name == "player3" || entity1->name == "player4")
+        vector<string> otherPlayers = entity0->getOtherPlayers();
+        if (entity1->name == otherPlayers[0] || entity1->name == otherPlayers[1] || entity1->name == otherPlayers[2])
         {
             entity0->getAudioSource()->play("thump.wav");
             Inventory* opponentInv = (Inventory*)entity1->getComponent("inventory");
-            int ingredient = p1Inv->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
+            int ingredient = playerInventory->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
             opponentInv->setIngredientFromId(ingredient);
             //printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
         }
     }
-    else if (entity1->name == "player1")
+    else if (entity1->name == "player1" || entity1->name == "player2" || entity1->name == "player3" || entity1->name == "player4")
     {
-        Inventory* p1Inv = (Inventory*)entity1->getComponent("inventory");
+        Inventory* playerInventory = (Inventory*)entity1->getComponent("inventory");
 
         // FOOD 
-        if (entity0->name == "tomato" && p1Inv->tomato == 0)
+        if (entity0->name == "tomato" && playerInventory->tomato == 0)
         {
-            p1Inv->tomato = 1;
+            playerInventory->tomato = 1;
             entity1->getAudioSource()->play("pickup.wav");
             //entity0->getModel()->visible = false;
             entity0->removeFlag = true;
         }
-        if (entity0->name == "cheese" && p1Inv->cheese == 0)
+        if (entity0->name == "cheese" && playerInventory->cheese == 0)
         {
-            p1Inv->cheese = 1;
+            playerInventory->cheese = 1;
             entity1->getAudioSource()->play("pickup.wav");
             //entity0->getModel()->visible = false;
             entity0->removeFlag = true;
         }
-        if (entity0->name == "dough" && p1Inv->dough == 0)
+        if (entity0->name == "dough" && playerInventory->dough == 0)
         {
-            p1Inv->dough = 1;
+            playerInventory->dough = 1;
             entity1->getAudioSource()->play("pickup.wav");
             //entity0->getModel()->visible = false;
             entity0->removeFlag = true;
         }
-        if (entity0->name == "sausage" && p1Inv->sausage == 0)
+        if (entity0->name == "sausage" && playerInventory->sausage == 0)
         {
-            p1Inv->sausage = 1;
+            playerInventory->sausage = 1;
             entity1->getAudioSource()->play("pickup.wav");
             //entity0->getModel()->visible = false;
             entity0->removeFlag = true;
         }
-        if (p1Inv->checkPizza())
+        if (playerInventory->checkPizza())
             entity1->getAudioSource()->play("ding.wav");
 
         // OTHER PLAYERS
-        if (entity0->name == "player2" || entity0->name == "player3" || entity0->name == "player4")
+        vector<string> otherPlayers = entity1->getOtherPlayers();
+        if (entity0->name == otherPlayers[0] || entity0->name == otherPlayers[1] || entity0->name == otherPlayers[2])
         {
             entity1->getAudioSource()->play("thump.wav");
             Inventory* opponentInv = (Inventory*)entity0->getComponent("inventory");
-            int ingredient = p1Inv->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
+            int ingredient = playerInventory->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
             opponentInv->setIngredientFromId(ingredient);
             //printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
-        }
-    }
-
-    if (entity0->name == "player2")
-    {
-        Inventory* p1Inv = (Inventory*)entity0->getComponent("inventory");
-
-        if (entity1->name == "tomato" && p1Inv->tomato == 0)
-        {
-            p1Inv->tomato = 1;
-            //entity1->getModel()->visible = false;
-            entity1->removeFlag = true;
-        }
-        if (entity1->name == "cheese" && p1Inv->cheese == 0)
-        {
-            p1Inv->cheese = 1;
-            //entity1->getModel()->visible = false;
-            entity1->removeFlag = true;
-        }
-        if (entity1->name == "dough" && p1Inv->dough == 0)
-        {
-            p1Inv->dough = 1;
-            //entity1->getModel()->visible = false;
-            entity1->removeFlag = true;
-        }
-        if (entity1->name == "sausage" && p1Inv->sausage == 0) {
-            p1Inv->sausage = 1;
-            //entity1->getModel()->visible = false;
-            entity1->removeFlag = true;
-        }
-
-        // OTHER PLAYERS
-        if (entity1->name == "player1" || entity1->name == "player3" || entity1->name == "player4")
-        {
-            //Inventory* opponentInv = (Inventory*)entity1->getComponent("inventory");
-            //int ingredient = p1Inv->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
-            //opponentInv->setIngredientFromId(ingredient);
-            //entity0->getAudioSource()->play("thump.wav");
-            //printf("%s collided with %s\n", entity0->name.c_str(), entity1->name.c_str());
-        }
-    }
-    else if (entity1->name == "player2")
-    {
-        Inventory* p1Inv = (Inventory*)entity1->getComponent("inventory");
-
-        // FOOD 
-        if (entity0->name == "tomato" && p1Inv->tomato == 0)
-        {
-            p1Inv->tomato = 1;
-            //entity0->getModel()->visible = false;
-            entity0->removeFlag = true;
-
-        }
-        if (entity0->name == "cheese" && p1Inv->cheese == 0)
-        {
-            p1Inv->cheese = 1;
-            //entity0->getModel()->visible = false;
-            entity0->removeFlag = true;
-
-        }
-        if (entity0->name == "dough" && p1Inv->dough == 0)
-        {
-            p1Inv->dough = 1;
-            //entity0->getModel()->visible = false;
-            entity0->removeFlag = true;
-
-        }
-        if (entity0->name == "sausage" && p1Inv->sausage == 0)
-        {
-            p1Inv->sausage = 1;
-            //entity0->getModel()->visible = false;
-            entity0->removeFlag = true;
-        }
-
-        // OTHER PLAYERS
-        if (entity0->name == "player1" || entity0->name == "player3" || entity0->name == "player4")
-        {
-            //entity1->getAudioSource()->play("thump.wav");
-            //printf("%s collided with %s\n", entity1->name.c_str(), entity0->name.c_str());
         }
     }
 }
