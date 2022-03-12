@@ -21,6 +21,7 @@ public:
 	void meshScale();
 	void update();
 	void shadows();
+	void physicsValues();
 
 private:
 

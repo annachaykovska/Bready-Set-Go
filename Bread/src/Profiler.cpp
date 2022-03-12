@@ -243,16 +243,27 @@ void Profiler::meshScale()
 	}
 }
 
+void Profiler::physicsValues() {
+	
+	if (ImGui::CollapsingHeader("Physics Values")) {
+		if (ImGui::Button("Reload", ImVec2(100, 30))) {// Restarts game
+			//g_systems.physics->cleanupPhysics(); // Causes and exception 
+			g_systems.physics->initialize(); //The old models are still kicking around if this is called alone
+		}
+	}
+}
+
 void Profiler::update()
 {
 	begin();
 	fps();
 	player1Inventory();
+	physicsValues();
 	player1Transform();
 	player2Transform();
 	player3Transform();
 	player4Transform();
-	cameraTransform();
+	cameraTransform();	
 	testTransform();
 	shadows();
 	meshScale();
