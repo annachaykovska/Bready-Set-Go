@@ -30,6 +30,8 @@ public:
 	bool removeFlag;
 	float speed;
 	glm::vec3 orientation;
+	bool verifyPlayerCollision;
+	std::string otherPlayerInCollision;
 
 private:
 

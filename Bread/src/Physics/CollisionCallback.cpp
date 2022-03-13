@@ -44,7 +44,6 @@ void CollisionCallback::onContact(const physx::PxContactPairHeader& pairHeader,
         entity1->checkIngredientCollision(entity0);
         // OTHER PLAYERS
         entity1->checkPlayerCollision(entity0);
-        
     }
 }
 

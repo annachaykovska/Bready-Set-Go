@@ -445,6 +445,45 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
 
+	// Check for collisions if recorded
+	Entity* player1 = g_scene.getEntity("player1");
+	Entity* player2 = g_scene.getEntity("player2");
+	Entity* player3 = g_scene.getEntity("player3");
+	Entity* player4 = g_scene.getEntity("player4");
+
+	if (player1->verifyPlayerCollision) {
+		if (player1->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player1->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
+		else if (player1->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player2->verifyPlayerCollision) {
+		if (player2->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player2->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
+		else if (player2->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player3->verifyPlayerCollision) {
+		if (player3->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player3->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player3->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player4->verifyPlayerCollision) {
+		if (player4->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player4->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player4->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);		
+	}
+
 	// Vehicle update
 	const PxVec3 grav = this->mScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
@@ -688,4 +727,12 @@ void PhysicsSystem::respawnPlayer(int playerNumber) {
 		default:
 			break;
 	}
+}
+
+void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle) {
+	firstActor->verifyPlayerCollision = false;
+	secondActor->verifyPlayerCollision = false;
+	firstActor->otherPlayerInCollision = "";
+	secondActor->otherPlayerInCollision = "";
+	printf("YA MADE IT\n");
 }

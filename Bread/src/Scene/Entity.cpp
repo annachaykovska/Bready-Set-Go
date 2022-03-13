@@ -2,6 +2,9 @@
 #include <vector>
 
 #include "Entity.h"
+#include "Scene.h"
+
+extern Scene g_scene;
 
 using namespace std;
 
@@ -11,12 +14,16 @@ Entity::Entity(std::string name)
 	this->name = name;
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
+	this->verifyPlayerCollision = false;
+	this->otherPlayerInCollision = "";
 }
 
 Entity::Entity(){
 	this->name = "default";
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
+	this->verifyPlayerCollision = false;
+	this->otherPlayerInCollision = "";
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)
@@ -125,9 +132,10 @@ void Entity::checkPlayerCollision(Entity* otherEntity) {
 	{
 		this->getAudioSource()->play("thump.wav");
 		Inventory* opponentInv = (Inventory*)otherEntity->getComponent("inventory");
-		int ingredient = playerInventory->removeRandomPizzaIngredient(opponentInv->cheese, opponentInv->dough, opponentInv->sausage, opponentInv->tomato);
-		opponentInv->setIngredientFromId(ingredient);
-		//printf("%s collided with %s and transferred food id %d\n", entity0->name.c_str(), entity1->name.c_str(), ingredient);
+
+		this->verifyPlayerCollision = true;
+		this->otherPlayerInCollision = otherEntity->name;
+		printf("Collision detected between %s and %s, raycast to find actors when updating physics next time\n", this->name.c_str(), otherEntity->name.c_str());
 	}
 	return;
 }
