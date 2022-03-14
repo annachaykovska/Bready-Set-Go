@@ -103,7 +103,8 @@ int main()
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = 4.1f;
+	counterTrans->position.y = -48.0f;
+	counterTrans->position.z = 50.0f;
 	counterTrans->update();
 
 	Transform* cheeseTransform = cheese->getTransform();
