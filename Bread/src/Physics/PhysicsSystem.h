@@ -60,7 +60,8 @@ public:
 	float chassis_mass;
 	float wheel_mass;
 	float wheel_moi;
-	float chassis_moi[3];
+	//float chassis_moi[3];
+	float chassis_moi_y;
 	float peak_torque;
 	float max_omega;
 

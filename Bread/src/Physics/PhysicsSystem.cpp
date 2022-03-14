@@ -88,10 +88,10 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = g_systems.physics->wheel_mass;
+	const PxF32 wheelMass = g_systems.physics->wheel_mass;		//800.f
 	const PxF32 wheelRadius = 1.5f;
 	const PxF32 wheelWidth = 0.6f;
-	const PxF32 wheelMOI = g_systems.physics->wheel_moi;//2.f * wheelMass * wheelRadius * wheelRadius;
+	const PxF32 wheelMOI = g_systems.physics->wheel_moi;		//2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -99,7 +99,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
-	vehicleDesc.chassisMOI.y *= 0.4;
+	vehicleDesc.chassisMOI.y *= g_systems.physics->chassis_moi_y;	//0.4
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -284,6 +284,7 @@ PhysicsSystem::PhysicsSystem() :
 	,	max_omega(1000.f)
 	,	wheel_mass(800.f)
 	,	wheel_moi(1440.f)
+	,	chassis_moi_y(0.4f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
