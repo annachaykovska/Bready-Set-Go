@@ -252,12 +252,12 @@ void Profiler::physicsValues() {
 	if (ImGui::CollapsingHeader("Physics Values")) {
 		// gSteerVsForwardSpeedData
 		ImGui::InputFloat("Chassis Mass", &(physSys->chassis_mass), 10.f, 100.f, "%.3f");	// Chassis Mass
-		ImGui::InputFloat("Wheel Mass", &testFloat, 10.f, 100.f, "%.3f");					// WheelMass
-		ImGui::InputFloat("Wheel MOI", &testFloat, 10.f, 100.f, "%.3f");					// WheelMOI
-		ImGui::InputFloat3("Chassis MOI", testList, "%.3f");								// Chassis MOI
+		ImGui::InputFloat("Wheel Mass", &(physSys->wheel_mass), 10.f, 100.f, "%.3f");		// WheelMass
+		ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");		// WheelMOI
+		ImGui::InputFloat3("Chassis MOI", physSys->chassis_moi, "%.3f");				// Chassis MOI
 		// engine ???
-		ImGui::InputFloat("Peak Torque", &testFloat, 10.f, 100.f, "%.3f");					// enging peak torque
-		ImGui::InputFloat("Max Omega", &testFloat, 10.f, 100.f, "%.3f");					// engine max Omega
+		ImGui::InputFloat("Peak Torque", &(physSys->peak_torque), 10.f, 100.f, "%.3f");	// enging peak torque
+		ImGui::InputFloat("Max Omega", &(physSys->max_omega), 10.f, 100.f, "%.3f");		// engine max Omega
 		if (ImGui::Button("Reload", ImVec2(100, 30))) {	// Restarts game
 			//g_systems.physics->cleanupPhysics(); // Causes an exception 
 			g_systems.physics->initialize(); //The old models are still kicking around if this is called alone

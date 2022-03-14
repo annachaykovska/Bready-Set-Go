@@ -163,6 +163,17 @@ PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfE
 	return body;
 }
 
+void PhysicsSystem::updateEngine() {
+	PxVehicleEngineData engine;
+	engine.mPeakTorque = peak_torque;
+	engine.mMaxOmega = max_omega;//approx 6000 rpm
+
+	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
+}
+
 void PhysicsSystem::initializeActors() {
 	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
 	// Create shape using the kitchen's mesh
@@ -209,14 +220,8 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
-	PxVehicleEngineData engine;
-	engine.mPeakTorque = 5000.0f;
-	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
+	updateEngine();
 
-	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
@@ -274,8 +279,9 @@ void PhysicsSystem::initializeActors() {
 }
 
 PhysicsSystem::PhysicsSystem() :
-	chassis_mass(400.f)
-	
+		chassis_mass(400.f)
+	,	peak_torque(5000.f)
+	,	max_omega(1000.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);

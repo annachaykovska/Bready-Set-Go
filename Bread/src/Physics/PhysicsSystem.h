@@ -54,8 +54,15 @@ public:
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
-	// Tweakable Values
+	// For Tweaking
+	void updateEngine();
+
 	float chassis_mass;
+	float wheel_mass;
+	float wheel_moi;
+	float chassis_moi[3];
+	float peak_torque;
+	float max_omega;
 
 private:
 
