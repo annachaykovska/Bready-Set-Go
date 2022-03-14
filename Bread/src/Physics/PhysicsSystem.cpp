@@ -730,9 +730,52 @@ void PhysicsSystem::respawnPlayer(int playerNumber) {
 }
 
 void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle) {
+	int collisionWinner = 2;
+	// FIRST ACTOR RAYCAST
+	printf("First Actor: %s\n", firstActor->name.c_str());
+	PxVec3 origin = firstVehicle->getRigidDynamicActor()->getGlobalPose().p;                 
+	PxVec3 unitDir = firstVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();                
+	PxReal maxDistance = 20;            
+	const PxU32 bufferSize = 256;        
+	PxRaycastHit hitBuffer[bufferSize];  
+	PxRaycastBuffer buf(hitBuffer, bufferSize); 
+	mScene->raycast(origin, unitDir,  maxDistance, buf);
+	for (PxU32 i = 0; i < buf.nbTouches; i++)
+		printf("Result ONE: %d\n", i);
+
+	// SECOND ACTOR RAYCAST
+	printf("Second Actor: %s\n", secondActor->name.c_str());
+	origin = secondVehicle->getRigidDynamicActor()->getGlobalPose().p;                 
+	unitDir = secondVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();                
+	PxRaycastHit hitBuffer2[bufferSize];  
+	PxRaycastBuffer buf2(hitBuffer2, bufferSize); 
+	mScene->raycast(origin, unitDir, maxDistance, buf2);
+	for (PxU32 i = 0; i < buf2.nbTouches; i++)
+		printf("Result TWO: %d\n", i);
+
+	// Resolve collision
+	if (collisionWinner == 0) {
+		// No winners (headon collision)
+		printf("No collision winners. No ingredients moved.\n");
+	}
+	else {
+		Inventory* player1Inventory = (Inventory*)firstActor->getComponent("inventory");
+		Inventory* player2Inventory = (Inventory*)secondActor->getComponent("inventory");
+		if (collisionWinner == 1) {
+			int ingredient = player2Inventory->removeRandomPizzaIngredient(player1Inventory->cheese, player1Inventory->dough, player1Inventory->sausage, player1Inventory->tomato);
+			player1Inventory->setIngredientFromId(ingredient);
+			printf("%s took food id %d from %s\n", firstActor->name.c_str(), ingredient, secondActor->name.c_str());
+		}
+		else if (collisionWinner == 2) {
+			int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
+			player2Inventory->setIngredientFromId(ingredient);
+			printf("%s took food id %d from %s\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
+		}
+	}
+
+	// Reset flags
 	firstActor->verifyPlayerCollision = false;
 	secondActor->verifyPlayerCollision = false;
 	firstActor->otherPlayerInCollision = "";
 	secondActor->otherPlayerInCollision = "";
-	printf("YA MADE IT\n");
 }
