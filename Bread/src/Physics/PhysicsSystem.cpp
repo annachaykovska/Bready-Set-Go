@@ -248,6 +248,27 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3->getRigidDynamicActor()->userData = vp3;
 	mVehiclePlayer4->getRigidDynamicActor()->userData = vp4;
 
+	PxShape* shapes1[1]; 
+	PxShape* shapes2[1];
+	PxShape* shapes3[1];
+	PxShape* shapes4[1];
+	this->mVehiclePlayer1->getRigidDynamicActor()->getShapes(shapes1, 1);
+	this->mVehiclePlayer2->getRigidDynamicActor()->getShapes(shapes2, 1);
+	this->mVehiclePlayer3->getRigidDynamicActor()->getShapes(shapes3, 1);
+	this->mVehiclePlayer4->getRigidDynamicActor()->getShapes(shapes4, 1);
+	PxFilterData qryVehicle1FilterData;
+	PxFilterData qryVehicle2FilterData;
+	PxFilterData qryVehicle3FilterData;
+	PxFilterData qryVehicle4FilterData;
+	qryVehicle1FilterData.word0 = PLAYERGROUP1;
+	qryVehicle2FilterData.word0 = PLAYERGROUP2;
+	qryVehicle3FilterData.word0 = PLAYERGROUP3;
+	qryVehicle4FilterData.word0 = PLAYERGROUP4;
+	shapes1[0]->setQueryFilterData(qryVehicle1FilterData);
+	shapes2[0]->setQueryFilterData(qryVehicle2FilterData);
+	shapes3[0]->setQueryFilterData(qryVehicle3FilterData);
+	shapes4[0]->setQueryFilterData(qryVehicle4FilterData);
+
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer2->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
@@ -730,7 +751,9 @@ void PhysicsSystem::respawnPlayer(int playerNumber) {
 }
 
 void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle) {
-	int collisionWinner = 2;
+	int collisionWinner = 0;
+	const PxHitFlags outputFlags = PxHitFlag::eDEFAULT;
+
 	// FIRST ACTOR RAYCAST
 	printf("First Actor: %s\n", firstActor->name.c_str());
 	PxVec3 origin = firstVehicle->getRigidDynamicActor()->getGlobalPose().p;                 
@@ -739,9 +762,18 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	const PxU32 bufferSize = 256;        
 	PxRaycastHit hitBuffer[bufferSize];  
 	PxRaycastBuffer buf(hitBuffer, bufferSize); 
-	mScene->raycast(origin, unitDir,  maxDistance, buf);
-	for (PxU32 i = 0; i < buf.nbTouches; i++)
-		printf("Result ONE: %d\n", i);
+	PxQueryFilterData filterData1 = PxQueryFilterData();
+	if (firstActor->name.c_str() == "player1")
+		filterData1.data.word0 = PLAYERGROUP1;
+	if (firstActor->name.c_str() == "player2")
+		filterData1.data.word0 = PLAYERGROUP2;
+	if (firstActor->name.c_str() == "player3")
+		filterData1.data.word0 = PLAYERGROUP3;
+	if (firstActor->name.c_str() == "player4")
+		filterData1.data.word0 = PLAYERGROUP4;
+	mScene->raycast(origin, unitDir,  maxDistance, buf, outputFlags, filterData1);
+	/*for (PxU32 i = 0; i < buf.nbTouches; i++)
+		printf("Result ONE: %d\n", i);*/
 
 	// SECOND ACTOR RAYCAST
 	printf("Second Actor: %s\n", secondActor->name.c_str());
@@ -749,11 +781,26 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	unitDir = secondVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();                
 	PxRaycastHit hitBuffer2[bufferSize];  
 	PxRaycastBuffer buf2(hitBuffer2, bufferSize); 
-	mScene->raycast(origin, unitDir, maxDistance, buf2);
-	for (PxU32 i = 0; i < buf2.nbTouches; i++)
-		printf("Result TWO: %d\n", i);
+	PxQueryFilterData filterData2 = PxQueryFilterData();
+	if (secondActor->name.c_str() == "player1")
+		filterData2.data.word0 = PLAYERGROUP1;
+	if (secondActor->name.c_str() == "player2")
+		filterData2.data.word0 = PLAYERGROUP2;
+	if (secondActor->name.c_str() == "player3")
+		filterData2.data.word0 = PLAYERGROUP3;
+	if (secondActor->name.c_str() == "player4")
+		filterData2.data.word0 = PLAYERGROUP4;
+	mScene->raycast(origin, unitDir, maxDistance, buf2, outputFlags, filterData2);
+	/*for (PxU32 i = 0; i < buf2.nbTouches; i++)
+		printf("Result TWO: %d\n", i);*/
 
-	// Resolve collision
+	// DECIDE COLLISION WINNER
+	if (buf.nbTouches > buf2.nbTouches || secondVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f))
+		collisionWinner = 1;
+	else if (buf.nbTouches < buf2.nbTouches || firstVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f))
+		collisionWinner = 2;
+
+	// RESOLVE COLLISION INGREDIENT EXCHANGE
 	if (collisionWinner == 0) {
 		// No winners (headon collision)
 		printf("No collision winners. No ingredients moved.\n");
@@ -773,7 +820,7 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		}
 	}
 
-	// Reset flags
+	// RESET FLAGS
 	firstActor->verifyPlayerCollision = false;
 	secondActor->verifyPlayerCollision = false;
 	firstActor->otherPlayerInCollision = "";
