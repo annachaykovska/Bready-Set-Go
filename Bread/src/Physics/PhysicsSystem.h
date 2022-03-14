@@ -54,6 +54,9 @@ public:
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
+	// Tweakable Values
+	float chassis_mass;
+
 private:
 
 	float mAccumulator;

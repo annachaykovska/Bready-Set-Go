@@ -244,10 +244,22 @@ void Profiler::meshScale()
 }
 
 void Profiler::physicsValues() {
-	
+	float testList[3];
+	float testFloat;
+	PhysicsSystem* physSys = g_systems.physics;
+	//physSys->mVehiclePlayer1
+	//std::cout << physSys->chassis_mass << std::endl;
 	if (ImGui::CollapsingHeader("Physics Values")) {
-		if (ImGui::Button("Reload", ImVec2(100, 30))) {// Restarts game
-			//g_systems.physics->cleanupPhysics(); // Causes and exception 
+		// gSteerVsForwardSpeedData
+		ImGui::InputFloat("Chassis Mass", &(physSys->chassis_mass), 10.f, 100.f, "%.3f");	// Chassis Mass
+		ImGui::InputFloat("Wheel Mass", &testFloat, 10.f, 100.f, "%.3f");					// WheelMass
+		ImGui::InputFloat("Wheel MOI", &testFloat, 10.f, 100.f, "%.3f");					// WheelMOI
+		ImGui::InputFloat3("Chassis MOI", testList, "%.3f");								// Chassis MOI
+		// engine ???
+		ImGui::InputFloat("Peak Torque", &testFloat, 10.f, 100.f, "%.3f");					// enging peak torque
+		ImGui::InputFloat("Max Omega", &testFloat, 10.f, 100.f, "%.3f");					// engine max Omega
+		if (ImGui::Button("Reload", ImVec2(100, 30))) {	// Restarts game
+			//g_systems.physics->cleanupPhysics(); // Causes an exception 
 			g_systems.physics->initialize(); //The old models are still kicking around if this is called alone
 		}
 	}
