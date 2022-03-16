@@ -121,7 +121,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(10, 2, 10) );
+	PxTransform localTm(PxVec3(10, 2, 10));
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
@@ -247,6 +247,27 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer2->getRigidDynamicActor()->userData = vp2;
 	mVehiclePlayer3->getRigidDynamicActor()->userData = vp3;
 	mVehiclePlayer4->getRigidDynamicActor()->userData = vp4;
+
+	PxShape* shapes1[1];
+	PxShape* shapes2[1];
+	PxShape* shapes3[1];
+	PxShape* shapes4[1];
+	this->mVehiclePlayer1->getRigidDynamicActor()->getShapes(shapes1, 1);
+	this->mVehiclePlayer2->getRigidDynamicActor()->getShapes(shapes2, 1);
+	this->mVehiclePlayer3->getRigidDynamicActor()->getShapes(shapes3, 1);
+	this->mVehiclePlayer4->getRigidDynamicActor()->getShapes(shapes4, 1);
+	PxFilterData qryVehicle1FilterData;
+	PxFilterData qryVehicle2FilterData;
+	PxFilterData qryVehicle3FilterData;
+	PxFilterData qryVehicle4FilterData;
+	qryVehicle1FilterData.word0 = PLAYERGROUP1;
+	qryVehicle2FilterData.word0 = PLAYERGROUP2;
+	qryVehicle3FilterData.word0 = PLAYERGROUP3;
+	qryVehicle4FilterData.word0 = PLAYERGROUP4;
+	shapes1[0]->setQueryFilterData(qryVehicle1FilterData);
+	shapes2[0]->setQueryFilterData(qryVehicle2FilterData);
+	shapes3[0]->setQueryFilterData(qryVehicle3FilterData);
+	shapes4[0]->setQueryFilterData(qryVehicle4FilterData);
 
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer2->getRigidDynamicActor());
@@ -385,7 +406,7 @@ void PhysicsSystem::cookKitchen()
 
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
-	
+
 	this->mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
 
 	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
@@ -430,7 +451,7 @@ float PhysicsSystem::getTurnDirectionalInfluence()
 	return turnDirectionalInfluence;
 }
 
-void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData &inputData, std::string entityName, const float timestep) {
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
 		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
@@ -444,6 +465,45 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+	// Check for collisions if recorded
+	Entity* player1 = g_scene.getEntity("player1");
+	Entity* player2 = g_scene.getEntity("player2");
+	Entity* player3 = g_scene.getEntity("player3");
+	Entity* player4 = g_scene.getEntity("player4");
+
+	if (player1->verifyPlayerCollision) {
+		if (player1->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player1->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
+		else if (player1->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player2->verifyPlayerCollision) {
+		if (player2->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player2->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
+		else if (player2->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player3->verifyPlayerCollision) {
+		if (player3->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player3->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player3->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player4->verifyPlayerCollision) {
+		if (player4->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player4->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player4->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+	}
 
 	// Vehicle update
 	const PxVec3 grav = this->mScene->getGravity();
@@ -547,7 +607,7 @@ void PhysicsSystem::update(const float dt)
 	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
 
 	mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
-	
+
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
@@ -617,7 +677,7 @@ void PhysicsSystem::cleanupPhysics()
 	PX_RELEASE(this->mScene);
 	PX_RELEASE(this->mDispatcher);
 	PX_RELEASE(this->mPhysics);
-	
+
 	if (this->mPvd)
 	{
 		PxPvdTransport* transport = this->mPvd->getTransport();
@@ -643,49 +703,165 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 
 	switch (playerNumber)
 	{
-		case (1):
-			result = (float)mVehiclePlayer1->computeForwardSpeed();
-			return result;
-			break;
-		case (2):
-			result = (float)mVehiclePlayer2->computeForwardSpeed();
-			return result;
-			break;
-		case (3):
-			result = (float)mVehiclePlayer3->computeForwardSpeed();
-			return result;
-			break;
-		case (4):
-			result = (float)mVehiclePlayer4->computeForwardSpeed();
-			return result;
-			break;
-		default:
-			break;
+	case (1):
+		result = (float)mVehiclePlayer1->computeForwardSpeed();
+		return result;
+		break;
+	case (2):
+		result = (float)mVehiclePlayer2->computeForwardSpeed();
+		return result;
+		break;
+	case (3):
+		result = (float)mVehiclePlayer3->computeForwardSpeed();
+		return result;
+		break;
+	case (4):
+		result = (float)mVehiclePlayer4->computeForwardSpeed();
+		return result;
+		break;
+	default:
+		break;
 	}
 }
 
 void PhysicsSystem::respawnPlayer(int playerNumber) {
 	switch (playerNumber)
 	{
-		case (1):
-			mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
-			//mVehiclePlayer1->getRigidDynamicActor()->setLinearVelocity(PxVec3(0.0), false);
-			//mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(0.0), false);
-			mVehiclePlayer1->setToRestState();
-			break;
-		case (2):
-			mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
-			mVehiclePlayer2->setToRestState();
-			break;
-		case (3):
-			mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
-			mVehiclePlayer3->setToRestState();
-			break;
-		case (4):
-			mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
-			mVehiclePlayer4->setToRestState();
-			break;
-		default:
-			break;
+	case (1):
+		mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
+		//mVehiclePlayer1->getRigidDynamicActor()->setLinearVelocity(PxVec3(0.0), false);
+		//mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(0.0), false);
+		mVehiclePlayer1->setToRestState();
+		break;
+	case (2):
+		mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+		mVehiclePlayer2->setToRestState();
+		break;
+	case (3):
+		mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+		mVehiclePlayer3->setToRestState();
+		break;
+	case (4):
+		mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
+		mVehiclePlayer4->setToRestState();
+		break;
+	default:
+		break;
 	}
+}
+
+void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle) {
+	int collisionWinner = 0;
+	const PxHitFlags outputFlags = PxHitFlag::eDEFAULT;
+
+	// Set rotation matrices
+	float theta = glm::radians(25.f);
+	glm::mat3 rotationMatrixLeft = glm::mat3(
+		cos(theta), sin(theta), 0,
+		-sin(theta), cos(theta), 0,
+		0, 0, 1.0f);
+	glm::mat3 rotationMatrixRight = glm::mat3(
+		cos(-1 * theta), sin(-1 * theta), 0,
+		-sin(-1 * theta), cos(-1 * theta), 0,
+		0, 0, 1.0f);
+
+	// FIRST ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	int firstCollisionNum = 0;
+	printf("First Actor: %s\n", firstActor->name.c_str());
+	PxVec3 origin = firstVehicle->getRigidDynamicActor()->getGlobalPose().p;
+	PxVec3 unitDir = firstVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();
+	PxReal maxDistance = 20;
+	const PxU32 bufferSize = 256;
+	PxRaycastHit hitBuffer[bufferSize];
+	PxRaycastBuffer buf(hitBuffer, bufferSize);
+	PxQueryFilterData filterData1 = PxQueryFilterData();
+	if (firstActor->name.c_str() == "player1")
+		filterData1.data.word0 = PLAYERGROUP1;
+	if (firstActor->name.c_str() == "player2")
+		filterData1.data.word0 = PLAYERGROUP2;
+	if (firstActor->name.c_str() == "player3")
+		filterData1.data.word0 = PLAYERGROUP3;
+	if (firstActor->name.c_str() == "player4")
+		filterData1.data.word0 = PLAYERGROUP4;
+	mScene->raycast(origin, unitDir, maxDistance, buf, outputFlags, filterData1);
+	firstCollisionNum += buf.nbTouches;
+	/*for (PxU32 i = 0; i < buf.nbTouches; i++)
+		printf("Result ONE: %d\n", i);*/
+
+	// Left raycast
+	glm::vec3 newDir = rotationMatrixLeft * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf, outputFlags, filterData1);
+	firstCollisionNum += buf.nbTouches;
+
+	// Right raycast
+	newDir = rotationMatrixRight * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf, outputFlags, filterData1);
+	firstCollisionNum += buf.nbTouches;
+	printf("NUM COLLISION 1: %d\n", firstCollisionNum);
+
+
+	// SECOND ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	int secondCollisionNum = 0;
+	printf("Second Actor: %s\n", secondActor->name.c_str());
+	origin = secondVehicle->getRigidDynamicActor()->getGlobalPose().p;
+	unitDir = secondVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();
+	PxRaycastHit hitBuffer2[bufferSize];
+	PxRaycastBuffer buf2(hitBuffer2, bufferSize);
+	PxQueryFilterData filterData2 = PxQueryFilterData();
+	if (secondActor->name.c_str() == "player1")
+		filterData2.data.word0 = PLAYERGROUP1;
+	if (secondActor->name.c_str() == "player2")
+		filterData2.data.word0 = PLAYERGROUP2;
+	if (secondActor->name.c_str() == "player3")
+		filterData2.data.word0 = PLAYERGROUP3;
+	if (secondActor->name.c_str() == "player4")
+		filterData2.data.word0 = PLAYERGROUP4;
+	mScene->raycast(origin, unitDir, maxDistance, buf2, outputFlags, filterData2);
+	secondCollisionNum += buf2.nbTouches;
+	/*for (PxU32 i = 0; i < buf2.nbTouches; i++)
+		printf("Result TWO: %d\n", i);*/
+
+	// Left raycast
+	newDir = rotationMatrixLeft * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf2, outputFlags, filterData1);
+	secondCollisionNum += buf2.nbTouches;
+
+	// Right raycast
+	newDir = rotationMatrixRight * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf2, outputFlags, filterData1);
+	secondCollisionNum += buf2.nbTouches;
+	printf("NUM COLLISION 2: %d\n", secondCollisionNum);
+
+
+	// DECIDE COLLISION WINNER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	if (buf.nbTouches > buf2.nbTouches || secondVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f))
+		collisionWinner = 1;
+	else if (buf.nbTouches < buf2.nbTouches || firstVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f))
+		collisionWinner = 2;
+
+	// RESOLVE COLLISION INGREDIENT EXCHANGE
+	if (collisionWinner == 0) {
+		// No winners (headon collision)
+		printf("No collision winners. No ingredients moved.\n");
+	}
+	else {
+		Inventory* player1Inventory = (Inventory*)firstActor->getComponent("inventory");
+		Inventory* player2Inventory = (Inventory*)secondActor->getComponent("inventory");
+		if (collisionWinner == 1) {
+			int ingredient = player2Inventory->removeRandomPizzaIngredient(player1Inventory->cheese, player1Inventory->dough, player1Inventory->sausage, player1Inventory->tomato);
+			player1Inventory->setIngredientFromId(ingredient);
+			printf("%s took food id %d from %s\n", firstActor->name.c_str(), ingredient, secondActor->name.c_str());
+		}
+		else if (collisionWinner == 2) {
+			int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
+			player2Inventory->setIngredientFromId(ingredient);
+			printf("%s took food id %d from %s\n\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
+		}
+	}
+
+	// RESET FLAGS
+	firstActor->verifyPlayerCollision = false;
+	secondActor->verifyPlayerCollision = false;
+	firstActor->otherPlayerInCollision = "";
+	secondActor->otherPlayerInCollision = "";
 }
