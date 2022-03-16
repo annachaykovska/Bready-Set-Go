@@ -855,7 +855,7 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		else if (collisionWinner == 2) {
 			int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
 			player2Inventory->setIngredientFromId(ingredient);
-			printf("%s took food id %d from %s\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
+			printf("%s took food id %d from %s\n\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
 		}
 	}
 
