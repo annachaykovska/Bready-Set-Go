@@ -41,6 +41,9 @@ private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
+	glm::vec3 offscreenBubbleLocation(glm::vec3 entityPos);
+
+	glm::vec3 findPlaneIntersection(glm::vec3 line);
 	float lerp(float p, float a, float b);
 
 	ImageTexture speedometer;
@@ -52,6 +55,8 @@ private:
 	ImageTexture cheese;
 	ImageTexture sausage;
 	ImageTexture dough;
+
+	ImageTexture cheeseOffscreen;
 
 	ImageTexture pizza;
 

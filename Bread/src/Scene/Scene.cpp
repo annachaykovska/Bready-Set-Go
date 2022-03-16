@@ -77,3 +77,8 @@ void Scene::init(PhysicsSystem* physics)
 {
 	camera.initPhysics(physics);
 }
+
+void Scene::initIngredientTracking(IngredientTracker* ingredientTracker)
+{
+	tracker = ingredientTracker;
+}

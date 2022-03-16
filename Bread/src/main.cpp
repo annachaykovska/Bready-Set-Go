@@ -31,8 +31,8 @@ int main()
 	glfwInit();
 
 	// Set window size
-	g_systems.width = 1024;
-	g_systems.height = 1024;
+	g_systems.width = 800;
+	g_systems.height = 600;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");
@@ -151,6 +151,7 @@ int main()
 
 	// Track Ingredient Locations
 	IngredientTracker ingredientTracker(*cheeseTransform, *tomatoTransform, *doughTransform, *sausageTransform);
+	g_scene.initIngredientTracking(&ingredientTracker);
 
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
@@ -221,6 +222,23 @@ int main()
 		if (p1Inv.dough)
 		{
 			ingredientTracker.updateDoughTransformSource(*player1->getTransform());
+		}
+
+		if (p2Inv.cheese)
+		{
+			ingredientTracker.updateCheeseTransformSource(*player2->getTransform());
+		}
+		if (p2Inv.tomato)
+		{
+			ingredientTracker.updateTomatoTransformSource(*player2->getTransform());
+		}
+		if (p2Inv.sausage)
+		{
+			ingredientTracker.updateSausageTransformSource(*player2->getTransform());
+		}
+		if (p2Inv.dough)
+		{
+			ingredientTracker.updateDoughTransformSource(*player2->getTransform());
 		}
 
 		// Update the ImGUI profiler

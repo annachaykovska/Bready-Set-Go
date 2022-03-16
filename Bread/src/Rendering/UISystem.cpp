@@ -5,6 +5,11 @@
 extern SystemManager g_systems;
 extern Scene g_scene;
 
+namespace
+{
+    const float PI = 3.141592;
+}
+
 UISystem::UISystem()
     : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
@@ -16,6 +21,7 @@ UISystem::UISystem()
     , cheese("resources/textures/cheese.png", GL_NEAREST)
     , sausage("resources/textures/sausage.png", GL_NEAREST)
     , dough("resources/textures/dough.png", GL_NEAREST)
+    , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -157,6 +163,10 @@ void UISystem::update() {
     width = miniMap.width;
     renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0, 1.f);
 
+    glm::vec3 location = offscreenBubbleLocation(g_scene.tracker->getCheeseLocation().position);
+    height = cheeseOffscreen.height;
+    width = cheeseOffscreen.width;
+    renderImage(imageShader, cheeseOffscreen, location.x, location.y, location.z * (width / height), location.z * (height / width), 0, 1.f);
 
     // Drawing Inventory
     Entity* player1 = g_scene.getEntity("player1");
@@ -346,6 +356,94 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // render quad
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
+{
+    glm::vec3 location;
+
+    //std::cout << entityPos.x << " " << entityPos.y << " " << entityPos.z << std::endl;
+    glm::vec3 cam = g_scene.camera.centerBeam;
+    glm::vec3 toEntity = entityPos - g_scene.camera.position;
+
+    location.z = 60 + ((20.f - 60.f) / (400.f - 0.f)) * (length(toEntity) - 0);
+    if (location.z < 30)
+    {
+        location.z = 30;
+    }
+
+    glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
+
+    float viewRange = g_scene.camera.perspective / 2.f;
+    viewRange *= (PI / 180.f);
+
+    float yawTheta = acos(dot(cam, yaw) / (length(yaw) * length(cam)));
+    glm::vec3 upVector = cross(cam, yaw);
+
+    float pitchTheta = acos(dot(toEntity, yaw) / (length(yaw) * length(toEntity)));
+    
+    if (yawTheta > (PI / 2.f))
+    {
+        location.y = 30.f;
+
+        float offset = (((386.f) / (PI - (PI / 2.f))) * (yawTheta - (PI / 2.f)));
+        if (upVector.y < 0)
+        {
+            location.x = 770 - offset;
+        }
+        else
+        {
+            location.x = 30 + offset;
+        }
+    }
+    else if (yawTheta > viewRange)
+    {
+        float offset = (((300 - 30) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
+        if (upVector.y < 0)
+        {
+            location.x = 770;
+            location.y = 300 - offset;
+        }
+        else
+        {
+            location.x = 30;
+            location.y = 300 - offset;
+        }
+    }
+    else
+    {
+        glm::vec3 screenPos = findPlaneIntersection(toEntity);
+        std::cout << g_systems.width << " " << g_systems.height << std::endl;
+        location.x = -screenPos.x * g_systems.width + (g_systems.width / 2.f);
+        location.y = 350.f;
+    }
+    return glm::vec3(location.x, location.y, location.z);
+}
+
+glm::vec3 UISystem::findPlaneIntersection(glm::vec3 line)
+{
+    float t;
+    glm::vec3 cam = g_scene.camera.centerBeam;
+    cam = cam / length(cam);
+
+    glm::vec3 zAxis = glm::vec3(0.f, 0.f, 1.f);
+
+    glm::vec3 a = cross(cam, zAxis);
+    a = a / length(a);
+
+    float sinPhi = length(cross(cam, zAxis)) / (length(cam) * length(zAxis));
+    float cosPhi = dot(cam, zAxis) / (length(cam) * length(zAxis));
+
+    cam = a * (dot(a, cam)) + cosPhi * cross((cross(a, cam)), a) + sinPhi * (cross(a, cam));
+    line = a * (dot(a, line)) + cosPhi * cross((cross(a, line)), a) + sinPhi * (cross(a, line));
+
+    glm::vec3 normal = cam;
+
+    float d = 1;
+    float value = normal.z * line.z;
+    t = d / value;
+
+    return glm::vec3(line.x * t, line.y * t, line.z * t);
 }
 
 float UISystem::lerp(float p, float a, float b) {

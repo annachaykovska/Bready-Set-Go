@@ -17,6 +17,8 @@ class Camera
 {
 public:
 	glm::vec3 position;
+	glm::vec3 centerBeam;
+	float perspective;
 	float yaw;
 	float pitch;
 
@@ -43,7 +45,6 @@ private:
 	float slowDownCounter;
 	int counter;
 
-	float perspective;
 	float cameraPositionOffset;
 	float forcedDirection;
 	float recordedForcedDirection;
