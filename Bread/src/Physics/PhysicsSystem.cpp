@@ -751,8 +751,12 @@ void PhysicsSystem::respawnPlayer(int playerNumber) {
 }
 
 void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle) {
-	int collisionWinner = 0;
+	// Variables
 	const PxHitFlags outputFlags = PxHitFlag::eDEFAULT;
+	const float cooldownThreshold = 3.0;
+	PxReal maxDistance = 5;
+	const PxU32 bufferSize = 256;
+	int collisionWinner = 0;
 
 	// Set rotation matrices
 	float theta = glm::radians(25.f);
@@ -767,11 +771,9 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 
 	// FIRST ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	int firstCollisionNum = 0;
-	printf("First Actor: %s\n", firstActor->name.c_str());
+	//printf("First Actor: %s\n", firstActor->name.c_str());
 	PxVec3 origin = firstVehicle->getRigidDynamicActor()->getGlobalPose().p;
 	PxVec3 unitDir = firstVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();
-	PxReal maxDistance = 20;
-	const PxU32 bufferSize = 256;
 	PxRaycastHit hitBuffer[bufferSize];
 	PxRaycastBuffer buf(hitBuffer, bufferSize);
 	PxQueryFilterData filterData1 = PxQueryFilterData();
@@ -797,12 +799,12 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	newDir = rotationMatrixRight * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
 	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf, outputFlags, filterData1);
 	firstCollisionNum += buf.nbTouches;
-	printf("NUM COLLISION 1: %d\n", firstCollisionNum);
+	//printf("NUM COLLISION 1: %d\n", firstCollisionNum);
 
 
 	// SECOND ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	int secondCollisionNum = 0;
-	printf("Second Actor: %s\n", secondActor->name.c_str());
+	//printf("Second Actor: %s\n", secondActor->name.c_str());
 	origin = secondVehicle->getRigidDynamicActor()->getGlobalPose().p;
 	unitDir = secondVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();
 	PxRaycastHit hitBuffer2[bufferSize];
@@ -830,19 +832,39 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	newDir = rotationMatrixRight * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
 	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf2, outputFlags, filterData1);
 	secondCollisionNum += buf2.nbTouches;
-	printf("NUM COLLISION 2: %d\n", secondCollisionNum);
+	//printf("NUM COLLISION 2: %d\n", secondCollisionNum);
 
 
-	// DECIDE COLLISION WINNER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	if (buf.nbTouches > buf2.nbTouches || secondVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f))
-		collisionWinner = 1;
-	else if (buf.nbTouches < buf2.nbTouches || firstVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f))
-		collisionWinner = 2;
+	// DECIDE COLLISION WINNER AND CHECK COOLDOWN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	float currentTime = glfwGetTime();
+	bool cooldownIncomplete = false;
+	if (buf.nbTouches > buf2.nbTouches || secondVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f)) {
+		if (currentTime - firstActor->collisionCooldownStart > cooldownThreshold) {
+			firstActor->collisionCooldownStart = -1.0;
+			collisionWinner = 1;
+		}
+		else {
+			cooldownIncomplete = true;
+			printf("Cooldown for %s is not over yet.\n", firstActor->name.c_str());
+		}
+	}
+	else if (buf.nbTouches < buf2.nbTouches || firstVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f)) {
+		if (currentTime - secondActor->collisionCooldownStart > cooldownThreshold) {
+			secondActor->collisionCooldownStart = -1.0;
+			collisionWinner = 2;
+		}
+		else {
+			cooldownIncomplete = true;
+			printf("Cooldown for %s is not over yet.\n", secondActor->name.c_str());
+		}
+	}
+	
 
-	// RESOLVE COLLISION INGREDIENT EXCHANGE
+	// RESOLVE COLLISION INGREDIENT EXCHANGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	if (collisionWinner == 0) {
 		// No winners (headon collision)
-		printf("No collision winners. No ingredients moved.\n");
+		if (!cooldownIncomplete)
+			printf("No collision winners. No ingredients moved.\n");
 	}
 	else {
 		Inventory* player1Inventory = (Inventory*)firstActor->getComponent("inventory");
@@ -850,12 +872,16 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		if (collisionWinner == 1) {
 			int ingredient = player2Inventory->removeRandomPizzaIngredient(player1Inventory->cheese, player1Inventory->dough, player1Inventory->sausage, player1Inventory->tomato);
 			player1Inventory->setIngredientFromId(ingredient);
+			firstActor->collisionCooldownStart = glfwGetTime();
 			printf("%s took food id %d from %s\n", firstActor->name.c_str(), ingredient, secondActor->name.c_str());
+			
 		}
 		else if (collisionWinner == 2) {
 			int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
 			player2Inventory->setIngredientFromId(ingredient);
+			secondActor->collisionCooldownStart = glfwGetTime();
 			printf("%s took food id %d from %s\n\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
+			
 		}
 	}
 

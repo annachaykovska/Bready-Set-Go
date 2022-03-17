@@ -16,6 +16,7 @@ Entity::Entity(std::string name)
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
 	this->otherPlayerInCollision = "";
+	this->collisionCooldownStart = -1;
 }
 
 Entity::Entity(){
@@ -24,6 +25,7 @@ Entity::Entity(){
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
 	this->otherPlayerInCollision = "";
+	this->collisionCooldownStart = -1;
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)
@@ -135,7 +137,7 @@ void Entity::checkPlayerCollision(Entity* otherEntity) {
 
 		this->verifyPlayerCollision = true;
 		this->otherPlayerInCollision = otherEntity->name;
-		printf("Collision detected between %s and %s, raycast to find actors when updating physics next time\n", this->name.c_str(), otherEntity->name.c_str());
+		//printf("Collision detected between %s and %s, raycast to find actors when updating physics next time\n", this->name.c_str(), otherEntity->name.c_str());
 	}
 	return;
 }
