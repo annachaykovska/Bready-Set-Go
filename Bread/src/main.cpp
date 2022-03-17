@@ -128,6 +128,7 @@ int main()
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
 	countertopAudioSource->gain = 0.01f; // Volume control
+	countertopAudioSource->loop = true;
 	countertopAudioSource->play("bg.wav"); // Comment this out to turn off the music on load
 	
 	AudioSource* p2Audio = player2->getAudioSource();
