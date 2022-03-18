@@ -27,8 +27,8 @@ CollisionCallback gCollisionCallback;
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.2f,
-	5.0f,		0.3f,
-	30.0f,		0.5f,
+	5.0f,		0.6f,
+	30.0f,		0.8f,
 	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -78,7 +78,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 400.0f;
+	const PxF32 chassisMass = g_systems.physics->chassis_mass;
 	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
@@ -88,10 +88,10 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 800.0f;
+	const PxF32 wheelMass = g_systems.physics->wheel_mass;		//800.f
 	const PxF32 wheelRadius = 1.5f;
 	const PxF32 wheelWidth = 0.6f;
-	const PxF32 wheelMOI = 2.f * wheelMass * wheelRadius * wheelRadius;
+	const PxF32 wheelMOI = g_systems.physics->wheel_moi;		//2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -99,7 +99,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
-	vehicleDesc.chassisMOI.y *= 0.4;
+	vehicleDesc.chassisMOI.y *= g_systems.physics->chassis_moi_y;	//0.4
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -163,6 +163,51 @@ PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfE
 	return body;
 }
 
+void PhysicsSystem::updateCar() {
+	PxVehicleDrive4W* cars[4];
+	cars[0] = mVehiclePlayer1;
+	cars[1] = mVehiclePlayer2;
+	cars[2] = mVehiclePlayer3;
+	cars[3] = mVehiclePlayer4;
+	for (int car = 0; car < 4; car++) {
+		// Update wheels
+		for (int wheel = 0; wheel < 4; wheel++) {
+			PxVehicleWheelData wheelData = cars[car]->mWheelsSimData.getWheelData(wheel);
+			wheelData.mMass = wheel_mass;
+			wheelData.mMOI = wheel_moi;
+			wheelData.mMaxBrakeTorque = max_brake_torque;
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) {
+				
+			}
+			else {
+
+			}
+			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
+		}
+
+		// Update engine
+		PxVehicleEngineData engineData = cars[car]->mDriveSimData.getEngineData();
+		engineData.mPeakTorque = peak_torque;
+		engineData.mMaxOmega = max_omega;
+		//q1
+		cars[car]->mDriveSimData.setEngineData(engineData);
+
+		// Update chassis
+		//PxVehicleChassisData gaming = cars[car]->
+	}
+}
+
+void PhysicsSystem::updateEngine() {
+	PxVehicleEngineData engine;
+	engine.mPeakTorque = peak_torque;
+	engine.mMaxOmega = max_omega;//approx 6000 rpm
+
+	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
+}
+
 void PhysicsSystem::initializeActors() {
 	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
 	// Create shape using the kitchen's mesh
@@ -209,14 +254,8 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
-	PxVehicleEngineData engine;
-	engine.mPeakTorque = 5000.0f;
-	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
+	updateEngine();
 
-	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
@@ -294,7 +333,14 @@ void PhysicsSystem::initializeActors() {
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 
-PhysicsSystem::PhysicsSystem()
+PhysicsSystem::PhysicsSystem() :
+		chassis_mass(400.f)
+	,	peak_torque(100000.f)
+	,	max_omega(1000.f)
+	,	wheel_mass(800.f)
+	,	wheel_moi(100.f)//wheel_moi(1440.f)
+	,	chassis_moi_y(0.25f)
+	,	max_brake_torque(100000.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
@@ -380,6 +426,8 @@ void PhysicsSystem::initialize()
 
 	viewDirectionalInfluence = 0.f;
 	turnDirectionalInfluence = 0.f;
+
+	updateCar(); // THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
 // Cooking mesh was creating a read access violation seemingly randomly, it appears to
