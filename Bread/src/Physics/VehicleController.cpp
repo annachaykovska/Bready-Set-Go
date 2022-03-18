@@ -134,16 +134,16 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	}
 
 	// KEY PRESSED
-	std::cout << physics->mVehiclePlayer1->computeForwardSpeed()<<std::endl;
-	if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL) {
-		std::cout << "Neutral" << std::endl;
-	}
-	else if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
-		std::cout << "FIRST" << std::endl;
-	}
-	else {
-		std::cout << "REVERSE" << std::endl;
-	}
+	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed()<<std::endl;
+	//if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL) {
+	//	std::cout << "Neutral" << std::endl;
+	//}
+	//else if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
+	//	std::cout << "FIRST" << std::endl;
+	//}
+	//else {
+	//	std::cout << "REVERSE" << std::endl;
+	//}
 	//TODO: LOOK AT THIS FOR THE BRAKING
 	//std::cout << "Left: " << triggerLeft << " Right: " << triggerRight << std::endl;
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
@@ -188,7 +188,8 @@ void XboxController::setButtonStateFromController(int controllerId) {
 		}
 		else { //brake 
 			// FIXME: DOESNT BRAKE CORRECTLY WHEN GOING BACKWARDS!!!!
-			analogVal = triggerLeft / 255;
+			std::cout << "BRAKING IN REVERSE" << std::endl;
+			analogVal = triggerRight / 255;
 			input->setAnalogBrake(analogVal);
 		}
 		// END OF REFACTOR
