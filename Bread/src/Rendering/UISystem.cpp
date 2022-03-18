@@ -37,7 +37,7 @@ UISystem::UISystem()
     FT_Face face;
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
-    projection = glm::ortho(0.f, 800.f, 0.f, 600.f); //check if the max limits can be changed
+    projection = glm::ortho(0.f, float(g_systems.width), 0.f, float(g_systems.height)); //check if the max limits can be changed
     imageProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
 	//Freetype initialization
 	if (FT_Init_FreeType(&ft))
@@ -342,8 +342,8 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
         {1., 1., 1., 1.}
     };
     glm::mat4 rotate = glm::rotate(glm::mat4(1.f), theta, glm::vec3(0.f,0.f,1.f));
-    glm::mat4 scale = glm::scale(glm::mat4(1.f), glm::vec3(scaleX/800.f, scaleY/600.f, 1.f));
-    glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3((x - 400.f) / 400.f, (y - 300.f) / 300.f, 0.f));
+    glm::mat4 scale = glm::scale(glm::mat4(1.f), glm::vec3(scaleX/g_systems.width, scaleY/g_systems.height, 1.f));
+    glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3((x - (g_systems.width / 2.f)) / (g_systems.width / 2.f), (y - (g_systems.height / 2.f)) / (g_systems.height / 2.f), 0.f));
     glm::mat4 modelMat = translation * scale * rotate;
 
     glUniformMatrix4fv(glGetUniformLocation(s.getId(), "model"), 1, GL_FALSE, glm::value_ptr(modelMat));
@@ -374,7 +374,8 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
 
     glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
 
-    float viewRange = g_scene.camera.perspective / 2.f;
+    //float viewRange = g_scene.camera.perspective / 2.f;
+    float viewRange = 80 / 2.f;
     viewRange *= (PI / 180.f);
 
     float yawTheta = acos(dot(cam, yaw) / (length(yaw) * length(cam)));
@@ -386,10 +387,10 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
     {
         location.y = 30.f;
 
-        float offset = (((386.f) / (PI - (PI / 2.f))) * (yawTheta - (PI / 2.f)));
+        float offset = (((g_systems.width / 2.f) / (PI - (PI / 2.f))) * (yawTheta - (PI / 2.f)));
         if (upVector.y < 0)
         {
-            location.x = 770 - offset;
+            location.x = g_systems.width - 30 - offset;
         }
         else
         {
@@ -398,24 +399,24 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
     }
     else if (yawTheta > viewRange)
     {
-        float offset = (((300 - 30) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
+        float offset = ((((g_systems.height / 2.f) - 0) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
         if (upVector.y < 0)
         {
-            location.x = 770;
-            location.y = 300 - offset;
+            location.x = g_systems.width - 30;
+            location.y = (g_systems.height / 2.f) - offset;
         }
         else
         {
             location.x = 30;
-            location.y = 300 - offset;
+            location.y = (g_systems.height / 2.f) - offset;
         }
     }
     else
     {
         glm::vec3 screenPos = findPlaneIntersection(toEntity);
-        std::cout << g_systems.width << " " << g_systems.height << std::endl;
+        //std::cout << screenPos.x << " " << screenPos.y << std::endl;
         location.x = -screenPos.x * g_systems.width + (g_systems.width / 2.f);
-        location.y = 350.f;
+        location.y = (g_systems.height / 2.f) + 100.f;
     }
     return glm::vec3(location.x, location.y, location.z);
 }
@@ -424,7 +425,7 @@ glm::vec3 UISystem::findPlaneIntersection(glm::vec3 line)
 {
     float t;
     glm::vec3 cam = g_scene.camera.centerBeam;
-    cam = cam / length(cam);
+    cam = -cam / length(cam);
 
     glm::vec3 zAxis = glm::vec3(0.f, 0.f, 1.f);
 
@@ -439,7 +440,7 @@ glm::vec3 UISystem::findPlaneIntersection(glm::vec3 line)
 
     glm::vec3 normal = cam;
 
-    float d = 1;
+    float d = 0.7;
     float value = normal.z * line.z;
     t = d / value;
 

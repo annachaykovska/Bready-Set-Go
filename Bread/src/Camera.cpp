@@ -62,7 +62,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 
 	if (vehicleSpeed > 0)
 	{
-		perspective = 40 + (vehicleSpeed / 12);
+		//perspective = 40 + (vehicleSpeed / 12);
 		cameraPositionOffset = (vehicleSpeed / 16);
 	}
 
