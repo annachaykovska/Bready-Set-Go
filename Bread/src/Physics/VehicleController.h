@@ -4,6 +4,7 @@
 #include <memory>
 #include <Windows.h>
 #include <xinput.h>
+#include <math.h>
 
 #include "../Window.h"
 #include "../Scene/Scene.h"
