@@ -55,6 +55,7 @@ public:
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
 	// For Tweaking
+	void updateCar();
 	void updateEngine();
 
 	float chassis_mass;
@@ -64,6 +65,7 @@ public:
 	float chassis_moi_y;
 	float peak_torque;
 	float max_omega;
+	float max_brake_torque;
 
 private:
 

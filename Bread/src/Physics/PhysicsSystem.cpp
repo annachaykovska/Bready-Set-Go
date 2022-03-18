@@ -163,6 +163,40 @@ PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfE
 	return body;
 }
 
+void PhysicsSystem::updateCar() {
+	PxVehicleDrive4W* cars[4];
+	cars[0] = mVehiclePlayer1;
+	cars[1] = mVehiclePlayer2;
+	cars[2] = mVehiclePlayer3;
+	cars[3] = mVehiclePlayer4;
+	for (int car = 0; car < 4; car++) {
+		// Update wheels
+		for (int wheel = 0; wheel < 4; wheel++) {
+			PxVehicleWheelData wheelData = cars[car]->mWheelsSimData.getWheelData(wheel);
+			wheelData.mMass = wheel_mass;
+			wheelData.mMOI = wheel_moi;
+			wheelData.mMaxBrakeTorque = max_brake_torque;
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) {
+				
+			}
+			else {
+
+			}
+			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
+		}
+
+		// Update engine
+		PxVehicleEngineData engineData = cars[car]->mDriveSimData.getEngineData();
+		engineData.mPeakTorque = peak_torque;
+		engineData.mMaxOmega = max_omega;
+		//q1
+		cars[car]->mDriveSimData.setEngineData(engineData);
+
+		// Update chassis
+		//PxVehicleChassisData gaming = cars[car]->
+	}
+}
+
 void PhysicsSystem::updateEngine() {
 	PxVehicleEngineData engine;
 	engine.mPeakTorque = peak_torque;
@@ -280,11 +314,12 @@ void PhysicsSystem::initializeActors() {
 
 PhysicsSystem::PhysicsSystem() :
 		chassis_mass(400.f)
-	,	peak_torque(5000.f)
+	,	peak_torque(100000.f)
 	,	max_omega(1000.f)
 	,	wheel_mass(800.f)
 	,	wheel_moi(1440.f)
 	,	chassis_moi_y(0.4f)
+	,	max_brake_torque(1000000.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
@@ -370,6 +405,8 @@ void PhysicsSystem::initialize()
 
 	viewDirectionalInfluence = 0.f;
 	turnDirectionalInfluence = 0.f;
+
+	updateCar(); // THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
 // Cooking mesh was creating a read access violation seemingly randomly, it appears to
