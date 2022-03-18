@@ -27,8 +27,8 @@ CollisionCallback gCollisionCallback;
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.2f,
-	5.0f,		0.3f,
-	30.0f,		0.5f,
+	5.0f,		0.6f,
+	30.0f,		0.8f,
 	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -317,9 +317,9 @@ PhysicsSystem::PhysicsSystem() :
 	,	peak_torque(100000.f)
 	,	max_omega(1000.f)
 	,	wheel_mass(800.f)
-	,	wheel_moi(1440.f)
-	,	chassis_moi_y(0.4f)
-	,	max_brake_torque(1000000.f)
+	,	wheel_moi(100.f)//wheel_moi(1440.f)
+	,	chassis_moi_y(0.25f)
+	,	max_brake_torque(100000.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);

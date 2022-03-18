@@ -253,10 +253,10 @@ void Profiler::physicsValues() {
 		// gSteerVsForwardSpeedData
 		//ImGui::InputFloat("Chassis Mass", &(physSys->chassis_mass), 10.f, 100.f, "%.3f");	// Chassis Mass
 		ImGui::InputFloat("Wheel Mass", &(physSys->wheel_mass), 10.f, 100.f, "%.3f");		// WheelMass
-		ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");		// WheelMOI
+		ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");			// WheelMOI
 
-		//ImGui::InputFloat3("Chassis MOI", physSys->chassis_moi, "%.3f");				// Chassis MOI
-		//ImGui::InputFloat("Chassis MOI y", &(physSys->chassis_moi_y), 0.01f, 0.1f, "%.3f");		// Chassis MOI y
+		//ImGui::InputFloat3("Chassis MOI", physSys->chassis_moi, "%.3f");					// Chassis MOI
+		ImGui::InputFloat("Chassis MOI y", &(physSys->chassis_moi_y), 0.01f, 0.1f, "%.3f");	// Chassis MOI y
 
 		// engine
 		ImGui::InputFloat("Peak Torque", &(physSys->peak_torque), 10.f, 100.f, "%.3f");	// enging peak torque
@@ -266,6 +266,9 @@ void Profiler::physicsValues() {
 			//g_systems.physics->cleanupPhysics(); // Causes an exception 
 			//g_systems.physics->initialize(); //The old models are still kicking around if this is called alone
 			g_systems.physics->updateCar();
+		}
+		if (ImGui::Button("Reload but Harder", ImVec2(300,30))) {
+			g_systems.physics->initialize();
 		}
 	}
 }
