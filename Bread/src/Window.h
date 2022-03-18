@@ -27,8 +27,8 @@ struct WindowDeleter {
 class Window {
 public:
 
-	Window(std::shared_ptr<CallbackInterface> callbacks, int width, int height, std::string name);
-	Window(int width, int height, std::string name);
+	Window(std::shared_ptr<CallbackInterface> callbacks, int width, int height, std::string name, bool fullScreen);
+	Window(int width, int height, std::string name, bool fullScreen);
 
 	void setCallbacks(std::shared_ptr<CallbackInterface> callbacks);
 

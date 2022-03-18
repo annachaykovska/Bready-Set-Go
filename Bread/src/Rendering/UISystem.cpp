@@ -137,21 +137,21 @@ void UISystem::update() {
     height = needle.height;
     width = needle.width;
 
-    renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
+    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225) * (width / height), scY(0.3) * (height / width), 
         lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
 
     height = speedometer.height;
     width = speedometer.width;
-    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f, 1.f);
+    renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225) * (width / height), scY(0.3) * (height / width), 0.f, 1.f);
 
 
     // Drawing minimap
     height = p1Icon.height;
     width = p1Icon.width;
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
+    renderImage(imageShader, p1Icon, scX(p1Location.x), scY(p1Location.y), scX(15.0f) * (width / height), scY(15.0f) * (height / width), 0, 1.f);
     height = p2Icon.height;
     width = p2Icon.width;
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
+    renderImage(imageShader, p2Icon, scX(p2Location.x), scY(p2Location.y), scX(15.0f) * (width / height), scY(15.0f) * (height / width), 0, 1.f);
     height = p3Icon.height;
     width = p3Icon.width;
     renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
@@ -362,14 +362,13 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
 {
     glm::vec3 location;
 
-    //std::cout << entityPos.x << " " << entityPos.y << " " << entityPos.z << std::endl;
     glm::vec3 cam = g_scene.camera.centerBeam;
     glm::vec3 toEntity = entityPos - g_scene.camera.position;
 
-    location.z = 60 + ((20.f - 60.f) / (400.f - 0.f)) * (length(toEntity) - 0);
-    if (location.z < 30)
+    location.z = scX(0.07) + ((scX(0.02) - scX(0.07)) / (400.f - 0.f)) * (length(toEntity) - 0);
+    if (location.z < scX(0.02))
     {
-        location.z = 30;
+        location.z = scX(0.02);
     }
 
     glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
@@ -383,40 +382,42 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
 
     float pitchTheta = acos(dot(toEntity, yaw) / (length(yaw) * length(toEntity)));
     
+    // If the entity is behind the player
     if (yawTheta > (PI / 2.f))
     {
-        location.y = 30.f;
+        location.y = scY(0.07);
 
         float offset = (((g_systems.width / 2.f) / (PI - (PI / 2.f))) * (yawTheta - (PI / 2.f)));
         if (upVector.y < 0)
         {
-            location.x = g_systems.width - 30 - offset;
+            location.x = g_systems.width - scX(0.02) - offset;
         }
         else
         {
-            location.x = 30 + offset;
+            location.x = scX(0.02) + offset;
         }
     }
+    // If the entity is between 90 deg and the viewrange of the player
     else if (yawTheta > viewRange)
     {
         float offset = ((((g_systems.height / 2.f) - 0) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
         if (upVector.y < 0)
         {
-            location.x = g_systems.width - 30;
+            location.x = g_systems.width - scX(0.0375);
             location.y = (g_systems.height / 2.f) - offset;
         }
         else
         {
-            location.x = 30;
+            location.x = scX(0.0375);
             location.y = (g_systems.height / 2.f) - offset;
         }
     }
+    // Entity is visible on screen
     else
     {
         glm::vec3 screenPos = findPlaneIntersection(toEntity);
-        //std::cout << screenPos.x << " " << screenPos.y << std::endl;
         location.x = -screenPos.x * g_systems.width + (g_systems.width / 2.f);
-        location.y = (g_systems.height / 2.f) + 100.f;
+        location.y = (g_systems.height / 2.f) + scY(0.15);
     }
     return glm::vec3(location.x, location.y, location.z);
 }
@@ -432,6 +433,8 @@ glm::vec3 UISystem::findPlaneIntersection(glm::vec3 line)
     glm::vec3 a = cross(cam, zAxis);
     a = a / length(a);
 
+
+    // Rotate the camera direction onto the z axis and then do the same for the entity direction
     float sinPhi = length(cross(cam, zAxis)) / (length(cam) * length(zAxis));
     float cosPhi = dot(cam, zAxis) / (length(cam) * length(zAxis));
 
@@ -440,11 +443,22 @@ glm::vec3 UISystem::findPlaneIntersection(glm::vec3 line)
 
     glm::vec3 normal = cam;
 
-    float d = 0.7;
+    // Magic number for distance that matches with screen resolution
+    float d = 0.78;
     float value = normal.z * line.z;
     t = d / value;
 
     return glm::vec3(line.x * t, line.y * t, line.z * t);
+}
+
+float UISystem::scX(float xVal)
+{
+    return xVal * g_systems.width;
+}
+
+float UISystem::scY(float yVal)
+{
+    return yVal * g_systems.height;
 }
 
 float UISystem::lerp(float p, float a, float b) {

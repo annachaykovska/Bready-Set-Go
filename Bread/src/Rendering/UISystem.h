@@ -44,6 +44,9 @@ private:
 	glm::vec3 offscreenBubbleLocation(glm::vec3 entityPos);
 
 	glm::vec3 findPlaneIntersection(glm::vec3 line);
+
+	float scX(float xVal);
+	float scY(float yVal);
 	float lerp(float p, float a, float b);
 
 	ImageTexture speedometer;

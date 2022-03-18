@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <Windows.h>
+#include <WinUser.h>
 
 #include "Window.h"
 #include "Profiler.h"
@@ -31,11 +33,13 @@ int main()
 	glfwInit();
 
 	// Set window size
-	g_systems.width = 800;
-	g_systems.height = 600;
+	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
+	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
+
+	bool fullScreen = true;
 
 	// Create viewport window
-	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");
+	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	// ImGui profiler for debugging
