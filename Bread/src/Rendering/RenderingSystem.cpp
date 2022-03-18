@@ -149,7 +149,7 @@ void RenderingSystem::loadModels()
 	// Environment models
 	//-----------------------------------------------------------------------------------
 	// Ground
-	std::string groundPath = "resources/models/kitchen/kitchen.obj";
+	std::string groundPath = "resources/models/kitchen/kitchen(final).obj";
 	this->models.emplace_back(Model(&groundPath[0])); 
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 

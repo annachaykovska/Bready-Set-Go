@@ -37,6 +37,7 @@ public:
 
 	float getPlayerSpeed(int playerNumber);
 	void respawnPlayer(int playerNumber);
+	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
 	void cleanupPhysics();
 

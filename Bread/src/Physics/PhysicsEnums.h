@@ -18,3 +18,11 @@ enum DriveMode
 	eDRIVE_MODE_NONE
 };
 
+enum ActiveGroup
+{
+	PLAYERGROUP1 = (1 << 0),
+	PLAYERGROUP2 = (1 << 1),
+	PLAYERGROUP3 = (1 << 2),
+	PLAYERGROUP4 = (1 << 3)
+};
+
