@@ -42,6 +42,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glEnable(GL_DEPTH_TEST); // Turn on depth testing
 	glDepthFunc(GL_LESS); // Should be default but make it explicit
 
+	glEnable(GL_CULL_FACE); // Enable face culling
+	glCullFace(GL_BACK); // Turn on back-face culling initially
+
 	// Rendering uniforms
 	shader.use();
 	this->modelLoc = glGetUniformLocation(getShaderId(), "model");
@@ -219,9 +222,9 @@ void RenderingSystem::update()
 	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT); // Switch to front-face culling to reduce peter-panning of shadows
 	renderShadowMap();
-	glCullFace(GL_BACK);
+	glCullFace(GL_BACK); // Switch back to back-face culling for regular rendering
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Debug code for rendering the depthMap to viewport

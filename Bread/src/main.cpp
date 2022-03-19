@@ -107,7 +107,8 @@ int main()
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = 4.1f;
+	counterTrans->position.y = -76.0f;
+	counterTrans->position.z = 50.0f;
 	counterTrans->update();
 
 	Transform* cheeseTransform = cheese->getTransform();
@@ -131,6 +132,7 @@ int main()
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
 	countertopAudioSource->gain = 0.01f; // Volume control
+	countertopAudioSource->loop = true;
 	countertopAudioSource->play("bg.wav"); // Comment this out to turn off the music on load
 	
 	AudioSource* p2Audio = player2->getAudioSource();

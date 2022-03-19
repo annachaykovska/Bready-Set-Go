@@ -37,6 +37,7 @@ public:
 
 	float getPlayerSpeed(int playerNumber);
 	void respawnPlayer(int playerNumber);
+	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
 	void cleanupPhysics();
 
@@ -54,6 +55,19 @@ public:
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
+	// For Tweaking
+	void updateCar();
+	void updateEngine();
+
+	float chassis_mass;
+	float wheel_mass;
+	float wheel_moi;
+	//float chassis_moi[3];
+	float chassis_moi_y;
+	float peak_torque;
+	float max_omega;
+	float max_brake_torque;
+
 private:
 
 	float mAccumulator;

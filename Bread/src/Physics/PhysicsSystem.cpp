@@ -27,8 +27,8 @@ CollisionCallback gCollisionCallback;
 PxF32 gSteerVsForwardSpeedData[2 * 8] =
 {
 	0.0f,		0.2f,
-	5.0f,		0.3f,
-	30.0f,		0.5f,
+	5.0f,		0.6f,
+	30.0f,		0.8f,
 	120.0f,		1.f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -78,7 +78,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 400.0f;
+	const PxF32 chassisMass = g_systems.physics->chassis_mass;
 	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
@@ -88,10 +88,10 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 800.0f;
+	const PxF32 wheelMass = g_systems.physics->wheel_mass;		//800.f
 	const PxF32 wheelRadius = 1.5f;
 	const PxF32 wheelWidth = 0.6f;
-	const PxF32 wheelMOI = 2.f * wheelMass * wheelRadius * wheelRadius;
+	const PxF32 wheelMOI = g_systems.physics->wheel_moi;		//2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -99,7 +99,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	vehicleDesc.chassisMass = chassisMass;
 	vehicleDesc.chassisDims = chassisDims;
 	vehicleDesc.chassisMOI = chassisMOI;
-	vehicleDesc.chassisMOI.y *= 0.4;
+	vehicleDesc.chassisMOI.y *= g_systems.physics->chassis_moi_y;	//0.4
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = mMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -121,7 +121,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(10, 2, 10) );
+	PxTransform localTm(PxVec3(10, 2, 10));
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
@@ -163,6 +163,51 @@ PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfE
 	return body;
 }
 
+void PhysicsSystem::updateCar() {
+	PxVehicleDrive4W* cars[4];
+	cars[0] = mVehiclePlayer1;
+	cars[1] = mVehiclePlayer2;
+	cars[2] = mVehiclePlayer3;
+	cars[3] = mVehiclePlayer4;
+	for (int car = 0; car < 4; car++) {
+		// Update wheels
+		for (int wheel = 0; wheel < 4; wheel++) {
+			PxVehicleWheelData wheelData = cars[car]->mWheelsSimData.getWheelData(wheel);
+			wheelData.mMass = wheel_mass;
+			wheelData.mMOI = wheel_moi;
+			wheelData.mMaxBrakeTorque = max_brake_torque;
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) {
+				
+			}
+			else {
+
+			}
+			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
+		}
+
+		// Update engine
+		PxVehicleEngineData engineData = cars[car]->mDriveSimData.getEngineData();
+		engineData.mPeakTorque = peak_torque;
+		engineData.mMaxOmega = max_omega;
+		//q1
+		cars[car]->mDriveSimData.setEngineData(engineData);
+
+		// Update chassis
+		//PxVehicleChassisData gaming = cars[car]->
+	}
+}
+
+void PhysicsSystem::updateEngine() {
+	PxVehicleEngineData engine;
+	engine.mPeakTorque = peak_torque;
+	engine.mMaxOmega = max_omega;//approx 6000 rpm
+
+	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
+	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
+}
+
 void PhysicsSystem::initializeActors() {
 	// KITCHEN ENVIRONMENT ---------------------------------------------------------------------------------------------------------
 	// Create shape using the kitchen's mesh
@@ -175,7 +220,7 @@ void PhysicsSystem::initializeActors() {
 	kitchenShape->setSimulationFilterData(kitchenFilter);
 
 	// Create the kitchen actor (rigid static)
-	PxTransform kitchenTransform(PxVec3(0, 0, 0), PxQuat(PxIdentity));
+	PxTransform kitchenTransform(PxVec3(0, -80, 50), PxQuat(PxIdentity));
 	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
 	this->kitchen->attachShape(*kitchenShape);
 
@@ -209,14 +254,8 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
-	PxVehicleEngineData engine;
-	engine.mPeakTorque = 5000.0f;
-	engine.mMaxOmega = 1000.0f;//approx 6000 rpm
+	updateEngine();
 
-	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
 	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
@@ -248,6 +287,27 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3->getRigidDynamicActor()->userData = vp3;
 	mVehiclePlayer4->getRigidDynamicActor()->userData = vp4;
 
+	PxShape* shapes1[1];
+	PxShape* shapes2[1];
+	PxShape* shapes3[1];
+	PxShape* shapes4[1];
+	this->mVehiclePlayer1->getRigidDynamicActor()->getShapes(shapes1, 1);
+	this->mVehiclePlayer2->getRigidDynamicActor()->getShapes(shapes2, 1);
+	this->mVehiclePlayer3->getRigidDynamicActor()->getShapes(shapes3, 1);
+	this->mVehiclePlayer4->getRigidDynamicActor()->getShapes(shapes4, 1);
+	PxFilterData qryVehicle1FilterData;
+	PxFilterData qryVehicle2FilterData;
+	PxFilterData qryVehicle3FilterData;
+	PxFilterData qryVehicle4FilterData;
+	qryVehicle1FilterData.word0 = PLAYERGROUP1;
+	qryVehicle2FilterData.word0 = PLAYERGROUP2;
+	qryVehicle3FilterData.word0 = PLAYERGROUP3;
+	qryVehicle4FilterData.word0 = PLAYERGROUP4;
+	shapes1[0]->setQueryFilterData(qryVehicle1FilterData);
+	shapes2[0]->setQueryFilterData(qryVehicle2FilterData);
+	shapes3[0]->setQueryFilterData(qryVehicle3FilterData);
+	shapes4[0]->setQueryFilterData(qryVehicle4FilterData);
+
 	mScene->addActor(*mVehiclePlayer1->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer2->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
@@ -257,23 +317,30 @@ void PhysicsSystem::initializeActors() {
 	// Note: Physx actor name must match Entity name
 	// CHEESE
 	float halfExtent = 1.0f;
-	PxTransform cheeseTransform(PxVec3(-270, 0, -220));
+	PxTransform cheeseTransform(PxVec3(-220, 3, -130));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
 	// SAUSAGE
-	PxTransform sausageTransform(PxVec3(-145, 0, 175));
+	PxTransform sausageTransform(PxVec3(-110, 3, 175));
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
-	PxTransform tomatoTransform(PxVec3(95, 0, 170));
+	PxTransform tomatoTransform(PxVec3(95, 3, 170));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH
-	PxTransform doughTransform(PxVec3(-150, 0, -8));
+	PxTransform doughTransform(PxVec3(-105, 3, -8));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 }
 
-PhysicsSystem::PhysicsSystem()
+PhysicsSystem::PhysicsSystem() :
+		chassis_mass(400.f)
+	,	peak_torque(100000.f)
+	,	max_omega(1000.f)
+	,	wheel_mass(800.f)
+	,	wheel_moi(100.f)//wheel_moi(1440.f)
+	,	chassis_moi_y(0.25f)
+	,	max_brake_torque(100000.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
@@ -359,6 +426,8 @@ void PhysicsSystem::initialize()
 
 	viewDirectionalInfluence = 0.f;
 	turnDirectionalInfluence = 0.f;
+
+	updateCar(); // THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
 // Cooking mesh was creating a read access violation seemingly randomly, it appears to
@@ -385,7 +454,7 @@ void PhysicsSystem::cookKitchen()
 
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
-	
+
 	this->mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
 
 	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
@@ -430,7 +499,7 @@ float PhysicsSystem::getTurnDirectionalInfluence()
 	return turnDirectionalInfluence;
 }
 
-void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData &inputData, std::string entityName, const float timestep) {
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
 		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
@@ -444,6 +513,45 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool &isVehicleInAir
 	PxRaycastQueryResult* raycastResults = this->mVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = this->mVehicleSceneQueryData->getQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(this->mBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+	// Check for collisions if recorded
+	Entity* player1 = g_scene.getEntity("player1");
+	Entity* player2 = g_scene.getEntity("player2");
+	Entity* player3 = g_scene.getEntity("player3");
+	Entity* player4 = g_scene.getEntity("player4");
+
+	if (player1->verifyPlayerCollision) {
+		if (player1->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player1->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
+		else if (player1->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player2->verifyPlayerCollision) {
+		if (player2->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player2->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
+		else if (player2->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player3->verifyPlayerCollision) {
+		if (player3->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player3->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player3->otherPlayerInCollision == "player4")
+			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
+	}
+	else if (player4->verifyPlayerCollision) {
+		if (player4->otherPlayerInCollision == "player1")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
+		else if (player4->otherPlayerInCollision == "player2")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
+		else if (player4->otherPlayerInCollision == "player3")
+			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+	}
 
 	// Vehicle update
 	const PxVec3 grav = this->mScene->getGravity();
@@ -547,7 +655,7 @@ void PhysicsSystem::update(const float dt)
 	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
 
 	mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
-	
+
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
@@ -617,7 +725,7 @@ void PhysicsSystem::cleanupPhysics()
 	PX_RELEASE(this->mScene);
 	PX_RELEASE(this->mDispatcher);
 	PX_RELEASE(this->mPhysics);
-	
+
 	if (this->mPvd)
 	{
 		PxPvdTransport* transport = this->mPvd->getTransport();
@@ -643,49 +751,191 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 
 	switch (playerNumber)
 	{
-		case (1):
-			result = (float)mVehiclePlayer1->computeForwardSpeed();
-			return result;
-			break;
-		case (2):
-			result = (float)mVehiclePlayer2->computeForwardSpeed();
-			return result;
-			break;
-		case (3):
-			result = (float)mVehiclePlayer3->computeForwardSpeed();
-			return result;
-			break;
-		case (4):
-			result = (float)mVehiclePlayer4->computeForwardSpeed();
-			return result;
-			break;
-		default:
-			break;
+	case (1):
+		result = (float)mVehiclePlayer1->computeForwardSpeed();
+		return result;
+		break;
+	case (2):
+		result = (float)mVehiclePlayer2->computeForwardSpeed();
+		return result;
+		break;
+	case (3):
+		result = (float)mVehiclePlayer3->computeForwardSpeed();
+		return result;
+		break;
+	case (4):
+		result = (float)mVehiclePlayer4->computeForwardSpeed();
+		return result;
+		break;
+	default:
+		break;
 	}
 }
 
 void PhysicsSystem::respawnPlayer(int playerNumber) {
 	switch (playerNumber)
 	{
-		case (1):
-			mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
-			//mVehiclePlayer1->getRigidDynamicActor()->setLinearVelocity(PxVec3(0.0), false);
-			//mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(0.0), false);
-			mVehiclePlayer1->setToRestState();
-			break;
-		case (2):
-			mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
-			mVehiclePlayer2->setToRestState();
-			break;
-		case (3):
-			mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
-			mVehiclePlayer3->setToRestState();
-			break;
-		case (4):
-			mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
-			mVehiclePlayer4->setToRestState();
-			break;
-		default:
-			break;
+	case (1):
+		mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
+		//mVehiclePlayer1->getRigidDynamicActor()->setLinearVelocity(PxVec3(0.0), false);
+		//mVehiclePlayer1->getRigidDynamicActor()->setAngularVelocity(PxVec3(0.0), false);
+		mVehiclePlayer1->setToRestState();
+		break;
+	case (2):
+		mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+		mVehiclePlayer2->setToRestState();
+		break;
+	case (3):
+		mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+		mVehiclePlayer3->setToRestState();
+		break;
+	case (4):
+		mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
+		mVehiclePlayer4->setToRestState();
+		break;
+	default:
+		break;
 	}
+}
+
+void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle) {
+	// Variables
+	const PxHitFlags outputFlags = PxHitFlag::eDEFAULT;
+	const float cooldownThreshold = 3.0;
+	PxReal maxDistance = 5;
+	const PxU32 bufferSize = 256;
+	int collisionWinner = 0;
+
+	// Set rotation matrices
+	float theta = glm::radians(25.f);
+	glm::mat3 rotationMatrixLeft = glm::mat3(
+		cos(theta), sin(theta), 0,
+		-sin(theta), cos(theta), 0,
+		0, 0, 1.0f);
+	glm::mat3 rotationMatrixRight = glm::mat3(
+		cos(-1 * theta), sin(-1 * theta), 0,
+		-sin(-1 * theta), cos(-1 * theta), 0,
+		0, 0, 1.0f);
+
+	// FIRST ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	int firstCollisionNum = 0;
+	//printf("First Actor: %s\n", firstActor->name.c_str());
+	PxVec3 origin = firstVehicle->getRigidDynamicActor()->getGlobalPose().p;
+	PxVec3 unitDir = firstVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();
+	PxRaycastHit hitBuffer[bufferSize];
+	PxRaycastBuffer buf(hitBuffer, bufferSize);
+	PxQueryFilterData filterData1 = PxQueryFilterData();
+	if (firstActor->name.c_str() == "player1")
+		filterData1.data.word0 = PLAYERGROUP1;
+	if (firstActor->name.c_str() == "player2")
+		filterData1.data.word0 = PLAYERGROUP2;
+	if (firstActor->name.c_str() == "player3")
+		filterData1.data.word0 = PLAYERGROUP3;
+	if (firstActor->name.c_str() == "player4")
+		filterData1.data.word0 = PLAYERGROUP4;
+	mScene->raycast(origin, unitDir, maxDistance, buf, outputFlags, filterData1);
+	firstCollisionNum += buf.nbTouches;
+	/*for (PxU32 i = 0; i < buf.nbTouches; i++)
+		printf("Result ONE: %d\n", i);*/
+
+	// Left raycast
+	glm::vec3 newDir = rotationMatrixLeft * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf, outputFlags, filterData1);
+	firstCollisionNum += buf.nbTouches;
+
+	// Right raycast
+	newDir = rotationMatrixRight * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf, outputFlags, filterData1);
+	firstCollisionNum += buf.nbTouches;
+	//printf("NUM COLLISION 1: %d\n", firstCollisionNum);
+
+
+	// SECOND ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	int secondCollisionNum = 0;
+	//printf("Second Actor: %s\n", secondActor->name.c_str());
+	origin = secondVehicle->getRigidDynamicActor()->getGlobalPose().p;
+	unitDir = secondVehicle->getRigidDynamicActor()->getLinearVelocity().getNormalized();
+	PxRaycastHit hitBuffer2[bufferSize];
+	PxRaycastBuffer buf2(hitBuffer2, bufferSize);
+	PxQueryFilterData filterData2 = PxQueryFilterData();
+	if (secondActor->name.c_str() == "player1")
+		filterData2.data.word0 = PLAYERGROUP1;
+	if (secondActor->name.c_str() == "player2")
+		filterData2.data.word0 = PLAYERGROUP2;
+	if (secondActor->name.c_str() == "player3")
+		filterData2.data.word0 = PLAYERGROUP3;
+	if (secondActor->name.c_str() == "player4")
+		filterData2.data.word0 = PLAYERGROUP4;
+	mScene->raycast(origin, unitDir, maxDistance, buf2, outputFlags, filterData2);
+	secondCollisionNum += buf2.nbTouches;
+	/*for (PxU32 i = 0; i < buf2.nbTouches; i++)
+		printf("Result TWO: %d\n", i);*/
+
+	// Left raycast
+	newDir = rotationMatrixLeft * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf2, outputFlags, filterData1);
+	secondCollisionNum += buf2.nbTouches;
+
+	// Right raycast
+	newDir = rotationMatrixRight * glm::vec3(unitDir.x, unitDir.y, unitDir.z);
+	mScene->raycast(origin, PxVec3(newDir.x, newDir.y, newDir.z), maxDistance, buf2, outputFlags, filterData1);
+	secondCollisionNum += buf2.nbTouches;
+	//printf("NUM COLLISION 2: %d\n", secondCollisionNum);
+
+
+	// DECIDE COLLISION WINNER AND CHECK COOLDOWN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	float currentTime = glfwGetTime();
+	bool cooldownIncomplete = false;
+	if (buf.nbTouches > buf2.nbTouches || secondVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f)) {
+		if (currentTime - firstActor->collisionCooldownStart > cooldownThreshold) {
+			firstActor->collisionCooldownStart = -1.0;
+			collisionWinner = 1;
+		}
+		else {
+			cooldownIncomplete = true;
+			printf("Cooldown for %s is not over yet.\n", firstActor->name.c_str());
+		}
+	}
+	else if (buf.nbTouches < buf2.nbTouches || firstVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f)) {
+		if (currentTime - secondActor->collisionCooldownStart > cooldownThreshold) {
+			secondActor->collisionCooldownStart = -1.0;
+			collisionWinner = 2;
+		}
+		else {
+			cooldownIncomplete = true;
+			printf("Cooldown for %s is not over yet.\n", secondActor->name.c_str());
+		}
+	}
+	
+
+	// RESOLVE COLLISION INGREDIENT EXCHANGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	if (collisionWinner == 0) {
+		// No winners (headon collision)
+		if (!cooldownIncomplete)
+			printf("No collision winners. No ingredients moved.\n");
+	}
+	else {
+		Inventory* player1Inventory = (Inventory*)firstActor->getComponent("inventory");
+		Inventory* player2Inventory = (Inventory*)secondActor->getComponent("inventory");
+		if (collisionWinner == 1) {
+			int ingredient = player2Inventory->removeRandomPizzaIngredient(player1Inventory->cheese, player1Inventory->dough, player1Inventory->sausage, player1Inventory->tomato);
+			player1Inventory->setIngredientFromId(ingredient);
+			firstActor->collisionCooldownStart = glfwGetTime();
+			printf("%s took food id %d from %s\n", firstActor->name.c_str(), ingredient, secondActor->name.c_str());
+			
+		}
+		else if (collisionWinner == 2) {
+			int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
+			player2Inventory->setIngredientFromId(ingredient);
+			secondActor->collisionCooldownStart = glfwGetTime();
+			printf("%s took food id %d from %s\n\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
+			
+		}
+	}
+
+	// RESET FLAGS
+	firstActor->verifyPlayerCollision = false;
+	secondActor->verifyPlayerCollision = false;
+	firstActor->otherPlayerInCollision = "";
+	secondActor->otherPlayerInCollision = "";
 }

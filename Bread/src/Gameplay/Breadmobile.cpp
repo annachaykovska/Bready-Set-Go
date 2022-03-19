@@ -77,7 +77,4 @@ void Breadmobile::checkProgress() {
 		this->currentRecipeID = this->recipes[this->progress].id; //Set current recipe id to the next on the list
 	
 	}
-
-
-
 }
