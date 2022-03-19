@@ -154,8 +154,8 @@ int main()
 	window.setCallbacks(movementCallbacks);
 
 	// Track Ingredient Locations
-	IngredientTracker ingredientTracker(*cheeseTransform, *tomatoTransform, *doughTransform, *sausageTransform);
-	g_scene.initIngredientTracking(&ingredientTracker);
+	IngredientTracker ingredientTracker(cheeseTransform, tomatoTransform, doughTransform, sausageTransform);
+	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
@@ -206,41 +206,6 @@ int main()
 			ui.update();
 		}
 
-		// TODO: Move this out of main
-		//if (p1Inv.cheese)
-		//{
-		//	ingredientTracker.updateCheeseTransformSource(*player1->getTransform());
-		//}
-		//if (p1Inv.tomato)
-		//{
-		//	ingredientTracker.updateTomatoTransformSource(*player1->getTransform());
-		//}
-		//if (p1Inv.sausage)
-		//{
-		//	ingredientTracker.updateSausageTransformSource(*player1->getTransform());
-		//}
-		//if (p1Inv.dough)
-		//{
-		//	ingredientTracker.updateDoughTransformSource(*player1->getTransform());
-		//}
-
-		//if (p2Inv.cheese)
-		//{
-		//	ingredientTracker.updateCheeseTransformSource(*player2->getTransform());
-		//}
-		//if (p2Inv.tomato)
-		//{
-		//	ingredientTracker.updateTomatoTransformSource(*player2->getTransform());
-		//}
-		//if (p2Inv.sausage)
-		//{
-		//	ingredientTracker.updateSausageTransformSource(*player2->getTransform());
-		//}
-		//if (p2Inv.dough)
-		//{
-		//	ingredientTracker.updateDoughTransformSource(*player2->getTransform());
-		//}
-
 		// Update the ImGUI profiler
 		profiler.newFrame();
 		profiler.update();
@@ -248,9 +213,9 @@ int main()
 		// Swap the frame buffers
 		window.swapBuffer();
 
-		// AI
-		//std::cout << player1->getTransform()->position.x << " " << player1->getTransform()->position.y << " " << player1->getTransform()->position.z << std::endl;
+		// AI + Navigation
 		p2Brain.update();
+		ingredientTracker.update();
 
 		// AUDIO
 		audio.update();

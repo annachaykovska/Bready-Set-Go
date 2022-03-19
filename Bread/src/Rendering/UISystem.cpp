@@ -11,7 +11,8 @@ namespace
 }
 
 UISystem::UISystem()
-    : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
+    : tracker(nullptr)
+    , textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
@@ -22,6 +23,9 @@ UISystem::UISystem()
     , sausage("resources/textures/sausage.png", GL_NEAREST)
     , dough("resources/textures/dough.png", GL_NEAREST)
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
+    , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
+    , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
+    , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -146,10 +150,20 @@ void UISystem::update() {
     renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.833), scX(0.15), scX(0.15), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15), scX(0.15), 0, 1.f);
 
-    glm::vec3 location = offscreenBubbleLocation(g_scene.tracker->getCheeseLocation().position);
-    renderImage(imageShader, cheeseOffscreen, location.x, location.y, location.z, location.z, 0, 1.f);
+    glm::vec3 IngLocation;
+    IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
+    renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+
+    IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
+    renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+
+    IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
+    renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+
+    IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
+    renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
 
     // Drawing Inventory
     Entity* player1 = g_scene.getEntity("player1");
@@ -181,6 +195,11 @@ void UISystem::update() {
 
     renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.3), 0, 1.f);
 
+}
+
+void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
+{
+    tracker = offscreenTracker;
 }
 
 int UISystem::checkForWin()
@@ -346,7 +365,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
     location.x = (location.x + 1) * g_systems.width * 0.5;
     location.y = (location.y + 1) * g_systems.height * 0.5 + scY(0.1);
 
-    if (location.z < -1 || location.z > 1)
+    if (location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
     {
         // When location.z is not in the interval between [-1, 1] it is no longer in the camera frustrum.
         // This where you will need to put your code for the object offscreen beside and behind states. 
