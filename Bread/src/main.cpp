@@ -36,7 +36,7 @@ int main()
 	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
 	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
 
-	bool fullScreen = true;
+	bool fullScreen = false;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
@@ -205,45 +205,41 @@ int main()
 			ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 			ui.update();
 		}
-		
-		//ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-		//ui.update();
-		//profiler.newFrame();
 
 		// TODO: Move this out of main
-		if (p1Inv.cheese)
-		{
-			ingredientTracker.updateCheeseTransformSource(*player1->getTransform());
-		}
-		if (p1Inv.tomato)
-		{
-			ingredientTracker.updateTomatoTransformSource(*player1->getTransform());
-		}
-		if (p1Inv.sausage)
-		{
-			ingredientTracker.updateSausageTransformSource(*player1->getTransform());
-		}
-		if (p1Inv.dough)
-		{
-			ingredientTracker.updateDoughTransformSource(*player1->getTransform());
-		}
+		//if (p1Inv.cheese)
+		//{
+		//	ingredientTracker.updateCheeseTransformSource(*player1->getTransform());
+		//}
+		//if (p1Inv.tomato)
+		//{
+		//	ingredientTracker.updateTomatoTransformSource(*player1->getTransform());
+		//}
+		//if (p1Inv.sausage)
+		//{
+		//	ingredientTracker.updateSausageTransformSource(*player1->getTransform());
+		//}
+		//if (p1Inv.dough)
+		//{
+		//	ingredientTracker.updateDoughTransformSource(*player1->getTransform());
+		//}
 
-		if (p2Inv.cheese)
-		{
-			ingredientTracker.updateCheeseTransformSource(*player2->getTransform());
-		}
-		if (p2Inv.tomato)
-		{
-			ingredientTracker.updateTomatoTransformSource(*player2->getTransform());
-		}
-		if (p2Inv.sausage)
-		{
-			ingredientTracker.updateSausageTransformSource(*player2->getTransform());
-		}
-		if (p2Inv.dough)
-		{
-			ingredientTracker.updateDoughTransformSource(*player2->getTransform());
-		}
+		//if (p2Inv.cheese)
+		//{
+		//	ingredientTracker.updateCheeseTransformSource(*player2->getTransform());
+		//}
+		//if (p2Inv.tomato)
+		//{
+		//	ingredientTracker.updateTomatoTransformSource(*player2->getTransform());
+		//}
+		//if (p2Inv.sausage)
+		//{
+		//	ingredientTracker.updateSausageTransformSource(*player2->getTransform());
+		//}
+		//if (p2Inv.dough)
+		//{
+		//	ingredientTracker.updateDoughTransformSource(*player2->getTransform());
+		//}
 
 		// Update the ImGUI profiler
 		profiler.newFrame();

@@ -42,8 +42,7 @@ private:
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
 	glm::vec3 offscreenBubbleLocation(glm::vec3 entityPos);
-
-	glm::vec3 findPlaneIntersection(glm::vec3 line);
+	glm::vec2 miniMapPlayerPosition(Transform& transform);
 
 	float scX(float xVal);
 	float scY(float yVal);
