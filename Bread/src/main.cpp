@@ -103,7 +103,7 @@ int main()
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = -76.0f;
+	counterTrans->position.y = -78.0f;
 	counterTrans->position.z = 50.0f;
 	counterTrans->update();
 
