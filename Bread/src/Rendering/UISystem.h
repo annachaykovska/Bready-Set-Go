@@ -6,6 +6,7 @@
 #include "../SystemManager.h"
 #include "../Scene/Scene.h"
 #include "../Physics/PhysicsSystem.h"
+#include "../Navigation/IngredientTracker.h"
 #include <iostream>
 #include <map>
 #include <ft2build.h>
@@ -32,6 +33,7 @@ public:
 	~UISystem();
 
 	void update();
+	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
 
@@ -41,7 +43,14 @@ private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
+	glm::vec3 offscreenBubbleLocation(glm::vec3 entityPos);
+	glm::vec2 miniMapPlayerPosition(Transform& transform);
+
+	float scX(float xVal);
+	float scY(float yVal);
 	float lerp(float p, float a, float b);
+
+	IngredientTracker* tracker;
 
 	ImageTexture speedometer;
 	ImageTexture needle;
@@ -52,6 +61,11 @@ private:
 	ImageTexture cheese;
 	ImageTexture sausage;
 	ImageTexture dough;
+
+	ImageTexture cheeseOffscreen;
+	ImageTexture tomatoOffscreen;
+	ImageTexture doughOffscreen;
+	ImageTexture sausageOffscreen;
 
 	ImageTexture pizza;
 
