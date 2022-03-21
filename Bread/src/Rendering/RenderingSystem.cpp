@@ -21,20 +21,20 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->screenHeight = 0;
 
 	// Orthographic projection for shadow map settings
-	this->ort.x = -162.0f;
-	this->ort.y = 314.0f;
-	this->ort.z = -236.0f;
-	this->ort.w = 165.0f;
-	this->ort.nearPlane = 1.0f;
-	this->ort.farPlane = 600.0f;
+	this->ort.left = 0;
+	this->ort.right = 0;
+	this->ort.bottom = 0;
+	this->ort.top = 0;
+	this->ort.nearPlane = 0.1f;
+	this->ort.farPlane = 700.0f;
 
 	// Directional light position
-	this->lightPos = glm::vec3(0.0f, 200.0f, -200.0f);
+	this->lightPos = glm::vec3(0.0f, 200.0f, 200.0f);
 	this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
 
 	// Shadow map viewport size
-	this->shadowWidth = 2048;
-	this->shadowHeight = 2048;
+	this->shadowWidth = g_systems.width * 4;
+	this->shadowHeight = g_systems.height * 4;
 
 	this->models.reserve(g_scene.count()); // Create space for models
 	loadModels(); // Load model files into the models vector
@@ -202,15 +202,26 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	glm::mat4 proj = glm::mat4(1.0f);
 	float screenWidth = g_systems.width;
 	float screenHeight = g_systems.height;
-	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 500.0f);
+	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+}
+
+void RenderingSystem::updateOrtho()
+{
+	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
+
+	this->ort.left = p1Pos.x + 150.0f;
+	this->ort.right = p1Pos.x - 150.0f;
+	this->ort.bottom = -p1Pos.z - 150.0f;
+	this->ort.top = -p1Pos.z + 150.0f;
 }
 
 void RenderingSystem::update()
 {
 	// Render depthMap to texture (from light's perspective)
 	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-	lightProjection = glm::ortho(ort.x, ort.y, ort.z, ort.w, ort.nearPlane, ort.farPlane);
+	updateOrtho();
+	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
 	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	lightSpaceMatrix = lightProjection * lightView;
 
@@ -232,7 +243,7 @@ void RenderingSystem::update()
 		renderDebugShadowMap();
 	else
 	{
-		// 3. Render scene as normal using the generated depth/shadow map
+		// Render scene as normal using the generated depth/shadow map
 		this->shader.use();
 		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		renderScene();

@@ -89,7 +89,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
 	const PxF32 wheelMass = g_systems.physics->wheel_mass;		//800.f
-	const PxF32 wheelRadius = 1.5f;
+	const PxF32 wheelRadius = 0.5f;
 	const PxF32 wheelWidth = 0.6f;
 	const PxF32 wheelMOI = g_systems.physics->wheel_moi;		//2.f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 4;

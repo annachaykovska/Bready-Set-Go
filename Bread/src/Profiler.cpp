@@ -211,10 +211,10 @@ void Profiler::shadows()
 		if (depthMap == 1)
 			g_systems.renderDebug = true;
 
-		ImGui::InputFloat("orthoProj.x", &(ort.x), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("orthoProj.y", &(ort.y), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("orthoProj.z", &(ort.z), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("orthoProj.w", &(ort.w), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.left", &(ort.left), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.right", &(ort.right), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.bottom", &(ort.bottom), 1.f, 10.f, "%.3f");
+		ImGui::InputFloat("orthoProj.top", &(ort.top), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.near", &(ort.nearPlane), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.far", &(ort.farPlane), 1.f, 10.f, "%.3f");
 
