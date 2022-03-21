@@ -149,7 +149,9 @@ int main()
 	//p4Audio->play("idle.wav");
 
 	// Track time
-	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0;
+	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0, accumulator = 0;
+	float frameBeginTime = 0, frameEndTime = 0; 
+	float fixedTimeInterval = 0, shortTimeInterval = 1.0f / 120.0f, longTimeInterval = 1.0f / 60.0f;
 
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
@@ -181,11 +183,11 @@ int main()
 	// GAME LOOP
 	while (!window.shouldClose())
 	{
+		frameBeginTime = glfwGetTime();
+
 		// INPUT
 		glfwPollEvents();
 		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
-
-		// READ CONTROLLERS
 		controllers.checkControllers(); // sets analog/digital
 		controllers.setButtonStateFromController(0); // Getting the input from player 1 controller
 		//controllers.setButtonStateFromController(1); // Getting the input from player 1 controller
@@ -193,10 +195,7 @@ int main()
 		//controllers.setButtonStateFromController(3); // Getting the input from player 1 controller
 
 		// SIMULATE
-		newTime = glfwGetTime();
-		deltaTime = newTime - oldTime;
 		g_systems.physics->update(deltaTime);
-		oldTime = newTime;
 
 		// RENDER
 		window.clear();
@@ -212,7 +211,6 @@ int main()
 		profiler.newFrame();
 		profiler.update();
 
-		// Swap the frame buffers
 		window.swapBuffer();
 
 		// AI + Navigation
@@ -221,6 +219,20 @@ int main()
 
 		// AUDIO
 		audio.update();
+
+		// UPDATE TIME
+		// If this frame took longer than 1/60 s to compute, treat it as two frames instead
+		if (frameEndTime - frameBeginTime > shortTimeInterval)
+			fixedTimeInterval = longTimeInterval;
+
+		// If the last frame took less than 1/60 s to compute, delay
+		do 
+		{
+			frameEndTime = glfwGetTime();
+			deltaTime = frameEndTime - frameBeginTime;
+		} while (deltaTime < fixedTimeInterval);
+
+		fixedTimeInterval = shortTimeInterval;
 	}
 
 	// Collect garbage
