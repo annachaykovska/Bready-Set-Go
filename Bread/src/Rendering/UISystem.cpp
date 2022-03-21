@@ -5,8 +5,14 @@
 extern SystemManager g_systems;
 extern Scene g_scene;
 
+namespace
+{
+    const float PI = 3.141592;
+}
+
 UISystem::UISystem()
-    : textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
+    : tracker(nullptr)
+    , textShader("resources/shaders/textVertex.txt", "resources/shaders/textFragment.txt")
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
@@ -16,6 +22,10 @@ UISystem::UISystem()
     , cheese("resources/textures/cheese.png", GL_NEAREST)
     , sausage("resources/textures/sausage.png", GL_NEAREST)
     , dough("resources/textures/dough.png", GL_NEAREST)
+    , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
+    , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
+    , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
+    , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -31,7 +41,7 @@ UISystem::UISystem()
     FT_Face face;
 
     textShader.checkCompileErrors(textShader.getId(), "PROGRAM");
-    projection = glm::ortho(0.f, 800.f, 0.f, 600.f); //check if the max limits can be changed
+    projection = glm::ortho(0.f, float(g_systems.width), 0.f, float(g_systems.height)); //check if the max limits can be changed
     imageProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
 	//Freetype initialization
 	if (FT_Init_FreeType(&ft))
@@ -128,35 +138,32 @@ void UISystem::update() {
 
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
-    height = needle.height;
-    width = needle.width;
-
-    renderImage(imageShader, needle, 700.0f, 120.0f, 180 * (width / height), 180.0f * (height / width), 
+    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 
         lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
 
-    height = speedometer.height;
-    width = speedometer.width;
-    renderImage(imageShader, speedometer, 700.0f, 120.0f, 180.0f * (width / height), 180.0f * (height / width), 0.f, 1.f);
+    renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
 
 
     // Drawing minimap
-    height = p1Icon.height;
-    width = p1Icon.width;
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
-    height = p2Icon.height;
-    width = p2Icon.width;
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
-    height = p3Icon.height;
-    width = p3Icon.width;
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
-    height = p4Icon.height;
-    width = p4Icon.width;
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 15.0f * (width / height), 15.0f * (height / width), 0, 1.f);
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
 
-    height = miniMap.height;
-    width = miniMap.width;
-    renderImage(imageShader, miniMap, 100.0f, 500.0f, 150.0f * (width / height), 150.0f * (height / width), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15), scX(0.15), 0, 1.f);
 
+    glm::vec3 IngLocation;
+    IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
+    renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+
+    IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
+    renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+
+    IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
+    renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+
+    IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
+    renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
 
     // Drawing Inventory
     Entity* player1 = g_scene.getEntity("player1");
@@ -165,35 +172,34 @@ void UISystem::update() {
     float faded = 0.2f;
     float opaque = 1.f;
 
+    float invScale = scX(0.04);
+    float invXOffset = scX(0.12);
+    float invYOffset = scY(0.4);
+    float invBlockOffset = scY(0.097);
+    float recipeYOffset = scY(0.54);
+
     alpha = (p1Inv->tomato) ? opaque : faded;
-    height = tomato.height;
-    width = tomato.width;
-    renderImage(imageShader, tomato, 60.0f, 290.0f - (0 * 58.f), 40.f, 40.f, 0, alpha);
+    renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScale, invScale, 0, alpha);
 
     alpha = (p1Inv->cheese) ? opaque : faded;
-    height = cheese.height;
-    width = cheese.width;
-    renderImage(imageShader, cheese, 60.0f, 290.0f - (1 * 58.f), 40.f, 40.f, 0, alpha);
+    renderImage(imageShader, cheese, invXOffset, invYOffset - (1 * invBlockOffset), invScale, invScale, 0, alpha);
     
     alpha = (p1Inv->dough) ? opaque : faded;
-    height = dough.height;
-    width = dough.width;
-    renderImage(imageShader, dough, 60.0f, 290.0f - (2 * 58.f), 40.f, 20.f, 0, alpha);
+    renderImage(imageShader, dough, invXOffset, invYOffset - (2 * invBlockOffset), invScale, invScale, 0, alpha);
 
     alpha = (p1Inv->sausage) ? opaque : faded;
-    height = sausage.height;
-    width = sausage.width;
-    renderImage(imageShader, sausage, 60.0f, 290.0f - (3 * 58.f), 40.f, 20.f, 0, alpha);
+    renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScale, invScale, 0, alpha);
 
     alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
-    height = pizza.height;
-    width = pizza.width;
-    renderImage(imageShader, pizza, 60.0f, 375.f, 60.f, 50.f, 0, alpha);
+    renderImage(imageShader, pizza, invXOffset, recipeYOffset, invScale, invScale, 0, alpha);
 
-    height = inventory.height;
-    width = inventory.width;
-    renderImage(imageShader, inventory, 60.0f, 250.0f, 400.0f * (width / height), 80.0f * (height / width), 0, 1.f);
+    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.3), 0, 1.f);
 
+}
+
+void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
+{
+    tracker = offscreenTracker;
 }
 
 int UISystem::checkForWin()
@@ -235,32 +241,24 @@ int UISystem::checkForWin()
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
 {
-    // TODO: Clean up these hardcoded numbers
+    p1Location = miniMapPlayerPosition(p1Transform);
+    p2Location = miniMapPlayerPosition(p2Transform);
+    p3Location = miniMapPlayerPosition(p3Transform);
+    p4Location = miniMapPlayerPosition(p4Transform);
+}
+
+glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
+{
+    // TODO: Fix mini map with new kitchen layout
     float x;
     float z;
-    x = ((150.f) / (150.f + 310.f)) * (p1Transform.position.x + 310.f);
-    z = ((150.f) / (220.f + 235.f)) * (p1Transform.position.z + 235.f);
-    p1Location = glm::vec2(x, z);
-    p1Location.y = 200.f - p1Location.y;
-    p1Location += glm::vec2(25.f, 380.f);
-
-    x = ((150.f) / (150.f + 310.f)) * (p2Transform.position.x + 310.f);
-    z = ((150.f) / (220.f + 235.f)) * (p2Transform.position.z + 235.f);
-    p2Location = glm::vec2(x, z);
-    p2Location.y = 200.f - p2Location.y;
-    p2Location += glm::vec2(25.f, 380.f);
-
-    x = ((150.f) / (150.f + 310.f)) * (p3Transform.position.x + 310.f);
-    z = ((150.f) / (220.f + 235.f)) * (p3Transform.position.z + 235.f);
-    p3Location = glm::vec2(x, z);
-    p3Location.y = 200.f - p3Location.y;
-    p3Location += glm::vec2(25.f, 380.f);
-
-    x = ((150.f) / (150.f + 310.f)) * (p4Transform.position.x + 310.f);
-    z = ((150.f) / (220.f + 235.f)) * (p4Transform.position.z + 235.f);
-    p4Location = glm::vec2(x, z);
-    p4Location.y = 200.f - p4Location.y;
-    p4Location += glm::vec2(25.f, 380.f);
+    glm::vec2 location;
+    x = ((150.f) / (150.f + 310.f)) * (transform.position.x + 310.f);
+    z = ((150.f) / (220.f + 235.f)) * (transform.position.z + 235.f);
+    location = glm::vec2(x, z);
+    location.y = 200.f - location.y;
+    location += glm::vec2(25.f, 380.f);
+    return location;
 }
 
 void UISystem::renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) 
@@ -332,8 +330,8 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
         {1., 1., 1., 1.}
     };
     glm::mat4 rotate = glm::rotate(glm::mat4(1.f), theta, glm::vec3(0.f,0.f,1.f));
-    glm::mat4 scale = glm::scale(glm::mat4(1.f), glm::vec3(scaleX/800.f, scaleY/600.f, 1.f));
-    glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3((x - 400.f) / 400.f, (y - 300.f) / 300.f, 0.f));
+    glm::mat4 scale = glm::scale(glm::mat4(1.f), glm::vec3(scaleX/g_systems.width, scaleY/g_systems.height, 1.f));
+    glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3((x - (g_systems.width / 2.f)) / (g_systems.width / 2.f), (y - (g_systems.height / 2.f)) / (g_systems.height / 2.f), 0.f));
     glm::mat4 modelMat = translation * scale * rotate;
 
     glUniformMatrix4fv(glGetUniformLocation(s.getId(), "model"), 1, GL_FALSE, glm::value_ptr(modelMat));
@@ -346,6 +344,92 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // render quad
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
+{
+    glm::vec4 location = glm::vec4(entityPos, 1);
+
+    glm::vec3 cam = g_scene.camera.centerBeam;
+    glm::vec3 toEntity = entityPos - g_scene.camera.position;
+
+    glm::mat4 viewMatrix = g_scene.camera.getViewMatrix(g_scene.getEntity("player1")->getTransform());
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
+
+    location = projectionMatrix * viewMatrix * location;
+
+    location.x /= location.w;
+    location.y /= location.w;
+    location.z /= location.w;
+
+    location.x = (location.x + 1) * g_systems.width * 0.5;
+    location.y = (location.y + 1) * g_systems.height * 0.5 + scY(0.1);
+
+    if (location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
+    {
+        // When location.z is not in the interval between [-1, 1] it is no longer in the camera frustrum.
+        // This where you will need to put your code for the object offscreen beside and behind states. 
+
+        glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
+
+        float viewRange = g_scene.camera.perspective / 2.f;
+        //float viewRange = 80 / 2.f;
+        viewRange *= (PI / 180.f);
+
+        float yawTheta = acos(dot(cam, yaw) / (length(yaw) * length(cam)));
+        glm::vec3 upVector = cross(cam, yaw);
+
+        float pitchTheta = acos(dot(toEntity, yaw) / (length(yaw) * length(toEntity)));
+        
+        // If the entity is behind the player
+        if (yawTheta > (PI / 2.f))
+        {
+            location.y = scY(0.07);
+
+            float offset = (((g_systems.width / 2.f) / (PI - (PI / 2.f))) * (yawTheta - (PI / 2.f)));
+            if (upVector.y < 0)
+            {
+                location.x = g_systems.width - scX(0.02) - offset;
+            }
+            else
+            {
+                location.x = scX(0.02) + offset;
+            }
+        }
+        // If the entity is between 90 deg and the viewrange of the player
+        else
+        {
+            float offset = ((((g_systems.height / 2.f) - 0) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
+            if (upVector.y < 0)
+            {
+                location.x = g_systems.width - scX(0.0375);
+                location.y = (g_systems.height / 2.f) - offset;
+            }
+            else
+            {
+                location.x = scX(0.0375);
+                location.y = (g_systems.height / 2.f) - offset;
+            }
+        }
+    }
+
+    location.z = scX(0.07) + ((scX(0.02) - scX(0.07)) / (400.f - 0.f)) * (length(toEntity) - 0);
+    if (location.z < scX(0.02))
+    {
+        location.z = scX(0.02);
+    }
+
+    return glm::vec3(location.x, location.y, location.z);
+}
+
+float UISystem::scX(float xVal)
+{
+    return xVal * g_systems.width;
+}
+
+float UISystem::scY(float yVal)
+{
+    return yVal * g_systems.height;
 }
 
 float UISystem::lerp(float p, float a, float b) {

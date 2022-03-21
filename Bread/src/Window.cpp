@@ -34,11 +34,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-Window::Window(std::shared_ptr<CallbackInterface> callbacks, int width, int height, std::string title)
+Window::Window(std::shared_ptr<CallbackInterface> callbacks, int width, int height, std::string title, bool fullScreen)
 	: width(width), height(height), title(title), callbacks(callbacks)
 {
 	setup();
-	window = std::unique_ptr<GLFWwindow, WindowDeleter>(glfwCreateWindow(width, height, title.c_str(), NULL, NULL));
+	if (fullScreen)
+	{
+		window = std::unique_ptr<GLFWwindow, WindowDeleter>(glfwCreateWindow(width, height, title.c_str(), glfwGetPrimaryMonitor(), NULL));
+	}
+	else
+	{
+		window = std::unique_ptr<GLFWwindow, WindowDeleter>(glfwCreateWindow(width, height, title.c_str(), NULL, NULL));
+	}
 	verifyGLFW();
 
 	glfwMakeContextCurrent(window.get());
@@ -50,8 +57,8 @@ Window::Window(std::shared_ptr<CallbackInterface> callbacks, int width, int heig
 	}
 };
 
-Window::Window(int width, int height, std::string title)
-	: Window(nullptr, width, height, title)
+Window::Window(int width, int height, std::string title, bool fullScreen)
+	: Window(nullptr, width, height, title, fullScreen)
 {}
 
 void Window::connectCallbacks() {
