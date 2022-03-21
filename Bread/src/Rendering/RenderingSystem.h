@@ -9,10 +9,10 @@
 
 struct Orthogonal
 {
-	float x;
-	float y;
-	float z;
-	float w;
+	float left;
+	float right;
+	float bottom;
+	float top;
 
 	float nearPlane;
 	float farPlane;
@@ -34,6 +34,8 @@ public:
 	void renderShadowMap();
 	void renderTexturedQuad();
 	void renderDebugShadowMap();
+
+	void updateOrtho();
 
 	Orthogonal ort;
 	glm::vec3 lightPos;

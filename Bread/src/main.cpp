@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <Windows.h>
+#include <WinUser.h>
 
 #include "Window.h"
 #include "Profiler.h"
@@ -31,11 +33,13 @@ int main()
 	glfwInit();
 
 	// Set window size
-	g_systems.width = 1024;
-	g_systems.height = 1024;
+	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
+	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
+
+	bool fullScreen = false;
 
 	// Create viewport window
-	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!");
+	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
 	window.setBackgroundColor(0.6784f, 0.8471f, 0.902f);
 
 	// ImGui profiler for debugging
@@ -103,7 +107,7 @@ int main()
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = -76.0f;
+	counterTrans->position.y = -78.0f;
 	counterTrans->position.z = 50.0f;
 	counterTrans->update();
 
@@ -154,7 +158,8 @@ int main()
 	window.setCallbacks(movementCallbacks);
 
 	// Track Ingredient Locations
-	IngredientTracker ingredientTracker(*cheeseTransform, *tomatoTransform, *doughTransform, *sausageTransform);
+	IngredientTracker ingredientTracker(cheeseTransform, tomatoTransform, doughTransform, sausageTransform);
+	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics);
@@ -201,24 +206,6 @@ int main()
 			ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
 			ui.update();
 		}
-		
-		// TODO: Move this out of main
-		if (p1Inv.cheese)
-		{
-			ingredientTracker.updateCheeseTransformSource(*player1->getTransform());
-		}
-		if (p1Inv.tomato)
-		{
-			ingredientTracker.updateTomatoTransformSource(*player1->getTransform());
-		}
-		if (p1Inv.sausage)
-		{
-			ingredientTracker.updateSausageTransformSource(*player1->getTransform());
-		}
-		if (p1Inv.dough)
-		{
-			ingredientTracker.updateDoughTransformSource(*player1->getTransform());
-		}
 
 		// Update the ImGUI profiler
 		profiler.newFrame();
@@ -226,8 +213,9 @@ int main()
 
 		window.swapBuffer();
 
-		// AI
+		// AI + Navigation
 		p2Brain.update();
+		ingredientTracker.update();
 
 		// AUDIO
 		audio.update();
