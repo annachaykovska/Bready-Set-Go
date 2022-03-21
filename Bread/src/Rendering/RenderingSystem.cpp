@@ -33,8 +33,8 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
 
 	// Shadow map viewport size
-	this->shadowWidth = g_systems.width * 4;
-	this->shadowHeight = g_systems.height * 4;
+	this->shadowWidth = 4096;
+	this->shadowHeight = 4096;
 
 	this->models.reserve(g_scene.count()); // Create space for models
 	loadModels(); // Load model files into the models vector
