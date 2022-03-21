@@ -202,7 +202,7 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	glm::mat4 proj = glm::mat4(1.0f);
 	float screenWidth = g_systems.width;
 	float screenHeight = g_systems.height;
-	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 500.0f);
+	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
@@ -210,10 +210,10 @@ void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
 
-	this->ort.left = p1Pos.x + 50.0f;
-	this->ort.right = p1Pos.x - 50.0f;
-	this->ort.bottom = -p1Pos.z - 50.0f;
-	this->ort.top = -p1Pos.z + 50.0f;
+	this->ort.left = p1Pos.x + 150.0f;
+	this->ort.right = p1Pos.x - 150.0f;
+	this->ort.bottom = -p1Pos.z - 150.0f;
+	this->ort.top = -p1Pos.z + 150.0f;
 }
 
 void RenderingSystem::update()
