@@ -117,7 +117,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent * 4, halfExtent), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
@@ -139,13 +139,14 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	return body;
 }
 
+/*
 PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfExtent, std::string name)
 {
 	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(0, 2, 0) * halfExtent);
+	PxTransform localTm(PxVec3(0, 2, 0));
 	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 100.f);
@@ -162,6 +163,7 @@ PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfE
 
 	return body;
 }
+*/
 
 void PhysicsSystem::updateCar() {
 	PxVehicleDrive4W* cars[4];
@@ -220,7 +222,7 @@ void PhysicsSystem::initializeActors() {
 	kitchenShape->setSimulationFilterData(kitchenFilter);
 
 	// Create the kitchen actor (rigid static)
-	PxTransform kitchenTransform(PxVec3(0, -80, 50), PxQuat(PxIdentity));
+	PxTransform kitchenTransform(PxVec3(0, -78, 50), PxQuat(PxIdentity));
 	this->kitchen = mPhysics->createRigidStatic(kitchenTransform);
 	this->kitchen->attachShape(*kitchenShape);
 
@@ -315,8 +317,10 @@ void PhysicsSystem::initializeActors() {
 
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
 	// Note: Physx actor name must match Entity name
-	// CHEESE
+	
 	float halfExtent = 1.0f;
+
+	// CHEESE
 	PxTransform cheeseTransform(PxVec3(-220, 3, -130));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
@@ -331,6 +335,42 @@ void PhysicsSystem::initializeActors() {
 	// DOUGH
 	PxTransform doughTransform(PxVec3(-105, 3, -8));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
+
+	// CARROT
+	PxTransform carrotTransform(PxVec3(-5, 3, 0));
+	this->carrot = createFoodBlock(carrotTransform, halfExtent, "carrot");
+
+	// LETTUCE
+	PxTransform lettuceTransform(PxVec3(-10, 3, 0));
+	this->lettuce = createFoodBlock(lettuceTransform, halfExtent, "lettuce");
+
+	// PARSNIP
+	PxTransform parsnipTransform(PxVec3(-15, 3, 0));
+	this->parsnip = createFoodBlock(parsnipTransform, halfExtent, "parsnip");
+
+	// RICE
+	PxTransform riceTransform(PxVec3(-20, 3, 0));
+	this->rice = createFoodBlock(riceTransform, halfExtent, "rice");
+
+	// EGG
+	PxTransform eggTransform(PxVec3(-25, 3, 0));
+	this->egg = createFoodBlock(eggTransform, halfExtent, "egg");
+
+	// CHICKEN
+	PxTransform chickenTransform(PxVec3(-30, 3, 0));
+	this->chicken = createFoodBlock(chickenTransform, halfExtent, "chicken");
+
+	// PEAS
+	PxTransform peasTransform(PxVec3(-35, 3, 0));
+	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
+
+	// SOUPBASE
+	PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
+	this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
+
+	// PUMPKIN
+	PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
+	this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
 PhysicsSystem::PhysicsSystem() :
@@ -427,13 +467,11 @@ void PhysicsSystem::initialize()
 	viewDirectionalInfluence = 0.f;
 	turnDirectionalInfluence = 0.f;
 
-	updateCar(); // THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
+	updateCar(); // TODO THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
-// Cooking mesh was creating a read access violation seemingly randomly, it appears to
-// be due to vertex and index data going out of scope before it was copied correctly
-// and read into the triangle mesh. See for more details:
-// https://stackoverflow.com/questions/49268620/issues-creating-meshes-in-nvidia-physx
+// Converts the assimp importer mesh in the rendering system to a format that physx
+// can use to produce a collider mesh
 void PhysicsSystem::cookKitchen()
 {
 	Model* kitchenModel = g_systems.render->getKitchenModel();
@@ -673,20 +711,43 @@ void PhysicsSystem::update(const float dt)
 void PhysicsSystem::updateFoodTransforms()
 {
 	// Cheese
-	Transform* cheese = g_scene.getEntity("cheese")->getTransform();
-	cheese->update(this->cheese->getGlobalPose());
+	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
 
-	// Sausagea
-	Transform* sausage = g_scene.getEntity("sausage")->getTransform();
-	sausage->update(this->sausage->getGlobalPose());
+	// Sausage
+	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
 
 	// Tomato
-	Transform* tomato = g_scene.getEntity("tomato")->getTransform();
-	tomato->update(this->tomato->getGlobalPose());
+	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
 
 	// Dough
-	Transform* dough = g_scene.getEntity("dough")->getTransform();
-	dough->update(this->dough->getGlobalPose());
+	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
+
+	// Carrot
+	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
+
+	// Lettuce
+	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
+
+	// Parsnip
+	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
+
+	// Rice
+	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
+
+	// Egg
+	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
+
+	// Chicken
+	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
+
+	// Peas
+	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
+
+	// Soupbase
+	g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
+
+	// Pumpkin
+	g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()
