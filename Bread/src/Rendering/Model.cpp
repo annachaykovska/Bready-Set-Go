@@ -290,7 +290,7 @@ void Model::physicsIndices(std::vector<physx::PxU32>* indices)
 		for (int j = 0; j < meshes[i].vertices.size(); j++)
 			indices->push_back(physx::PxU32(meshes[i].indices[j] + offset));
 
-		offset += indices->size();
+		offset = indices->size();
 	}
 }
 
