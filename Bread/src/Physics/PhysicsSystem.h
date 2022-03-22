@@ -45,10 +45,21 @@ public:
 	PxVehicleDrive4W* mVehiclePlayer2;
 	PxVehicleDrive4W* mVehiclePlayer3;
 	PxVehicleDrive4W* mVehiclePlayer4;
+
 	PxRigidDynamic* cheese;
 	PxRigidDynamic* sausage;
 	PxRigidDynamic* tomato;
 	PxRigidDynamic* dough;
+	PxRigidDynamic* carrot;
+	PxRigidDynamic* lettuce;
+	PxRigidDynamic* parsnip;
+	PxRigidDynamic* rice;
+	PxRigidDynamic* egg;
+	PxRigidDynamic* chicken;
+	PxRigidDynamic* peas;
+	PxRigidDynamic* soupbase;
+	PxRigidDynamic* pumpkin;
+
 
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer2;

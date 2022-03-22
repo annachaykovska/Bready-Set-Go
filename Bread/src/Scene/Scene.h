@@ -14,7 +14,7 @@ public:
 
 	void createEntities();
 	Entity* getEntity(std::string name);
-	int count();
+	int entityCount();
 
 	void init(PhysicsSystem* physics);
 	
