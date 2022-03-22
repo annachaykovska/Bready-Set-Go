@@ -36,7 +36,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->shadowWidth = 4096;
 	this->shadowHeight = 4096;
 
-	this->models.reserve(g_scene.count()); // Create space for models
+	this->models.reserve(g_scene.entityCount() * 2); // Create space for models
 	loadModels(); // Load model files into the models vector
 
 	glEnable(GL_DEPTH_TEST); // Turn on depth testing
@@ -161,30 +161,75 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Cheese
 	std::string cheesePath = "resources/models/ingredients/cheese.obj";
-	this->models.emplace_back(Model(&cheesePath[0])); // Cheese ingredient
+	this->models.emplace_back(Model(&cheesePath[0]));
 	g_scene.getEntity("cheese")->attachComponent(&(this->models[5]), "model");
 
 	// Sausage
 	std::string sausagePath = "resources/models/ingredients/sausage.obj";
-	this->models.emplace_back(Model(&sausagePath[0])); // Sausage ingredient
+	this->models.emplace_back(Model(&sausagePath[0]));
 	g_scene.getEntity("sausage")->attachComponent(&(this->models[6]), "model");
 
 	// Tomato
 	std::string tomatoPath = "resources/models/ingredients/tomato.obj";
-	this->models.emplace_back(Model(&tomatoPath[0])); // Tomato ingredient
+	this->models.emplace_back(Model(&tomatoPath[0]));
 	g_scene.getEntity("tomato")->attachComponent(&(this->models[7]), "model");
 
 	// Dough
 	std::string doughPath = "resources/models/ingredients/dough.obj";
-	this->models.emplace_back(Model(&doughPath[0])); // Dough ingredient
+	this->models.emplace_back(Model(&doughPath[0]));
 	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
+
+	// Carrot
+	std::string carrotPath = "resources/models/ingredients/carrot.obj";
+	this->models.emplace_back(Model(&carrotPath[0]));
+	g_scene.getEntity("carrot")->attachComponent(&(this->models[9]), "model");
+
+	// Lettuce
+	std::string lettucePath = "resources/models/ingredients/lettuce.obj";
+	this->models.emplace_back(Model(&lettucePath[0]));
+	g_scene.getEntity("lettuce")->attachComponent(&(this->models[10]), "model");
+
+	// Parsnip
+	std::string parsnipPath = "resources/models/ingredients/parsnip.obj";
+	this->models.emplace_back(Model(&parsnipPath[0]));
+	g_scene.getEntity("parsnip")->attachComponent(&(this->models[11]), "model");
+
+	// Rice
+	std::string ricePath = "resources/models/ingredients/rice.obj";
+	this->models.emplace_back(Model(&ricePath[0]));
+	g_scene.getEntity("rice")->attachComponent(&(this->models[12]), "model");
+
+	// Egg
+	std::string eggPath = "resources/models/ingredients/egg.obj";
+	this->models.emplace_back(Model(&eggPath[0]));
+	g_scene.getEntity("egg")->attachComponent(&(this->models[13]), "model");
+
+	// Chicken
+	std::string chickenPath = "resources/models/ingredients/chicken.obj";
+	this->models.emplace_back(Model(&chickenPath[0]));
+	g_scene.getEntity("chicken")->attachComponent(&(this->models[14]), "model");
+
+	// Peas
+	std::string peasPath = "resources/models/ingredients/peas.obj";
+	this->models.emplace_back(Model(&peasPath[0]));
+	g_scene.getEntity("peas")->attachComponent(&(this->models[15]), "model");
+
+	// Soupbase
+	std::string soupbasePath = "resources/models/ingredients/soupbase.obj";
+	this->models.emplace_back(Model(&soupbasePath[0]));
+	g_scene.getEntity("soupbase")->attachComponent(&(this->models[16]), "model");
+
+	// Pumpkin
+	std::string pumpkinPath = "resources/models/ingredients/pumpkin.obj";
+	this->models.emplace_back(Model(&pumpkinPath[0]));
+	g_scene.getEntity("pumpkin")->attachComponent(&(this->models[17]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Debug models
 	//-----------------------------------------------------------------------------------
 	std::string testPath = "resources/models/ball/ball.obj";
 	this->models.emplace_back(Model(&testPath[0]));
-	g_scene.getEntity("test")->attachComponent(&(this->models[9]), "model");
+	g_scene.getEntity("test")->attachComponent(&(this->models[18]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -202,10 +247,13 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	glm::mat4 proj = glm::mat4(1.0f);
 	float screenWidth = g_systems.width;
 	float screenHeight = g_systems.height;
+
+	// TODO There is a bug here? screenWidth and screenHeight are both 0?
 	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
+// Moves the orthographic projection used for the depthMap so that it follows the player
 void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
@@ -293,15 +341,14 @@ void RenderingSystem::renderScene()
 		Transform* ownerTransform = models[i].owner->getTransform();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
-		if (i < 4)
+		if (i < 4) // Use material info for player models
 		{
 			glUniform1i(texLoc, 0);
 			models[i].draw(this->shader);
 		}
-		else if (i >= 4 && i <= 8) // Use textures images for ingredients and kitchen
+		else if (i >= 4) // Use texture images for everything else
 		{
-			if (i == 4)
-				ownerTransform->update();
+			ownerTransform->update();
 
 			glUniform1i(texLoc, 1);
 			models[i].draw(this->shader);

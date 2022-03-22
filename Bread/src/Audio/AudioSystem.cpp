@@ -7,7 +7,7 @@ extern Scene g_scene;
 AudioSystem::AudioSystem()
 {
 	// Reserve space for AudioSource Components in contiguous memory
-	audioSources.reserve(g_scene.count());
+	audioSources.reserve(g_scene.entityCount() * 2);
 
 	// Set audio device as default
 	device = alcOpenDevice(NULL); // Create device

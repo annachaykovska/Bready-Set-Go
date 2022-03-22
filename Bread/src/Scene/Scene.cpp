@@ -7,14 +7,28 @@
 void Scene::createEntities()
 {
 	// Game Entities
+	// Players
 	createEntity("player1");
 	createEntity("player2");
 	createEntity("player3");
 	createEntity("player4");
+
+	// Ingredients
 	createEntity("cheese");
 	createEntity("sausage");
 	createEntity("tomato");
 	createEntity("dough");
+	createEntity("carrot");
+	createEntity("lettuce");
+	createEntity("parsnip");
+	createEntity("rice");
+	createEntity("egg");
+	createEntity("chicken");
+	createEntity("peas");
+	createEntity("soupbase");
+	createEntity("pumpkin");
+
+	// World
 	createEntity("countertop");
 
 	// Debug Entities
@@ -47,7 +61,7 @@ Entity* Scene::getEntity(std::string name)
 /// <returns>
 /// int number of Entities.
 /// </returns>
-int Scene::count()
+int Scene::entityCount()
 {
 	size_t count = entities.size();
 
