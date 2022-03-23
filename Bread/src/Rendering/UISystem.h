@@ -33,7 +33,7 @@ public:
 	~UISystem();
 
 	void updateGame();
-	void updateMainMenu();
+	void updateMainMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
@@ -80,7 +80,12 @@ private:
 	glm::vec2 p3Location;
 	glm::vec2 p4Location;
 
+	// Main Menu
 	ImageTexture mainMenuBackground;
+	ImageTexture startGameButtonNormal;
+	ImageTexture startGameButtonPressed;
+	ImageTexture exitButtonNormal;
+	ImageTexture exitButtonPressed;
 
 	//Constants needed to render
 	std::map<char, Character> Characters;
