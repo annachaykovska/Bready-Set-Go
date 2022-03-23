@@ -148,65 +148,118 @@ void XboxController::setButtonStateFromController(int controllerId) {
 	//std::cout << "Left: " << triggerLeft << " Right: " << triggerRight << std::endl;
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
 		//std::cout << "both pressed" << std::endl;
-
-		analogVal = pow(triggerLeft / 255,4.0);
+		analogVal = triggerLeft / 255.0f;
+		float step = analogVal * 2;
+		analogVal = -(1 / (10 * (step - 2.1))) - 0.048;
+		if (analogVal > 1)
+		{
+			analogVal = 1;
+		}
+		else if (analogVal < 0)
+		{
+			analogVal = 0;
+		}
 		input->setAnalogBrake(analogVal);
 	}
 	else if (triggerRight > 0.1) { // Forward/Break when backwards
-		//std::cout << "only right pressed" << std::endl;
+		////std::cout << "only right pressed" << std::endl;
 
-		// Accelerate if still or moving forwards
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL
-			&& physics->mVehiclePlayer1->computeForwardSpeed() > -8) {
+		//// Accelerate if still or moving forwards
+		//if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL
+		//	&& physics->mVehiclePlayer1->computeForwardSpeed() > -8) {
+		//	physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		//}
+		//else if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE) {
+		//	physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		//	input->setAnalogBrake(1.f);
+		//}
+
+		//if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) { // Accelerate forward
+		//	if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
+		//	{
+		//		analogVal = triggerRight / 255;
+		//		input->setAnalogAccel(analogVal);
+		//	}
+		//	else
+		//	{
+		//		input->setAnalogAccel(0);
+		//	}
+		//}
+		//else { //brake 
+		//	analogVal = pow(triggerRight / 255, 4.0);
+		//	input->setAnalogBrake(analogVal);
+		//}
+
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
+			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
 			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		
+		if (physics->mVehiclePlayer1->computeForwardSpeed() < -30)
+		{
+			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
+			input->setAnalogBrake(1.f);
 		}
-		else if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE) {
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		//else if (physics->mVehiclePlayer1->computeForwardSpeed() > -2 && physics->mVehiclePlayer1->computeForwardSpeed() < -2)
+		//{
+		//	physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+		//}
+		else if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
+		{
+			analogVal = triggerRight / 255;
+			input->setAnalogAccel(analogVal);
 		}
-
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) { // Accelerate forward
-			if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
-			{
-				analogVal = triggerRight / 255;
-				input->setAnalogAccel(analogVal);
-			}
-			else
-			{
-				input->setAnalogAccel(0);
-			}
+		else
+		{
+			input->setAnalogAccel(0);
 		}
-		else { //brake 
-			analogVal = pow(triggerRight / 255, 4.0);
-			input->setAnalogBrake(analogVal);
-		}
+		input->setAnalogBrake(0);
 	}
 	else if (triggerLeft > 0.1){// && triggerRight == 0.0) { // Reverse/Break when forward
 		//std::cout << "only left pressed" << std::endl;
 
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL 
-			&& physics->mVehiclePlayer1->computeForwardSpeed() < 8) {
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-		}
-		else if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
-		}
+		//if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL 
+		//	&& physics->mVehiclePlayer1->computeForwardSpeed() < 8) {
+		//	physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		//}
+		//else if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eFIRST) {
+		//	physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		//}
 
-		//Accelerate if moving in reverse
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE) { // Accelerate backwards
-			if (physics->mVehiclePlayer1->computeForwardSpeed() > -30)
-			{
-				analogVal = pow(triggerLeft / 255,4.0);
-				input->setAnalogAccel(analogVal);
-			}
-			else
-			{
-				input->setAnalogAccel(0);
-			}
+		////Accelerate if moving in reverse
+		//if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE) { // Accelerate backwards
+		//	if (physics->mVehiclePlayer1->computeForwardSpeed() > -30)
+		//	{
+		//		analogVal = pow(triggerLeft / 255,4.0);
+		//		input->setAnalogAccel(analogVal);
+		//	}
+		//	else
+		//	{
+		//		input->setAnalogAccel(0);
+		//	}
+		//}
+		//else { // Brake
+		//	analogVal = triggerLeft / 255;
+		//	input->setAnalogBrake(analogVal);
+		//}
+
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		if (physics->mVehiclePlayer1->computeForwardSpeed() > 50)
+		{
+			//std::cout << "NORMAL BRAKE FORWARD" << std::endl;
+			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
+			input->setAnalogBrake(1.f);
 		}
-		else { // Brake
+		else if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 20)
+		{
 			analogVal = triggerLeft / 255;
-			input->setAnalogBrake(analogVal);
+			input->setAnalogAccel(analogVal);
 		}
+		else
+		{
+			input->setAnalogAccel(0);
+		}
+		input->setAnalogBrake(0);
 	}
 	else
 	{
