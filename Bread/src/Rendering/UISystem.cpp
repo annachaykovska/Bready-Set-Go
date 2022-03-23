@@ -35,6 +35,7 @@ UISystem::UISystem()
     , p2Location(glm::vec2(0))
     , p3Location(glm::vec2(0))
     , p4Location(glm::vec2(0))
+    , mainMenuBackground("resources/textures/backup_main_menu.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -127,7 +128,12 @@ UISystem::~UISystem(){
 
 }
 
-void UISystem::update() {
+void UISystem::updateMainMenu() {
+    renderImage(imageShader, mainMenuBackground, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
+}
+
+
+void UISystem::updateGame() {
     
     if (checkForWin() != 0)
     {

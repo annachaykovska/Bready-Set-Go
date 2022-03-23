@@ -180,6 +180,9 @@ int main()
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
+	// 1 = main menu, 2 = play
+	int gameStage = 1;
+
 	// GAME LOOP
 	while (!window.shouldClose())
 	{
@@ -197,28 +200,37 @@ int main()
 		// SIMULATE
 		g_systems.physics->update(deltaTime);
 
-		// RENDER
+		// WINDOW
 		window.clear();
-		renderer.update();
 
-		if (!g_systems.renderDebug)
-		{
-			ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-			ui.update();
+		if (gameStage == 1) {
+			// RENDER
+			ui.updateMainMenu();
+			window.swapBuffer();
 		}
+		else if (gameStage == 2) {
+			// RENDER
+			renderer.update();
 
-		// Update the ImGUI profiler
-		profiler.newFrame();
-		profiler.update();
+			if (!g_systems.renderDebug)
+			{
+				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
+				ui.updateGame();
+			}
 
-		window.swapBuffer();
+			// Update the ImGUI profiler
+			profiler.newFrame();
+			profiler.update();
 
-		// AI + Navigation
-		p2Brain.update();
-		ingredientTracker.update();
+			window.swapBuffer();
 
-		// AUDIO
-		audio.update();
+			// AI + Navigation
+			p2Brain.update();
+			ingredientTracker.update();
+
+			// AUDIO
+			audio.update();
+		}
 
 		// UPDATE TIME
 		// If this frame took longer than 1/60 s to compute, treat it as two frames instead
