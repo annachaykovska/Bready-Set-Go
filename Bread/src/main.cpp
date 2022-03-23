@@ -53,15 +53,31 @@ int main()
 	g_scene.createEntities();
 
 	// Get references to Entities for easy use
+	// Players
 	Entity* player1 = g_scene.getEntity("player1");
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
+
+	// Ingredients
 	Entity* cheese = g_scene.getEntity("cheese");
 	Entity* sausage = g_scene.getEntity("sausage");
 	Entity* tomato = g_scene.getEntity("tomato");
 	Entity* dough = g_scene.getEntity("dough");
+	Entity* carrot = g_scene.getEntity("carrot");
+	Entity* lettuce = g_scene.getEntity("lettuce");
+	Entity* parsnip = g_scene.getEntity("parsnip");
+	Entity* rice = g_scene.getEntity("rice");
+	Entity* egg = g_scene.getEntity("egg");
+	Entity* chicken = g_scene.getEntity("chicken");
+	Entity* peas = g_scene.getEntity("peas");
+	Entity* soupbase = g_scene.getEntity("soupbase");
+	Entity* pumpkin = g_scene.getEntity("pumpkin");
+
+	// World
 	Entity* countertop = g_scene.getEntity("countertop");
+
+	// Debug
 	Entity* test = g_scene.getEntity("test");
 
 	//-----------------------------------------------------------------------------------
@@ -78,7 +94,6 @@ int main()
 	AudioSystem audio;
 	g_systems.audio = &audio;
 
-	//TODO put UI system here
 	UISystem ui;
 	g_systems.ui = &ui;
 
@@ -90,20 +105,36 @@ int main()
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < g_scene.entityCount(); i++)
 		transforms.emplace_back(Transform());
 
 	// Attach one of the Transform Components to each Entity in the Scene
+	// Players
 	player1->attachComponent(&transforms[0], "transform");
 	player2->attachComponent(&transforms[1], "transform");
 	player3->attachComponent(&transforms[2], "transform");
 	player4->attachComponent(&transforms[3], "transform");
+
+	// Ingredients
 	cheese->attachComponent(&transforms[4], "transform");
 	sausage->attachComponent(&transforms[5], "transform");
 	tomato->attachComponent(&transforms[6], "transform");
 	dough->attachComponent(&transforms[7], "transform");
-	countertop->attachComponent(&transforms[8], "transform");
-	test->attachComponent(&transforms[9], "transform");
+	carrot->attachComponent(&transforms[8], "transform");
+	lettuce->attachComponent(&transforms[9], "transform");
+	parsnip->attachComponent(&transforms[10], "transform");
+	rice->attachComponent(&transforms[11], "transform");
+	egg->attachComponent(&transforms[12], "transform");
+	chicken->attachComponent(&transforms[13], "transform");
+	peas->attachComponent(&transforms[14], "transform");
+	soupbase->attachComponent(&transforms[15], "transform");
+	pumpkin->attachComponent(&transforms[16], "transform");
+
+	// World
+	countertop->attachComponent(&transforms[17], "transform");
+
+	// Debug
+	test->attachComponent(&transforms[18], "transform");
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
@@ -111,17 +142,29 @@ int main()
 	counterTrans->position.z = 50.0f;
 	counterTrans->update();
 
-	Transform* cheeseTransform = cheese->getTransform();
-	cheeseTransform->scale = glm::vec3(30, 30, 30);
+	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
+	sausage->getTransform()->scale = glm::vec3(30, 30, 30);
+	tomato->getTransform()->scale = glm::vec3(30, 30, 30);
+	dough->getTransform()->scale = glm::vec3(30, 30, 30);
 
-	Transform* sausageTransform = sausage->getTransform();
-	sausageTransform->scale = glm::vec3(30, 30, 30);
-
-	Transform* tomatoTransform = tomato->getTransform();
-	tomatoTransform->scale = glm::vec3(30, 30, 30);
-
-	Transform* doughTransform = dough->getTransform();
-	doughTransform->scale = glm::vec3(30, 30, 30);
+	carrot->getTransform()->scale = glm::vec3(30, 30, 30);
+	carrot->getTransform()->position = glm::vec3(0, 5, 0);
+	lettuce->getTransform()->scale = glm::vec3(30, 30, 30);
+	lettuce->getTransform()->position = glm::vec3(-5, 5, 0);
+	parsnip->getTransform()->scale = glm::vec3(30, 30, 30);
+	parsnip->getTransform()->position = glm::vec3(-10, 5, 0);
+	rice->getTransform()->scale = glm::vec3(30, 30, 30);
+	rice->getTransform()->position = glm::vec3(-15, 5, 0);
+	egg->getTransform()->scale = glm::vec3(30, 30, 30);
+	egg->getTransform()->position = glm::vec3(-20, 5, 0);
+	chicken->getTransform()->scale = glm::vec3(30, 30, 30);
+	chicken->getTransform()->position = glm::vec3(-25, 5, 0);
+	peas->getTransform()->scale = glm::vec3(30, 30, 30);
+	peas->getTransform()->position = glm::vec3(-30, 5, 0);
+	soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
+	soupbase->getTransform()->position = glm::vec3(-35, 5, 0);
+	pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
+	pumpkin->getTransform()->position = glm::vec3(-40, 5, 0);
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
@@ -158,7 +201,7 @@ int main()
 	window.setCallbacks(movementCallbacks);
 
 	// Track Ingredient Locations
-	IngredientTracker ingredientTracker(cheeseTransform, tomatoTransform, doughTransform, sausageTransform);
+	IngredientTracker ingredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
 	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up controller inputs
