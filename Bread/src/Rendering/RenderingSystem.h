@@ -36,6 +36,7 @@ public:
 	void renderDebugShadowMap();
 
 	void updateOrtho();
+	void updateRoughOrtho();
 
 	Orthogonal ort;
 	glm::vec3 lightPos;
@@ -44,7 +45,6 @@ public:
 	float shadowHeight;
 
 	unsigned int depthMapTex;
-
 
 private:
 
@@ -70,6 +70,9 @@ private:
 	unsigned int quadVAO;
 	unsigned int quadVBO;
 
+	unsigned int roughDepthMapTex;
+	unsigned int roughDepthMapFBO;
+	unsigned int roughDepthMapVAO;
 	unsigned int depthMapFBO;
 	unsigned int dpethMapVAO;
 

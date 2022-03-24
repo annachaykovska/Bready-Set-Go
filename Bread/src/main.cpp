@@ -224,7 +224,7 @@ int main()
 	player4->attachComponent(&p4Inv, "inventory");
 
 	// 1 = main menu, 2 = play
-	int gameStage = 1;
+	int gameStage = 2;
 	bool gameExit = false;
 
 	// GAME LOOP

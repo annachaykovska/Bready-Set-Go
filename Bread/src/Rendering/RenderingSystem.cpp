@@ -21,12 +21,12 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->screenHeight = 0;
 
 	// Orthographic projection for shadow map settings
-	this->ort.left = 0;
-	this->ort.right = 0;
-	this->ort.bottom = 0;
-	this->ort.top = 0;
+	this->ort.left = 281.0f;
+	this->ort.right = -279.0f;
+	this->ort.bottom = -205.0f;
+	this->ort.top = 197.0f;
 	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 700.0f;
+	this->ort.farPlane = 600.0f;
 
 	// Directional light position
 	this->lightPos = glm::vec3(0.0f, 200.0f, 200.0f);
@@ -64,6 +64,31 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// --------------------------------------------------------------------------------------------
 	// SHADOWS
 	// --------------------------------------------------------------------------------------------
+	// Rough shadows ------------------------------------------------------------------------------
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->roughDepthMapFBO);
+
+	// Create depth texture
+	glGenTextures(1, &this->roughDepthMapTex);
+	glActiveTexture(GL_TEXTURE24);
+	glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, g_systems.width, g_systems.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->roughDepthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->roughDepthMapTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// High resolution shadows ---------------------------------------------------------------------
 	// Configure depth map FBO
 	glGenFramebuffers(1, &this->depthMapFBO);
 	
@@ -76,7 +101,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	// Attach depth texture as FBO's depth buffer
@@ -87,8 +111,12 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Shader configuration
-	debugShader.use();
-	debugShader.setInt("depthMap", 25);
+	//debugShader.use();
+	//debugShader.setInt("depthMap", 24);
+
+	// --------------------------------------------------------------------------------------------
+	// QUAD FOR RENDERING FINAL PASS
+	// --------------------------------------------------------------------------------------------
 
 	// Create quad VAO for final default framebuffer image render
 	float quadVerts[] = {
@@ -253,6 +281,14 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
+void RenderingSystem::updateRoughOrtho()
+{
+	this->ort.left = 281.0f;
+	this->ort.right = -279.0f;
+	this->ort.bottom = -205.0f;
+	this->ort.top = 197.0f;
+}
+
 // Moves the orthographic projection used for the depthMap so that it follows the player
 void RenderingSystem::updateOrtho()
 {
@@ -266,8 +302,27 @@ void RenderingSystem::updateOrtho()
 
 void RenderingSystem::update()
 {
+	// Rough shadows -----------------------------------------------------------------
+	// Render roughDepthMap to texture (from light's perspective)
+	glm::mat4 lightProjection, lightView, roughLightSpaceMatrix, lightSpaceMatrix;
+	updateRoughOrtho();
+	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
+	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	roughLightSpaceMatrix = lightProjection * lightView;
+
+	depthShader.use();
+	depthShader.setMat4("lightSpaceMatrix", roughLightSpaceMatrix);
+
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->roughDepthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	renderShadowMap();
+	glCullFace(GL_BACK);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// High res shadows --------------------------------------------------------------
 	// Render depthMap to texture (from light's perspective)
-	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
 	updateOrtho();
 	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
 	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -275,8 +330,6 @@ void RenderingSystem::update()
 
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-	g_scene.getEntity("countertop")->getTransform()->update();
 
 	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
@@ -286,6 +339,7 @@ void RenderingSystem::update()
 	glCullFace(GL_BACK); // Switch back to back-face culling for regular rendering
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// Regular render pass -------------------------------------------------------------
 	// Debug code for rendering the depthMap to viewport
 	if (g_systems.renderDebug)
 		renderDebugShadowMap();
@@ -294,6 +348,7 @@ void RenderingSystem::update()
 		// Render scene as normal using the generated depth/shadow map
 		this->shader.use();
 		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		this->shader.setMat4("roughLightSpaceMatrix", roughLightSpaceMatrix);
 		renderScene();
 	}
 }
@@ -304,9 +359,9 @@ void RenderingSystem::renderDebugShadowMap()
 	glViewport(0, 0, g_systems.width, g_systems.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	this->depthShader.use();
-	glActiveTexture(GL_TEXTURE25);
+	glActiveTexture(GL_TEXTURE24);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
+	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 24);
 	renderTexturedQuad();
 }
 
@@ -326,7 +381,14 @@ void RenderingSystem::renderScene()
 	g_scene.camera.updateCameraVectors(p1Transform);
 	setupCameras(p1Transform);
 
-	// Bind shadow map
+	// Bind rough shadow map
+	glActiveTexture(GL_TEXTURE24);
+	glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
+	glUniform1i(glGetUniformLocation(this->shader.getId(), "roughShadowMap"), 24);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE, 0);
+
+	// Bind high res shadow map
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
 	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);

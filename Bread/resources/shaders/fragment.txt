@@ -33,6 +33,7 @@ in vec2 ourTexCoord;
 in vec3 ourNormal;
 in vec3 fragPos;
 in vec4 fragPosLightSpace;
+in vec4 roughFragPosLightSpace;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
@@ -40,8 +41,10 @@ uniform sampler2D texture_diffuse3;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_specular2;
 uniform sampler2D texture_specular3;
-uniform sampler2D shadowMap;
 uniform int textured;
+
+uniform sampler2D shadowMap;
+uniform sampler2D roughShadowMap;
 
 uniform vec3 viewPos;
 uniform Material material;
@@ -66,7 +69,15 @@ vec3 dirLight()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 	vec3 specular = light.specular * spec * material.specular;
 
-	// Shadow
+	// Rough shadows ----------------------------------------------------------------------------
+	vec3 roughProjCoords = roughFragPosLightSpace.xyz / roughFragPosLightSpace.w;
+	roughProjCoords = roughProjCoords * 0.5 + 0.5;
+	float roughClosestDepth = texture(roughShadowMap, roughProjCoords.xy).r;
+	float roughCurrentDepth = roughProjCoords.z;
+	float roughBias = max(0.01 * (1.0 - dot(norm, lightDir)), 0.005);
+	float roughShadow = (roughCurrentDepth - roughBias) > roughClosestDepth ? 1.0 : 0.0;
+	
+	// High res shadows ---------------------------------------------------------------------------
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 	projCoords = projCoords * 0.5 + 0.5;
 	float closestDepth = texture(shadowMap, projCoords.xy).r;
@@ -89,8 +100,13 @@ vec3 dirLight()
 
 	if (projCoords.z > 1.0)
 		shadow = 0.0;
-	
-	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse +	 specular));
+
+	vec3 lighting = vec3(0.0);
+
+	if (roughShadow > shadow)
+		lighting = (ambient + (1.0 - roughShadow) * (diffuse +	 specular));
+	else
+		lighting = (ambient + (1.0 - shadow) * (diffuse +	 specular));
 
 	return lighting;
 }
