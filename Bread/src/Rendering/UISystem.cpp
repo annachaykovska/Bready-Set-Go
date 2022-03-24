@@ -159,8 +159,8 @@ void UISystem::updateGame() {
 
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
-    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 
-        lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
+    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3),
+        lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), 3.f * 3.14 / 4.f + 0.2f, -3.14 / 4.f), 1.f);
 
     renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
 
