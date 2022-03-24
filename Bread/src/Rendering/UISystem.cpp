@@ -35,6 +35,11 @@ UISystem::UISystem()
     , p2Location(glm::vec2(0))
     , p3Location(glm::vec2(0))
     , p4Location(glm::vec2(0))
+    , mainMenuBackground("resources/textures/main_menu_7.png", GL_NEAREST)
+    , startGameButtonNormal("resources/textures/button_start_game_2.png", GL_NEAREST)
+    , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
+    , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
+    , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -127,7 +132,23 @@ UISystem::~UISystem(){
 
 }
 
-void UISystem::update() {
+void UISystem::updateMainMenu(int itemSelected) {
+    // Buttons
+    if (itemSelected == 1) { // start game
+        renderImage(imageShader, exitButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+    }
+    else if (itemSelected == 2) { // exit
+        renderImage(imageShader, exitButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, startGameButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+    }
+
+    // Background
+    renderImage(imageShader, mainMenuBackground, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
+}
+
+
+void UISystem::updateGame() {
     
     if (checkForWin() != 0)
     {

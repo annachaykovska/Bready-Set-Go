@@ -5,8 +5,9 @@
 
 using namespace std;
 
-XboxController::XboxController(PhysicsSystem* physicsSystem) : forwards(true) {
+XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem) : forwards(true), menuItemSelected(false), menuSelection(1) {
 	this->physics = physicsSystem;
+	this->ui = uiSystem;
 }
 
 void XboxController::checkControllers() {
@@ -73,7 +74,46 @@ float XboxController::getDeadZone(float x, float y, float deadzone) {
 	return normalizedMagnitude;
 }
 
-void XboxController::setButtonStateFromController(int controllerId) {
+void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
+	physx::PxVehicleDrive4WRawInputData* input;
+	if (controllerId == 1)
+		input = &physics->mVehicleInputDataPlayer2;
+	else if (controllerId == 2)
+		input = &physics->mVehicleInputDataPlayer3;
+	else if (controllerId == 3)
+		input = &physics->mVehicleInputDataPlayer4;
+	else
+		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
+	XINPUT_STATE state = getControllerState(controllerId);
+
+	// Left Thumb
+	float thumbLeftX = state.Gamepad.sThumbLX;
+	float thumbLeftY = state.Gamepad.sThumbLY;
+
+	float thumbLeftDeadZone = getDeadZone(thumbLeftX, thumbLeftY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+
+	// A button
+	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
+
+	if (A_button_pressed) {
+		menuItemSelected = true;
+	}
+
+	if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
+		if (menuSelection == 2) {
+			menuSelection = 1;
+		}
+		
+	}
+	else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
+		if (menuSelection == 1) {
+			menuSelection = 2;
+		}
+	}
+	printf("menu: %d\n", menuSelection);
+}
+
+void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
 	if (controllerId == 1)

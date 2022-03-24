@@ -9,6 +9,7 @@
 #include "../Window.h"
 #include "../Scene/Scene.h"
 #include "PhysicsSystem.h"
+#include "../Rendering/UISystem.h"
 
 #pragma comment(lib, "Xinput.lib") 
 #pragma comment(lib, "Xinput9_1_0.lib")
@@ -18,14 +19,19 @@ extern Scene g_scene;
 
 class XboxController {
 public:
-	XboxController(PhysicsSystem* physicsSystem);
+	XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem);
 	void checkControllers();
-	void setButtonStateFromController(int controllerId);
+	void setButtonStateFromControllerDriving(int controllerId);
+	void setButtonStateFromControllerMainMenu(int controllerId);
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
 
+	int menuSelection;
+	bool menuItemSelected;
+
 private:
 	PhysicsSystem* physics;
+	UISystem* ui;
 	bool forwards;
 };
 
