@@ -285,10 +285,10 @@ void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
 
-	this->ort.left = p1Pos.x + 150.0f;
-	this->ort.right = p1Pos.x - 150.0f;
-	this->ort.bottom = -p1Pos.z - 150.0f;
-	this->ort.top = -p1Pos.z + 150.0f;
+	this->ort.left = p1Pos.x + 50.0f;
+	this->ort.right = p1Pos.x - 50.0f;
+	this->ort.bottom = -p1Pos.z - 50.0f;
+	this->ort.top = -p1Pos.z + 50.0f;
 }
 
 void RenderingSystem::update()
@@ -350,10 +350,11 @@ void RenderingSystem::renderDebugShadowMap()
 	glViewport(0, 0, g_systems.width, g_systems.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	this->depthShader.use();
-	glActiveTexture(GL_TEXTURE24);
+	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 24);
+	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
 	renderTexturedQuad();
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Model* RenderingSystem::getKitchenModel()
@@ -435,6 +436,7 @@ void RenderingSystem::renderTexturedQuad()
 
 	// Render scene to viewport by applying depthMap as texture to 2D quad
 	this->debugShader.use();
+	this->debugShader.setInt("depthMap", 25);
 	glBindVertexArray(this->quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
