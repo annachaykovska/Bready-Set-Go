@@ -16,10 +16,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
 									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt")
 {
-	// Viewport settings
-	this->screenWidth = 0;
-	this->screenHeight = 0;
-
 	// Orthographic projection for shadow map settings
 	this->ort.left = 281.0f;
 	this->ort.right = -279.0f;
@@ -72,7 +68,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glGenTextures(1, &this->roughDepthMapTex);
 	glActiveTexture(GL_TEXTURE24);
 	glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, g_systems.width, g_systems.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -110,14 +106,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Shader configuration
-	//debugShader.use();
-	//debugShader.setInt("depthMap", 24);
-
 	// --------------------------------------------------------------------------------------------
 	// QUAD FOR RENDERING FINAL PASS
 	// --------------------------------------------------------------------------------------------
-
 	// Create quad VAO for final default framebuffer image render
 	float quadVerts[] = {
 		// Position   // Tex Coords
@@ -276,11 +267,11 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	float screenWidth = g_systems.width;
 	float screenHeight = g_systems.height;
 
-	// TODO There is a bug here? screenWidth and screenHeight are both 0?
 	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
+// Orthographic projection for the depth map that shows the entire level layout for rough shadows at a distance
 void RenderingSystem::updateRoughOrtho()
 {
 	this->ort.left = 281.0f;
@@ -289,7 +280,7 @@ void RenderingSystem::updateRoughOrtho()
 	this->ort.top = 197.0f;
 }
 
-// Moves the orthographic projection used for the depthMap so that it follows the player
+// Moves the orthographic projection used for the depth map so that it follows the player for high res shadows
 void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
@@ -313,7 +304,7 @@ void RenderingSystem::update()
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", roughLightSpaceMatrix);
 
-	glViewport(0, 0, g_systems.width, g_systems.height);
+	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->roughDepthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glCullFace(GL_FRONT);

@@ -75,7 +75,4 @@ private:
 	unsigned int roughDepthMapVAO;
 	unsigned int depthMapFBO;
 	unsigned int dpethMapVAO;
-
-	int screenWidth;
-	int screenHeight;
 };
