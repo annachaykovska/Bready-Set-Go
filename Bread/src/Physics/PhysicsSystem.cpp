@@ -172,21 +172,39 @@ void PhysicsSystem::updateCar() {
 	cars[2] = mVehiclePlayer3;
 	cars[3] = mVehiclePlayer4;
 	for (int car = 0; car < 4; car++) {
-		// Update wheels
+		// Update wheels/suspension
 		for (int wheel = 0; wheel < 4; wheel++) {
 			PxVehicleWheelData wheelData = cars[car]->mWheelsSimData.getWheelData(wheel);
+			PxVehicleSuspensionData suspData = cars[car]->mWheelsSimData.getSuspensionData(wheel);
+
+			// Wheels
+
 			wheelData.mMass = wheel_mass;
 			wheelData.mMOI = wheel_moi;
 			wheelData.mMaxBrakeTorque = max_brake_torque;
-			wheelData.mMaxHandBrakeTorque = max_hand_brake_torque;
 			wheelData.mToeAngle = 0.f;
 			wheelData.mDampingRate = wheel_damping_rate;
-			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear wheel changes
-				
+
+			// Suspension
+			suspData.mSpringStrength = spring_strength;
+
+			// Properties dependent on position
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear changes
+				wheelData.mMaxHandBrakeTorque = max_hand_brake_torque;
 			}
-			else { // Front wheel changes
+			else { // Front changes
 
 			}
+
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eFRONT_LEFT) { // Left changes
+				suspData.mCamberAtRest = camber_at_rest;
+			}
+			else { // right changes
+				suspData.mCamberAtRest = -camber_at_rest;
+			}
+			// Updating
+			cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
+			cars[car]->mWheelsSimData.setSuspensionData(wheel, suspData);
 			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
 		}
 
@@ -377,15 +395,17 @@ void PhysicsSystem::initializeActors() {
 }
 
 PhysicsSystem::PhysicsSystem() :
-		chassis_mass(400.f)
-	,	peak_torque(100000.f)
-	,	max_omega(1000.f)
-	,	wheel_mass(800.f)
-	,	wheel_damping_rate(20.f)
-	,	wheel_moi(100.f)//wheel_moi(1440.f)
-	,	chassis_moi_y(0.25f)
-	,	max_brake_torque(100000.f)
-	,	max_hand_brake_torque(50000.f)
+	chassis_mass(400.f)
+	, peak_torque(100000.f)
+	, max_omega(1000.f)
+	, wheel_mass(800.f)
+	, wheel_damping_rate(20.f)
+	, wheel_moi(100.f)//wheel_moi(1440.f)
+	, chassis_moi_y(0.25f)
+	, max_brake_torque(100000.f)
+	, max_hand_brake_torque(50000.f)
+	, camber_at_rest(0.2f)
+	, spring_strength(100.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
@@ -397,7 +417,10 @@ PhysicsSystem::PhysicsSystem() :
 	mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 	// Physics
-	this->mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(), true, mPvd);
+	PxTolerancesScale tolerances = PxTolerancesScale();
+	tolerances.length = 10;
+	tolerances.speed = 10;
+	this->mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, tolerances, true, mPvd);
 	initVehicleSDK();
 
 	// Dispatcher
