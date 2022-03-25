@@ -86,7 +86,7 @@ int main()
 	PhysicsSystem physics;
 	g_systems.physics = &physics;
 
-	//DebugOverlay debugOverlay;
+	DebugOverlay debugOverlay;
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
 	g_systems.physics->initialize(); // Needs to happen after renderer loads the models
@@ -216,7 +216,7 @@ int main()
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
 	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
 
-	//debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
+	debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 	player1->attachComponent(&p1Inv, "inventory");
 	player2->attachComponent(&p2Inv, "inventory");
 	player2->attachComponent(&p2NavSystem, "navigation");
@@ -260,7 +260,7 @@ int main()
 			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
 			
 			// RENDER
-			renderer.update();
+			renderer.update(navMesh.getWireframe());
 
 			if (!g_systems.renderDebug)
 			{

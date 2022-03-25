@@ -28,9 +28,9 @@ public:
 	Shader& getShader();
 	void loadModels();
 	void setupCameras(Transform* playerTransform);
-	void update();
+	void update(Mesh mesh);
 	Model* getKitchenModel();
-	void renderScene();
+	void renderScene(Mesh mesh);
 	void renderShadowMap();
 	void renderTexturedQuad();
 	void renderDebugShadowMap();

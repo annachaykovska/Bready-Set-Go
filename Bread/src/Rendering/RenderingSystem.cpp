@@ -264,7 +264,7 @@ void RenderingSystem::updateOrtho()
 	this->ort.top = -p1Pos.z + 150.0f;
 }
 
-void RenderingSystem::update()
+void RenderingSystem::update(Mesh mesh)
 {
 	// Render depthMap to texture (from light's perspective)
 	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
@@ -294,7 +294,7 @@ void RenderingSystem::update()
 		// Render scene as normal using the generated depth/shadow map
 		this->shader.use();
 		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		renderScene();
+		renderScene(mesh);
 	}
 }
 
@@ -315,7 +315,7 @@ Model* RenderingSystem::getKitchenModel()
 	return g_scene.getEntity("countertop")->getModel();
 }
 
-void RenderingSystem::renderScene()
+void RenderingSystem::renderScene(Mesh mesh)
 {
 	// Reset viewport
 	glViewport(0, 0, g_systems.width, g_systems.height);
@@ -334,6 +334,11 @@ void RenderingSystem::renderScene()
 	glBindTexture(GL_TEXTURE, 0);
 
 	glUniform1i(texLoc, 1);
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
+	glUniform1i(texLoc, 0); // Turn textures off
+	mesh.setWireframe(true);
+	mesh.draw(getShader());
 
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
