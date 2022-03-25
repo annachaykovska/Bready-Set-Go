@@ -81,7 +81,24 @@ vec3 dirLight()
 	float roughClosestDepth = texture(roughShadowMap, roughProjCoords.xy).r;
 	float roughCurrentDepth = roughProjCoords.z;
 	float roughBias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
-	float roughShadow = (roughCurrentDepth - roughBias) > roughClosestDepth ? 1.0 : 0.0;
+
+	// Softening shadow edges
+	float roughShadow = 0.0;
+	vec2 roughTexelSize = 1.0 / textureSize(roughShadowMap, 0);
+	const int halfKernelWidth = 3;
+	for (int x = -halfKernelWidth; x <= halfKernelWidth; x++)
+	{
+		for (int y = -halfKernelWidth; y <= halfKernelWidth; y++)
+		{
+			float pcfDepth = texture(roughShadowMap, roughProjCoords.xy + vec2(x, y) * roughTexelSize).r;
+			roughShadow += roughCurrentDepth - roughBias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+
+	roughShadow /= ((halfKernelWidth * 2 + 1) * (halfKernelWidth * 2 + 1));
+
+	if (roughProjCoords.z > 1.0)
+		roughShadow = 0.0;
 	
 	// High res shadows ---------------------------------------------------------------------------
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -89,13 +106,11 @@ vec3 dirLight()
 	float closestDepth = texture(shadowMap, projCoords.xy).r;
 	float currentDepth = projCoords.z;
 	float bias = max(0.001 * (1.0 - dot(norm, lightDir)), 0.000001);
-	//float shadow = 0.0;
-	//shadow += currentDepth - bias > closestDepth ? 1.0 : 0.0;
 	
 	// Softening shadow edges
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-	const int halfKernelWidth = 3;
+	//const int halfKernelWidth = 3;
 	for (int x = -halfKernelWidth; x <= halfKernelWidth; x++)
 	{
 		for (int y = -halfKernelWidth; y <= halfKernelWidth; y++)
@@ -107,15 +122,16 @@ vec3 dirLight()
 
 	shadow /= ((halfKernelWidth * 2 + 1) * (halfKernelWidth * 2 + 1));
 
-	if (projCoords.z > 1.0)
-		shadow = 0.0;
+	//if (projCoords.z > 1.0)
+		//shadow = 0.0;
 
 	vec3 lighting = vec3(0.0);
 
-	if (length(playerFragPos - vec4(fragPos, 1.0)) < 100.0)
-		lighting = (ambient + (1.0 - shadow) * (diffuse +	 specular));
-	if (length(playerFragPos - vec4(fragPos, 1.0)) > 80.0)
-		lighting = (ambient + (1.0 - roughShadow) * (diffuse +	 specular));
+	//if (length(playerFragPos - vec4(fragPos, 1.0)) < 40.0)
+		lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
+
+	//if (length(playerFragPos - vec4(fragPos, 1.0)) > 30)
+		//lighting = (ambient + (1.0 - roughShadow) * (diffuse +	 specular));
 
 	return lighting;
 }
@@ -164,6 +180,20 @@ void main()
 	// Phong light model
 	vec3 phong = result * objectColor;
 
+	vec3 norm = normalize(ourNormal);
+	vec3 lightDir = normalize(light.position - fragPos);
+	float intensity = dot(lightDir, norm);
+
+	if (intensity > 0.9)
+		fragColor = vec4(phong, 1.0);
+	else if (intensity > 0.5)
+		fragColor = vec4(0.6 * phong, 1.0);
+	else if (intensity > 0.25)
+		fragColor = vec4(0.4 * phong, 1.0);
+	else
+		fragColor = vec4(0.2 * phong, 1.0);
+	
+
 	// Final
-	fragColor = vec4(phong, 1.0);
+	//fragColor = vec4(phong, 1.0);
 }
