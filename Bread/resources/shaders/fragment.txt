@@ -45,6 +45,10 @@ uniform int textured;
 
 uniform sampler2D shadowMap;
 uniform sampler2D roughShadowMap;
+uniform float maxBias;
+uniform float minBias;
+uniform float maxRoughBias;
+uniform float minRoughBias;
 
 uniform vec3 viewPos;
 uniform Material material;
@@ -76,7 +80,7 @@ vec3 dirLight()
 	roughProjCoords = roughProjCoords * 0.5 + 0.5;
 	float roughClosestDepth = texture(roughShadowMap, roughProjCoords.xy).r;
 	float roughCurrentDepth = roughProjCoords.z;
-	float roughBias = max(0.01 * (1.0 - dot(norm, lightDir)), 0.005);
+	float roughBias = max(0.005 * (1.0 - dot(norm, lightDir)), 0.0005);
 	float roughShadow = (roughCurrentDepth - roughBias) > roughClosestDepth ? 1.0 : 0.0;
 	
 	// High res shadows ---------------------------------------------------------------------------
@@ -84,7 +88,7 @@ vec3 dirLight()
 	projCoords = projCoords * 0.5 + 0.5;
 	float closestDepth = texture(shadowMap, projCoords.xy).r;
 	float currentDepth = projCoords.z;
-	float bias = max(0.01 * (1.0 - dot(norm, lightDir)), 0.005);
+	float bias = max(0.001 * (1.0 - dot(norm, lightDir)), 0.00005);
 	
 	// Softening shadow edges
 	float shadow = 0.0;

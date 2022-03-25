@@ -32,6 +32,11 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->shadowWidth = 4096;
 	this->shadowHeight = 4096;
 
+	this->maxBias = 0.001f;
+	this->minBias = 0.00005f;
+	this->maxRoughBias = 0.005f;
+	this->minRoughBias = 0.0005f;
+
 	this->models.reserve(g_scene.entityCount() * 2); // Create space for models
 	loadModels(); // Load model files into the models vector
 
@@ -149,7 +154,7 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Player models
 	//-----------------------------------------------------------------------------------
-	std::string breadmobilePath = "resources/models/breadbus/breadbus2.obj";
+	std::string breadmobilePath = "resources/models/breadbus/breadbus.obj";
 	
 	// Player 1
 	this->models.emplace_back(Model(&breadmobilePath[0]));
@@ -390,6 +395,13 @@ void RenderingSystem::renderScene()
 	glBindTexture(GL_TEXTURE, 0);
 
 	glUniform1i(texLoc, 1);
+
+	// Set shadow bias uniforms
+	
+	shader.setFloat("maxBias", this->maxBias);
+	shader.setFloat("minBias", this->minBias);
+	shader.setFloat("maxRoughBias", this->maxRoughBias);
+	shader.setFloat("minRoughBias", this->minRoughBias);
 
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)

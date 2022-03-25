@@ -201,6 +201,10 @@ void Profiler::shadows()
 	Orthogonal& ort = g_systems.render->ort;
 	glm::vec3& lightDir = g_systems.render->lightDir;
 	glm::vec3& lightPos = g_systems.render->lightPos;
+	float& maxBias = g_systems.render->maxBias;
+	float& minBias = g_systems.render->minBias;
+	float& maxRoughBias = g_systems.render->maxRoughBias;
+	float& minRoughBias = g_systems.render->minRoughBias;
 
 	if (ImGui::CollapsingHeader("Shadows"))
 	{
@@ -218,13 +222,14 @@ void Profiler::shadows()
 		ImGui::InputFloat("orthoProj.near", &(ort.nearPlane), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.far", &(ort.farPlane), 1.f, 10.f, "%.3f");
 
-		ImGui::InputFloat("lightDir.x", &(lightDir.x), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("lightDir.y", &(lightDir.y), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("lightDir.z", &(lightDir.z), 1.f, 10.f, "%.3f");
-
 		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
+
+		ImGui::InputFloat("maxBias", &(maxBias), 0.0001f, 0.01f, "%.5f");
+		ImGui::InputFloat("minBias", &(minBias), 0.0001f, 0.01f, "%.5f");
+		ImGui::InputFloat("maxRoughBias", &(maxRoughBias), 0.0001f, 0.01f, "%.5f");
+		ImGui::InputFloat("minRoughBias", &(minRoughBias), 0.0001f, 0.01f, "%.5f");
 	}
 }
 

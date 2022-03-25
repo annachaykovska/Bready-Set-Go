@@ -46,6 +46,11 @@ public:
 
 	unsigned int depthMapTex;
 
+	float maxBias;
+	float minBias;
+	float maxRoughBias;
+	float minRoughBias;
+
 private:
 
 	//DebugOverlay& debugOverlay;
