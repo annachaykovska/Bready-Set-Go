@@ -244,8 +244,6 @@ void Profiler::meshScale()
 }
 
 void Profiler::physicsValues() {
-	float testList[3];
-	float testFloat;
 	PhysicsSystem* physSys = g_systems.physics;
 	//physSys->mVehiclePlayer1
 	//std::cout << physSys->chassis_mass << std::endl;
@@ -278,11 +276,23 @@ void Profiler::physicsValues() {
 	}
 }
 
+void Profiler::cameraValues() {
+	auto camera = g_scene.camera;
+	if (ImGui::CollapsingHeader("Camera Values")) {
+		//FIXME: THESE DOESNT CHANGE THE VALUES
+		ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
+	}
+}
+
 void Profiler::update()
 {
 	begin();
 	fps();
 	player1Inventory();
+	//cameraValues(); //doesn't really work rn I DONT KNOW WHY
 	physicsValues();
 	player1Transform();
 	player2Transform();
