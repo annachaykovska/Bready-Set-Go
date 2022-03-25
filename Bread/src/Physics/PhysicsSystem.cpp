@@ -7,6 +7,10 @@
 #include <snippetvehiclecommon/SnippetVehicleTireFriction.h>
 #include <snippetutils/SnippetUtils.h>
 
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 #include "../SystemManager.h"
 #include "../Rendering/RenderingSystem.h"
 #include "PhysicsSystem.h"
@@ -731,6 +735,9 @@ void PhysicsSystem::update(const float dt)
 	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
 	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
 	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
+
+	// Update kitchen position
+	g_scene.getEntity("countertop")->getTransform()->update(kitchen->getGlobalPose());
 
 	// Update the food transforms
 	updateFoodTransforms();
