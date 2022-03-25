@@ -30,6 +30,9 @@ public:
 
 	void initPhysics(PhysicsSystem* physicsSystem);
 
+	//Tweakable
+	float max_fov;
+
 private:
 
 	PhysicsSystem* physics;
@@ -56,4 +59,9 @@ private:
 	float movementSpeed;
 	float mouseSensitivity;
 	float zoom;
+
+	// Camera Tweaks
+	bool in_whiplash;
+	int total_whip_lash_frames;
+	int whiplash_frame;
 };

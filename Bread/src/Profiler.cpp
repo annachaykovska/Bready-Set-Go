@@ -244,8 +244,6 @@ void Profiler::meshScale()
 }
 
 void Profiler::physicsValues() {
-	float testList[3];
-	float testFloat;
 	PhysicsSystem* physSys = g_systems.physics;
 	//physSys->mVehiclePlayer1
 	//std::cout << physSys->chassis_mass << std::endl;
@@ -273,11 +271,19 @@ void Profiler::physicsValues() {
 	}
 }
 
+void Profiler::cameraValues() {
+	auto camera = g_scene.camera;
+	if (ImGui::CollapsingHeader("Camera Values")) {
+		ImGui::InputFloat("MAX FOV", &(camera.max_fov), 10.f, 100.f, "%.3f");		// WheelMass
+	}
+}
+
 void Profiler::update()
 {
 	begin();
 	fps();
 	player1Inventory();
+	//cameraValues(); //doesn't really work rn
 	physicsValues();
 	player1Transform();
 	player2Transform();
