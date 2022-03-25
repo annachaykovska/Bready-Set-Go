@@ -28,6 +28,10 @@ Camera::Camera()
 	, max_fov(50.f)
 	, in_whiplash(false)
 {
+	a = 7.f;
+	b = 4.6f;
+	c = 0.01f;
+	d = 1.1f;
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	updateCameraVectors(&transform);
@@ -87,11 +91,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	}
 	if (vehicleSpeed > 0)
 	{
-		float a = 8.f; 
-		float b = 4.f;
-		float c = -0.02f;
-		float d = 1.f;
-		float ratio = std::min(d * ((1 / (1 + pow(EULER, -a * (vehicleSpeed / TOP_SPEED) + b))) - c),1.0f);
+		float ratio = std::min(d * ((1 / (1 + pow(EULER, -a * (vehicleSpeed / TOP_SPEED) + b))) - c), 1.0f);
 		perspective += ratio * 35.f;
 		//cameraPositionOffset = (vehicleSpeed / 16);
 	}

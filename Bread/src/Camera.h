@@ -32,6 +32,11 @@ public:
 
 	//Tweakable
 	float max_fov;
+	// values for the fov sigmoid function
+	float a;
+	float b;
+	float c;
+	float d;
 
 private:
 

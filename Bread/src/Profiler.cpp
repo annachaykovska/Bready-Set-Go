@@ -274,7 +274,11 @@ void Profiler::physicsValues() {
 void Profiler::cameraValues() {
 	auto camera = g_scene.camera;
 	if (ImGui::CollapsingHeader("Camera Values")) {
-		ImGui::InputFloat("MAX FOV", &(camera.max_fov), 10.f, 100.f, "%.3f");		// WheelMass
+		//FIXME: THESE DOESNT CHANGE THE VALUES
+		ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
 	}
 }
 
@@ -283,7 +287,7 @@ void Profiler::update()
 	begin();
 	fps();
 	player1Inventory();
-	//cameraValues(); //doesn't really work rn
+	//cameraValues(); //doesn't really work rn I DONT KNOW WHY
 	physicsValues();
 	player1Transform();
 	player2Transform();
