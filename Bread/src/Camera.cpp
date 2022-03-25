@@ -10,6 +10,7 @@
 #define CAMERA_DISTANCE 10.0
 #define CAMERA_GROUND_HEIGHT 5.0
 #define TOP_SPEED 40.f
+#define EULER 2.71828f
 
 Camera::Camera()
 	: position(glm::vec3(0, 200.0f, 500.0f))
@@ -86,17 +87,20 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	}
 	if (vehicleSpeed > 0)
 	{
-		perspective += powf((vehicleSpeed / TOP_SPEED), 2.f) * 60.f;
+		float a = 8.f; 
+		float b = 4.f;
+		float c = -0.02f;
+		float d = 1.f;
+		float ratio = std::min(d * ((1 / (1 + pow(EULER, -a * (vehicleSpeed / TOP_SPEED) + b))) - c),1.0f);
+		perspective += ratio * 35.f;
 		//cameraPositionOffset = (vehicleSpeed / 16);
 	}
 	float max_fov_change = 4.f; //FIXME: THIS VARIABLE IS A CONSTANT 
 	if (perspective - oldFOV > max_fov_change) {
 		perspective = oldFOV + max_fov_change;
-		std::cout << "FOV CHANGE TOO HIGH" << std::endl;
 	}
 	else if (perspective - oldFOV < -max_fov_change) {
 		perspective = oldFOV - max_fov_change;
-		std::cout << "FOV CHANGE TOO LOW" << std::endl;
 	}
 
 	//perspective -= whiplashFOVChange;
