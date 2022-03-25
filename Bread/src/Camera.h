@@ -53,6 +53,7 @@ private:
 	float recordedForcedDirection;
 	float oldForcedDirection;
 	float oldCameraRotationOffset;
+	float oldFOV;
 
 	float predictedCameraDelta;
 
