@@ -303,8 +303,6 @@ int main()
 				gameExit = true;
 			}
 		}
-		
-		std::cout << "Updated.\n";
 	}
 
 	// Collect garbage
