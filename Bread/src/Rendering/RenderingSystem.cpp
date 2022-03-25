@@ -285,10 +285,10 @@ void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
 
-	this->ort.left = p1Pos.x + 50.0f;
-	this->ort.right = p1Pos.x - 50.0f;
-	this->ort.bottom = -p1Pos.z - 50.0f;
-	this->ort.top = -p1Pos.z + 50.0f;
+	this->ort.left = p1Pos.x + 100.0f;
+	this->ort.right = p1Pos.x - 100.0f;
+	this->ort.bottom = -p1Pos.z - 100.0f;
+	this->ort.top = -p1Pos.z + 100.0f;
 }
 
 void RenderingSystem::update()
@@ -338,11 +338,10 @@ void RenderingSystem::update()
 	{
 		// Render scene as normal using the generated depth/shadow map
 		this->shader.use();
-		glm::vec3 p1pos = g_scene.getEntity("player1")->getTransform()->position;
-		//std::cout << "(" << p1pos.x << ", " << p1pos.y << ", " << p1pos.z << ")\n";
-		glUniform3fv(glGetUniformLocation(this->shader.getId(), "playerPosition"), sizeof(p1pos), &p1pos[0]);
 		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		this->shader.setMat4("roughLightSpaceMatrix", roughLightSpaceMatrix);
+		this->shader.setVec3("playerPos", g_scene.getEntity("player1")->getTransform()->position);
+		this->shader.setMat4("playerModelMatrix", g_scene.getEntity("player1")->getTransform()->getModelMatrix());
 		renderScene();
 	}
 }

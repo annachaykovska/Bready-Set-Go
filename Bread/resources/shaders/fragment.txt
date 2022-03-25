@@ -50,7 +50,7 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
 
-uniform vec3 playerPosition;
+in vec4 playerFragPos;
 
 vec3 dirLight()
 {
@@ -105,10 +105,10 @@ vec3 dirLight()
 
 	vec3 lighting = vec3(0.0);
 
-	if (roughShadow > shadow)
-		lighting = (ambient + (1.0 - roughShadow) * (diffuse +	 specular));
-	else
+	if (length(playerFragPos - vec4(fragPos, 1.0)) < 100.0)
 		lighting = (ambient + (1.0 - shadow) * (diffuse +	 specular));
+	else
+		lighting = (ambient + (1.0 - roughShadow) * (diffuse +	 specular));
 
 	return lighting;
 }
@@ -156,9 +156,6 @@ void main()
 
 	// Phong light model
 	vec3 phong = result * objectColor;
-
-	//if (distance(playerPosition, fragPos) > 10.0)
-		//phong = vec3(0.0);
 
 	// Final
 	fragColor = vec4(phong, 1.0);

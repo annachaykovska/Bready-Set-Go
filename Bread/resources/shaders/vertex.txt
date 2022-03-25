@@ -15,6 +15,11 @@ uniform mat4 proj;
 uniform mat4 lightSpaceMatrix;
 uniform mat4 roughLightSpaceMatrix;
 
+uniform vec3 playerPos;
+uniform mat4 playerModelMatrix;
+
+out vec4 playerFragPos;
+
 void main()
 {
 	gl_Position = proj * view * model * vec4(aPos, 1.0);
@@ -23,4 +28,5 @@ void main()
 	fragPos = vec3(model * vec4(aPos, 1.0));
 	fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
 	roughFragPosLightSpace = roughLightSpaceMatrix * vec4(fragPos, 1.0);
+	playerFragPos = playerModelMatrix * vec4(playerPos, 1.0);
 }
