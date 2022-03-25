@@ -34,6 +34,7 @@ public:
 
 	void updateGame();
 	void updateMainMenu(int itemSelected);
+	void updateEndGame();
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
@@ -49,7 +50,7 @@ private:
 
 	float scX(float xVal);
 	float scY(float yVal);
-	float lerp(float p, float a, float b);
+	float lerp(float p, float a, float b);                                                                  
 
 	IngredientTracker* tracker;
 
@@ -86,6 +87,10 @@ private:
 	ImageTexture startGameButtonPressed;
 	ImageTexture exitButtonNormal;
 	ImageTexture exitButtonPressed;
+
+	// End Game
+	ImageTexture gameOverPopUp;
+	ImageTexture backToMainMenuButtonPressed;
 
 	//Constants needed to render
 	std::map<char, Character> Characters;

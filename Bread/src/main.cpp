@@ -204,8 +204,11 @@ int main()
 	IngredientTracker ingredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
 	ui.initIngredientTracking(&ingredientTracker);
 
+	// Set up game loop manager
+	GameLoopManager gameLoop = GameLoopManager();
+
 	// Set up controller inputs
-	XboxController controllers = XboxController(&physics, &ui);
+	XboxController controllers = XboxController(&physics, &ui, &gameLoop);
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
@@ -223,12 +226,9 @@ int main()
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
-	// 1 = main menu, 2 = play
-	int gameStage = 1;
-	bool gameExit = false;
 
 	// GAME LOOP
-	while (!window.shouldClose() && !gameExit)
+	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
 	{
 		frameBeginTime = glfwGetTime();
 
@@ -243,18 +243,21 @@ int main()
 		// WINDOW
 		window.clear();
 
-		if (gameStage == 1) {
-			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
+		if (gameLoop.gameStage == 1) {
+			if (frameBeginTime - gameLoop.returnTimeoutStart > gameLoop.returnTimeoutLength) {
+				controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
+				//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
+				//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
+				//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
+				gameLoop.returnTimeoutStart = -1;
+			}
 			
 			// RENDER
-			ui.updateMainMenu(controllers.menuSelection);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber);
 			window.swapBuffer();
 		}
-		else if (gameStage == 2) {
-			controllers.setButtonStateFromControllerDriving(0); // Getting the input from player 1 controller
+		else if (gameLoop.gameStage == 2) {
+			controllers.setButtonStateFromControllerDriving(0, ui.checkForWin()); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
@@ -282,6 +285,10 @@ int main()
 			audio.update();
 		}
 
+		if (ui.checkForWin() != 0) {
+			gameLoop.isGameEnded = true;
+		}
+
 		// UPDATE TIME
 		// If this frame took longer than 1/60 s to compute, treat it as two frames instead
 		if (frameEndTime - frameBeginTime > shortTimeInterval)
@@ -296,14 +303,14 @@ int main()
 
 		fixedTimeInterval = shortTimeInterval;
 
-		// Update game stage
-		if (controllers.menuItemSelected) { 
-			if (controllers.menuSelection == 1) {// start game selected
-				gameStage = 2;
-			}
-			else if (controllers.menuSelection == 2) { // exit
-				gameExit = true;
-			}
+		// UPDATE GAME STAGE
+		if (gameLoop.isMenuItemSelected) {
+			gameLoop.updateGameStageFromMenu();
+		}
+
+		// RESET game
+		else if (gameLoop.isBackToMenuSelected) {
+			gameLoop.resetBackToStart();
 		}
 		
 	}

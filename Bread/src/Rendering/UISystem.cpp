@@ -35,11 +35,13 @@ UISystem::UISystem()
     , p2Location(glm::vec2(0))
     , p3Location(glm::vec2(0))
     , p4Location(glm::vec2(0))
-    , mainMenuBackground("resources/textures/main_menu_7.png", GL_NEAREST)
+    , mainMenuBackground("resources/textures/main_menu_8.png", GL_NEAREST)
     , startGameButtonNormal("resources/textures/button_start_game_2.png", GL_NEAREST)
     , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
+    , gameOverPopUp("resources/textures/game_over_screen.png", GL_NEAREST)
+    , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -147,13 +149,18 @@ void UISystem::updateMainMenu(int itemSelected) {
     renderImage(imageShader, mainMenuBackground, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
 }
 
+void UISystem::updateEndGame() {
+    std::string winText = "Player " + std::to_string(checkForWin()) + " Wins!";
+    renderText(textShader, winText, 250.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
+    renderImage(imageShader, gameOverPopUp, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+}
+
 
 void UISystem::updateGame() {
-    
     if (checkForWin() != 0)
     {
-        std::string winText = "Player " + std::to_string(checkForWin()) + " Wins!";
-        renderText(textShader, winText, 250.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+        updateEndGame();
     }
     float height, width;
 
@@ -257,7 +264,7 @@ int UISystem::checkForWin()
         return 4;
     }
 
-    return 0;
+    return 1;
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
