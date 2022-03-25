@@ -97,7 +97,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		perspective += ratio * 35.f;
 		//cameraPositionOffset = (vehicleSpeed / 16);
 	}
-	float max_fov_change = 6.f; //FIXME: THIS VARIABLE IS A CONSTANT 
+	float max_fov_change = 2.f; //FIXME: THIS VARIABLE IS A CONSTANT 
 	if (perspective - oldFOV > max_fov_change) {
 		perspective = oldFOV + max_fov_change;
 	}
