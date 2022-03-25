@@ -338,6 +338,9 @@ void RenderingSystem::update()
 	{
 		// Render scene as normal using the generated depth/shadow map
 		this->shader.use();
+		glm::vec3 p1pos = g_scene.getEntity("player1")->getTransform()->position;
+		//std::cout << "(" << p1pos.x << ", " << p1pos.y << ", " << p1pos.z << ")\n";
+		glUniform3fv(glGetUniformLocation(this->shader.getId(), "playerPosition"), sizeof(p1pos), &p1pos[0]);
 		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		this->shader.setMat4("roughLightSpaceMatrix", roughLightSpaceMatrix);
 		renderScene();
