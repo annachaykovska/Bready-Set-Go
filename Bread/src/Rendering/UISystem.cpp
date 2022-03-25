@@ -8,6 +8,9 @@ extern Scene g_scene;
 namespace
 {
     const float PI = 3.141592;
+    const float MIN_SPEED_THETA = 3.f * PI / 4.f + 0.2f;
+    const float MAX_SPEED_THETA = -PI / 4.f + 0.2f;
+    const float MAX_NEEDLE_DELTA = (MIN_SPEED_THETA - MAX_SPEED_THETA) / 10.f;
 }
 
 UISystem::UISystem()
@@ -40,6 +43,7 @@ UISystem::UISystem()
     , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
+    , speedometer_theta(MIN_SPEED_THETA)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -159,8 +163,9 @@ void UISystem::updateGame() {
 
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
-    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 
-        lerp(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 3.f*3.14/4.f, -3.14 / 4.f), 1.f);
+    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
+    speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
+    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
     renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
 

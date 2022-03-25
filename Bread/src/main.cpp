@@ -191,11 +191,6 @@ int main()
 	//p4Audio->loop = true;
 	//p4Audio->play("idle.wav");
 
-	// Track time
-	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0, accumulator = 0;
-	float frameBeginTime = 0, frameEndTime = 0; 
-	float fixedTimeInterval = 0, shortTimeInterval = 1.0f / 120.0f, longTimeInterval = 1.0f / 60.0f;
-
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
@@ -227,23 +222,39 @@ int main()
 	int gameStage = 2;
 	bool gameExit = false;
 
+	// Track time
+	double t = 0.0;
+	const double dt = 1.0/120.0;
+	double currentTime = glfwGetTime();
+	double accumulator = 0.0;
+
 	// GAME LOOP
 	while (!window.shouldClose() && !gameExit)
 	{
-		frameBeginTime = glfwGetTime();
+		double newTime = glfwGetTime();
+		double frameTime = newTime - currentTime;
+		currentTime = newTime;
+
+		accumulator += frameTime;
 
 		// INPUT
 		glfwPollEvents();
 		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
 		controllers.checkControllers(); // sets analog/digital
 
-		// SIMULATE
-		g_systems.physics->update(deltaTime);
+		while (accumulator >= dt)
+		{
+			// SIMULATE
+			g_systems.physics->update(dt);
+			accumulator -= dt;
+			t += dt;
+		}
 
 		// WINDOW
 		window.clear();
 
-		if (gameStage == 1) {
+		if (gameStage == 1) 
+		{
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
@@ -253,7 +264,8 @@ int main()
 			ui.updateMainMenu(controllers.menuSelection);
 			window.swapBuffer();
 		}
-		else if (gameStage == 2) {
+		else if (gameStage == 2) 
+		{
 			controllers.setButtonStateFromControllerDriving(0); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
@@ -282,20 +294,6 @@ int main()
 			audio.update();
 		}
 
-		// UPDATE TIME
-		// If this frame took longer than 1/60 s to compute, treat it as two frames instead
-		if (frameEndTime - frameBeginTime > shortTimeInterval)
-			fixedTimeInterval = longTimeInterval;
-
-		// If the last frame took less than 1/60 s to compute, delay
-		do 
-		{
-			frameEndTime = glfwGetTime();
-			deltaTime = frameEndTime - frameBeginTime;
-		} while (deltaTime < fixedTimeInterval);
-
-		fixedTimeInterval = shortTimeInterval;
-
 		// Update game stage
 		if (controllers.menuItemSelected) { 
 			if (controllers.menuSelection == 1) {// start game selected
@@ -305,7 +303,6 @@ int main()
 				gameExit = true;
 			}
 		}
-		
 	}
 
 	// Collect garbage

@@ -111,8 +111,8 @@ void Mesh::draw(Shader &shader)
 		glActiveTexture(GL_TEXTURE0);
 	}
 
-	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, g_systems.render->depthMapTex);
+	//glActiveTexture(GL_TEXTURE25);
+	//glBindTexture(GL_TEXTURE_2D, g_systems.render->depthMapTex);
 
 	// Material uniforms
 	unsigned int ambientLoc = glGetUniformLocation(shader.getId(), "material.ambient");
