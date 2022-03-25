@@ -178,10 +178,13 @@ void PhysicsSystem::updateCar() {
 			wheelData.mMass = wheel_mass;
 			wheelData.mMOI = wheel_moi;
 			wheelData.mMaxBrakeTorque = max_brake_torque;
-			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) {
+			wheelData.mMaxHandBrakeTorque = max_hand_brake_torque;
+			wheelData.mToeAngle = 0.f;
+			wheelData.mDampingRate = wheel_damping_rate;
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear wheel changes
 				
 			}
-			else {
+			else { // Front wheel changes
 
 			}
 			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
@@ -378,9 +381,11 @@ PhysicsSystem::PhysicsSystem() :
 	,	peak_torque(100000.f)
 	,	max_omega(1000.f)
 	,	wheel_mass(800.f)
+	,	wheel_damping_rate(20.f)
 	,	wheel_moi(100.f)//wheel_moi(1440.f)
 	,	chassis_moi_y(0.25f)
 	,	max_brake_torque(100000.f)
+	,	max_hand_brake_torque(50000.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
