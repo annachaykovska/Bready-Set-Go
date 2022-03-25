@@ -29,8 +29,8 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->ort.farPlane = 700.0f;
 
 	// Directional light position
-	this->lightPos = glm::vec3(0.0f, 200.0f, 200.0f);
-	this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
+	this->lightPos = glm::vec3(50.0f, 200.0f, 200.0f);
+	//this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
 
 	// Shadow map viewport size
 	this->shadowWidth = 4096;
@@ -276,7 +276,7 @@ void RenderingSystem::update()
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-	g_scene.getEntity("countertop")->getTransform()->update();
+	//g_scene.getEntity("countertop")->getTransform()->update();
 
 	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
@@ -348,7 +348,7 @@ void RenderingSystem::renderScene()
 		}
 		else if (i >= 4) // Use texture images for everything else
 		{
-			ownerTransform->update();
+			//ownerTransform->update();
 
 			glUniform1i(texLoc, 1);
 			models[i].draw(this->shader);
