@@ -36,6 +36,8 @@ public:
 	float getTurnDirectionalInfluence();
 
 	float getPlayerSpeed(int playerNumber);
+	bool getIsVehicleInAir(int playerNumber);
+
 	void respawnPlayer(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 

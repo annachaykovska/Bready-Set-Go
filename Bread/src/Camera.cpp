@@ -84,8 +84,10 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		//	if (whiplash_frame == total_whip_lash_frames) in_whiplash = false;
 		//}
 		
-		float max_rot=8.f; //FIXME: THIS VARIABLE IS A CONSTANT
-		cameraRotationOffset = vehicleSpeed * vehicleTurn * 2.5;
+		float max_rot=2.f; //FIXME: THIS VARIABLE IS A CONSTANT
+		if (!physics->getIsVehicleInAir(1)) {
+			cameraRotationOffset = vehicleSpeed * vehicleTurn * 2.2f;
+		}
 		if (cameraRotationOffset - oldCameraRotationOffset > max_rot) cameraRotationOffset = oldCameraRotationOffset + max_rot;
 		else if (cameraRotationOffset - oldCameraRotationOffset < -max_rot) cameraRotationOffset = oldCameraRotationOffset - max_rot;
 	}
@@ -95,7 +97,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		perspective += ratio * 35.f;
 		//cameraPositionOffset = (vehicleSpeed / 16);
 	}
-	float max_fov_change = 4.f; //FIXME: THIS VARIABLE IS A CONSTANT 
+	float max_fov_change = 6.f; //FIXME: THIS VARIABLE IS A CONSTANT 
 	if (perspective - oldFOV > max_fov_change) {
 		perspective = oldFOV + max_fov_change;
 	}
