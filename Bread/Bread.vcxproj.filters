@@ -48,6 +48,7 @@
     <ClCompile Include="src\Navigation\IngredientTracker.cpp" />
     <ClCompile Include="src\Navigation\NavigationSystem.cpp" />
     <ClCompile Include="src\Rendering\DebugOverlay.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\AL\al.h" />
