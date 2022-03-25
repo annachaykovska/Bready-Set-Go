@@ -154,22 +154,25 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Player models
 	//-----------------------------------------------------------------------------------
-	std::string breadmobilePath = "resources/models/breadbus/breadbus.obj";
+	std::string breadbusPath = "resources/models/breadbus/breadbus.obj";
+	std::string pancakebusPath = "resources/models/breadbus/pancakebus.obj";
+	std::string baguettebusPath = "resources/models/breadbus/baguettebus.obj";
+	std::string cakebusPath = "resources/models/breadbus/cakebus.obj";
 	
 	// Player 1
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&breadbusPath[0]));
 	g_scene.getEntity("player1")->attachComponent(&(this->models[0]), "model");
 	
 	// Player 2
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&pancakebusPath[0]));
 	g_scene.getEntity("player2")->attachComponent(&(this->models[1]), "model");
 	
 	// Player 3
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&baguettebusPath[0]));
 	g_scene.getEntity("player3")->attachComponent(&(this->models[2]), "model");
 	
 	// Player 4
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&cakebusPath[0]));
 	g_scene.getEntity("player4")->attachComponent(&(this->models[3]), "model");
 
 	//-----------------------------------------------------------------------------------
