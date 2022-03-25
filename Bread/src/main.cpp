@@ -246,7 +246,6 @@ int main()
 		{
 			// SIMULATE
 			g_systems.physics->update(dt);
-			std::cout << "Simulated\n";
 			accumulator -= dt;
 			t += dt;
 		}
