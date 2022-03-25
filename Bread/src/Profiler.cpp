@@ -254,7 +254,10 @@ void Profiler::physicsValues() {
 		ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");			// WheelMOI
 		ImGui::InputFloat("Damping Rate", &(physSys->wheel_damping_rate), 10.f, 100.f, "%.3f");	// Damping Rate
 		ImGui::InputFloat("Max hand brake torque", &(physSys->max_hand_brake_torque), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 10.f, 100.f, "%.3f");	// Damping Rate
+		ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 10.f, 100.f, "%.3f");	
+		ImGui::InputFloat("Max Compression", &(physSys->max_compression), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("Spring Min", &(physSys->spring_strength), 10.f, 100.f, "%.3f");
+
 		
 		ImGui::InputFloat("Camber at rest", &(physSys->camber_at_rest), 3.14/60.f, 3.14f/6.f, "%.3f");
 

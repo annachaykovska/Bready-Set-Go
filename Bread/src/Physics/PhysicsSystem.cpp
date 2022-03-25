@@ -191,6 +191,7 @@ void PhysicsSystem::updateCar() {
 
 			// Suspension
 			suspData.mSpringStrength = spring_strength;
+			suspData.mMaxCompression = max_compression;
 
 			// Properties dependent on position
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear changes
@@ -410,6 +411,7 @@ PhysicsSystem::PhysicsSystem() :
 	, max_hand_brake_torque(50000.f)
 	, camber_at_rest(0.2f)
 	, spring_strength(100.f)
+	, max_compression(1.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
