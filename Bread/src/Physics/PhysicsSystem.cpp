@@ -868,6 +868,27 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 	}
 }
 
+bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
+	switch (playerNumber)
+	{
+	case (1):
+		return mIsVehicleInAirPlayer1;
+		break;
+	case (2):
+		return mIsVehicleInAirPlayer2;
+		break;
+	case (3):
+		return mIsVehicleInAirPlayer3;
+		break;
+	case (4):
+		return mIsVehicleInAirPlayer4;
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
 void PhysicsSystem::respawnPlayer(int playerNumber) {
 	switch (playerNumber)
 	{

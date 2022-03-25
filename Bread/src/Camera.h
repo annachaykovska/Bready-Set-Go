@@ -30,6 +30,14 @@ public:
 
 	void initPhysics(PhysicsSystem* physicsSystem);
 
+	//Tweakable
+	float max_fov;
+	// values for the fov sigmoid function
+	float a;
+	float b;
+	float c;
+	float d;
+
 private:
 
 	PhysicsSystem* physics;
@@ -50,10 +58,16 @@ private:
 	float recordedForcedDirection;
 	float oldForcedDirection;
 	float oldCameraRotationOffset;
+	float oldFOV;
 
 	float predictedCameraDelta;
 
 	float movementSpeed;
 	float mouseSensitivity;
 	float zoom;
+
+	// Camera Tweaks
+	bool in_whiplash;
+	int total_whip_lash_frames;
+	int whiplash_frame;
 };

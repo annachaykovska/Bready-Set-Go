@@ -22,6 +22,7 @@ public:
 	void update();
 	void shadows();
 	void physicsValues();
+	void cameraValues();
 
 private:
 
