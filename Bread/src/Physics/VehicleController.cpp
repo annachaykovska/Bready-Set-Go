@@ -96,8 +96,12 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 	// A button
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
 
-	if (A_button_pressed) {
-		gameLoop->isMenuItemSelected = true;
+	float newTime = glfwGetTime();
+	if (newTime - gameLoop->returnTimeoutStart > gameLoop->returnTimeoutLength) {
+		gameLoop->returnTimeoutStart = -1;
+		if (A_button_pressed) {
+			gameLoop->isMenuItemSelected = true; 
+		}
 	}
 
 	if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {

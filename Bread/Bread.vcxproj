@@ -143,6 +143,7 @@
     <ClCompile Include="src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Rendering\Shader.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>

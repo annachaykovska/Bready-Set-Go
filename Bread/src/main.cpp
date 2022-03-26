@@ -245,7 +245,7 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			g_systems.physics->update(dt);
+			g_systems.physics->update(dt, gameLoop.gameStage);
 			accumulator -= dt;
 			t += dt;
 		}
@@ -254,20 +254,21 @@ int main()
 		window.clear();
 
 		if (gameLoop.gameStage == 1) {
-			if (frameBeginTime - gameLoop.returnTimeoutStart > gameLoop.returnTimeoutLength) {
-				controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-				//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
-				//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
-				//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
-				gameLoop.returnTimeoutStart = -1;
-			}
+			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
+			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
+			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
+			//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
 			
 			// RENDER
 			ui.updateMainMenu(gameLoop.menuSelectionNumber);
 			window.swapBuffer();
 		}
-		else if (gameLoop.gameStage == 2) {
-			controllers.setButtonStateFromControllerDriving(0, ui.checkForWin()); // Getting the input from player 1 controller
+		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			int winner = ui.checkForWin();
+			if (winner != 0) {
+				gameLoop.setEndStage();
+			}
+			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
@@ -299,26 +300,12 @@ int main()
 			gameLoop.isGameEnded = true;
 		}
 
-		// UPDATE TIME
-		// If this frame took longer than 1/60 s to compute, treat it as two frames instead
-		if (frameEndTime - frameBeginTime > shortTimeInterval)
-			fixedTimeInterval = longTimeInterval;
-
-		// If the last frame took less than 1/60 s to compute, delay
-		do 
-		{
-			frameEndTime = glfwGetTime();
-			deltaTime = frameEndTime - frameBeginTime;
-		} while (deltaTime < fixedTimeInterval);
-
-		fixedTimeInterval = shortTimeInterval;
-
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu();
 		}
 
-		// RESET game
+		// RESET game if end of game and menu selected
 		else if (gameLoop.isBackToMenuSelected) {
 			gameLoop.resetBackToStart();
 		}

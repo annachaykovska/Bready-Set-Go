@@ -33,3 +33,7 @@ void GameLoopManager::updateGameStageFromMenu() {
 	}
 	return;
 }
+
+void GameLoopManager::setEndStage() {
+	gameStage = 3;
+}

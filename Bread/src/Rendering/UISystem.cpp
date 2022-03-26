@@ -169,7 +169,6 @@ void UISystem::updateEndGame() {
         renderImage(imageShader, gameOverPlayer3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
     else if (winner == 4)
         renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
-
 }
 
 
@@ -281,7 +280,7 @@ int UISystem::checkForWin()
         return 4;
     }
 
-    return 1;
+    return 0;
 }
 
 void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
