@@ -111,10 +111,8 @@ float shadows(vec3 norm, vec3 lightDir)
 
 	float distance = length(playerFragPos - vec4(fragPos, 1.0));
 
-	if (distance > 75.0)
+	if (distance > 50.0)
 		shadow = roughShadow;
-	else if (distance <= 75.0 && distance >= 50.0)
-		shadow = (shadow + roughShadow) / 2.0;
 
 	return shadow;
 }

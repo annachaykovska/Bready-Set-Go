@@ -310,12 +310,12 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 // Orthographic projection for the depth map that shows the entire level layout for rough shadows at a distance
 void RenderingSystem::updateRoughOrtho()
 {
-	this->ort.left = -310.0f;
-	this->ort.right = 268.0f;
-	this->ort.bottom = -264.0f;
-	this->ort.top = 167.0f;
-	//this->ort.nearPlane = 0.1f;
-	//this->ort.farPlane = 1500.0f;
+	this->ort.left = 280.0f;
+	this->ort.right = -284.0f;
+	this->ort.bottom = -206.0f;
+	this->ort.top = 241.0f;
+	this->ort.nearPlane = 0.1f;
+	this->ort.farPlane = 1400.0f;
 }
 
 // Moves the orthographic projection used for the depth map so that it follows the player for high res shadows
@@ -338,8 +338,8 @@ void RenderingSystem::updateOrtho(glm::mat4 lightView)
 	this->ort.right = -(p1Pos.x - 50.0f);
 	this->ort.top = p1Pos.z + 50.0f;
 	this->ort.bottom = p1Pos.z - 50.0f;;
-	//this->ort.nearPlane = 0.1f;
-	//this->ort.farPlane = 600.0f;
+	this->ort.nearPlane = 0.1f;
+	this->ort.farPlane = 1400.0f;
 }
 
 void RenderingSystem::update()
