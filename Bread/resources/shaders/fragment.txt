@@ -187,6 +187,20 @@ void main()
 	// Phong light model
 	vec3 phong = result * objectColor;
 
+	vec3 norm = normalize(ourNormal);
+	vec3 lightDir = normalize(light.position - fragPos);
+	float intensity = dot(lightDir, norm);
+
+	if (intensity > 0.9)
+		fragColor = vec4(phong, 1.0);
+	else if (intensity > 0.5)
+		fragColor = vec4(0.6 * phong, 1.0);
+	else if (intensity > 0.25)
+		fragColor = vec4(0.4 * phong, 1.0);
+	else
+		fragColor = vec4(0.2 * phong, 1.0);
+	
+
 	// Final
-	fragColor = vec4(phong, 1.0);
+	//fragColor = vec4(phong, 1.0);
 }
