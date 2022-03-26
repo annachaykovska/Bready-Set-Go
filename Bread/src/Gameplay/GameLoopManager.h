@@ -24,6 +24,7 @@ public:
 	// End game things
 	bool isGameExitSelected;
 	bool isGameEnded;
+	int endScreenGenerated;
 
 	// To give a few seconds timeout
 	float mainMenuTimeoutStart; // after starting game in main

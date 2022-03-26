@@ -279,7 +279,7 @@ int main()
 			if (!g_systems.renderDebug)
 			{
 				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame();
+				ui.updateGame(gameLoop.endScreenGenerated);
 			}
 
 			// Update the ImGUI profiler

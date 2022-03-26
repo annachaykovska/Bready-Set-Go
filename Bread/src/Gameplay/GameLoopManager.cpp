@@ -1,5 +1,7 @@
 #include "GameLoopManager.h"
 #include <glfw/glfw3.h>
+#include <stdlib.h>
+#include <time.h>
 
 GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the menu
 , menuSelectionNumber(1)
@@ -11,6 +13,7 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 , returnTimeoutStart(-1)
 , mainMenuTimeoutLength(3)
 , returnTimeoutLength(3)
+, endScreenGenerated(-1)
 {}
 
 
@@ -19,6 +22,7 @@ void GameLoopManager::resetBackToStart() {
 	isBackToMenuSelected = false;
 	isGameEnded = false;
 	returnTimeoutStart = glfwGetTime();
+	endScreenGenerated = -1;
 	return;
 }
 
@@ -36,4 +40,9 @@ void GameLoopManager::updateGameStageFromMenu() {
 
 void GameLoopManager::setEndStage() {
 	gameStage = 3;
+	if (endScreenGenerated == -1) {
+		// Add some random generation to final message 
+		srand((unsigned)time(0));
+		endScreenGenerated = rand() % 4;
+	}
 }

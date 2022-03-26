@@ -32,9 +32,9 @@ public:
 	UISystem();
 	~UISystem();
 
-	void updateGame();
+	void updateGame(int endScreenValue);
 	void updateMainMenu(int itemSelected);
-	void updateEndGame();
+	void updateEndGame(int endScreenValue);
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
@@ -90,7 +90,10 @@ private:
 	ImageTexture exitButtonPressed;
 
 	// End Game
-	ImageTexture gameOverPlayer1;
+	ImageTexture gameOverPlayer1_1;
+	ImageTexture gameOverPlayer1_2;
+	ImageTexture gameOverPlayer1_3;
+	ImageTexture gameOverPlayer1_4;
 	ImageTexture gameOverPlayer2;
 	ImageTexture gameOverPlayer3;
 	ImageTexture gameOverPlayer4;
