@@ -1085,6 +1085,13 @@
     <None Include="dependencies\include\glm\gtx\vector_query.inl" />
     <None Include="dependencies\include\glm\gtx\wrap.inl" />
     <None Include="imgui.ini" />
+    <None Include="resources\models\kitchen\drivable-cutting-board.blend" />
+    <None Include="resources\models\kitchen\drivable-cutting-board.fbx" />
+    <None Include="resources\models\kitchen\drivable-tray.blend" />
+    <None Include="resources\models\kitchen\drivable-tray.fbx" />
+    <None Include="resources\models\kitchen\kitchen.blend" />
+    <None Include="resources\models\kitchen\kitchen.blend1" />
+    <None Include="resources\models\kitchen\kitchen.mtl" />
     <None Include="src\assimp-vc142-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -1110,6 +1117,11 @@
     <ResourceCompile Include="Bread.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\models\kitchen\granite.jpg" />
+    <Image Include="resources\models\kitchen\PandaMat.png" />
+    <Image Include="resources\models\kitchen\shelf.jpg" />
+    <Image Include="resources\models\kitchen\steel.jpg" />
+    <Image Include="resources\models\kitchen\steel.png" />
     <Image Include="resources\rat.ico" />
     <Image Include="resources\textures\coolpicture.png" />
     <Image Include="resources\textures\diffuse.jpg" />
