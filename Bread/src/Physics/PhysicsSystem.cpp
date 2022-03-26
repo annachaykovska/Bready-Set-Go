@@ -36,7 +36,7 @@ PxF32 gSteerVsForwardSpeedData[2 * 10] =
 	10.0f,		0.2f,
 	20.0f,		0.6f,
 	30.0f,		1.0f,
-	40.0f,		0.6f,
+	40.0f,		0.7f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
@@ -49,14 +49,14 @@ PxVehicleKeySmoothingData gKeySmoothingData =
 {
 	{
 		10.0f,	//rise rate eANALOG_INPUT_ACCEL
-		6.0f,	//rise rate eANALOG_INPUT_BRAKE		
+		100.0f,	//rise rate eANALOG_INPUT_BRAKE		
 		6.0f,	//rise rate eANALOG_INPUT_HANDBRAKE	
 		2.5f,	//rise rate eANALOG_INPUT_STEER_LEFT
 		2.5f,	//rise rate eANALOG_INPUT_STEER_RIGHT
 	},
 	{
 		10.0f,	//fall rate eANALOG_INPUT_ACCEL
-		10.0f,	//fall rate eANALOG_INPUT_BRAKE		
+		100.0f,	//fall rate eANALOG_INPUT_BRAKE		
 		10.0f,	//fall rate eANALOG_INPUT_HANDBRAKE	
 		5.0f,	//fall rate eANALOG_INPUT_STEER_LEFT
 		5.0f	//fall rate eANALOG_INPUT_STEER_RIGHT
@@ -400,7 +400,7 @@ PhysicsSystem::PhysicsSystem() :
 	, wheel_moi(100.f)//wheel_moi(1440.f)
 	, chassis_moi_y(0.25f)
 	, max_brake_torque(100000.f)
-	, max_hand_brake_torque(50000.f)
+	, max_hand_brake_torque(15000.f)
 	, camber_at_rest(0.2f)
 	, spring_strength(100.f)
 	, max_compression(1.f)
