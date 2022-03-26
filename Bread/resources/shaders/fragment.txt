@@ -56,6 +56,9 @@ uniform Light light;
 
 in vec4 playerFragPos;
 
+in vec3 textureDir;
+uniform samplerCube cubeMap;
+
 float shadows(vec3 norm, vec3 lightDir)
 {
 

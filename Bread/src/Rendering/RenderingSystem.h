@@ -72,6 +72,7 @@ private:
 	Shader simpleShader;
 	Shader depthShader;
 	Shader debugShader;
+	Shader skyboxShader;
 
 	std::vector<Model> models;
 
@@ -87,6 +88,9 @@ private:
 	unsigned int depthMapFBO;
 	unsigned int dpethMapVAO;
 
-	unsigned int cascadeFBO;
-	unsigned int cascadeMaps[3];
+	unsigned int cubeMap;
+	unsigned int skyboxVAO;
+	unsigned int skyboxVBO;
+
+	void drawSkybox();
 };

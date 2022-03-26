@@ -1035,5 +1035,7 @@
     <Text Include="resources\shaders\debugVertex.txt" />
     <Text Include="resources\shaders\depthFragment.txt" />
     <Text Include="resources\shaders\depthVertex.txt" />
+    <Text Include="resources\shaders\skyboxVertex.txt" />
+    <Text Include="resources\shaders\skyboxFragment.txt" />
   </ItemGroup>
 </Project>

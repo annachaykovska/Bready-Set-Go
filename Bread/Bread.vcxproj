@@ -1100,6 +1100,8 @@
     <Text Include="resources\shaders\lightSourceVertex.txt" />
     <Text Include="resources\shaders\simpleFragment.txt" />
     <Text Include="resources\shaders\simpleVertex.txt" />
+    <Text Include="resources\shaders\skyboxFragment.txt" />
+    <Text Include="resources\shaders\skyboxVertex.txt" />
     <Text Include="resources\shaders\textFragment.txt" />
     <Text Include="resources\shaders\textVertex.txt" />
     <Text Include="resources\shaders\vertex.txt" />
