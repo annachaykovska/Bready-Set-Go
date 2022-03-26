@@ -55,6 +55,7 @@ private:
 	IngredientTracker* tracker;
 
 	ImageTexture speedometer;
+	float speedometer_theta;
 	ImageTexture needle;
 	ImageTexture miniMap;
 	ImageTexture inventory;

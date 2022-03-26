@@ -36,6 +36,8 @@ public:
 	float getTurnDirectionalInfluence();
 
 	float getPlayerSpeed(int playerNumber);
+	bool getIsVehicleInAir(int playerNumber);
+
 	void respawnPlayer(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
@@ -71,10 +73,18 @@ public:
 	void updateEngine();
 
 	float chassis_mass;
+	float chassis_moi_y;
+
 	float wheel_mass;
 	float wheel_moi;
+	float wheel_damping_rate;
+	float max_hand_brake_torque;
+
+	float camber_at_rest;
+	float spring_strength;
+
 	//float chassis_moi[3];
-	float chassis_moi_y;
+
 	float peak_torque;
 	float max_omega;
 	float max_brake_torque;

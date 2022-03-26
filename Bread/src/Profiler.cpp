@@ -244,8 +244,6 @@ void Profiler::meshScale()
 }
 
 void Profiler::physicsValues() {
-	float testList[3];
-	float testFloat;
 	PhysicsSystem* physSys = g_systems.physics;
 	//physSys->mVehiclePlayer1
 	//std::cout << physSys->chassis_mass << std::endl;
@@ -254,6 +252,11 @@ void Profiler::physicsValues() {
 		//ImGui::InputFloat("Chassis Mass", &(physSys->chassis_mass), 10.f, 100.f, "%.3f");	// Chassis Mass
 		ImGui::InputFloat("Wheel Mass", &(physSys->wheel_mass), 10.f, 100.f, "%.3f");		// WheelMass
 		ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");			// WheelMOI
+		ImGui::InputFloat("Damping Rate", &(physSys->wheel_damping_rate), 10.f, 100.f, "%.3f");	// Damping Rate
+		ImGui::InputFloat("Max hand brake torque", &(physSys->max_hand_brake_torque), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 10.f, 100.f, "%.3f");	// Damping Rate
+		
+		ImGui::InputFloat("Camber at rest", &(physSys->camber_at_rest), 3.14/60.f, 3.14f/6.f, "%.3f");
 
 		//ImGui::InputFloat3("Chassis MOI", physSys->chassis_moi, "%.3f");					// Chassis MOI
 		ImGui::InputFloat("Chassis MOI y", &(physSys->chassis_moi_y), 0.01f, 0.1f, "%.3f");	// Chassis MOI y
@@ -273,11 +276,23 @@ void Profiler::physicsValues() {
 	}
 }
 
+void Profiler::cameraValues() {
+	auto camera = g_scene.camera;
+	if (ImGui::CollapsingHeader("Camera Values")) {
+		//FIXME: THESE DOESNT CHANGE THE VALUES
+		ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
+		ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
+	}
+}
+
 void Profiler::update()
 {
 	begin();
 	fps();
 	player1Inventory();
+	//cameraValues(); //doesn't really work rn I DONT KNOW WHY
 	physicsValues();
 	player1Transform();
 	player2Transform();

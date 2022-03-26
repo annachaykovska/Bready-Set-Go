@@ -191,11 +191,6 @@ int main()
 	//p4Audio->loop = true;
 	//p4Audio->play("idle.wav");
 
-	// Track time
-	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0, accumulator = 0;
-	float frameBeginTime = 0, frameEndTime = 0; 
-	float fixedTimeInterval = 0, shortTimeInterval = 1.0f / 120.0f, longTimeInterval = 1.0f / 60.0f;
-
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
@@ -227,18 +222,33 @@ int main()
 	player4->attachComponent(&p4Inv, "inventory");
 
 
+	// Track time
+	double t = 0.0;
+	const double dt = 1.0/120.0;
+	double currentTime = glfwGetTime();
+	double accumulator = 0.0;
+
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
 	{
-		frameBeginTime = glfwGetTime();
+		double newTime = glfwGetTime();
+		double frameTime = newTime - currentTime;
+		currentTime = newTime;
+
+		accumulator += frameTime;
 
 		// INPUT
 		glfwPollEvents();
 		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
 		controllers.checkControllers(); // sets analog/digital
 
-		// SIMULATE
-		g_systems.physics->update(deltaTime);
+		while (accumulator >= dt)
+		{
+			// SIMULATE
+			g_systems.physics->update(dt);
+			accumulator -= dt;
+			t += dt;
+		}
 
 		// WINDOW
 		window.clear();
@@ -312,7 +322,6 @@ int main()
 		else if (gameLoop.isBackToMenuSelected) {
 			gameLoop.resetBackToStart();
 		}
-		
 	}
 
 	// Collect garbage
