@@ -20,6 +20,8 @@
 #include "../Scene/Entity.h"
 #include <Windows.h>
 
+#define PI 3.14159f
+
 using namespace snippetvehicle;
 using namespace physx;
 
@@ -28,16 +30,18 @@ extern SystemManager g_systems;
 
 CollisionCallback gCollisionCallback;
 
-PxF32 gSteerVsForwardSpeedData[2 * 8] =
+PxF32 gSteerVsForwardSpeedData[2 * 10] =
 {
-	0.0f,		0.2f,
-	5.0f,		0.6f,
-	30.0f,		0.8f,
-	120.0f,		1.f,
+	0.0f,		0.0f,
+	10.0f,		0.2f,
+	20.0f,		0.6f,
+	30.0f,		1.0f,
+	40.0f,		0.6f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
-	PX_MAX_F32, PX_MAX_F32
+	PX_MAX_F32, PX_MAX_F32,
+	PX_MAX_F32, PX_MAX_F32,
 };
 PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4);
 
@@ -188,27 +192,27 @@ void PhysicsSystem::updateCar() {
 			wheelData.mMaxBrakeTorque = max_brake_torque;
 			wheelData.mToeAngle = 0.f;
 			wheelData.mDampingRate = wheel_damping_rate;
-
+			
 			// Suspension
-			suspData.mSpringStrength = spring_strength;
-			suspData.mMaxCompression = max_compression;
+			//suspData.mSpringStrength = spring_strength;
+			//suspData.mMaxCompression = max_compression;
 
 			// Properties dependent on position
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear changes
 				wheelData.mMaxHandBrakeTorque = max_hand_brake_torque;
 			}
 			else { // Front changes
-
+				wheelData.mMaxSteer = max_steer;
 			}
 
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eFRONT_LEFT) { // Left changes
-				suspData.mCamberAtRest = camber_at_rest;
+				//suspData.mCamberAtRest = camber_at_rest;
 			}
 			else { // right changes
-				suspData.mCamberAtRest = -camber_at_rest;
+				//suspData.mCamberAtRest = -camber_at_rest;
 			}
 			// Updating
-			cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
+			//cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
 			cars[car]->mWheelsSimData.setSuspensionData(wheel, suspData);
 			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
 		}
@@ -223,17 +227,6 @@ void PhysicsSystem::updateCar() {
 		// Update chassis
 		//PxVehicleChassisData gaming = cars[car]->
 	}
-}
-
-void PhysicsSystem::updateEngine() {
-	PxVehicleEngineData engine;
-	engine.mPeakTorque = peak_torque;
-	engine.mMaxOmega = max_omega;//approx 6000 rpm
-
-	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 }
 
 void PhysicsSystem::initializeActors() {
@@ -281,8 +274,6 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer2 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
-
-	updateEngine();
 
 	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
@@ -399,6 +390,7 @@ void PhysicsSystem::initializeActors() {
 	this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
+// Constructor
 PhysicsSystem::PhysicsSystem() :
 	chassis_mass(400.f)
 	, peak_torque(100000.f)
@@ -412,6 +404,7 @@ PhysicsSystem::PhysicsSystem() :
 	, camber_at_rest(0.2f)
 	, spring_strength(100.f)
 	, max_compression(1.f)
+	, max_steer(PI/2.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);

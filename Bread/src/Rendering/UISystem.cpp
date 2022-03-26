@@ -163,7 +163,7 @@ void UISystem::updateGame() {
 
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
-    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
+    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
     speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
     renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
