@@ -145,7 +145,7 @@ void Mesh::draw(Shader &shader)
 	glUniform3f(lightDirLoc, lightDir.x, lightDir.y, lightDir.z);
 
 	unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
-	glUniform3f(aIntensityLoc, 0.5f, 0.5f, 0.5f);
+	glUniform3f(aIntensityLoc, 0.3f, 0.3f, 0.3f);
 
 	unsigned int dIntensityLoc = glGetUniformLocation(shader.getId(), "light.diffuse");
 	glUniform3f(dIntensityLoc, 1.0f, 1.0f, 1.0f);
