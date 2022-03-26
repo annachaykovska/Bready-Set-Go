@@ -221,12 +221,13 @@ int main()
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
-
 	// Track time
 	double t = 0.0;
 	const double dt = 1.0/120.0;
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
+
+	gameLoop.gameStage = 2;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)

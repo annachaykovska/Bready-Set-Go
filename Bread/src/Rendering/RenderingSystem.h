@@ -35,16 +35,27 @@ public:
 	void renderTexturedQuad();
 	void renderDebugShadowMap();
 
-	void updateOrtho();
+	void updateOrtho(glm::mat4 lightView);
+	void updateRoughOrtho();
+	glm::mat4 calculateOrthoProjection();
 
 	Orthogonal ort;
 	glm::vec3 lightPos;
 	glm::vec3 lightDir;
-	float shadowWidth;
-	float shadowHeight;
+	float shadowHiRes;
+	float shadowLoRes;
+
+	int shadowDebugMode;
 
 	unsigned int depthMapTex;
 
+	float maxBias;
+	float minBias;
+	float maxRoughBias;
+	float minRoughBias;
+
+	glm::mat4 projMatrix;
+	glm::mat4 viewMatrix;
 
 private:
 
@@ -61,6 +72,7 @@ private:
 	Shader simpleShader;
 	Shader depthShader;
 	Shader debugShader;
+	Shader skyboxShader;
 
 	std::vector<Model> models;
 
@@ -70,9 +82,15 @@ private:
 	unsigned int quadVAO;
 	unsigned int quadVBO;
 
+	unsigned int roughDepthMapTex;
+	unsigned int roughDepthMapFBO;
+	unsigned int roughDepthMapVAO;
 	unsigned int depthMapFBO;
 	unsigned int dpethMapVAO;
 
-	int screenWidth;
-	int screenHeight;
+	unsigned int cubeMap;
+	unsigned int skyboxVAO;
+	unsigned int skyboxVBO;
+
+	void drawSkybox();
 };

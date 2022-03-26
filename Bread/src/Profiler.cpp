@@ -201,7 +201,7 @@ void Profiler::shadows()
 	Orthogonal& ort = g_systems.render->ort;
 	glm::vec3& lightDir = g_systems.render->lightDir;
 	glm::vec3& lightPos = g_systems.render->lightPos;
-
+	
 	if (ImGui::CollapsingHeader("Shadows"))
 	{
 		ImGui::InputInt("DepthMap Render", &depthMap);
@@ -209,7 +209,15 @@ void Profiler::shadows()
 		if (depthMap == 0)
 			g_systems.renderDebug = false;
 		if (depthMap == 1)
+		{
 			g_systems.renderDebug = true;
+			g_systems.render->shadowDebugMode = 1;
+		}
+		if (depthMap == 2)
+		{
+			g_systems.renderDebug = true;
+			g_systems.render->shadowDebugMode = 2;
+		}
 
 		ImGui::InputFloat("orthoProj.left", &(ort.left), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.right", &(ort.right), 1.f, 10.f, "%.3f");
@@ -218,13 +226,17 @@ void Profiler::shadows()
 		ImGui::InputFloat("orthoProj.near", &(ort.nearPlane), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.far", &(ort.farPlane), 1.f, 10.f, "%.3f");
 
-		ImGui::InputFloat("lightDir.x", &(lightDir.x), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("lightDir.y", &(lightDir.y), 1.f, 10.f, "%.3f");
-		ImGui::InputFloat("lightDir.z", &(lightDir.z), 1.f, 10.f, "%.3f");
-
 		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
+		
+		//float& maxBias = g_systems.render->maxBias;
+
+		//ImGui::InputFloat("maxBias", &(maxBias), 0.0001f, 0.01f,  "%.5f");
+		//ImGui::InputFloat("maxBias", &(g_systems.render->maxBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("minBias", &(g_systems.render->minBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("maxRoughBias", &(g_systems.render->maxRoughBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("minRoughBias", &(g_systems.render->minRoughBias), 0.0001f, 0.01f, "%.5f");
 	}
 }
 
@@ -287,10 +299,10 @@ void Profiler::cameraValues() {
 	auto camera = g_scene.camera;
 	if (ImGui::CollapsingHeader("Camera Values")) {
 		//FIXME: THESE DOESNT CHANGE THE VALUES
-		ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
 	}
 }
 
