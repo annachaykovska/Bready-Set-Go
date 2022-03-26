@@ -16,17 +16,21 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
 									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt")
 {
+	// Initialize matrices
+	this->projMatrix = glm::mat4(1.0f);
+	this->viewMatrix = glm::mat4(1.0f);
+
 	// Orthographic projection for shadow map settings
 	this->ort.left = 281.0f;
 	this->ort.right = -279.0f;
 	this->ort.bottom = -205.0f;
 	this->ort.top = 197.0f;
 	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 600.0f;
+	this->ort.farPlane = 2000.0f;
 
 	// Directional light position
-	this->lightPos = glm::vec3(50.0f, 200.0f, 200.0f);
-	//this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
+	this->lightPos = glm::vec3(-0.1f, 1000.0f, -200.0f);
+	this->lightDir = glm::normalize(glm::vec3(0) - this->lightPos);
 
 	// Shadow map viewport size
 	this->shadowHiRes = 4096;
@@ -78,7 +82,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	// Attach depth texture as FBO's depth buffer
@@ -100,9 +104,10 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes, this->shadowHiRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor2[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor2);
 
 	// Attach depth texture as FBO's depth buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
@@ -136,6 +141,31 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenFramebuffers(1, &this->cascadeFBO);
+	glGenTextures(3, this->cascadeMaps);
+
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, this->cascadeMaps[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, this->shadowLoRes, this->shadowLoRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, this->cascadeFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->cascadeMaps[0], 0);
+
+	// Disable write to color buffer
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER NOT COMPLETE\n";
 }
 
 RenderingSystem::~RenderingSystem() { }
@@ -260,8 +290,8 @@ void RenderingSystem::loadModels()
 void RenderingSystem::setupCameras(Transform* player1Transform)
 {
 	// Get view matrix from Camera and update the Shader
-	glm::mat4 view = g_scene.camera.getViewMatrix(player1Transform);
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	this->viewMatrix = g_scene.camera.getViewMatrix(player1Transform);
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
 
 	// Tell shader about camera position
 	unsigned int viewPosLoc = glGetUniformLocation(getShaderId(), "viewPos");
@@ -269,42 +299,47 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
 	// Projection matrix will be handled by the Camera class in the future
-	glm::mat4 proj = glm::mat4(1.0f);
+	this->projMatrix = glm::mat4(1.0f);
 	float screenWidth = g_systems.width;
 	float screenHeight = g_systems.height;
 
-	proj = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
-	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+	this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
 }
 
 // Orthographic projection for the depth map that shows the entire level layout for rough shadows at a distance
 void RenderingSystem::updateRoughOrtho()
 {
-	this->ort.left = 310.0f;
-	this->ort.right = -268.0f;
+	this->ort.left = -310.0f;
+	this->ort.right = 268.0f;
 	this->ort.bottom = -264.0f;
 	this->ort.top = 167.0f;
-	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 800.0f;
+	//this->ort.nearPlane = 0.1f;
+	//this->ort.farPlane = 1500.0f;
 }
 
 // Moves the orthographic projection used for the depth map so that it follows the player for high res shadows
-void RenderingSystem::updateOrtho()
+void RenderingSystem::updateOrtho(glm::mat4 lightView)
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
+	glm::mat4 p1ModelMatrix = g_scene.getEntity("player1")->getTransform()->getModelMatrix();
 
-	if (p1Pos.x > 0)
-	{
-		this->ort.left = 0.9f * p1Pos.x + 75.0f;
-		this->ort.right = 0.9f * p1Pos.x - 75.0f;
-	}
-	else
-	{
-		this->ort.left = 1.1f * p1Pos.x + 75.0f;
-		this->ort.left = 0.75f * p1Pos.x + 75.0f;
-	}
-	this->ort.bottom = -0.5f * p1Pos.z - 75.0f;
-	this->ort.top = -0.5f * p1Pos.z + 75.0f;
+	glm::vec4 left = glm::vec4(p1Pos.x + 50.0f, p1Pos.y, p1Pos.z, 1.0f);
+	glm::vec4 right = glm::vec4(p1Pos.x - 50.0f, p1Pos.y, p1Pos.z, 1.0f);
+	glm::vec4 top = glm::vec4(p1Pos.x, p1Pos.y, p1Pos.z + 50.0f, 1.0f);
+	glm::vec4 bottom = glm::vec4(p1Pos.x, p1Pos.y, p1Pos.z + 50.0f, 1.0f);
+
+	left = lightView * left;
+	right = lightView * right;
+	top = lightView * top;
+	bottom = lightView * bottom;
+
+	this->ort.left = -(p1Pos.x + 50.0f);
+	this->ort.right = -(p1Pos.x - 50.0f);
+	this->ort.top = p1Pos.z + 50.0f;
+	this->ort.bottom = p1Pos.z - 50.0f;;
+	//this->ort.nearPlane = 0.1f;
+	//this->ort.farPlane = 600.0f;
 }
 
 void RenderingSystem::update()
@@ -329,9 +364,9 @@ void RenderingSystem::update()
 
 	// High res shadows --------------------------------------------------------------
 	// Render depthMap to texture (from light's perspective)
-	updateOrtho();
-	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
 	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	updateOrtho(lightView);
+	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
 	lightSpaceMatrix = lightProjection * lightView;
 
 	depthShader.use();
@@ -466,4 +501,76 @@ void RenderingSystem::renderTexturedQuad()
 	glBindVertexArray(this->quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+glm::mat4 RenderingSystem::calculateOrthoProjection()
+{
+	// Get the inverse of the view transform
+	glm::mat4 inverseMatrix = glm::inverse(this->projMatrix * this->viewMatrix);
+
+	// Get the frustum corners in world space coordinates
+	std::vector<glm::vec4> corners;
+	for (unsigned int x = 0; x < 2; x++)
+	{
+		for (unsigned int y = 0; y < 2; y++)
+		{
+			for (unsigned int z = 0; z < 2; z++)
+			{
+				glm::vec4 point = inverseMatrix * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+				corners.push_back(point / point.w); // Why?
+			}
+		}
+	}
+
+	// Find the center point of the regular camer'a frustum
+	glm::vec3 center = glm::vec3(0);
+	for (auto& v : corners)
+	{
+		v /= 5.0;
+		center += glm::vec3(v);
+	}
+
+	center /= corners.size();
+
+	// Calculate the light's view matrix
+	glm::mat4 lightView = glm::lookAt(center + this->lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// Transform frustum corner points to light space
+	float minX = std::numeric_limits<float>::max();
+	float maxX = std::numeric_limits<float>::min();
+	float minY = std::numeric_limits<float>::max();
+	float maxY = std::numeric_limits<float>::min();
+	float minZ = std::numeric_limits<float>::max();
+	float maxZ = std::numeric_limits<float>::min();
+	
+	for (auto& v : corners)
+	{
+		glm::vec4 transformed = lightView * v;
+		minX = std::min(minX, transformed.x);
+		maxX = std::min(maxX, transformed.x);
+		minY = std::min(minY, transformed.y);
+		maxY = std::min(maxY, transformed.y);
+		minZ = std::min(minZ, transformed.z);
+		maxZ = std::min(maxZ, transformed.z);
+	}
+
+	// Stretch near and far planes
+	float zMult = 10.0f;
+	if (minZ < 0)
+		minZ *= zMult;
+	else
+		minZ /= zMult;
+	if (maxZ < 0)
+		maxZ /= zMult;
+	else
+		maxZ *= zMult;
+
+	this->ort.left = maxX;
+	this->ort.right = minX;
+	this->ort.top = maxY;
+	this->ort.bottom = minY;
+	this->ort.nearPlane = minZ;
+	this->ort.farPlane = maxZ;
+
+	return glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
 }

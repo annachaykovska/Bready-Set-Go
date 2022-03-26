@@ -35,8 +35,9 @@ public:
 	void renderTexturedQuad();
 	void renderDebugShadowMap();
 
-	void updateOrtho();
+	void updateOrtho(glm::mat4 lightView);
 	void updateRoughOrtho();
+	glm::mat4 calculateOrthoProjection();
 
 	Orthogonal ort;
 	glm::vec3 lightPos;
@@ -52,6 +53,9 @@ public:
 	float minBias;
 	float maxRoughBias;
 	float minRoughBias;
+
+	glm::mat4 projMatrix;
+	glm::mat4 viewMatrix;
 
 private:
 
@@ -82,4 +86,7 @@ private:
 	unsigned int roughDepthMapVAO;
 	unsigned int depthMapFBO;
 	unsigned int dpethMapVAO;
+
+	unsigned int cascadeFBO;
+	unsigned int cascadeMaps[3];
 };
