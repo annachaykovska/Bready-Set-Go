@@ -5,9 +5,10 @@
 
 using namespace std;
 
-XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem) : forwards(true), menuItemSelected(false), menuSelection(1) {
+XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem, GameLoopManager* gameLoopManager) : forwards(true) {
 	this->physics = physicsSystem;
 	this->ui = uiSystem;
+	this->gameLoop = gameLoopManager;
 }
 
 void XboxController::checkControllers() {
@@ -95,25 +96,28 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 	// A button
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
 
-	if (A_button_pressed) {
-		menuItemSelected = true;
+	float newTime = glfwGetTime();
+	if (newTime - gameLoop->returnTimeoutStart > gameLoop->returnTimeoutLength) {
+		gameLoop->returnTimeoutStart = -1;
+		if (A_button_pressed) {
+			gameLoop->isMenuItemSelected = true; 
+		}
 	}
 
 	if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
-		if (menuSelection == 2) {
-			menuSelection = 1;
+		if (gameLoop->menuSelectionNumber == 2) {
+			gameLoop->menuSelectionNumber = 1;
 		}
 		
 	}
 	else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
-		if (menuSelection == 1) {
-			menuSelection = 2;
+		if (gameLoop->menuSelectionNumber == 1) {
+			gameLoop->menuSelectionNumber = 2;
 		}
 	}
-	printf("menu: %d\n", menuSelection);
 }
 
-void XboxController::setButtonStateFromControllerDriving(int controllerId) {
+void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted) {
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
 	if (controllerId == 1)
@@ -146,6 +150,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 
 	// Other buttons
 	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // UNUSED FOR NOW
+	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 
 	if (X_button_pressed)
@@ -155,6 +160,15 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 	else
 	{
 		input->setAnalogHandbrake(0.0f);
+	}
+
+	// Accept exit conditions back to the menu
+	float currentTime = glfwGetTime();
+	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
+		if (A_button_pressed && gameCompleted) {
+			gameLoop->isBackToMenuSelected = true;
+		}
 	}
 
 	// Respawn player

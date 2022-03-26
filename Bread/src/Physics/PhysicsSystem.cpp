@@ -566,7 +566,7 @@ float PhysicsSystem::getTurnDirectionalInfluence()
 	return turnDirectionalInfluence;
 }
 
-void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep) {
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
 		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
@@ -586,38 +586,39 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
-
-	if (player1->verifyPlayerCollision) {
-		if (player1->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player1->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
-		else if (player1->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player2->verifyPlayerCollision) {
-		if (player2->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player2->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
-		else if (player2->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player3->verifyPlayerCollision) {
-		if (player3->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player3->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player3->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player4->verifyPlayerCollision) {
-		if (player4->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player4->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player4->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+	if (gameStage != 3) {
+		if (player1->verifyPlayerCollision) {
+			if (player1->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player1->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
+			else if (player1->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player2->verifyPlayerCollision) {
+			if (player2->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player2->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
+			else if (player2->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player3->verifyPlayerCollision) {
+			if (player3->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player3->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player3->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player4->verifyPlayerCollision) {
+			if (player4->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player4->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player4->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+		}
 	}
 
 	// Vehicle update
@@ -688,7 +689,7 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	playerTransform->update(player->getRigidDynamicActor()->getGlobalPose());
 }
 
-void PhysicsSystem::update(const float dt)
+void PhysicsSystem::update(const float dt, int gameStage)
 {
 	// Only update if more than 1/120th of a second has passed since last update
 	// Making the constant much larger than 1/120th causes a significant jitter
@@ -728,10 +729,10 @@ void PhysicsSystem::update(const float dt)
 	this->mScene->fetchResults(true);
 
 	// Update the players
-	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep);
-	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
-	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
-	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
+	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep, gameStage);
 
 	// Update kitchen position
 	g_scene.getEntity("countertop")->getTransform()->update(kitchen->getGlobalPose());

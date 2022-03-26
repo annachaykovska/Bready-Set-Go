@@ -10,6 +10,7 @@
 #include "../Scene/Scene.h"
 #include "PhysicsSystem.h"
 #include "../Rendering/UISystem.h"
+#include "../Gameplay/GameLoopManager.h"
 
 #pragma comment(lib, "Xinput.lib") 
 #pragma comment(lib, "Xinput9_1_0.lib")
@@ -19,19 +20,17 @@ extern Scene g_scene;
 
 class XboxController {
 public:
-	XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem);
+	XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem, GameLoopManager* gameLoopManager);
 	void checkControllers();
-	void setButtonStateFromControllerDriving(int controllerId);
+	void setButtonStateFromControllerDriving(int controllerId, bool gameEnded);
 	void setButtonStateFromControllerMainMenu(int controllerId);
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
 
-	int menuSelection;
-	bool menuItemSelected;
-
 private:
 	PhysicsSystem* physics;
 	UISystem* ui;
+	GameLoopManager* gameLoop;
 	bool forwards;
 };
 

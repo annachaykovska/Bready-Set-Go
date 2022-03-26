@@ -25,8 +25,8 @@ public:
 	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 	PxRigidDynamic* createObstacle(const PxTransform& t, PxReal halfExtent, std::string name);
-	void update(const float timestep);
-	void updateVehicle(PxVehicleDrive4W *player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep);
+	void update(const float timestep, int gameStage);
+	void updateVehicle(PxVehicleDrive4W *player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage);
 	void updateFoodTransforms();
 	void setAnalogInputs(bool input);
 
