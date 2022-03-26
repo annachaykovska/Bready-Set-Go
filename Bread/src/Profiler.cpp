@@ -251,9 +251,9 @@ void Profiler::physicsValues() {
 		if (ImGui::Button("Reload", ImVec2(100, 30))) {	// Restarts game
 			g_systems.physics->updateCar();
 		}
-		if (ImGui::Button("Reload but Harder", ImVec2(300, 30))) {
-			g_systems.physics->initialize();
-		}
+		//if (ImGui::Button("Reload but Harder", ImVec2(300, 30))) {
+		//	g_systems.physics->initialize();
+		//}
 		if (ImGui::CollapsingHeader("Wheels")) {
 			ImGui::InputFloat("Wheel Mass", &(physSys->wheel_mass), 10.f, 100.f, "%.3f");		// WheelMass
 			ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");			// WheelMOI
@@ -263,8 +263,9 @@ void Profiler::physicsValues() {
 			ImGui::InputFloat("Max Brake Torque", &(physSys->max_brake_torque), 10.f, 100.f, "%.3f");	
 		}
 		if (ImGui::CollapsingHeader("Suspension")) {
-			ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 10.f, 100.f, "%.3f");
-			ImGui::InputFloat("Max Compression", &(physSys->max_compression), 10.f, 100.f, "%.3f");
+			ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 100.f, 1000.f, "%.3f");
+			ImGui::InputFloat("Max Compression", &(physSys->max_compression), .01f, .1f, "%.3f");
+			ImGui::InputFloat("Max Droop", &(physSys->max_droop), 0.01f, .1f, "%.3f");
 			//ImGui::InputFloat("Spring Min", &(physSys->spring_strength), 10.f, 100.f, "%.3f");
 
 
@@ -297,7 +298,7 @@ void Profiler::update()
 {
 	begin();
 	fps();
-	player1Inventory();
+	//player1Inventory();
 	//cameraValues(); //doesn't really work rn I DONT KNOW WHY
 	physicsValues();
 	player1Transform();

@@ -83,6 +83,7 @@ public:
 	float camber_at_rest;
 	float spring_strength;
 	float max_compression;
+	float max_droop;
 
 	//float chassis_moi[3];
 

@@ -194,8 +194,9 @@ void PhysicsSystem::updateCar() {
 			wheelData.mDampingRate = wheel_damping_rate;
 			
 			// Suspension
-			//suspData.mSpringStrength = spring_strength;
-			//suspData.mMaxCompression = max_compression;
+			suspData.mSpringStrength = spring_strength;
+			suspData.mMaxCompression = max_compression;
+			suspData.mMaxDroop = max_droop;
 
 			// Properties dependent on position
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear changes
@@ -206,10 +207,10 @@ void PhysicsSystem::updateCar() {
 			}
 
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eFRONT_LEFT) { // Left changes
-				//suspData.mCamberAtRest = camber_at_rest;
+				suspData.mCamberAtRest = camber_at_rest;
 			}
 			else { // right changes
-				//suspData.mCamberAtRest = -camber_at_rest;
+				suspData.mCamberAtRest = -camber_at_rest;
 			}
 			// Updating
 			//cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
@@ -397,13 +398,14 @@ PhysicsSystem::PhysicsSystem() :
 	, max_omega(1000.f)
 	, wheel_mass(800.f)
 	, wheel_damping_rate(20.f)
-	, wheel_moi(100.f)//wheel_moi(1440.f)
+	, wheel_moi(100.f)
 	, chassis_moi_y(0.25f)
 	, max_brake_torque(100000.f)
 	, max_hand_brake_torque(15000.f)
 	, camber_at_rest(0.2f)
-	, spring_strength(100.f)
-	, max_compression(1.f)
+	, spring_strength(35000.f)
+	, max_compression(.5f)
+	, max_droop(0.1f)
 	, max_steer(PI/2.f)
 {
 	// Foundation
