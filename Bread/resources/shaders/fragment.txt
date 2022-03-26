@@ -191,14 +191,12 @@ void main()
 	vec3 lightDir = normalize(light.position - fragPos);
 	float intensity = dot(lightDir, norm);
 
-	if (intensity > 0.9)
+	if (intensity > 0.66)
 		fragColor = vec4(phong, 1.0);
-	else if (intensity > 0.5)
-		fragColor = vec4(0.6 * phong, 1.0);
-	else if (intensity > 0.25)
-		fragColor = vec4(0.4 * phong, 1.0);
+	else if (intensity > 0.33)
+		fragColor = vec4(0.9 * phong, 1.0);
 	else
-		fragColor = vec4(0.2 * phong, 1.0);
+		fragColor = vec4(0.8 * phong, 1.0);
 	
 
 	// Final
