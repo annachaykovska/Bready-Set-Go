@@ -199,8 +199,11 @@ int main()
 	IngredientTracker ingredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
 	ui.initIngredientTracking(&ingredientTracker);
 
+	// Set up game loop manager
+	GameLoopManager gameLoop = GameLoopManager();
+
 	// Set up controller inputs
-	XboxController controllers = XboxController(&physics, &ui);
+	XboxController controllers = XboxController(&physics, &ui, &gameLoop);
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
@@ -218,9 +221,6 @@ int main()
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
-	// 1 = main menu, 2 = play
-	int gameStage = 1;
-	bool gameExit = false;
 
 	// Track time
 	double t = 0.0;
@@ -229,7 +229,7 @@ int main()
 	double accumulator = 0.0;
 
 	// GAME LOOP
-	while (!window.shouldClose() && !gameExit)
+	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
 	{
 		double newTime = glfwGetTime();
 		double frameTime = newTime - currentTime;
@@ -245,7 +245,7 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			g_systems.physics->update(dt);
+			g_systems.physics->update(dt, gameLoop.gameStage);
 			accumulator -= dt;
 			t += dt;
 		}
@@ -253,20 +253,22 @@ int main()
 		// WINDOW
 		window.clear();
 
-		if (gameStage == 1) 
-		{
+		if (gameLoop.gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
 			
 			// RENDER
-			ui.updateMainMenu(controllers.menuSelection);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber);
 			window.swapBuffer();
 		}
-		else if (gameStage == 2) 
-		{
-			controllers.setButtonStateFromControllerDriving(0); // Getting the input from player 1 controller
+		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			int winner = ui.checkForWin();
+			if (winner != 0) {
+				gameLoop.setEndStage();
+			}
+			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
@@ -277,7 +279,7 @@ int main()
 			if (!g_systems.renderDebug)
 			{
 				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame();
+				ui.updateGame(gameLoop.endScreenGenerated);
 			}
 
 			// Update the ImGUI profiler
@@ -294,14 +296,18 @@ int main()
 			audio.update();
 		}
 
-		// Update game stage
-		if (controllers.menuItemSelected) { 
-			if (controllers.menuSelection == 1) {// start game selected
-				gameStage = 2;
-			}
-			else if (controllers.menuSelection == 2) { // exit
-				gameExit = true;
-			}
+		if (ui.checkForWin() != 0) {
+			gameLoop.isGameEnded = true;
+		}
+
+		// UPDATE GAME STAGE
+		if (gameLoop.isMenuItemSelected) {
+			gameLoop.updateGameStageFromMenu();
+		}
+
+		// RESET game if end of game and menu selected
+		else if (gameLoop.isBackToMenuSelected) {
+			gameLoop.resetBackToStart();
 		}
 	}
 
