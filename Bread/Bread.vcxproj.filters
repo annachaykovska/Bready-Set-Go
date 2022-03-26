@@ -48,6 +48,7 @@
     <ClCompile Include="src\Navigation\IngredientTracker.cpp" />
     <ClCompile Include="src\Navigation\NavigationSystem.cpp" />
     <ClCompile Include="src\Rendering\DebugOverlay.cpp" />
+    <ClCompile Include="src\Gameplay\GameLoopManager.cpp" />
     <ClCompile Include="src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -788,6 +789,7 @@
     <ClInclude Include="src\Navigation\IngredientTracker.h" />
     <ClInclude Include="src\Navigation\NavigationSystem.h" />
     <ClInclude Include="src\Rendering\DebugOverlay.h" />
+    <ClInclude Include="src\Gameplay\GameLoopManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />

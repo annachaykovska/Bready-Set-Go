@@ -38,12 +38,20 @@ UISystem::UISystem()
     , p2Location(glm::vec2(0))
     , p3Location(glm::vec2(0))
     , p4Location(glm::vec2(0))
-    , mainMenuBackground("resources/textures/main_menu_7.png", GL_NEAREST)
+    , mainMenuBackground("resources/textures/main_menu_8.png", GL_NEAREST)
     , startGameButtonNormal("resources/textures/button_start_game_2.png", GL_NEAREST)
     , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
     , speedometer_theta(MIN_SPEED_THETA)
+    , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
+    , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
+    , gameOverPlayer1_3("resources/textures/game_over_screen_player_1_3.png", GL_NEAREST)
+    , gameOverPlayer1_4("resources/textures/game_over_screen_player_1_4.png", GL_NEAREST)
+    , gameOverPlayer2("resources/textures/game_over_screen_player_2.png", GL_NEAREST)
+    , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
+    , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
+    , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -151,13 +159,38 @@ void UISystem::updateMainMenu(int itemSelected) {
     renderImage(imageShader, mainMenuBackground, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
 }
 
+void UISystem::updateEndGame(int endScreenValue) {
+    int winner = checkForWin();
+    std::string winText = "Player " + std::to_string(winner) + " Wins!";
+    //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
+    if (winner == 1) {
+        if (endScreenValue == 0) {
+            renderImage(imageShader, gameOverPlayer1_1, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+        else if (endScreenValue == 1) {
+            renderImage(imageShader, gameOverPlayer1_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+        else if (endScreenValue == 2) {
+            renderImage(imageShader, gameOverPlayer1_3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+        else if (endScreenValue == 3) {
+            renderImage(imageShader, gameOverPlayer1_4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+    }
+    else if (winner == 2)
+        renderImage(imageShader, gameOverPlayer2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 3)
+        renderImage(imageShader, gameOverPlayer3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 4)
+        renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+}
 
-void UISystem::updateGame() {
-    
+
+void UISystem::updateGame(int endScreenValue) {
     if (checkForWin() != 0)
     {
-        std::string winText = "Player " + std::to_string(checkForWin()) + " Wins!";
-        renderText(textShader, winText, 250.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+        updateEndGame(endScreenValue);
     }
     float height, width;
 
