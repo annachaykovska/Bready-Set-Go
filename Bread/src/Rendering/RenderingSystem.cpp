@@ -220,11 +220,15 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	{
 		data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
 		if (data)
+		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
 		else
+		{
 			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-		
-		stbi_image_free(data);
+			stbi_image_free(data);
+		}
 	}
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -459,6 +463,8 @@ void RenderingSystem::update()
 		this->shader.setMat4("playerModelMatrix", g_scene.getEntity("player1")->getTransform()->getModelMatrix());
 		renderScene();
 	}
+
+	drawSkybox();
 }
 
 void RenderingSystem::renderDebugShadowMap()
@@ -645,7 +651,7 @@ void RenderingSystem::drawSkybox()
 {
 	glDepthFunc(GL_LEQUAL);
 	this->skyboxShader.use();
-	this->skyboxShader.setMat4("view", this->viewMatrix);
+	this->skyboxShader.setMat4("view", glm::mat4(glm::mat3(this->viewMatrix)));
 	this->skyboxShader.setMat4("projection", this->projMatrix);
 	this->skyboxShader.setInt("skybox", 23);
 
@@ -654,6 +660,5 @@ void RenderingSystem::drawSkybox()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeMap);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glDepthFunc(GL_LESS);
 }

@@ -227,6 +227,8 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
+	gameLoop.gameStage = 2;
+
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
 	{

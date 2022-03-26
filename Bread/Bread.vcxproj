@@ -1121,6 +1121,14 @@
     <Image Include="resources\textures\p3Icon.png" />
     <Image Include="resources\textures\p4Icon.png" />
     <Image Include="resources\textures\PandaMat.png" />
+    <Image Include="resources\textures\skybox\back.jpg" />
+    <Image Include="resources\textures\skybox\bottom.jpg" />
+    <Image Include="resources\textures\skybox\cozy.jpg" />
+    <Image Include="resources\textures\skybox\front.jpg" />
+    <Image Include="resources\textures\skybox\kitchen.jpg" />
+    <Image Include="resources\textures\skybox\left.jpg" />
+    <Image Include="resources\textures\skybox\right.jpg" />
+    <Image Include="resources\textures\skybox\top.jpg" />
     <Image Include="resources\textures\speedometer.png" />
     <Image Include="resources\textures\testtexture.png" />
   </ItemGroup>
