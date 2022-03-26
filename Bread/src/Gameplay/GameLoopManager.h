@@ -7,6 +7,10 @@ public:
 	void resetBackToStart();
 	void updateGameStageFromMenu();
 
+	// Constants
+	const float mainMenuTimeoutLength;
+	const float returnTimeoutLength;
+
 	// 1 = main menu, 2 = play
 	int gameStage;
 
@@ -21,9 +25,6 @@ public:
 	float mainMenuTimeoutStart; // after starting game in main
 	float returnTimeoutStart; // after returning to main
 
-	// Constants
-	const float mainMenuTimeoutLength;
-	const float returnTimeoutLength;
 private:
 
 };

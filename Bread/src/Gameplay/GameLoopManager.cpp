@@ -1,7 +1,7 @@
 #include "GameLoopManager.h"
 #include <glfw/glfw3.h>
 
-GameLoopManager::GameLoopManager() : gameStage(1)
+GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the menu
 , menuSelectionNumber(1)
 , isMenuItemSelected(false)
 , isBackToMenuSelected(false)
@@ -23,7 +23,7 @@ void GameLoopManager::resetBackToStart() {
 }
 
 void GameLoopManager::updateGameStageFromMenu() {
-	if (menuSelectionNumber == 1) {// start game selected
+	if (menuSelectionNumber == 1) { // start game selected
 		gameStage = 2;
 		isMenuItemSelected = false;
 		mainMenuTimeoutStart = glfwGetTime();

@@ -89,7 +89,10 @@ private:
 	ImageTexture exitButtonPressed;
 
 	// End Game
-	ImageTexture gameOverPopUp;
+	ImageTexture gameOverPlayer1;
+	ImageTexture gameOverPlayer2;
+	ImageTexture gameOverPlayer3;
+	ImageTexture gameOverPlayer4;
 	ImageTexture backToMainMenuButtonPressed;
 
 	//Constants needed to render
