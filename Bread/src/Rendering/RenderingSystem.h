@@ -41,8 +41,10 @@ public:
 	Orthogonal ort;
 	glm::vec3 lightPos;
 	glm::vec3 lightDir;
-	float shadowWidth;
-	float shadowHeight;
+	float shadowHiRes;
+	float shadowLoRes;
+
+	int shadowDebugMode;
 
 	unsigned int depthMapTex;
 

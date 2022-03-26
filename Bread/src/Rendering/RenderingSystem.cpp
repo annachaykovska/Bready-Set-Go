@@ -29,8 +29,8 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	//this->lightDir = glm::vec3(1.0f, -1.0f, 1.0f);
 
 	// Shadow map viewport size
-	this->shadowWidth = 4096;
-	this->shadowHeight = 4096;
+	this->shadowHiRes = 4096;
+	this->shadowLoRes = 2048;
 
 	this->maxBias = 0.001f;
 	this->minBias = 0.00005f;
@@ -73,12 +73,12 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glGenTextures(1, &this->roughDepthMapTex);
 	glActiveTexture(GL_TEXTURE24);
 	glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowLoRes, this->shadowLoRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	// Attach depth texture as FBO's depth buffer
@@ -97,12 +97,12 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glGenTextures(1, &this->depthMapTex);
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes, this->shadowHiRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	// Attach depth texture as FBO's depth buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
@@ -110,6 +110,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// --------------------------------------------------------------------------------------------
 	// QUAD FOR RENDERING FINAL PASS
@@ -279,10 +280,12 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 // Orthographic projection for the depth map that shows the entire level layout for rough shadows at a distance
 void RenderingSystem::updateRoughOrtho()
 {
-	this->ort.left = 281.0f;
-	this->ort.right = -279.0f;
-	this->ort.bottom = -205.0f;
-	this->ort.top = 197.0f;
+	this->ort.left = 310.0f;
+	this->ort.right = -268.0f;
+	this->ort.bottom = -264.0f;
+	this->ort.top = 167.0f;
+	this->ort.nearPlane = 0.1f;
+	this->ort.farPlane = 800.0f;
 }
 
 // Moves the orthographic projection used for the depth map so that it follows the player for high res shadows
@@ -290,10 +293,18 @@ void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
 
-	this->ort.left = p1Pos.x + 75.0f;
-	this->ort.right = p1Pos.x - 75.0f;
-	this->ort.bottom = -p1Pos.z - 75.0f;
-	this->ort.top = -p1Pos.z + 75.0f;
+	if (p1Pos.x > 0)
+	{
+		this->ort.left = 0.9f * p1Pos.x + 75.0f;
+		this->ort.right = 0.9f * p1Pos.x - 75.0f;
+	}
+	else
+	{
+		this->ort.left = 1.1f * p1Pos.x + 75.0f;
+		this->ort.left = 0.75f * p1Pos.x + 75.0f;
+	}
+	this->ort.bottom = -0.5f * p1Pos.z - 75.0f;
+	this->ort.top = -0.5f * p1Pos.z + 75.0f;
 }
 
 void RenderingSystem::update()
@@ -309,12 +320,11 @@ void RenderingSystem::update()
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", roughLightSpaceMatrix);
 
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, this->shadowLoRes, this->shadowLoRes);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->roughDepthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glCullFace(GL_FRONT);
 	renderShadowMap();
-	glCullFace(GL_BACK);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// High res shadows --------------------------------------------------------------
@@ -327,12 +337,11 @@ void RenderingSystem::update()
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
+	glViewport(0, 0, this->shadowHiRes, this->shadowHiRes);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glCullFace(GL_FRONT); // Switch to front-face culling to reduce peter-panning of shadows
 	renderShadowMap();
-	glCullFace(GL_BACK); // Switch back to back-face culling for regular rendering
+	glCullFace(GL_BACK);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Regular render pass -------------------------------------------------------------
@@ -358,8 +367,12 @@ void RenderingSystem::renderDebugShadowMap()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	this->depthShader.use();
 	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
+
+	if (this->shadowDebugMode == 1)
+		glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
+	if (this->shadowDebugMode == 2)
+		glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	//glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
 	renderTexturedQuad();
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -204,13 +204,20 @@ void Profiler::shadows()
 	
 	if (ImGui::CollapsingHeader("Shadows"))
 	{
-		/*
 		ImGui::InputInt("DepthMap Render", &depthMap);
 
 		if (depthMap == 0)
 			g_systems.renderDebug = false;
 		if (depthMap == 1)
+		{
 			g_systems.renderDebug = true;
+			g_systems.render->shadowDebugMode = 1;
+		}
+		if (depthMap == 2)
+		{
+			g_systems.renderDebug = true;
+			g_systems.render->shadowDebugMode = 2;
+		}
 
 		ImGui::InputFloat("orthoProj.left", &(ort.left), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.right", &(ort.right), 1.f, 10.f, "%.3f");
@@ -218,7 +225,6 @@ void Profiler::shadows()
 		ImGui::InputFloat("orthoProj.top", &(ort.top), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.near", &(ort.nearPlane), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.far", &(ort.farPlane), 1.f, 10.f, "%.3f");
-		*/
 
 		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
