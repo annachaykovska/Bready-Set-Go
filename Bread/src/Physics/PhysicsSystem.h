@@ -70,7 +70,6 @@ public:
 	
 	// For Tweaking
 	void updateCar();
-	void updateEngine();
 
 	float chassis_mass;
 	float chassis_moi_y;
@@ -79,9 +78,12 @@ public:
 	float wheel_moi;
 	float wheel_damping_rate;
 	float max_hand_brake_torque;
+	float max_steer;
 
 	float camber_at_rest;
 	float spring_strength;
+	float max_compression;
+	float max_droop;
 
 	//float chassis_moi[3];
 
