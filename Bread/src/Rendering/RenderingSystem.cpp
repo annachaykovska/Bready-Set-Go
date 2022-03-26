@@ -290,10 +290,10 @@ void RenderingSystem::updateOrtho()
 {
 	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
 
-	this->ort.left = p1Pos.x + 50.0f;
-	this->ort.right = p1Pos.x - 50.0f;
-	this->ort.bottom = -p1Pos.z - 50.0f;
-	this->ort.top = -p1Pos.z + 50.0f;
+	this->ort.left = p1Pos.x + 75.0f;
+	this->ort.right = p1Pos.x - 75.0f;
+	this->ort.bottom = -p1Pos.z - 75.0f;
+	this->ort.top = -p1Pos.z + 75.0f;
 }
 
 void RenderingSystem::update()
