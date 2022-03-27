@@ -76,6 +76,7 @@ int main()
 
 	// World
 	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* fan = g_scene.getEntity("fan");
 
 	// Debug
 	Entity* test = g_scene.getEntity("test");
@@ -132,15 +133,20 @@ int main()
 
 	// World
 	countertop->attachComponent(&transforms[17], "transform");
+	fan->attachComponent(&transforms[18], "transform");
 
 	// Debug
-	test->attachComponent(&transforms[18], "transform");
+	test->attachComponent(&transforms[19], "transform");
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
 	counterTrans->position.y = -78.0f;
 	counterTrans->position.z = 50.0f;
 	counterTrans->update();
+
+	fan->getTransform()->position = glm::vec3(0.0f, 150.0f, -50.0f);
+	fan->getTransform()->scale = glm::vec3(15.0f);
+	fan->getTransform()->update();
 
 	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
 	sausage->getTransform()->scale = glm::vec3(30, 30, 30);

@@ -61,10 +61,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
-	//glEnable(GL_STENCIL_TEST); // Turn on stencil testing
-	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
 	// Camera
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
@@ -207,12 +203,12 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeMap);
 
 	std::vector<std::string> faces;
-	faces.push_back("resources/textures/skybox/right.jpg");
-	faces.push_back("resources/textures/skybox/left.jpg");
-	faces.push_back("resources/textures/skybox/top.jpg");
-	faces.push_back("resources/textures/skybox/bottom.jpg");
-	faces.push_back("resources/textures/skybox/front.jpg");
-	faces.push_back("resources/textures/skybox/back.jpg");
+	faces.push_back("resources/textures/skybox/cubemap/nx.jpg");
+	faces.push_back("resources/textures/skybox/cubemap/px.jpg");
+	faces.push_back("resources/textures/skybox/cubemap/py.jpg");
+	faces.push_back("resources/textures/skybox/cubemap/ny.jpg");
+	faces.push_back("resources/textures/skybox/cubemap/nz.jpg");
+	faces.push_back("resources/textures/skybox/cubemap/pz.jpg");
 
 	int width, height, nrChannels;
 	unsigned char* data;
@@ -281,80 +277,85 @@ void RenderingSystem::loadModels()
 	this->models.emplace_back(Model(&groundPath[0])); 
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
+	// Fan
+	std::string fanPath = "resources/models/kitchen/fan.obj";
+	this->models.emplace_back(Model(&fanPath[0]));
+	g_scene.getEntity("fan")->attachComponent(&(this->models[5]), "model");
+
 	//-----------------------------------------------------------------------------------
 	// Ingredient models
 	//-----------------------------------------------------------------------------------
 	// Cheese
 	std::string cheesePath = "resources/models/ingredients/cheese.obj";
 	this->models.emplace_back(Model(&cheesePath[0]));
-	g_scene.getEntity("cheese")->attachComponent(&(this->models[5]), "model");
+	g_scene.getEntity("cheese")->attachComponent(&(this->models[6]), "model");
 
 	// Sausage
 	std::string sausagePath = "resources/models/ingredients/sausage.obj";
 	this->models.emplace_back(Model(&sausagePath[0]));
-	g_scene.getEntity("sausage")->attachComponent(&(this->models[6]), "model");
+	g_scene.getEntity("sausage")->attachComponent(&(this->models[7]), "model");
 
 	// Tomato
 	std::string tomatoPath = "resources/models/ingredients/tomato.obj";
 	this->models.emplace_back(Model(&tomatoPath[0]));
-	g_scene.getEntity("tomato")->attachComponent(&(this->models[7]), "model");
+	g_scene.getEntity("tomato")->attachComponent(&(this->models[8]), "model");
 
 	// Dough
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0]));
-	g_scene.getEntity("dough")->attachComponent(&(this->models[8]), "model");
+	g_scene.getEntity("dough")->attachComponent(&(this->models[9]), "model");
 
 	// Carrot
 	std::string carrotPath = "resources/models/ingredients/carrot.obj";
 	this->models.emplace_back(Model(&carrotPath[0]));
-	g_scene.getEntity("carrot")->attachComponent(&(this->models[9]), "model");
+	g_scene.getEntity("carrot")->attachComponent(&(this->models[10]), "model");
 
 	// Lettuce
 	std::string lettucePath = "resources/models/ingredients/lettuce.obj";
 	this->models.emplace_back(Model(&lettucePath[0]));
-	g_scene.getEntity("lettuce")->attachComponent(&(this->models[10]), "model");
+	g_scene.getEntity("lettuce")->attachComponent(&(this->models[11]), "model");
 
 	// Parsnip
 	std::string parsnipPath = "resources/models/ingredients/parsnip.obj";
 	this->models.emplace_back(Model(&parsnipPath[0]));
-	g_scene.getEntity("parsnip")->attachComponent(&(this->models[11]), "model");
+	g_scene.getEntity("parsnip")->attachComponent(&(this->models[12]), "model");
 
 	// Rice
 	std::string ricePath = "resources/models/ingredients/rice.obj";
 	this->models.emplace_back(Model(&ricePath[0]));
-	g_scene.getEntity("rice")->attachComponent(&(this->models[12]), "model");
+	g_scene.getEntity("rice")->attachComponent(&(this->models[13]), "model");
 
 	// Egg
 	std::string eggPath = "resources/models/ingredients/egg.obj";
 	this->models.emplace_back(Model(&eggPath[0]));
-	g_scene.getEntity("egg")->attachComponent(&(this->models[13]), "model");
+	g_scene.getEntity("egg")->attachComponent(&(this->models[14]), "model");
 
 	// Chicken
 	std::string chickenPath = "resources/models/ingredients/chicken.obj";
 	this->models.emplace_back(Model(&chickenPath[0]));
-	g_scene.getEntity("chicken")->attachComponent(&(this->models[14]), "model");
+	g_scene.getEntity("chicken")->attachComponent(&(this->models[15]), "model");
 
 	// Peas
 	std::string peasPath = "resources/models/ingredients/peas.obj";
 	this->models.emplace_back(Model(&peasPath[0]));
-	g_scene.getEntity("peas")->attachComponent(&(this->models[15]), "model");
+	g_scene.getEntity("peas")->attachComponent(&(this->models[16]), "model");
 
 	// Soupbase
 	std::string soupbasePath = "resources/models/ingredients/soupbase.obj";
 	this->models.emplace_back(Model(&soupbasePath[0]));
-	g_scene.getEntity("soupbase")->attachComponent(&(this->models[16]), "model");
+	g_scene.getEntity("soupbase")->attachComponent(&(this->models[17]), "model");
 
 	// Pumpkin
 	std::string pumpkinPath = "resources/models/ingredients/pumpkin.obj";
 	this->models.emplace_back(Model(&pumpkinPath[0]));
-	g_scene.getEntity("pumpkin")->attachComponent(&(this->models[17]), "model");
+	g_scene.getEntity("pumpkin")->attachComponent(&(this->models[18]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Debug models
 	//-----------------------------------------------------------------------------------
 	std::string testPath = "resources/models/ball/ball.obj";
 	this->models.emplace_back(Model(&testPath[0]));
-	g_scene.getEntity("test")->attachComponent(&(this->models[18]), "model");
+	g_scene.getEntity("test")->attachComponent(&(this->models[19]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -527,6 +528,12 @@ void RenderingSystem::renderScene()
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		if (models[i].owner->name == "fan")
+		{
+			models[i].owner->getTransform()->rotation = glm::vec3(0.0f, glfwGetTime() * 50.0f, 0.0f);
+			models[i].owner->getTransform()->update();
+		}
 
 		if (i < 4) // Use material info for player models
 		{
