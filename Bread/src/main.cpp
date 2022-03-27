@@ -180,9 +180,7 @@ int main()
 	// Get a reference to the countertop's AudioSource to play background music
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
-	countertopAudioSource->gain = 0.01f; // Volume control
-	countertopAudioSource->loop = true;
-	countertopAudioSource->play("bg.wav"); // Comment this out to turn off the music on load
+	audio.playMainMenuMusic(countertopAudioSource);
 	
 	AudioSource* p2Audio = player2->getAudioSource();
 	AudioSource* p3Audio = player3->getAudioSource();
@@ -233,7 +231,7 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
-	gameLoop.gameStage = 2;
+	gameLoop.gameStage = 1;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -310,12 +308,16 @@ int main()
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu();
+			audio.stopMusic(countertopAudioSource);
+			audio.playGameMusic(countertopAudioSource);
 		}
 
 		// RESET game if end of game and menu selected
 		else if (gameLoop.isBackToMenuSelected) {
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
+			audio.stopMusic(countertopAudioSource);
+			audio.playMainMenuMusic(countertopAudioSource);
 		}
 	}
 

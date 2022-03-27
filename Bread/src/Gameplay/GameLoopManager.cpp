@@ -55,8 +55,7 @@ void GameLoopManager::gameActorsReset(PhysicsSystem* physics, Inventory* p1Inv, 
 	physics->respawnPlayer(4);
 
 	// Reset all ingredient positions 
-
-	// Reset all food tracking (recipe tracking?)
+	physics->randomizeIngredientLocations();
 
 	// Reset player inventory
 	p1Inv->clearAllIngredients();
@@ -65,5 +64,4 @@ void GameLoopManager::gameActorsReset(PhysicsSystem* physics, Inventory* p1Inv, 
 	p4Inv->clearAllIngredients();
 
 	// Freeze the physics ?
-
 }
