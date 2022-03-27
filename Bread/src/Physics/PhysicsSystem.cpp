@@ -341,15 +341,6 @@ void PhysicsSystem::randomizeIngredientLocations()
 
 	std::shuffle(std::begin(spawnLocations), std::end(spawnLocations), eng);
 
-	//struct RNG {
-	//	int operator() (int n) {
-	//		return std::rand() / (1.0 + RAND_MAX) * n;
-	//	}
-	//};
-
-	//std::srand(42);
-	//std::random_shuffle(std::begin(spawnLocations), std::end(spawnLocations), RNG());
-
 	float halfExtent = 1.0f;
 	glm::vec3 loc;
 
