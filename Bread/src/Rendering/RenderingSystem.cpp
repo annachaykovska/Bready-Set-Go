@@ -203,12 +203,12 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeMap);
 
 	std::vector<std::string> faces;
-	faces.push_back("resources/textures/skybox/cubemap/nx.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/px.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/py.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/ny.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/nz.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/pz.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/z.jpg");
+	faces.push_back("resources/textures/skybox/z.jpg");
 
 	int width, height, nrChannels;
 	unsigned char* data;
