@@ -11,6 +11,11 @@ NavMesh::NavMesh()
 	vert n61, n62, n63, n64, n65, n66, n67, n68, n69, n70;
 	vert n71, n72, n73, n74, n75, n76, n77, n78, n79, n80;
 	vert n81, n82, n83, n84, n85, n86, n87, n88, n89, n90;
+	vert n91, n92, n93, n94, n95, n96, n97, n98, n99, n100;
+	vert n101, n102, n103, n104, n105, n106, n107, n108, n109, n110;
+	vert n111, n112, n113, n114, n115, n116, n117, n118, n119, n120;
+	vert n121, n122, n123, n124, n125, n126, n127, n128, n129, n130;
+	vert n131, n132;
 
 	//KITCHEN COUNTER
 	n1 = vert(90, 2, -145);
@@ -79,7 +84,7 @@ NavMesh::NavMesh()
 	n60 = vert(166, 6, 41);
 	n61 = vert(221, 6, -51);
 	n62 = vert(195, 6, -66);
-	n63 = vert(221, 6, -82);
+	n63 = vert(237, 6, -60);
 	n64 = vert(221, 6, -150);
 	n65 = vert(170, 6, -150);
 	n66 = vert(259, 6, -63);
@@ -109,6 +114,58 @@ NavMesh::NavMesh()
 	n88 = vert(-40, 108, 174);
 	n89 = vert(194, 58, 143);
 	n90 = vert(194, 58, 179);
+
+	// UNDER
+	n91 = vert(-61, -27, -149);
+	n92 = vert(-61, -27, -129);
+	n93 = vert(-99, -30, -146);
+	n94 = vert(-99, -30, -134);
+	n95 = vert(-143, -39, -146);
+
+	n96 = vert(-143, -39, -134);
+	n97 = vert(-192, -63, -146);
+	n98 = vert(-192, -63, -132);
+	n99 = vert(-264, -63, -153);
+	n100 = vert(-226, -63, -112);
+
+	n101 = vert(-264, -63, -106);
+	n102 = vert(-226, -63, -74);
+	n103 = vert(-264, -63, -32);
+	n104 = vert(-114, -63, -32);
+	n105 = vert(-114, -63, -70);
+
+	n106 = vert(-61, -63, -79);
+	n107 = vert(-76, -63, -50);
+	n108 = vert(-68, -63, -15);
+	n109 = vert(-88, -63, -15);
+	//n110 = vert();
+
+	n111 = vert(-104, -63, 26);
+	n112 = vert(-58, -63, 26);
+	n113 = vert(-77, -63, 26);
+	n114 = vert(-73, -63, 67);
+	n115 = vert(-80, -63, 67);
+
+	n116 = vert(-83, -63, 150);
+	n117 = vert(-76, -63, 151);
+	n118 = vert(-79, -63, 174);
+	n119 = vert(-98, -63, 203);
+	n120 = vert(-49, -63, 208);
+
+	n121 = vert(220, -63, 200);
+	n122 = vert(222, -63, 158);
+	n123 = vert(166, -63, 157);
+	n124 = vert(193, -63, 135);
+	n125 = vert(200, -63, 100);
+
+	n126 = vert(187, -63, 100);
+	n127 = vert(162, -64, 58);
+	n128 = vert(196, -64, 57);
+	n129 = vert(233, -64, 50);
+	n130 = vert(260, -64, 49);
+
+	n131 = vert(245, -64, -121);
+	n132 = vert(162, -64, -121);
 
 	// KITCHEN COUNTER
 	MeshSegment* m1 = new MeshSegment(n8, n1, n7);
@@ -242,6 +299,65 @@ NavMesh::NavMesh()
 	MeshSegment* m104 = new MeshSegment(n68, n89, n42);
 	MeshSegment* m105 = new MeshSegment(n68, n90, n89);
 
+	// UNDER
+	MeshSegment* m106 = new MeshSegment(n8, n7, n91);
+	MeshSegment* m107 = new MeshSegment(n92, n8, n91);
+	MeshSegment* m108 = new MeshSegment(n94, n92, n91);
+	MeshSegment* m109 = new MeshSegment(n94, n91, n93);
+	MeshSegment* m110 = new MeshSegment(n95, n94, n93);
+
+	MeshSegment* m111 = new MeshSegment(n96, n94, n95);
+	MeshSegment* m112 = new MeshSegment(n98, n96, n95);
+	MeshSegment* m113 = new MeshSegment(n98, n95, n97);
+	MeshSegment* m114 = new MeshSegment(n98, n97, n99);
+	MeshSegment* m115 = new MeshSegment(n100, n98, n99);
+
+	MeshSegment* m116 = new MeshSegment(n101, n100, n99);
+	MeshSegment* m117 = new MeshSegment(n102, n100, n101);
+	MeshSegment* m118 = new MeshSegment(n103, n102, n101);
+	MeshSegment* m119 = new MeshSegment(n103, n104, n102);
+	MeshSegment* m120 = new MeshSegment(n104, n105, n102);
+
+	MeshSegment* m121 = new MeshSegment(n104, n107, n105);
+	MeshSegment* m122 = new MeshSegment(n107, n106, n105);
+	MeshSegment* m123 = new MeshSegment(n108, n106, n107);
+	MeshSegment* m124 = new MeshSegment(n104, n109, n107);
+	MeshSegment* m125 = new MeshSegment(n109, n108, n107);
+
+	MeshSegment* m126 = new MeshSegment(n113, n108, n109);
+	MeshSegment* m127 = new MeshSegment(n111, n113, n109);
+	MeshSegment* m128 = new MeshSegment(n113, n112, n108);
+	MeshSegment* m129 = new MeshSegment(n115, n113, n111);
+	MeshSegment* m130 = new MeshSegment(n115, n114, n113);
+
+	MeshSegment* m131 = new MeshSegment(n114, n112, n113);
+	MeshSegment* m132 = new MeshSegment(n117, n114, n115);
+	MeshSegment* m133 = new MeshSegment(n116, n117, n115);
+	MeshSegment* m134 = new MeshSegment(n118, n117, n116);
+	MeshSegment* m135 = new MeshSegment(n119, n118, n116);
+
+	MeshSegment* m136 = new MeshSegment(n120, n117, n118);
+	MeshSegment* m137 = new MeshSegment(n119, n120, n118);
+	MeshSegment* m138 = new MeshSegment(n120, n123, n117);
+	MeshSegment* m139 = new MeshSegment(n120, n121, n123);
+	MeshSegment* m140 = new MeshSegment(n121, n122, n123);
+
+	MeshSegment* m141 = new MeshSegment(n123, n122, n124);
+	MeshSegment* m142 = new MeshSegment(n123, n124, n126);
+	MeshSegment* m143 = new MeshSegment(n122, n125, n124);
+	MeshSegment* m144 = new MeshSegment(n124, n125, n126);
+	MeshSegment* m145 = new MeshSegment(n126, n125, n128);
+
+	MeshSegment* m146 = new MeshSegment(n126, n128, n127);
+	MeshSegment* m147 = new MeshSegment(n125, n129, n128);
+	MeshSegment* m148 = new MeshSegment(n125, n130, n129);
+	MeshSegment* m149 = new MeshSegment(n127, n128, n132);
+	MeshSegment* m150 = new MeshSegment(n128, n131, n132);
+
+	MeshSegment* m151 = new MeshSegment(n128, n129, n131);
+	MeshSegment* m152 = new MeshSegment(n129, n130, n63);
+	MeshSegment* m153 = new MeshSegment(n130, n66, n63);
+
 	// KITCHEN COUNTER
 	mesh_.push_back(m1);
 	mesh_.push_back(m2);
@@ -373,6 +489,65 @@ NavMesh::NavMesh()
 	mesh_.push_back(m103);
 	mesh_.push_back(m104);
 	mesh_.push_back(m105);
+
+	// UNDER
+	mesh_.push_back(m106);
+	mesh_.push_back(m107);
+	mesh_.push_back(m108);
+	mesh_.push_back(m109);
+	mesh_.push_back(m110);
+
+	mesh_.push_back(m111);
+	mesh_.push_back(m112);
+	mesh_.push_back(m113);
+	mesh_.push_back(m114);
+	mesh_.push_back(m115);
+
+	mesh_.push_back(m116);
+	mesh_.push_back(m117);
+	mesh_.push_back(m118);
+	mesh_.push_back(m119);
+	mesh_.push_back(m120);
+
+	mesh_.push_back(m121);
+	mesh_.push_back(m122);
+	mesh_.push_back(m123);
+	mesh_.push_back(m124);
+	mesh_.push_back(m125);
+
+	mesh_.push_back(m126);
+	mesh_.push_back(m127);
+	mesh_.push_back(m128);
+	mesh_.push_back(m129);
+	mesh_.push_back(m130);
+
+	mesh_.push_back(m131);
+	mesh_.push_back(m132);
+	mesh_.push_back(m133);
+	mesh_.push_back(m134);
+	mesh_.push_back(m135);
+
+	mesh_.push_back(m136);
+	mesh_.push_back(m137);
+	mesh_.push_back(m138);
+	mesh_.push_back(m139);
+	mesh_.push_back(m140);
+
+	mesh_.push_back(m141);
+	mesh_.push_back(m142);
+	mesh_.push_back(m143);
+	mesh_.push_back(m144);
+	mesh_.push_back(m145);
+
+	mesh_.push_back(m146);
+	mesh_.push_back(m147);
+	mesh_.push_back(m148);
+	mesh_.push_back(m149);
+	mesh_.push_back(m150);
+
+	mesh_.push_back(m151);
+	mesh_.push_back(m152);
+	mesh_.push_back(m153);
 
 	for (int i = 1; i <= mesh_.size(); i++)
 	{

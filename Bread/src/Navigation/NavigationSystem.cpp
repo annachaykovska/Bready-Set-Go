@@ -51,7 +51,7 @@ void NavigationSystem::update()
 		break;
 	}
 
-	if (vehicle_.getTransform()->position.y < -30)
+	if (vehicle_.getTransform()->position.y < -70)
 	{
 		resetFlag_ = true;
 		physics_.respawnPlayer(id_);
