@@ -105,7 +105,7 @@ public:
 
 	int removeRandomPizzaIngredient(int opponentCheese, int opponentDough, int opponentSausage, int opponentTomato) {
 		// TODO add randomizer
-		if (this->cheese == 0 && this->dough == 0 && this->sausage == 0 && this->tomato == 0)
+		if (this->cheese == 0 && this->dough  == 0 && this->sausage == 0 && this->tomato == 0)
 			return -1;
 		else {
 			if (opponentCheese == 0 && this->cheese == 1) {
