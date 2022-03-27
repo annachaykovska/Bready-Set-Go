@@ -214,22 +214,22 @@ void RenderingSystem::loadModels()
 	this->models.emplace_back(Model(&peasPath[0]));
 	g_scene.getEntity("peas")->attachComponent(&(this->models[15]), "model");
 
-	// Soupbase
-	std::string soupbasePath = "resources/models/ingredients/soupbase.obj";
-	this->models.emplace_back(Model(&soupbasePath[0]));
-	g_scene.getEntity("soupbase")->attachComponent(&(this->models[16]), "model");
+	//// Soupbase
+	//std::string soupbasePath = "resources/models/ingredients/soupbase.obj";
+	//this->models.emplace_back(Model(&soupbasePath[0]));
+	//g_scene.getEntity("soupbase")->attachComponent(&(this->models[16]), "model");
 
-	// Pumpkin
-	std::string pumpkinPath = "resources/models/ingredients/pumpkin.obj";
-	this->models.emplace_back(Model(&pumpkinPath[0]));
-	g_scene.getEntity("pumpkin")->attachComponent(&(this->models[17]), "model");
+	//// Pumpkin
+	//std::string pumpkinPath = "resources/models/ingredients/pumpkin.obj";
+	//this->models.emplace_back(Model(&pumpkinPath[0]));
+	//g_scene.getEntity("pumpkin")->attachComponent(&(this->models[17]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Debug models
 	//-----------------------------------------------------------------------------------
 	std::string testPath = "resources/models/ball/ball.obj";
 	this->models.emplace_back(Model(&testPath[0]));
-	g_scene.getEntity("test")->attachComponent(&(this->models[18]), "model");
+	g_scene.getEntity("test")->attachComponent(&(this->models[16]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)

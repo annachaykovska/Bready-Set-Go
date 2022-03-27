@@ -27,8 +27,8 @@ public:
 
 	//SOUP
 	unsigned int peas;// id == 10;
-	unsigned int soupbase;// id == 11;
-	unsigned int pumpkin;// id == 12;
+	//unsigned int soupbase;// id == 11;
+	//unsigned int pumpkin;// id == 12;
 	//carrot
 
 	Inventory()
@@ -44,8 +44,8 @@ public:
 		this->egg = 0;
 		this->chicken = 0;
 		this->peas = 0;
-		this->soupbase = 0;
-		this->pumpkin = 0;
+		//this->soupbase = 0;
+		//this->pumpkin = 0;
 	}
 
 	bool checkPizza()
@@ -92,12 +92,12 @@ public:
 		case (10):
 			this->peas = 1;
 			break;
-		case (11):
-			this->soupbase = 1;
-			break;
-		case (12):
-			this->pumpkin = 1;
-			break;
+		//case (11):
+		//	this->soupbase = 1;
+		//	break;
+		//case (12):
+		//	this->pumpkin = 1;
+		//	break;
 		default:
 			break;
 		}

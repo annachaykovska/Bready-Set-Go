@@ -21,6 +21,7 @@ public:
 	void cookKitchen();
 	void initVehicleSDK();
 	void initializeActors();
+	void randomizeIngredientLocations();
 
 	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
@@ -57,8 +58,8 @@ public:
 	PxRigidDynamic* egg;
 	PxRigidDynamic* chicken;
 	PxRigidDynamic* peas;
-	PxRigidDynamic* soupbase;
-	PxRigidDynamic* pumpkin;
+	//PxRigidDynamic* soupbase;
+	//PxRigidDynamic* pumpkin;
 
 
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;

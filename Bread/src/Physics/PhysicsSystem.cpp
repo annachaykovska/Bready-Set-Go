@@ -19,9 +19,17 @@
 #include "../Transform.h"
 #include "../Scene/Entity.h"
 #include <Windows.h>
+#include <algorithm>
+#include <random>
+#include "../Scene/SpawnLocations.h"
 
 using namespace snippetvehicle;
 using namespace physx;
+
+namespace
+{
+	int spawnLocations[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+}
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -319,62 +327,94 @@ void PhysicsSystem::initializeActors() {
 	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
+	randomizeIngredientLocations();
+}
+
+void PhysicsSystem::randomizeIngredientLocations()
+{
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
 	// Note: Physx actor name must match Entity name
-	
+
+	std::random_device r;
+	std::seed_seq seed{ r(), r(), r(), r(), r(), r(), r(), r() };
+	std::mt19937 eng(seed);
+
+	std::shuffle(std::begin(spawnLocations), std::end(spawnLocations), eng);
+
+	//struct RNG {
+	//	int operator() (int n) {
+	//		return std::rand() / (1.0 + RAND_MAX) * n;
+	//	}
+	//};
+
+	//std::srand(42);
+	//std::random_shuffle(std::begin(spawnLocations), std::end(spawnLocations), RNG());
+
 	float halfExtent = 1.0f;
+	glm::vec3 loc;
 
 	// CHEESE
-	PxTransform cheeseTransform(PxVec3(-220, 3, -130));
+	loc = LOCATIONS[spawnLocations[0]];
+	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
 	// SAUSAGE
-	PxTransform sausageTransform(PxVec3(-110, 3, 175));
+	loc = LOCATIONS[spawnLocations[1]];
+	PxTransform sausageTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
-	PxTransform tomatoTransform(PxVec3(95, 3, 170));
+	loc = LOCATIONS[spawnLocations[2]];
+	PxTransform tomatoTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH
-	PxTransform doughTransform(PxVec3(-105, 3, -8));
+	loc = LOCATIONS[spawnLocations[3]];
+	PxTransform doughTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 
 	// CARROT
-	PxTransform carrotTransform(PxVec3(-5, 3, 0));
+	loc = LOCATIONS[spawnLocations[4]];
+	PxTransform carrotTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->carrot = createFoodBlock(carrotTransform, halfExtent, "carrot");
 
 	// LETTUCE
-	PxTransform lettuceTransform(PxVec3(-10, 3, 0));
+	loc = LOCATIONS[spawnLocations[5]];
+	PxTransform lettuceTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->lettuce = createFoodBlock(lettuceTransform, halfExtent, "lettuce");
 
 	// PARSNIP
-	PxTransform parsnipTransform(PxVec3(-15, 3, 0));
+	loc = LOCATIONS[spawnLocations[6]];
+	PxTransform parsnipTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->parsnip = createFoodBlock(parsnipTransform, halfExtent, "parsnip");
 
 	// RICE
-	PxTransform riceTransform(PxVec3(-20, 3, 0));
+	loc = LOCATIONS[spawnLocations[7]];
+	PxTransform riceTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->rice = createFoodBlock(riceTransform, halfExtent, "rice");
 
 	// EGG
-	PxTransform eggTransform(PxVec3(-25, 3, 0));
+	loc = LOCATIONS[spawnLocations[8]];
+	PxTransform eggTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->egg = createFoodBlock(eggTransform, halfExtent, "egg");
 
 	// CHICKEN
-	PxTransform chickenTransform(PxVec3(-30, 3, 0));
+	loc = LOCATIONS[spawnLocations[9]];
+	PxTransform chickenTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->chicken = createFoodBlock(chickenTransform, halfExtent, "chicken");
 
 	// PEAS
-	PxTransform peasTransform(PxVec3(-35, 3, 0));
+	loc = LOCATIONS[spawnLocations[10]];
+	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
 
-	// SOUPBASE
-	PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
-	this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
+	//// SOUPBASE
+	//PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
+	//this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
 
-	// PUMPKIN
-	PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
-	this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
+	//// PUMPKIN
+	//PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
+	//this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
 PhysicsSystem::PhysicsSystem() :
@@ -750,11 +790,11 @@ void PhysicsSystem::updateFoodTransforms()
 	// Peas
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
 
-	// Soupbase
-	g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
+	//// Soupbase
+	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
 
-	// Pumpkin
-	g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
+	//// Pumpkin
+	//g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()

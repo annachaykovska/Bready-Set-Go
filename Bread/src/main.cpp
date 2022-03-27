@@ -71,8 +71,8 @@ int main()
 	Entity* egg = g_scene.getEntity("egg");
 	Entity* chicken = g_scene.getEntity("chicken");
 	Entity* peas = g_scene.getEntity("peas");
-	Entity* soupbase = g_scene.getEntity("soupbase");
-	Entity* pumpkin = g_scene.getEntity("pumpkin");
+	//Entity* soupbase = g_scene.getEntity("soupbase");
+	//Entity* pumpkin = g_scene.getEntity("pumpkin");
 
 	// World
 	Entity* countertop = g_scene.getEntity("countertop");
@@ -127,8 +127,8 @@ int main()
 	egg->attachComponent(&transforms[12], "transform");
 	chicken->attachComponent(&transforms[13], "transform");
 	peas->attachComponent(&transforms[14], "transform");
-	soupbase->attachComponent(&transforms[15], "transform");
-	pumpkin->attachComponent(&transforms[16], "transform");
+	//soupbase->attachComponent(&transforms[15], "transform");
+	//pumpkin->attachComponent(&transforms[16], "transform");
 
 	// World
 	countertop->attachComponent(&transforms[17], "transform");
@@ -161,10 +161,10 @@ int main()
 	chicken->getTransform()->position = glm::vec3(-25, 5, 0);
 	peas->getTransform()->scale = glm::vec3(30, 30, 30);
 	peas->getTransform()->position = glm::vec3(-30, 5, 0);
-	soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	soupbase->getTransform()->position = glm::vec3(-35, 5, 0);
-	pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
-	pumpkin->getTransform()->position = glm::vec3(-40, 5, 0);
+	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
+	//soupbase->getTransform()->position = glm::vec3(-35, 5, 0);
+	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
+	//pumpkin->getTransform()->position = glm::vec3(-40, 5, 0);
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
