@@ -23,6 +23,7 @@ public:
 	float distanceFromVehicle(position target);
 	bool hasPath();
 
+	bool lostPath();
 	bool queryReset();
 
 private:
@@ -36,6 +37,7 @@ private:
 
 	int id_;
 	bool resetFlag_;
+	bool lostPath_;
 	Steering steering_;
 
 	position currentTarget_;

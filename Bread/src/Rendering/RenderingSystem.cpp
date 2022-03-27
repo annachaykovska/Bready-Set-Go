@@ -12,6 +12,11 @@
 extern Scene g_scene;
 extern SystemManager g_systems;
 
+namespace
+{
+	const bool DEBUG_NAVMESH = false;
+}
+
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
@@ -526,10 +531,13 @@ void RenderingSystem::renderScene()
 	shader.setFloat("maxRoughBias", this->maxRoughBias);
 	shader.setFloat("minRoughBias", this->minRoughBias);
 
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
-	glUniform1i(texLoc, 0); // Turn textures off
-	navMesh.setWireframe(true);
-	navMesh.draw(getShader());
+	if (DEBUG_NAVMESH)
+	{
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
+		glUniform1i(texLoc, 0); // Turn textures off
+		navMesh.setWireframe(true);
+		navMesh.draw(getShader());
+	}
 
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)

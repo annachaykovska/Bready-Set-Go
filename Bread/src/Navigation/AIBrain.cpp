@@ -49,7 +49,7 @@ void AIBrain::update()
 			movingTarget = true;
 		break;
 	}
-	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || movingTarget)
+	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget)
 	{
 		navigation.setMode(NavMode::nav);
 		panicCounter_ = 0;

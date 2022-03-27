@@ -271,7 +271,7 @@ int main()
 			window.swapBuffer();
 		}
 		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
-			navMesh.currentMeshSegment(player1->getTransform()->position);
+			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
 			int winner = ui.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();

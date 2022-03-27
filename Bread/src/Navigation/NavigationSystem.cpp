@@ -18,12 +18,9 @@ void NavigationSystem::planPath(position target)
 	if (vehicle_.getTransform()->position != glm::vec3(0.f, 0.f, 0.f))
 	{
 		waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position, target));
-		//waypointUpdater_.setTarget(target);
 
 		currentTarget_ = target;
 	}
-	//std::cout << "Planned Path Length" << std::endl;
-	//std::cout << waypointUpdater_.numWaypoints() << std::endl;
 }
 
 void NavigationSystem::pause()
@@ -37,6 +34,7 @@ void NavigationSystem::update()
 	{
 	case nav:
 		//steering_.updateSteering(waypointUpdater_.interpolator());
+		lostPath_ = waypointUpdater_.offPath();
 		if (waypointUpdater_.currentWaypoint() != nullptr)
 		{
 			steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
@@ -78,6 +76,11 @@ bool NavigationSystem::hasPath()
 		return false;
 	}
 	return true;
+}
+
+bool NavigationSystem::lostPath()
+{
+	return lostPath_;
 }
 
 bool NavigationSystem::queryReset()

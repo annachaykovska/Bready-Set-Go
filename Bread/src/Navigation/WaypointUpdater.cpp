@@ -13,6 +13,7 @@ WaypointUpdater::WaypointUpdater(Entity& entity, NavMesh& navMesh)
 	: entity_(entity)
 	, navMesh_(navMesh)
 	, replanFlag_(false)
+	, offPath_(false)
 {
 }
 
@@ -32,7 +33,11 @@ void WaypointUpdater::updateWaypoints()
 	if (waypoints_.size() > 0)
 	{
 		/*if (length(entity_.getTransform()->position - currentWaypoint()) < THRESHOLD)*/
-		if(navMesh_.currentMeshSegment(entity_.getTransform()->position) == currentWaypoint()->id_)
+		if (!waypointInPath(currentWaypoint()))
+		{
+			//offPath_ = true;
+		}
+		if(navMesh_.currentMeshSegment(entity_.getTransform()->position) == currentWaypoint())
 		{
 			waypoints_.pop_back();
 		}
@@ -47,6 +52,13 @@ void WaypointUpdater::updateWaypoints()
 		//	}
 		//}
 	}
+}
+
+bool WaypointUpdater::offPath()
+{
+	bool temp = offPath_;
+	offPath_ = false;
+	return temp;
 }
 
 bool WaypointUpdater::pathComplete()
@@ -112,4 +124,17 @@ position WaypointUpdater::interpolator()
 	//	direction = normalize(target - interpolator_);
 	//}
 	return interpolator_;
+}
+
+bool WaypointUpdater::waypointInPath(NavMesh::MeshSegment* segment)
+{
+	bool inPath = false;
+	for (NavMesh::MeshSegment* seg : waypoints_)
+	{
+		if (segment == seg)
+		{
+			inPath = true;
+		}
+	}
+	return inPath;
 }

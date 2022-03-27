@@ -360,199 +360,346 @@ NavMesh::NavMesh()
 
 	// KITCHEN COUNTER
 	mesh_.push_back(m1);
+	mesh_.back()->id_ = 1;
 	mesh_.push_back(m2);
+	mesh_.back()->id_ = 2;
 	mesh_.push_back(m3);
+	mesh_.back()->id_ = 3;
 	mesh_.push_back(m4);
+	mesh_.back()->id_ = 4;
 	mesh_.push_back(m5);
+	mesh_.back()->id_ = 5;
 
 	mesh_.push_back(m6);
+	mesh_.back()->id_ = 6;
 	mesh_.push_back(m7);
+	mesh_.back()->id_ = 7;
 	mesh_.push_back(m8);
+	mesh_.back()->id_ = 8;
 	mesh_.push_back(m9);
+	mesh_.back()->id_ = 9;
 	mesh_.push_back(m10);
+	mesh_.back()->id_ = 10;
 
 	mesh_.push_back(m11);
+	mesh_.back()->id_ = 11;
 	mesh_.push_back(m12);
+	mesh_.back()->id_ = 12;
 	mesh_.push_back(m13);
+	mesh_.back()->id_ = 13;
 	mesh_.push_back(m14);
+	mesh_.back()->id_ = 14;
 	mesh_.push_back(m15);
+	mesh_.back()->id_ = 15;
 
 	mesh_.push_back(m16);
+	mesh_.back()->id_ = 16;
 	mesh_.push_back(m17);
+	mesh_.back()->id_ = 17;
 	mesh_.push_back(m18);
+	mesh_.back()->id_ = 18;
 	mesh_.push_back(m19);
+	mesh_.back()->id_ = 19;
 	mesh_.push_back(m20);
+	mesh_.back()->id_ = 20;
 
 	mesh_.push_back(m21);
+	mesh_.back()->id_ = 21;
 	mesh_.push_back(m22);
+	mesh_.back()->id_ = 22;
 	mesh_.push_back(m23);
+	mesh_.back()->id_ = 23;
 	mesh_.push_back(m24);
+	mesh_.back()->id_ = 24;
 	mesh_.push_back(m25);
+	mesh_.back()->id_ = 25;
 	
 	mesh_.push_back(m26);
+	mesh_.back()->id_ = 26;
 	mesh_.push_back(m27);
+	mesh_.back()->id_ = 27;
 	mesh_.push_back(m28);
+	mesh_.back()->id_ = 28;
 	mesh_.push_back(m29);
+	mesh_.back()->id_ = 29;
 	mesh_.push_back(m30);
+	mesh_.back()->id_ = 30;
 
 	mesh_.push_back(m31);
+	mesh_.back()->id_ = 31;
 	mesh_.push_back(m32);
+	mesh_.back()->id_ = 32;
 	mesh_.push_back(m33);
+	mesh_.back()->id_ = 33;
 	mesh_.push_back(m34);
+	mesh_.back()->id_ = 34;
 	mesh_.push_back(m35);
+	mesh_.back()->id_ = 35;
 
 	mesh_.push_back(m36);
+	mesh_.back()->id_ = 36;
 	mesh_.push_back(m37);
+	mesh_.back()->id_ = 37;
 	mesh_.push_back(m38);
+	mesh_.back()->id_ = 38;
 	mesh_.push_back(m39);
+	mesh_.back()->id_ = 39;
 	mesh_.push_back(m40);
+	mesh_.back()->id_ = 40;
 
 	mesh_.push_back(m41);
+	mesh_.back()->id_ = 41;
 	mesh_.push_back(m42);
+	mesh_.back()->id_ = 42;
 	mesh_.push_back(m43);
+	mesh_.back()->id_ = 43;
 	mesh_.push_back(m44);
+	mesh_.back()->id_ = 44;
 
 	// COUNTER RAMPS
 	mesh_.push_back(m45);
+	mesh_.back()->id_ = 45;
 
 	mesh_.push_back(m46);
+	mesh_.back()->id_ = 46;
 	mesh_.push_back(m47);
+	mesh_.back()->id_ = 47;
 	mesh_.push_back(m48);
+	mesh_.back()->id_ = 48;
 	mesh_.push_back(m49);
+	mesh_.back()->id_ = 49;
 	mesh_.push_back(m50);
+	mesh_.back()->id_ = 50;
 
 	// COUNTER LEVEL SHELVES
 	mesh_.push_back(m51);
+	mesh_.back()->id_ = 51;
 	mesh_.push_back(m52);
+	mesh_.back()->id_ = 52;
 	mesh_.push_back(m53);
+	mesh_.back()->id_ = 53;
 	mesh_.push_back(m54);
+	mesh_.back()->id_ = 54;
 	mesh_.push_back(m55);
+	mesh_.back()->id_ = 55;
 
 	mesh_.push_back(m56);
+	mesh_.back()->id_ = 56;
 	mesh_.push_back(m57);
+	mesh_.back()->id_ = 56;
 	mesh_.push_back(m58);
+	mesh_.back()->id_ = 58;
 	mesh_.push_back(m59);
+	mesh_.back()->id_ = 59;
 	mesh_.push_back(m60);
+	mesh_.back()->id_ = 60;
 
 	mesh_.push_back(m61);
+	mesh_.back()->id_ = 61;
 	mesh_.push_back(m62);
+	mesh_.back()->id_ = 62;
 	mesh_.push_back(m63);
+	mesh_.back()->id_ = 63;
 	mesh_.push_back(m64);
+	mesh_.back()->id_ = 64;
 	mesh_.push_back(m65);
+	mesh_.back()->id_ = 65;
 
 	mesh_.push_back(m66);
+	mesh_.back()->id_ = 66;
 	mesh_.push_back(m67);
+	mesh_.back()->id_ = 67;
 	mesh_.push_back(m68);
+	mesh_.back()->id_ = 68;
 	mesh_.push_back(m69);
+	mesh_.back()->id_ = 69;
 	mesh_.push_back(m70);
+	mesh_.back()->id_ = 70;
 
 	mesh_.push_back(m71);
+	mesh_.back()->id_ = 71;
 	mesh_.push_back(m72);
+	mesh_.back()->id_ = 72;
 	mesh_.push_back(m73);
+	mesh_.back()->id_ = 73;
 	mesh_.push_back(m74);
+	mesh_.back()->id_ = 74;
 	mesh_.push_back(m75);
+	mesh_.back()->id_ = 75;
 
 	mesh_.push_back(m76);
+	mesh_.back()->id_ = 76;
 	mesh_.push_back(m77);
+	mesh_.back()->id_ = 77;
 	mesh_.push_back(m78);
+	mesh_.back()->id_ = 78;
 
 	// SHELVES
 	mesh_.push_back(m79);
+	mesh_.back()->id_ = 79;
 	mesh_.push_back(m80);
+	mesh_.back()->id_ = 80;
 
 	mesh_.push_back(m81);
+	mesh_.back()->id_ = 81;
 	mesh_.push_back(m82);
+	mesh_.back()->id_ = 82;
 	mesh_.push_back(m83);
+	mesh_.back()->id_ = 83;
 	mesh_.push_back(m84);
+	mesh_.back()->id_ = 84;
 	mesh_.push_back(m85);
+	mesh_.back()->id_ = 85;
 
 	//mesh_.push_back(m86);
 	mesh_.push_back(m87);
+	mesh_.back()->id_ = 87;
 	mesh_.push_back(m88);
+	mesh_.back()->id_ = 88;
 	mesh_.push_back(m89);
+	mesh_.back()->id_ = 89;
 	mesh_.push_back(m90);
+	mesh_.back()->id_ = 90;
 
 	mesh_.push_back(m91);
+	mesh_.back()->id_ = 91;
 	mesh_.push_back(m92);
+	mesh_.back()->id_ = 92;
 	mesh_.push_back(m93);
+	mesh_.back()->id_ = 93;
 	mesh_.push_back(m94);
+	mesh_.back()->id_ = 94;
 	mesh_.push_back(m95);
+	mesh_.back()->id_ = 95;
 
 	mesh_.push_back(m96);
+	mesh_.back()->id_ = 96;
 	mesh_.push_back(m97);
+	mesh_.back()->id_ = 97;
 	mesh_.push_back(m98);
+	mesh_.back()->id_ = 98;
 	mesh_.push_back(m99);
+	mesh_.back()->id_ = 99;
 	mesh_.push_back(m100);
+	mesh_.back()->id_ = 100;
 
 	mesh_.push_back(m101);
+	mesh_.back()->id_ = 101;
 	mesh_.push_back(m102);
+	mesh_.back()->id_ = 102;
 	mesh_.push_back(m103);
+	mesh_.back()->id_ = 103;
 	mesh_.push_back(m104);
+	mesh_.back()->id_ = 104;
 	mesh_.push_back(m105);
+	mesh_.back()->id_ = 105;
 
 	// UNDER
 	mesh_.push_back(m106);
+	mesh_.back()->id_ = 106;
 	mesh_.push_back(m107);
+	mesh_.back()->id_ = 107;
 	mesh_.push_back(m108);
+	mesh_.back()->id_ = 108;
 	mesh_.push_back(m109);
+	mesh_.back()->id_ = 109;
 	mesh_.push_back(m110);
+	mesh_.back()->id_ = 110;
 
 	mesh_.push_back(m111);
+	mesh_.back()->id_ = 111;
 	mesh_.push_back(m112);
+	mesh_.back()->id_ = 112;
 	mesh_.push_back(m113);
+	mesh_.back()->id_ = 113;
 	mesh_.push_back(m114);
+	mesh_.back()->id_ = 114;
 	mesh_.push_back(m115);
+	mesh_.back()->id_ = 115;
 
 	mesh_.push_back(m116);
+	mesh_.back()->id_ = 116;
 	mesh_.push_back(m117);
+	mesh_.back()->id_ = 117;
 	mesh_.push_back(m118);
+	mesh_.back()->id_ = 118;
 	mesh_.push_back(m119);
+	mesh_.back()->id_ = 119;
 	mesh_.push_back(m120);
+	mesh_.back()->id_ = 120;
 
 	mesh_.push_back(m121);
+	mesh_.back()->id_ = 121;
 	mesh_.push_back(m122);
+	mesh_.back()->id_ = 122;
 	mesh_.push_back(m123);
+	mesh_.back()->id_ = 123;
 	mesh_.push_back(m124);
+	mesh_.back()->id_ = 124;
 	mesh_.push_back(m125);
+	mesh_.back()->id_ = 125;
 
 	mesh_.push_back(m126);
+	mesh_.back()->id_ = 126;
 	mesh_.push_back(m127);
+	mesh_.back()->id_ = 127;
 	mesh_.push_back(m128);
+	mesh_.back()->id_ = 128;
 	mesh_.push_back(m129);
+	mesh_.back()->id_ = 129;
 	mesh_.push_back(m130);
+	mesh_.back()->id_ = 130;
 
 	mesh_.push_back(m131);
+	mesh_.back()->id_ = 131;
 	mesh_.push_back(m132);
+	mesh_.back()->id_ = 132;
 	mesh_.push_back(m133);
+	mesh_.back()->id_ = 133;
 	mesh_.push_back(m134);
+	mesh_.back()->id_ = 134;
 	mesh_.push_back(m135);
+	mesh_.back()->id_ = 135;
 
 	mesh_.push_back(m136);
+	mesh_.back()->id_ = 136;
 	mesh_.push_back(m137);
+	mesh_.back()->id_ = 137;
 	mesh_.push_back(m138);
+	mesh_.back()->id_ = 138;
 	mesh_.push_back(m139);
+	mesh_.back()->id_ = 139;
 	mesh_.push_back(m140);
+	mesh_.back()->id_ = 140;
 
 	mesh_.push_back(m141);
+	mesh_.back()->id_ = 141;
 	mesh_.push_back(m142);
+	mesh_.back()->id_ = 142;
 	mesh_.push_back(m143);
+	mesh_.back()->id_ = 143;
 	mesh_.push_back(m144);
+	mesh_.back()->id_ = 144;
 	mesh_.push_back(m145);
+	mesh_.back()->id_ = 145;
 
 	mesh_.push_back(m146);
+	mesh_.back()->id_ = 146;
 	mesh_.push_back(m147);
+	mesh_.back()->id_ = 147;
 	mesh_.push_back(m148);
+	mesh_.back()->id_ = 148;
 	mesh_.push_back(m149);
+	mesh_.back()->id_ = 149;
 	mesh_.push_back(m150);
+	mesh_.back()->id_ = 150;
 
 	mesh_.push_back(m151);
+	mesh_.back()->id_ = 151;
 	mesh_.push_back(m152);
+	mesh_.back()->id_ = 152;
 	mesh_.push_back(m153);
-
-	for (int i = 1; i <= mesh_.size(); i++)
-	{
-		mesh_.at(i-1)->id_ = i;
-	}
+	mesh_.back()->id_ = 153;
 
 	setupVisualizer();
 	connectMesh();
@@ -659,10 +806,10 @@ bool NavMesh::alreadyContainsNeighbor(MeshSegment* segment, MeshSegment* neighbo
 	return false;
 }
 
-int NavMesh::currentMeshSegment(vert position)
+NavMesh::MeshSegment* NavMesh::currentMeshSegment(vert position)
 {
 	float min = 999999;
-	int minInd = -1;
+	MeshSegment* bestSeg = nullptr;
 
 	for (int i = 0; i < mesh_.size(); i++)
 	{
@@ -679,9 +826,9 @@ int NavMesh::currentMeshSegment(vert position)
 		if (abs(summedAngle - (2 * 3.1415926)) < min)
 		{
 			min = abs(summedAngle - (2 * 3.1415926));
-			minInd = mesh_.at(i)->id_;
+			bestSeg = mesh_.at(i);
 		}
 	}
-	std::cout << minInd << " " << min << std::endl;
-	return minInd;
+	//std::cout << minInd << " " << min << std::endl;
+	return bestSeg;
 }
