@@ -115,6 +115,7 @@
     <ClCompile Include="src\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Audio\AudioSource.cpp" />
     <ClCompile Include="src\Gameplay\Breadmobile.cpp" />
+    <ClCompile Include="src\Gameplay\GameLoopManager.cpp" />
     <ClCompile Include="src\Gameplay\Ingredient.cpp" />
     <ClCompile Include="src\Gameplay\Recipe.cpp" />
     <ClCompile Include="src\Navigation\AIBrain.cpp" />
@@ -852,6 +853,7 @@
     <ClInclude Include="src\Audio\AudioSource.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Gameplay\Breadmobile.h" />
+    <ClInclude Include="src\Gameplay\GameLoopManager.h" />
     <ClInclude Include="src\Gameplay\Ingredient.h" />
     <ClInclude Include="src\Gameplay\Recipe.h" />
     <ClInclude Include="src\Inventory.h" />
@@ -1083,6 +1085,13 @@
     <None Include="dependencies\include\glm\gtx\vector_query.inl" />
     <None Include="dependencies\include\glm\gtx\wrap.inl" />
     <None Include="imgui.ini" />
+    <None Include="resources\models\kitchen\drivable-cutting-board.blend" />
+    <None Include="resources\models\kitchen\drivable-cutting-board.fbx" />
+    <None Include="resources\models\kitchen\drivable-tray.blend" />
+    <None Include="resources\models\kitchen\drivable-tray.fbx" />
+    <None Include="resources\models\kitchen\kitchen.blend" />
+    <None Include="resources\models\kitchen\kitchen.blend1" />
+    <None Include="resources\models\kitchen\kitchen.mtl" />
     <None Include="src\assimp-vc142-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -1098,6 +1107,8 @@
     <Text Include="resources\shaders\lightSourceVertex.txt" />
     <Text Include="resources\shaders\simpleFragment.txt" />
     <Text Include="resources\shaders\simpleVertex.txt" />
+    <Text Include="resources\shaders\skyboxFragment.txt" />
+    <Text Include="resources\shaders\skyboxVertex.txt" />
     <Text Include="resources\shaders\textFragment.txt" />
     <Text Include="resources\shaders\textVertex.txt" />
     <Text Include="resources\shaders\vertex.txt" />
@@ -1106,6 +1117,11 @@
     <ResourceCompile Include="Bread.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\models\kitchen\granite.jpg" />
+    <Image Include="resources\models\kitchen\PandaMat.png" />
+    <Image Include="resources\models\kitchen\shelf.jpg" />
+    <Image Include="resources\models\kitchen\steel.jpg" />
+    <Image Include="resources\models\kitchen\steel.png" />
     <Image Include="resources\rat.ico" />
     <Image Include="resources\textures\coolpicture.png" />
     <Image Include="resources\textures\diffuse.jpg" />
@@ -1117,6 +1133,14 @@
     <Image Include="resources\textures\p3Icon.png" />
     <Image Include="resources\textures\p4Icon.png" />
     <Image Include="resources\textures\PandaMat.png" />
+    <Image Include="resources\textures\skybox\back.jpg" />
+    <Image Include="resources\textures\skybox\bottom.jpg" />
+    <Image Include="resources\textures\skybox\cozy.jpg" />
+    <Image Include="resources\textures\skybox\front.jpg" />
+    <Image Include="resources\textures\skybox\kitchen.jpg" />
+    <Image Include="resources\textures\skybox\left.jpg" />
+    <Image Include="resources\textures\skybox\right.jpg" />
+    <Image Include="resources\textures\skybox\top.jpg" />
     <Image Include="resources\textures\speedometer.png" />
     <Image Include="resources\textures\testtexture.png" />
   </ItemGroup>

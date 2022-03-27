@@ -38,12 +38,20 @@ UISystem::UISystem()
     , p2Location(glm::vec2(0))
     , p3Location(glm::vec2(0))
     , p4Location(glm::vec2(0))
-    , mainMenuBackground("resources/textures/main_menu_7.png", GL_NEAREST)
+    , mainMenuBackground("resources/textures/main_menu_8.png", GL_NEAREST)
     , startGameButtonNormal("resources/textures/button_start_game_2.png", GL_NEAREST)
     , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
     , speedometer_theta(MIN_SPEED_THETA)
+    , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
+    , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
+    , gameOverPlayer1_3("resources/textures/game_over_screen_player_1_3.png", GL_NEAREST)
+    , gameOverPlayer1_4("resources/textures/game_over_screen_player_1_4.png", GL_NEAREST)
+    , gameOverPlayer2("resources/textures/game_over_screen_player_2.png", GL_NEAREST)
+    , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
+    , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
+    , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -151,19 +159,44 @@ void UISystem::updateMainMenu(int itemSelected) {
     renderImage(imageShader, mainMenuBackground, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
 }
 
+void UISystem::updateEndGame(int endScreenValue) {
+    int winner = checkForWin();
+    std::string winText = "Player " + std::to_string(winner) + " Wins!";
+    //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+    renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
+    if (winner == 1) {
+        if (endScreenValue == 0) {
+            renderImage(imageShader, gameOverPlayer1_1, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+        else if (endScreenValue == 1) {
+            renderImage(imageShader, gameOverPlayer1_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+        else if (endScreenValue == 2) {
+            renderImage(imageShader, gameOverPlayer1_3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+        else if (endScreenValue == 3) {
+            renderImage(imageShader, gameOverPlayer1_4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+        }
+    }
+    else if (winner == 2)
+        renderImage(imageShader, gameOverPlayer2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 3)
+        renderImage(imageShader, gameOverPlayer3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 4)
+        renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+}
 
-void UISystem::updateGame() {
-    
+
+void UISystem::updateGame(int endScreenValue) {
     if (checkForWin() != 0)
     {
-        std::string winText = "Player " + std::to_string(checkForWin()) + " Wins!";
-        renderText(textShader, winText, 250.0f, 500.0f, 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
+        updateEndGame(endScreenValue);
     }
     float height, width;
 
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
-    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 50.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
+    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
     speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
     renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
@@ -437,12 +470,16 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
                 location.y = (g_systems.height / 2.f) - offset;
             }
         }
+        location.z = scX(0.04);
+    }
+    else
+    {
+        location.z = scX(0.07) + ((scX(0.04) - scX(0.07)) / (400.f - 0.f)) * (length(toEntity) - 0);
     }
 
-    location.z = scX(0.07) + ((scX(0.02) - scX(0.07)) / (400.f - 0.f)) * (length(toEntity) - 0);
-    if (location.z < scX(0.02))
+    if (location.z < scX(0.04))
     {
-        location.z = scX(0.02);
+        location.z = scX(0.04);
     }
 
     return glm::vec3(location.x, location.y, location.z);

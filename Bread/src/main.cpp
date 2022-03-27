@@ -76,6 +76,7 @@ int main()
 
 	// World
 	Entity* countertop = g_scene.getEntity("countertop");
+	Entity* fan = g_scene.getEntity("fan");
 
 	// Debug
 	Entity* test = g_scene.getEntity("test");
@@ -132,15 +133,20 @@ int main()
 
 	// World
 	countertop->attachComponent(&transforms[17], "transform");
+	fan->attachComponent(&transforms[18], "transform");
 
 	// Debug
-	test->attachComponent(&transforms[18], "transform");
+	test->attachComponent(&transforms[19], "transform");
 
 	// Initialize transform components
 	Transform* counterTrans = countertop->getTransform();
 	counterTrans->position.y = -78.0f;
 	counterTrans->position.z = 50.0f;
 	counterTrans->update();
+
+	fan->getTransform()->position = glm::vec3(0.0f, 150.0f, -50.0f);
+	fan->getTransform()->scale = glm::vec3(15.0f);
+	fan->getTransform()->update();
 
 	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
 	sausage->getTransform()->scale = glm::vec3(30, 30, 30);
@@ -191,11 +197,6 @@ int main()
 	//p4Audio->loop = true;
 	//p4Audio->play("idle.wav");
 
-	// Track time
-	float oldTime = glfwGetTime(), newTime = 0, deltaTime = 0, accumulator = 0;
-	float frameBeginTime = 0, frameEndTime = 0; 
-	float fixedTimeInterval = 0, shortTimeInterval = 1.0f / 120.0f, longTimeInterval = 1.0f / 60.0f;
-
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
 	window.setCallbacks(movementCallbacks);
@@ -204,8 +205,11 @@ int main()
 	IngredientTracker ingredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
 	ui.initIngredientTracking(&ingredientTracker);
 
+	// Set up game loop manager
+	GameLoopManager gameLoop = GameLoopManager();
+
 	// Set up controller inputs
-	XboxController controllers = XboxController(&physics, &ui);
+	XboxController controllers = XboxController(&physics, &ui, &gameLoop);
 
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
@@ -223,40 +227,57 @@ int main()
 	player3->attachComponent(&p3Inv, "inventory");
 	player4->attachComponent(&p4Inv, "inventory");
 
-	// 1 = main menu, 2 = play
-	int gameStage = 1;
-	bool gameExit = false;
+	// Track time
+	double t = 0.0;
+	const double dt = 1.0/120.0;
+	double currentTime = glfwGetTime();
+	double accumulator = 0.0;
+
+	gameLoop.gameStage = 2;
 
 	// GAME LOOP
-	while (!window.shouldClose() && !gameExit)
+	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
 	{
-		frameBeginTime = glfwGetTime();
+		double newTime = glfwGetTime();
+		double frameTime = newTime - currentTime;
+		currentTime = newTime;
+
+		accumulator += frameTime;
 
 		// INPUT
 		glfwPollEvents();
 		glfwGetWindowSize(window.getWindow(), &g_systems.width, &g_systems.height);
 		controllers.checkControllers(); // sets analog/digital
 
-		// SIMULATE
-		g_systems.physics->update(deltaTime);
+		while (accumulator >= dt)
+		{
+			// SIMULATE
+			g_systems.physics->update(dt, gameLoop.gameStage);
+			accumulator -= dt;
+			t += dt;
+		}
 
 		// WINDOW
 		window.clear();
 
 		navMesh.currentMeshSegment(player1->getTransform()->position);
 
-		if (gameStage == 1) {
+		if (gameLoop.gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
 			
 			// RENDER
-			ui.updateMainMenu(controllers.menuSelection);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber);
 			window.swapBuffer();
 		}
-		else if (gameStage == 2) {
-			controllers.setButtonStateFromControllerDriving(0); // Getting the input from player 1 controller
+		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			int winner = ui.checkForWin();
+			if (winner != 0) {
+				gameLoop.setEndStage();
+			}
+			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
@@ -267,7 +288,7 @@ int main()
 			if (!g_systems.renderDebug)
 			{
 				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame();
+				ui.updateGame(gameLoop.endScreenGenerated);
 			}
 
 			// Update the ImGUI profiler
@@ -284,30 +305,19 @@ int main()
 			audio.update();
 		}
 
-		// UPDATE TIME
-		// If this frame took longer than 1/60 s to compute, treat it as two frames instead
-		if (frameEndTime - frameBeginTime > shortTimeInterval)
-			fixedTimeInterval = longTimeInterval;
-
-		// If the last frame took less than 1/60 s to compute, delay
-		do 
-		{
-			frameEndTime = glfwGetTime();
-			deltaTime = frameEndTime - frameBeginTime;
-		} while (deltaTime < fixedTimeInterval);
-
-		fixedTimeInterval = shortTimeInterval;
-
-		// Update game stage
-		if (controllers.menuItemSelected) { 
-			if (controllers.menuSelection == 1) {// start game selected
-				gameStage = 2;
-			}
-			else if (controllers.menuSelection == 2) { // exit
-				gameExit = true;
-			}
+		if (ui.checkForWin() != 0) {
+			gameLoop.isGameEnded = true;
 		}
-		
+
+		// UPDATE GAME STAGE
+		if (gameLoop.isMenuItemSelected) {
+			gameLoop.updateGameStageFromMenu();
+		}
+
+		// RESET game if end of game and menu selected
+		else if (gameLoop.isBackToMenuSelected) {
+			gameLoop.resetBackToStart();
+		}
 	}
 
 	// Collect garbage

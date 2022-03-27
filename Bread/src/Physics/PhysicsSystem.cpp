@@ -16,12 +16,17 @@
 #include "PhysicsSystem.h"
 #include "CollisionCallback.h"
 #include "../Scene/Scene.h"
+#include "../Scene/SpawnLocations.h"
 #include "../Transform.h"
 #include "../Scene/Entity.h"
+#include <random>
+#include <algorithm>
 #include <Windows.h>
 #include <algorithm>
 #include <random>
 #include "../Scene/SpawnLocations.h"
+
+#define PI 3.14159f
 
 using namespace snippetvehicle;
 using namespace physx;
@@ -36,16 +41,18 @@ extern SystemManager g_systems;
 
 CollisionCallback gCollisionCallback;
 
-PxF32 gSteerVsForwardSpeedData[2 * 8] =
+PxF32 gSteerVsForwardSpeedData[2 * 10] =
 {
-	0.0f,		0.2f,
-	5.0f,		0.6f,
-	30.0f,		0.8f,
-	120.0f,		1.f,
+	0.0f,		0.0f,
+	10.0f,		0.2f,
+	20.0f,		0.6f,
+	30.0f,		1.0f,
+	40.0f,		0.7f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
-	PX_MAX_F32, PX_MAX_F32
+	PX_MAX_F32, PX_MAX_F32,
+	PX_MAX_F32, PX_MAX_F32,
 };
 PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4);
 
@@ -53,14 +60,14 @@ PxVehicleKeySmoothingData gKeySmoothingData =
 {
 	{
 		10.0f,	//rise rate eANALOG_INPUT_ACCEL
-		6.0f,	//rise rate eANALOG_INPUT_BRAKE		
+		100.0f,	//rise rate eANALOG_INPUT_BRAKE		
 		6.0f,	//rise rate eANALOG_INPUT_HANDBRAKE	
 		2.5f,	//rise rate eANALOG_INPUT_STEER_LEFT
 		2.5f,	//rise rate eANALOG_INPUT_STEER_RIGHT
 	},
 	{
 		10.0f,	//fall rate eANALOG_INPUT_ACCEL
-		10.0f,	//fall rate eANALOG_INPUT_BRAKE		
+		100.0f,	//fall rate eANALOG_INPUT_BRAKE		
 		10.0f,	//fall rate eANALOG_INPUT_HANDBRAKE	
 		5.0f,	//fall rate eANALOG_INPUT_STEER_LEFT
 		5.0f	//fall rate eANALOG_INPUT_STEER_RIGHT
@@ -184,18 +191,41 @@ void PhysicsSystem::updateCar() {
 	cars[2] = mVehiclePlayer3;
 	cars[3] = mVehiclePlayer4;
 	for (int car = 0; car < 4; car++) {
-		// Update wheels
+		// Update wheels/suspension
 		for (int wheel = 0; wheel < 4; wheel++) {
 			PxVehicleWheelData wheelData = cars[car]->mWheelsSimData.getWheelData(wheel);
+			PxVehicleSuspensionData suspData = cars[car]->mWheelsSimData.getSuspensionData(wheel);
+
+			// Wheels
+
 			wheelData.mMass = wheel_mass;
 			wheelData.mMOI = wheel_moi;
 			wheelData.mMaxBrakeTorque = max_brake_torque;
-			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) {
-				
-			}
-			else {
+			wheelData.mToeAngle = 0.f;
+			wheelData.mDampingRate = wheel_damping_rate;
+			
+			// Suspension
+			suspData.mSpringStrength = spring_strength;
+			suspData.mMaxCompression = max_compression;
+			suspData.mMaxDroop = max_droop;
 
+			// Properties dependent on position
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear changes
+				wheelData.mMaxHandBrakeTorque = max_hand_brake_torque;
 			}
+			else { // Front changes
+				wheelData.mMaxSteer = max_steer;
+			}
+
+			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eFRONT_LEFT) { // Left changes
+				suspData.mCamberAtRest = camber_at_rest;
+			}
+			else { // right changes
+				suspData.mCamberAtRest = -camber_at_rest;
+			}
+			// Updating
+			//cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
+			cars[car]->mWheelsSimData.setSuspensionData(wheel, suspData);
 			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
 		}
 
@@ -209,17 +239,6 @@ void PhysicsSystem::updateCar() {
 		// Update chassis
 		//PxVehicleChassisData gaming = cars[car]->
 	}
-}
-
-void PhysicsSystem::updateEngine() {
-	PxVehicleEngineData engine;
-	engine.mPeakTorque = peak_torque;
-	engine.mMaxOmega = max_omega;//approx 6000 rpm
-
-	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 }
 
 void PhysicsSystem::initializeActors() {
@@ -267,8 +286,6 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer2 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
-
-	updateEngine();
 
 	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
@@ -408,14 +425,22 @@ void PhysicsSystem::randomizeIngredientLocations()
 	//this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
+// Constructor
 PhysicsSystem::PhysicsSystem() :
-		chassis_mass(400.f)
-	,	peak_torque(100000.f)
-	,	max_omega(1000.f)
-	,	wheel_mass(800.f)
-	,	wheel_moi(100.f)//wheel_moi(1440.f)
-	,	chassis_moi_y(0.25f)
-	,	max_brake_torque(100000.f)
+	chassis_mass(400.f)
+	, peak_torque(100000.f)
+	, max_omega(1000.f)
+	, wheel_mass(800.f)
+	, wheel_damping_rate(20.f)
+	, wheel_moi(100.f)
+	, chassis_moi_y(0.25f)
+	, max_brake_torque(100000.f)
+	, max_hand_brake_torque(15000.f)
+	, camber_at_rest(0.2f)
+	, spring_strength(35000.f)
+	, max_compression(.5f)
+	, max_droop(0.1f)
+	, max_steer(PI/2.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
@@ -427,7 +452,10 @@ PhysicsSystem::PhysicsSystem() :
 	mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 	// Physics
-	this->mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(), true, mPvd);
+	PxTolerancesScale tolerances = PxTolerancesScale();
+	tolerances.length = 10;
+	tolerances.speed = 10;
+	this->mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, tolerances, true, mPvd);
 	initVehicleSDK();
 
 	// Dispatcher
@@ -572,7 +600,7 @@ float PhysicsSystem::getTurnDirectionalInfluence()
 	return turnDirectionalInfluence;
 }
 
-void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep) {
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
 		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
@@ -592,38 +620,39 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
-
-	if (player1->verifyPlayerCollision) {
-		if (player1->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player1->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
-		else if (player1->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player2->verifyPlayerCollision) {
-		if (player2->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player2->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
-		else if (player2->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player3->verifyPlayerCollision) {
-		if (player3->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player3->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player3->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player4->verifyPlayerCollision) {
-		if (player4->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player4->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player4->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+	if (gameStage != 3) {
+		if (player1->verifyPlayerCollision) {
+			if (player1->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player1->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
+			else if (player1->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player2->verifyPlayerCollision) {
+			if (player2->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player2->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
+			else if (player2->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player3->verifyPlayerCollision) {
+			if (player3->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player3->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player3->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player4->verifyPlayerCollision) {
+			if (player4->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player4->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player4->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+		}
 	}
 
 	// Vehicle update
@@ -694,7 +723,7 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	playerTransform->update(player->getRigidDynamicActor()->getGlobalPose());
 }
 
-void PhysicsSystem::update(const float dt)
+void PhysicsSystem::update(const float dt, int gameStage)
 {
 	// Only update if more than 1/120th of a second has passed since last update
 	// Making the constant much larger than 1/120th causes a significant jitter
@@ -734,10 +763,10 @@ void PhysicsSystem::update(const float dt)
 	this->mScene->fetchResults(true);
 
 	// Update the players
-	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep);
-	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
-	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
-	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
+	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep, gameStage);
 
 	// Update kitchen position
 	g_scene.getEntity("countertop")->getTransform()->update(kitchen->getGlobalPose());
@@ -869,6 +898,27 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 	default:
 		break;
 	}
+}
+
+bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
+	switch (playerNumber)
+	{
+	case (1):
+		return mIsVehicleInAirPlayer1;
+		break;
+	case (2):
+		return mIsVehicleInAirPlayer2;
+		break;
+	case (3):
+		return mIsVehicleInAirPlayer3;
+		break;
+	case (4):
+		return mIsVehicleInAirPlayer4;
+		break;
+	default:
+		break;
+	}
+	return false;
 }
 
 void PhysicsSystem::respawnPlayer(int playerNumber) {

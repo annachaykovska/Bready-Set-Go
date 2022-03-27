@@ -30,6 +30,7 @@ void Scene::createEntities()
 
 	// World
 	createEntity("countertop");
+	createEntity("fan");
 
 	// Debug Entities
 	createEntity("navmesh-debug");

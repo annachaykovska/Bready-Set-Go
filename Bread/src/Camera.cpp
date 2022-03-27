@@ -9,6 +9,8 @@
 
 #define CAMERA_DISTANCE 10.0
 #define CAMERA_GROUND_HEIGHT 5.0
+#define TOP_SPEED 40.f
+#define EULER 2.71828f
 
 Camera::Camera()
 	: position(glm::vec3(0, 200.0f, 500.0f))
@@ -23,7 +25,13 @@ Camera::Camera()
 	, counter(0)
 	, oldCameraRotationOffset(0.f)
 	, predictedCameraDelta(0.f)
+	, max_fov(50.f)
+	, in_whiplash(false)
 {
+	a = 7.f;
+	b = 4.6f;
+	c = 0.01f;
+	d = 1.1f;
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	updateCameraVectors(&transform);
@@ -39,11 +47,12 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float theta = 225.f;
 	float cameraRotationOffset = 0.f;
 
-	float elasticForce = 0.8f; // Lower = more resistance
+	float elasticForce = 0.2f; // Lower = more resistance
 
 	float vehicleSpeed = 0;
 	float vehicleTurn = 0;
 
+	float whiplashFOVChange=0;
 	perspective = 40;
 	cameraPositionOffset = 0;
 
@@ -52,19 +61,51 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		vehicleSpeed = physics->mVehiclePlayer1->computeForwardSpeed();
 		vehicleTurn = physics->mVehiclePlayer1->computeSidewaysSpeed();
 
-		if (vehicleSpeed > 20)
+		if (vehicleSpeed > TOP_SPEED)
 		{
-			vehicleSpeed = 20;
+			vehicleSpeed = TOP_SPEED;
+			//std::cout << "top speed" << std::endl;
+		}
+		else {
+			//std::cout << "not top speed" << std::endl;
 		}
 
-		cameraRotationOffset = vehicleSpeed * vehicleTurn * 2;
+		//TODO: FIX (whiplash happens back to back)
+		// See if harsh stop happened
+		//if (((vehicleSpeed > 0 && vehicleSpeed - lastSpeed < -0.1f) || (vehicleSpeed < 0 && vehicleSpeed - lastSpeed > 0.1f)) && !in_whiplash) {
+		//	in_whiplash = true;
+		//	total_whip_lash_frames=10;
+		//	whiplash_frame = 0;
+		//}
+		//if (in_whiplash) {
+		//	float x = (float)(whiplash_frame++)/total_whip_lash_frames;
+		//	std::cout << x << std::endl;
+		//	whiplashFOVChange = 4.f*(x)*(x - 1.f)*20.f;
+		//	if (whiplash_frame == total_whip_lash_frames) in_whiplash = false;
+		//}
+		
+		float max_rot=2.f; //FIXME: THIS VARIABLE IS A CONSTANT
+		if (!physics->getIsVehicleInAir(1)) {
+			cameraRotationOffset = vehicleSpeed * vehicleTurn * 2.2f;
+		}
+		if (cameraRotationOffset - oldCameraRotationOffset > max_rot) cameraRotationOffset = oldCameraRotationOffset + max_rot;
+		else if (cameraRotationOffset - oldCameraRotationOffset < -max_rot) cameraRotationOffset = oldCameraRotationOffset - max_rot;
 	}
-
 	if (vehicleSpeed > 0)
 	{
-		//perspective = 40 + (vehicleSpeed / 12);
-		cameraPositionOffset = (vehicleSpeed / 16);
+		float ratio = std::min(d * ((1 / (1 + pow(EULER, -a * (vehicleSpeed / TOP_SPEED) + b))) - c), 1.0f);
+		perspective += ratio * 35.f;
+		//cameraPositionOffset = (vehicleSpeed / 16);
 	}
+	float max_fov_change = 2.f; //FIXME: THIS VARIABLE IS A CONSTANT 
+	if (perspective - oldFOV > max_fov_change) {
+		perspective = oldFOV + max_fov_change;
+	}
+	else if (perspective - oldFOV < -max_fov_change) {
+		perspective = oldFOV - max_fov_change;
+	}
+
+	//perspective -= whiplashFOVChange;
 
 	float stopDegrees = 0;
 	if (physics != nullptr)
@@ -169,9 +210,13 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 			}
 		}
 	}
+	// Setting old values
+	lastSpeed = vehicleSpeed;
 	oldForcedDirection = forcedDirection;
+	oldCameraRotationOffset = cameraRotationOffset;
+	oldFOV = perspective;
 
-	theta += cameraRotationOffset / 16 + forcedDirection;
+	theta += cameraRotationOffset / 8 + forcedDirection;
 	glm::mat4 rotation45 = glm::mat4(cos(glm::radians(theta)), 0, sin(glm::radians(theta)), 0,
 		0, 1.0f, 0, 0,
 		-sin(glm::radians(theta)), 0, cos(glm::radians(theta)), 0,
