@@ -13,12 +13,12 @@ extern Scene g_scene;
 extern SystemManager g_systems;
 
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
-									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
-									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
-								     simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
-									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
-									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt"),
-									 skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFragment.txt")
+lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
+borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
+simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
+depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
+debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt"),
+skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFragment.txt")
 {
 	// Initialize matrices
 	this->projMatrix = glm::mat4(1.0f);
@@ -65,7 +65,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	Transform transform = Transform();
 	transform.position = glm::vec3(1.0f);
 	setupCameras(&transform); // Setup the camera
-	
+
 	// --------------------------------------------------------------------------------------------
 	// SHADOWS
 	// --------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// High resolution shadows ---------------------------------------------------------------------
 	// Configure depth map FBO
 	glGenFramebuffers(1, &this->depthMapFBO);
-	
+
 	// Create depth texture
 	glGenTextures(1, &this->depthMapTex);
 	glActiveTexture(GL_TEXTURE25);
@@ -141,7 +141,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-	
+
 	// --------------------------------------------------------------------------------------------
 	// SKYBOX
 	// --------------------------------------------------------------------------------------------
@@ -227,6 +227,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 		}
 	}
 
+	NavMesh navMeshPoints;
+	navMesh = navMeshPoints.getWireframe();
+
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -252,19 +255,19 @@ void RenderingSystem::loadModels()
 	// Player models
 	//-----------------------------------------------------------------------------------
 	std::string breadmobilePath = "resources/models/breadbus/breadbus.obj";
-	
+
 	// Player 1
 	this->models.emplace_back(Model(&breadmobilePath[0]));
 	g_scene.getEntity("player1")->attachComponent(&(this->models[0]), "model");
-	
+
 	// Player 2
 	this->models.emplace_back(Model(&breadmobilePath[0]));
 	g_scene.getEntity("player2")->attachComponent(&(this->models[1]), "model");
-	
+
 	// Player 3
 	this->models.emplace_back(Model(&breadmobilePath[0]));
 	g_scene.getEntity("player3")->attachComponent(&(this->models[2]), "model");
-	
+
 	// Player 4
 	this->models.emplace_back(Model(&breadmobilePath[0]));
 	g_scene.getEntity("player4")->attachComponent(&(this->models[3]), "model");
@@ -274,7 +277,7 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Ground
 	std::string groundPath = "resources/models/kitchen/kitchen.obj";
-	this->models.emplace_back(Model(&groundPath[0])); 
+	this->models.emplace_back(Model(&groundPath[0]));
 	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
 
 	// Fan
@@ -343,19 +346,19 @@ void RenderingSystem::loadModels()
 	//// Soupbase
 	//std::string soupbasePath = "resources/models/ingredients/soupbase.obj";
 	//this->models.emplace_back(Model(&soupbasePath[0]));
-	//g_scene.getEntity("soupbase")->attachComponent(&(this->models[16]), "model");
+	//g_scene.getEntity("soupbase")->attachComponent(&(this->models[17]), "model");
 
 	//// Pumpkin
 	//std::string pumpkinPath = "resources/models/ingredients/pumpkin.obj";
 	//this->models.emplace_back(Model(&pumpkinPath[0]));
-	//g_scene.getEntity("pumpkin")->attachComponent(&(this->models[17]), "model");
+	//g_scene.getEntity("pumpkin")->attachComponent(&(this->models[18]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Debug models
 	//-----------------------------------------------------------------------------------
 	std::string testPath = "resources/models/ball/ball.obj";
 	this->models.emplace_back(Model(&testPath[0]));
-	g_scene.getEntity("test")->attachComponent(&(this->models[16]), "model");
+	g_scene.getEntity("test")->attachComponent(&(this->models[17]), "model");
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -413,7 +416,7 @@ void RenderingSystem::updateOrtho(glm::mat4 lightView)
 	this->ort.farPlane = 1400.0f;
 }
 
-void RenderingSystem::update(Mesh mesh)
+void RenderingSystem::update()
 {
 	// Rough shadows -----------------------------------------------------------------
 	// Render roughDepthMap to texture (from light's perspective)
@@ -462,7 +465,7 @@ void RenderingSystem::update(Mesh mesh)
 		this->shader.setMat4("roughLightSpaceMatrix", roughLightSpaceMatrix);
 		this->shader.setVec3("playerPos", g_scene.getEntity("player1")->getTransform()->position);
 		this->shader.setMat4("playerModelMatrix", g_scene.getEntity("player1")->getTransform()->getModelMatrix());
-		renderScene(mesh);
+		renderScene();
 	}
 
 	drawSkybox();
@@ -490,7 +493,7 @@ Model* RenderingSystem::getKitchenModel()
 	return g_scene.getEntity("countertop")->getModel();
 }
 
-void RenderingSystem::renderScene(Mesh mesh)
+void RenderingSystem::renderScene()
 {
 	// Reset viewport
 	glViewport(0, 0, g_systems.width, g_systems.height);
@@ -525,8 +528,9 @@ void RenderingSystem::renderScene(Mesh mesh)
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
 	glUniform1i(texLoc, 0); // Turn textures off
-	mesh.setWireframe(true);
-	mesh.draw(getShader());
+	navMesh.setWireframe(true);
+	navMesh.draw(getShader());
+
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
 	{
@@ -555,7 +559,7 @@ void RenderingSystem::renderScene(Mesh mesh)
 }
 
 void RenderingSystem::renderShadowMap()
-{	
+{
 	// Get model unfirom location in shader
 	unsigned int modelLoc = glGetUniformLocation(this->depthShader.getId(), "model");
 
@@ -625,7 +629,7 @@ glm::mat4 RenderingSystem::calculateOrthoProjection()
 	float maxY = std::numeric_limits<float>::min();
 	float minZ = std::numeric_limits<float>::max();
 	float maxZ = std::numeric_limits<float>::min();
-	
+
 	for (auto& v : corners)
 	{
 		glm::vec4 transformed = lightView * v;

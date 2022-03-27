@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "DebugOverlay.h"
 #include "../Transform.h"
+#include "../Navigation/NavMesh.h"
 
 struct Orthogonal
 {
@@ -28,9 +29,9 @@ public:
 	Shader& getShader();
 	void loadModels();
 	void setupCameras(Transform* playerTransform);
-	void update(Mesh mesh);
+	void update();
 	Model* getKitchenModel();
-	void renderScene(Mesh mesh);
+	void renderScene();
 	void renderShadowMap();
 	void renderTexturedQuad();
 	void renderDebugShadowMap();
@@ -75,6 +76,8 @@ private:
 	Shader skyboxShader;
 
 	std::vector<Model> models;
+
+	Mesh navMesh;
 
 	unsigned int FBO;
 	unsigned int textureColorBuffer;
