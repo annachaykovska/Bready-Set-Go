@@ -260,8 +260,6 @@ int main()
 		// WINDOW
 		window.clear();
 
-		navMesh.currentMeshSegment(player1->getTransform()->position);
-
 		if (gameLoop.gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
@@ -273,6 +271,7 @@ int main()
 			window.swapBuffer();
 		}
 		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			navMesh.currentMeshSegment(player1->getTransform()->position);
 			int winner = ui.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();

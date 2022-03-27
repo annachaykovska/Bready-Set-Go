@@ -37,7 +37,10 @@ void NavigationSystem::update()
 	{
 	case nav:
 		//steering_.updateSteering(waypointUpdater_.interpolator());
-		steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
+		if (waypointUpdater_.currentWaypoint() != nullptr)
+		{
+			steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
+		}
 		//std::cout << waypointUpdater_.interpolator().x << " " << waypointUpdater_.interpolator().y << " " << waypointUpdater_.interpolator().z << std::endl;
 		//std::cout << waypointUpdater_.currentWaypoint().x << " " << waypointUpdater_.currentWaypoint().y << " " << waypointUpdater_.currentWaypoint().z << std::endl;
 		waypointUpdater_.updateWaypoints();
