@@ -470,12 +470,16 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
                 location.y = (g_systems.height / 2.f) - offset;
             }
         }
+        location.z = scX(0.04);
+    }
+    else
+    {
+        location.z = scX(0.07) + ((scX(0.04) - scX(0.07)) / (400.f - 0.f)) * (length(toEntity) - 0);
     }
 
-    location.z = scX(0.07) + ((scX(0.02) - scX(0.07)) / (400.f - 0.f)) * (length(toEntity) - 0);
-    if (location.z < scX(0.02))
+    if (location.z < scX(0.04))
     {
-        location.z = scX(0.02);
+        location.z = scX(0.04);
     }
 
     return glm::vec3(location.x, location.y, location.z);
