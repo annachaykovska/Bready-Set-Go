@@ -26,28 +26,32 @@ void AIBrain::update()
 		}
 	}
 	bool movingTarget = false;
-
 	switch (currentTarget)
 	{
 	case CHEESE:
+		//std::cout << "Cheese" << std::endl;
 		if (length(tracker.getCheeseLocation().position - trackedTargetDelta) > 5)
 			movingTarget = true;
 		break;
 	case TOMATO:
+		//std::cout << "Tomato" << std::endl;
 		if (length(tracker.getTomatoLocation().position - trackedTargetDelta) > 5)
 			movingTarget = true;
 		break;
 	case DOUGH:
+		//std::cout << "Dough" << std::endl;
 		if (length(tracker.getDoughLocation().position - trackedTargetDelta) > 5)
 			movingTarget = true;
 		break;
 	case SAUSAGE:
+		//std::cout << "Sausage" << std::endl;
 		if (length(tracker.getSausageLocation().position - trackedTargetDelta) > 5)
 			movingTarget = true;
 		break;
 	}
-	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || movingTarget)
+	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget)
 	{
+		navigation.setMode(NavMode::nav);
 		panicCounter_ = 0;
 		oldInventoryCount = getInventoryCount();
 		currentTarget = findClosestTarget();

@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "DebugOverlay.h"
 #include "../Transform.h"
+#include "../Navigation/NavMesh.h"
 
 struct Orthogonal
 {
@@ -75,6 +76,8 @@ private:
 	Shader skyboxShader;
 
 	std::vector<Model> models;
+
+	Mesh navMesh;
 
 	unsigned int FBO;
 	unsigned int textureColorBuffer;
