@@ -49,6 +49,7 @@ public:
 	Mesh getWireframe();
 	Transform getWireframeTransform();
 	std::vector<MeshSegment*> getSegments();
+	int currentMeshSegment(vert position);
 
 private:
 	void setupVisualizer();

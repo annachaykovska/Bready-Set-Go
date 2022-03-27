@@ -6,7 +6,11 @@ NavMesh::NavMesh()
 	vert n11, n12, n13, n14, n15, n16, n17, n18, n19, n20;
 	vert n21, n22, n23, n24, n25, n26, n27, n28, n29, n30;
 	vert n31, n32, n33, n34, n35, n36, n37, n38, n39, n40;
-	vert n41, n42, n43, n44;
+	vert n41, n42, n43, n44, n45, n46, n47, n48, n49, n50;
+	vert n51, n52, n53, n54, n55, n56, n57, n58, n59, n60;
+	vert n61, n62, n63, n64, n65, n66, n67, n68, n69, n70;
+	vert n71, n72, n73, n74, n75, n76, n77, n78, n79, n80;
+	vert n81, n82, n83, n84, n85, n86, n87, n88, n89, n90;
 
 	//KITCHEN COUNTER
 	n1 = vert(90, 2, -145);
@@ -55,6 +59,56 @@ NavMesh::NavMesh()
 	n42 = vert(-69, 58, 141);
 	n43 = vert(92, 6, 167);
 	n44 = vert(72, 6, 167);
+
+	// COUNTER LEVEL SHELVES
+	n45 = vert(-10, 6, 162);
+	n46 = vert(-90, 6, 162);
+	n47 = vert(-90, 6, 203);
+	n48 = vert(-10, 6, 203);
+	n49 = vert(72, 6, 203);
+	n50 = vert(82, 6, 185);
+	n51 = vert(92, 6, 203);
+	n52 = vert(205, 6, 203);
+	n53 = vert(173, 6, 165);
+	n54 = vert(205, 6, 165);
+	n55 = vert(195, 6, 131);
+	n56 = vert(199, 6, 101);
+	n57 = vert(191, 6, 101);
+	n58 = vert(195, 6, 70);
+	n59 = vert(225, 6, 41);
+	n60 = vert(166, 6, 41);
+	n61 = vert(221, 6, -51);
+	n62 = vert(195, 6, -66);
+	n63 = vert(221, 6, -82);
+	n64 = vert(221, 6, -150);
+	n65 = vert(170, 6, -150);
+	n66 = vert(259, 6, -63);
+
+	// SHELVES
+	n67 = vert(-96, 58, 184);
+	n68 = vert(-43, 58, 179);
+	n69 = vert(-43, 58, 205);
+	n70 = vert(20, 81, 205);
+	n71 = vert(20, 81, 179);
+	n72 = vert(93, 108, 179);
+	n73 = vert(93, 108, 205);
+	n74 = vert(123, 108, 206);
+	n75 = vert(93, 108, 143);
+	n76 = vert(126, 108, 143);
+	n77 = vert(156, 108, 168);
+	n78 = vert(206, 108, 205);
+	n79 = vert(206, 108, 143);
+	n80 = vert(164, 108, 143);
+	n81 = vert(172, 108, 91);
+	n82 = vert(206, 108, 91);
+	n83 = vert(267, 108, 91);
+	n84 = vert(219, 108, -35);
+	n85 = vert(172, 108, -159);
+	n86 = vert(267, 108, -159);
+	n87 = vert(-40, 108, 143);
+	n88 = vert(-40, 108, 174);
+	n89 = vert(194, 58, 143);
+	n90 = vert(194, 58, 179);
 
 	// KITCHEN COUNTER
 	MeshSegment* m1 = new MeshSegment(n8, n1, n7);
@@ -112,70 +166,81 @@ NavMesh::NavMesh()
 
 	// COUNTER RAMPS
 	MeshSegment* m45 = new MeshSegment(n36, n40, n2);
+
 	MeshSegment* m46 = new MeshSegment(n40, n39, n2);
 	MeshSegment* m47 = new MeshSegment(n42, n18, n26);
 	MeshSegment* m48 = new MeshSegment(n41, n42, n26);
 	MeshSegment* m49 = new MeshSegment(n43, n4, n11);
-
 	MeshSegment* m50 = new MeshSegment(n44, n43, n11);
 
-	//// KITCHEN COUNTER
-	//m1->id_ = 1;
-	//m2->id_ = 2;
-	//m3->id_ = 3;
-	//m4->id_ = 4;
-	//m5->id_ = 5;
+	// COUNTER LEVEL SHELVES
+	MeshSegment* m51 = new MeshSegment(n50, n43, n44);
+	MeshSegment* m52 = new MeshSegment(n49, n50, n44);
+	MeshSegment* m53 = new MeshSegment(n48, n49, n44);
+	MeshSegment* m54 = new MeshSegment(n48, n44, n45);
+	MeshSegment* m55 = new MeshSegment(n48, n45, n46);
 
-	//m6->id_ = 6;
-	//m7->id_ = 7;
-	//m8->id_ = 8;
-	//m9->id_ = 9;
-	//m10->id_ = 10;
+	MeshSegment* m56 = new MeshSegment(n48, n46, n47);
+	MeshSegment* m57 = new MeshSegment(n49, n51, n50);
+	MeshSegment* m58 = new MeshSegment(n51, n43, n50);
+	MeshSegment* m59 = new MeshSegment(n51, n53, n43);
+	MeshSegment* m60 = new MeshSegment(n51, n52, n53);
 
-	//m11->id_ = 11;
-	//m12->id_ = 12;
-	//m13->id_ = 13;
-	//m14->id_ = 14;
-	//m15->id_ = 15;
+	MeshSegment* m61 = new MeshSegment(n52, n54, n53);
+	MeshSegment* m62 = new MeshSegment(n53, n54, n55);
+	MeshSegment* m63 = new MeshSegment(n53, n55, n57);
+	MeshSegment* m64 = new MeshSegment(n54, n56, n55);
+	MeshSegment* m65 = new MeshSegment(n55, n56, n57);
 
-	//m16->id_ = 16;
-	//m17->id_ = 17;
-	//m18->id_ = 18;
-	//m19->id_ = 19;
-	//m20->id_ = 20;
+	MeshSegment* m66 = new MeshSegment(n57, n56, n58);
+	MeshSegment* m67 = new MeshSegment(n57, n58, n60);
+	MeshSegment* m68 = new MeshSegment(n56, n59, n58);
+	MeshSegment* m69 = new MeshSegment(n58, n59, n60);
+	MeshSegment* m70 = new MeshSegment(n60, n59, n61);
+	
+	MeshSegment* m71 = new MeshSegment(n60, n61, n40);
+	MeshSegment* m72 = new MeshSegment(n40, n61, n62);
+	MeshSegment* m73 = new MeshSegment(n40, n62, n39);
+	MeshSegment* m74 = new MeshSegment(n61, n63, n62);
+	MeshSegment* m75 = new MeshSegment(n62, n63, n39);
 
-	//m21->id_ = 21;
-	//m22->id_ = 22;
-	//m23->id_ = 23;
-	//m24->id_ = 24;
-	//m25->id_ = 25;
+	MeshSegment* m76 = new MeshSegment(n39, n63, n65);
+	MeshSegment* m77 = new MeshSegment(n63, n64, n65);
+	MeshSegment* m78 = new MeshSegment(n66, n64, n63);
 
-	//m26->id_ = 26;
-	//m27->id_ = 27;
-	//m28->id_ = 28;
-	//m29->id_ = 29;
-	//m30->id_ = 30;
+	// SHELVES
+	MeshSegment* m79 = new MeshSegment(n68, n42, n41);
+	MeshSegment* m80 = new MeshSegment(n67, n68, n41);
 
-	//m31->id_ = 31;
-	//m32->id_ = 32;
-	//m33->id_ = 33;
-	//m34->id_ = 34;
-	//m35->id_ = 35;
+	MeshSegment* m81 = new MeshSegment(n67, n69, n68);
+	MeshSegment* m82 = new MeshSegment(n69, n71, n68);
+	MeshSegment* m83 = new MeshSegment(n69, n70, n71);
+	MeshSegment* m84 = new MeshSegment(n70, n73, n71);
+	MeshSegment* m85 = new MeshSegment(n73, n72, n71);
 
-	//m36->id_ = 36;
-	//m37->id_ = 37;
-	//m38->id_ = 38;
-	//m39->id_ = 39;
-	//m40->id_ = 40;
+	//MeshSegment* m86 = new MeshSegment();
+	MeshSegment* m87 = new MeshSegment(n73, n74, n72);
+	MeshSegment* m88 = new MeshSegment(n74, n76, n72);
+	MeshSegment* m89 = new MeshSegment(n72, n76, n75);
+	MeshSegment* m90 = new MeshSegment(n74, n77, n76);
 
-	//m41->id_ = 41;
-	//m42->id_ = 42;
-	//m43->id_ = 43;
-	//m44->id_ = 44;
+	MeshSegment* m91 = new MeshSegment(n74, n78, n77);
+	MeshSegment* m92 = new MeshSegment(n78, n79, n77);
+	MeshSegment* m93 = new MeshSegment(n77, n80, n76);
+	MeshSegment* m94 = new MeshSegment(n77, n79, n80);
+	MeshSegment* m95 = new MeshSegment(n79, n81, n80);
 
-	//// COUNTER RAMPS
-	//m45->id_ = 45;
-	//m46->id_ = 
+	MeshSegment* m96 = new MeshSegment(n79, n82, n81);
+	MeshSegment* m97 = new MeshSegment(n81, n82, n84);
+	MeshSegment* m98 = new MeshSegment(n82, n83, n84);
+	MeshSegment* m99 = new MeshSegment(n83, n86, n84);
+	MeshSegment* m100 = new MeshSegment(n81, n84, n85);
+
+	MeshSegment* m101 = new MeshSegment(n84, n86, n85);
+	MeshSegment* m102 = new MeshSegment(n72, n75, n87);
+	MeshSegment* m103 = new MeshSegment(n88, n72, n87);
+	MeshSegment* m104 = new MeshSegment(n68, n89, n42);
+	MeshSegment* m105 = new MeshSegment(n68, n90, n89);
 
 	// KITCHEN COUNTER
 	mesh_.push_back(m1);
@@ -233,12 +298,81 @@ NavMesh::NavMesh()
 
 	// COUNTER RAMPS
 	mesh_.push_back(m45);
+
 	mesh_.push_back(m46);
 	mesh_.push_back(m47);
 	mesh_.push_back(m48);
 	mesh_.push_back(m49);
-
 	mesh_.push_back(m50);
+
+	// COUNTER LEVEL SHELVES
+	mesh_.push_back(m51);
+	mesh_.push_back(m52);
+	mesh_.push_back(m53);
+	mesh_.push_back(m54);
+	mesh_.push_back(m55);
+
+	mesh_.push_back(m56);
+	mesh_.push_back(m57);
+	mesh_.push_back(m58);
+	mesh_.push_back(m59);
+	mesh_.push_back(m60);
+
+	mesh_.push_back(m61);
+	mesh_.push_back(m62);
+	mesh_.push_back(m63);
+	mesh_.push_back(m64);
+	mesh_.push_back(m65);
+
+	mesh_.push_back(m66);
+	mesh_.push_back(m67);
+	mesh_.push_back(m68);
+	mesh_.push_back(m69);
+	mesh_.push_back(m70);
+
+	mesh_.push_back(m71);
+	mesh_.push_back(m72);
+	mesh_.push_back(m73);
+	mesh_.push_back(m74);
+	mesh_.push_back(m75);
+
+	mesh_.push_back(m76);
+	mesh_.push_back(m77);
+	mesh_.push_back(m78);
+
+	// SHELVES
+	mesh_.push_back(m79);
+	mesh_.push_back(m80);
+
+	mesh_.push_back(m81);
+	mesh_.push_back(m82);
+	mesh_.push_back(m83);
+	mesh_.push_back(m84);
+	mesh_.push_back(m85);
+
+	//mesh_.push_back(m86);
+	mesh_.push_back(m87);
+	mesh_.push_back(m88);
+	mesh_.push_back(m89);
+	mesh_.push_back(m90);
+
+	mesh_.push_back(m91);
+	mesh_.push_back(m92);
+	mesh_.push_back(m93);
+	mesh_.push_back(m94);
+	mesh_.push_back(m95);
+
+	mesh_.push_back(m96);
+	mesh_.push_back(m97);
+	mesh_.push_back(m98);
+	mesh_.push_back(m99);
+	mesh_.push_back(m100);
+
+	mesh_.push_back(m101);
+	mesh_.push_back(m102);
+	mesh_.push_back(m103);
+	mesh_.push_back(m104);
+	mesh_.push_back(m105);
 
 	for (int i = 1; i <= mesh_.size(); i++)
 	{
@@ -348,4 +482,31 @@ bool NavMesh::alreadyContainsNeighbor(MeshSegment* segment, MeshSegment* neighbo
 		}
 	}
 	return false;
+}
+
+int NavMesh::currentMeshSegment(vert position)
+{
+	float min = 999999;
+	int minInd = -1;
+
+	for (int i = 0; i < mesh_.size(); i++)
+	{
+		float summedAngle = 0;
+
+		glm::vec3 vectorA = mesh_.at(i)->v0_ - position;
+		glm::vec3 vectorB = mesh_.at(i)->v1_ - position;
+		glm::vec3 vectorC = mesh_.at(i)->v2_ - position;
+
+		summedAngle += acos(dot(vectorA, vectorB) / (length(vectorA) * length(vectorB)));
+		summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));
+		summedAngle += acos(dot(vectorB, vectorC) / (length(vectorB) * length(vectorC)));
+
+		if (abs(summedAngle - (2 * 3.1415926)) < min)
+		{
+			min = abs(summedAngle - (2 * 3.1415926));
+			minInd = mesh_.at(i)->id_;
+		}
+	}
+	std::cout << minInd << " " << min << std::endl;
+	return minInd;
 }

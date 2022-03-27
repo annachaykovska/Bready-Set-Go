@@ -243,6 +243,8 @@ int main()
 		// WINDOW
 		window.clear();
 
+		navMesh.currentMeshSegment(player1->getTransform()->position);
+
 		if (gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
