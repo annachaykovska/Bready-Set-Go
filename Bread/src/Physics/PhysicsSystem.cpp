@@ -1085,3 +1085,55 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	firstActor->otherPlayerInCollision = "";
 	secondActor->otherPlayerInCollision = "";
 }
+
+void PhysicsSystem::magnet(int stealer_id)
+{
+	if (!(stealer_id > 0 && stealer_id < 5)) return; // stealer index should be one of the four players
+
+	// Get the entity that is stealing, and the entities that can be stolen from
+	Entity* stealer;
+	std::vector<Entity*> victims = {
+		g_scene.getEntity("player 1"),
+		g_scene.getEntity("player 2"),
+		g_scene.getEntity("player 3"),
+		g_scene.getEntity("player 4") };
+	switch (stealer_id) {
+	case 1:
+		stealer = g_scene.getEntity("player 1");
+		victims.erase(victims.begin());
+		break;
+	case 2:
+		stealer = g_scene.getEntity("player 2");
+		victims.erase(victims.begin() + 1);
+		break;
+	case 3:
+		stealer = g_scene.getEntity("player 3");
+		victims.erase(victims.begin() + 2);
+		break;
+	case 4:
+		stealer = g_scene.getEntity("player 4");
+		victims.erase(victims.begin() + 3);
+		break;
+	default:
+		break;
+	}
+	// See if the stealer can steal (cooldown)
+	if (true) return;
+
+	// See the victims that can be stolen from
+	
+	if (victims.empty()) return;
+
+	// See the victims that are in range
+
+	if (victims.empty()) return;
+
+	// See if the stealer is in the correct position to steal from a victim
+
+	if (victims.empty()) return;
+
+	for (Entity* victim : victims) {
+		std::cout << victim->name << " ";
+	}
+	std::cout << std::endl;
+}
