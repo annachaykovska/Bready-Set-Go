@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include "NavMesh.h"
 #include "../Scene/Entity.h"
 
 typedef glm::vec3 position;
@@ -9,20 +10,21 @@ typedef glm::vec3 position;
 class WaypointUpdater
 {
 public:
-	WaypointUpdater(Entity& entity);
+	WaypointUpdater(Entity& entity, NavMesh& navMesh);
 
-	void setWaypoints(std::vector<position> waypoints);
+	void setWaypoints(std::vector<NavMesh::MeshSegment*> waypoints);
 	void setTarget(position target);
 	void updateWaypoints();
 	bool pathComplete();
 	int numWaypoints();
-	position currentWaypoint();
-	position futureWaypoint(int iter);
+	NavMesh::MeshSegment* currentWaypoint();
+	NavMesh::MeshSegment* futureWaypoint(int iter);
 	position interpolator();
 
 private:
 	Entity& entity_;
-	std::vector<position> waypoints_;
+	NavMesh& navMesh_;
+	std::vector<NavMesh::MeshSegment*> waypoints_;
 	
 	position interpolator_;
 	bool replanFlag_;

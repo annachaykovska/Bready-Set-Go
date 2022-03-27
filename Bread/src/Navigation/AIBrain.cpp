@@ -48,6 +48,7 @@ void AIBrain::update()
 	}
 	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || movingTarget)
 	{
+		navigation.setMode(NavMode::nav);
 		panicCounter_ = 0;
 		oldInventoryCount = getInventoryCount();
 		currentTarget = findClosestTarget();

@@ -142,7 +142,7 @@ bool PathFinder::stepContainsTarget(position target, PathStep* step)
 	*/
 }
 
-std::vector<position> PathFinder::findPath(position start, position end)
+std::vector<NavMesh::MeshSegment*> PathFinder::findPath(position start, position end)
 {
 	updateTraversablePathSteps();
 	open_.clear();
@@ -181,7 +181,7 @@ std::vector<position> PathFinder::findPath(position start, position end)
 		{
 			std::cout << "Not What we want" << std::endl;
 			printPath(previous);
-			std::vector<position> empty;
+			std::vector<NavMesh::MeshSegment*> empty;
 			return empty;
 		}
 
@@ -190,14 +190,14 @@ std::vector<position> PathFinder::findPath(position start, position end)
 		{
 			//printPath(current);
 
-			std::vector<position> finalPath;
+			std::vector<NavMesh::MeshSegment*> finalPath;
 
 			while (current->parent != nullptr)
 			{
-				finalPath.push_back(current->segment.first->position_);
+				finalPath.push_back(current->segment.second);
 				current = current->parent;
 			}
-			finalPath.push_back(current->segment.first->position_);
+			finalPath.push_back(current->segment.second);
 			
 			return finalPath;
 		}
