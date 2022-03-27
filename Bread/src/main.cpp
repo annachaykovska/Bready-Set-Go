@@ -314,7 +314,8 @@ int main()
 
 		// RESET game if end of game and menu selected
 		else if (gameLoop.isBackToMenuSelected) {
-			gameLoop.resetBackToStart();
+			gameLoop.resetGameLoopValues();
+			gameLoop.gameActorsReset(&physics, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 		}
 	}
 

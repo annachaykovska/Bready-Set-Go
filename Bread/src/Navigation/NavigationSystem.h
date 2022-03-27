@@ -22,8 +22,9 @@ public:
 
 	bool queryReset();
 
-private:
 	PhysicsSystem& physics_;
+
+private:
 	Entity& vehicle_;
 	NavMesh& navmesh_;
 

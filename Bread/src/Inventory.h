@@ -33,19 +33,7 @@ public:
 
 	Inventory()
 	{
-		this->cheese = 0;
-		this->dough = 0;
-		this->sausage = 0;
-		this->tomato = 0;
-		this->carrot = 0;
-		this->lettuce = 0;
-		this->parsnip = 0;
-		this->rice = 0;
-		this->egg = 0;
-		this->chicken = 0;
-		this->peas = 0;
-		this->soupbase = 0;
-		this->pumpkin = 0;
+		clearAllIngredients();
 	}
 
 	bool checkPizza()
@@ -126,5 +114,21 @@ public:
 			}
 		}
 		return -1;
+	}
+
+	void clearAllIngredients() {
+		this->cheese = 0;
+		this->dough = 0;
+		this->sausage = 0;
+		this->tomato = 0;
+		this->carrot = 0;
+		this->lettuce = 0;
+		this->parsnip = 0;
+		this->rice = 0;
+		this->egg = 0;
+		this->chicken = 0;
+		this->peas = 0;
+		this->soupbase = 0;
+		this->pumpkin = 0;
 	}
 };
