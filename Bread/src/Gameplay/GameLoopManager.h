@@ -24,6 +24,9 @@ public:
 	bool isMenuItemSelected;
 	bool isBackToMenuSelected;
 
+	// Mid game things
+	bool isPaused;
+
 	// End game things
 	bool isGameExitSelected;
 	bool isGameEnded;

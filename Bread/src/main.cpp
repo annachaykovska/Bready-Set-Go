@@ -231,6 +231,7 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
+	// Change to 1 for submission
 	gameLoop.gameStage = 1;
 
 	// GAME LOOP
@@ -250,7 +251,9 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			g_systems.physics->update(dt, gameLoop.gameStage);
+			if (!gameLoop.isPaused) {
+				g_systems.physics->update(dt, gameLoop.gameStage);
+			}
 			accumulator -= dt;
 			t += dt;
 		}
@@ -310,6 +313,7 @@ int main()
 			gameLoop.updateGameStageFromMenu();
 			audio.stopMusic(countertopAudioSource);
 			audio.playGameMusic(countertopAudioSource);
+			gameLoop.isPaused = false;
 		}
 
 		// RESET game if end of game and menu selected
@@ -318,6 +322,7 @@ int main()
 			gameLoop.gameActorsReset(&physics, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 			audio.stopMusic(countertopAudioSource);
 			audio.playMainMenuMusic(countertopAudioSource);
+			gameLoop.isPaused = true;
 		}
 	}
 

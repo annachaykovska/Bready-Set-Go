@@ -14,6 +14,7 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 , mainMenuTimeoutLength(3)
 , returnToMainMenuTimeoutLength(3)
 , endScreenGenerated(-1)
+, isPaused(false)
 {}
 
 
@@ -62,6 +63,4 @@ void GameLoopManager::gameActorsReset(PhysicsSystem* physics, Inventory* p1Inv, 
 	p2Inv->clearAllIngredients();
 	p3Inv->clearAllIngredients();
 	p4Inv->clearAllIngredients();
-
-	// Freeze the physics ?
 }

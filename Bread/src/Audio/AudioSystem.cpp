@@ -234,7 +234,7 @@ void AudioSystem::playGameMusic(AudioSource* source) {
 }
 
 void AudioSystem::playMainMenuMusic(AudioSource* source) {
-	source->gain = 0.07f; // Volume control
+	source->gain = 0.08f; // Volume control
 	source->loop = true;
 	source->play("le_festin.wav"); // Comment this out to turn off the music on load
 }
