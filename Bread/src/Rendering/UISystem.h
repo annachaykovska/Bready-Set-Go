@@ -7,6 +7,7 @@
 #include "../Scene/Scene.h"
 #include "../Physics/PhysicsSystem.h"
 #include "../Navigation/IngredientTracker.h"
+#include "../Audio/AudioSystem.h"
 #include <iostream>
 #include <map>
 #include <ft2build.h>
@@ -61,6 +62,7 @@ private:
 
 	ImageTexture speedometer;
 	float speedometer_theta;
+	bool powerReady;
 	ImageTexture needle;
 	ImageTexture vacuum;
 	ImageTexture miniMap;

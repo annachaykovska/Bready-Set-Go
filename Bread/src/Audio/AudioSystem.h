@@ -35,6 +35,8 @@ public:
 	void stopMusic(AudioSource* source);
 	void playSlurp(AudioSource* source);
 	void endSlurp(AudioSource* source, bool success);
+	void ingredientSuck(AudioSource* source);
+	void powerReady(AudioSource* source);
 
 	void update();
 
