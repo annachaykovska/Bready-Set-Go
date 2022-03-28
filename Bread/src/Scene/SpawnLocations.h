@@ -3,7 +3,7 @@
 
 glm::vec3 FRIDGE_ROOF = glm::vec3(215, 109, -95);
 glm::vec3 TOP_SHELF = glm::vec3(-16, 109, 157);
-glm::vec3 SECOND_SHELF = glm::vec3(158, 60, 165);
+glm::vec3 SECOND_SHELF = glm::vec3(120, 60, 165);
 glm::vec3 FIRST_SHELF = glm::vec3(-65, 7, 185);
 glm::vec3 FRIDGE_SHELF = glm::vec3(194, 7, 12);
 glm::vec3 FAR_COUNTER = glm::vec3(-240, 4, -81);

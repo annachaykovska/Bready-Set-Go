@@ -313,9 +313,9 @@ int main()
 
 			// AI + Navigation
 			ingredientTracker.update();
-			p2Brain.update();
+			//p2Brain.update();
 			p3Brain.update();
-			p4Brain.update();
+			//p4Brain.update();
 
 			// AUDIO
 			audio.update();
