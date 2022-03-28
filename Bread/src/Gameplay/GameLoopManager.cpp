@@ -57,6 +57,7 @@ void GameLoopManager::gameActorsReset(PhysicsSystem* physics, Inventory* p1Inv, 
 
 	// Reset all ingredient positions 
 	physics->randomizeIngredientLocations();
+	physics->updateFoodTransforms(true);
 
 	// Reset player inventory
 	p1Inv->clearAllIngredients();

@@ -28,7 +28,7 @@ public:
 	PxRigidDynamic* createObstacle(const PxTransform& t, PxReal halfExtent, std::string name);
 	void update(const float timestep, int gameStage);
 	void updateVehicle(PxVehicleDrive4W *player, bool &isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage);
-	void updateFoodTransforms();
+	void updateFoodTransforms(bool setAllVisible = false);
 	void setAnalogInputs(bool input);
 
 	void setViewDirectionalInfluence(float value);

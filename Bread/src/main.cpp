@@ -321,11 +321,11 @@ int main()
 		else if (gameLoop.isBackToMenuSelected) {
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
-			audio.stopMusic(countertopAudioSource);
-			audio.playMainMenuMusic(countertopAudioSource);
-
 			ingredientTracker = IngredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
 			ui.initIngredientTracking(&ingredientTracker);
+
+			audio.stopMusic(countertopAudioSource);
+			audio.playMainMenuMusic(countertopAudioSource);
 			gameLoop.isPaused = true;
 		}
 	}
