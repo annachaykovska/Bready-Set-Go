@@ -168,6 +168,7 @@ int main()
 	// Get a reference to the countertop's AudioSource to play background music
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
+	countertopAudioSource->gain = 0.05f;
 	audio.playMainMenuMusic(countertopAudioSource);
 	
 	AudioSource* p2Audio = player2->getAudioSource();

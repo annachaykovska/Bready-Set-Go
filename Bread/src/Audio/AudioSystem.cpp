@@ -81,7 +81,7 @@ AudioSystem::AudioSystem()
 	player4->attachComponent(p4Engine, "engineAudio");
 
 	bgMusic->loop = true;
-	bgMusic->gain = 0.1f;
+	bgMusic->gain = 0.05f;
 	bgMusic->pitch = 1.0f;
 
 	p1Engine->loop = true;
