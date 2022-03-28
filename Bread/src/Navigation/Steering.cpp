@@ -13,7 +13,10 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics, int id)
 	, finalApproach_(false)
 	, stuckTimer_(0)
 	, stuck_(false)
+	, locked_(false)
 	, procedureTimer_(0)
+	, positionDelta_(glm::vec3(0, 0, 0))
+	, deltaTimer_(0)
 {
 	switch (id_)
 	{
@@ -53,8 +56,26 @@ void Steering::evasiveAction()
 	procedureTimer_++;
 }
 
+bool Steering::locked()
+{
+	bool temp = locked_;
+	locked_ = false;
+	return temp;
+}
+
 void Steering::updateSteering(position target)
 {
+	deltaTimer_++;
+	if (deltaTimer_ > 800)
+	{
+		if (length(entity_.getTransform()->position - positionDelta_) < 1.f)
+		{
+			locked_ = true;
+		}
+		positionDelta_ = entity_.getTransform()->position;
+		deltaTimer_ = 0;
+	}
+
 	if (stuck_)
 	{
 		evasiveAction();
@@ -84,7 +105,7 @@ void Steering::updateSteering(position target)
 		stuckTimer_ = 0;
 	}
 
-	if (stuckTimer_ > 600)
+	if (stuckTimer_ > 400)
 	{
 		stuckTimer_ = 0;
 		stuck_ = true;

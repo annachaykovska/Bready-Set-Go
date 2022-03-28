@@ -16,6 +16,7 @@ public:
 	void updateSteering(position target);
 	void setFinalApproach(bool status);
 	void evasiveAction();
+	bool locked();
 
 private:
 	Entity& entity_;
@@ -27,6 +28,10 @@ private:
 
 	int stuckTimer_;
 	bool stuck_;
+	bool locked_;
+
+	int deltaTimer_;
+	position positionDelta_;
 
 	int procedureTimer_;
 };

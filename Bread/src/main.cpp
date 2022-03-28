@@ -291,6 +291,7 @@ int main()
 			if (winner != 0) {
 				gameLoop.setEndStage();
 			}
+
 			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
@@ -313,9 +314,12 @@ int main()
 
 			// AI + Navigation
 			ingredientTracker.update();
-			p2Brain.update();
-			p3Brain.update();
-			p4Brain.update();
+			if (!gameLoop.isGameEnded)
+			{
+				p2Brain.update();
+				p3Brain.update();
+				p4Brain.update();
+			}
 
 			// AUDIO
 			audio.update();

@@ -126,6 +126,11 @@ void AIBrain::update()
 		break;
 	}
 
+	if (oldInventoryCount > getInventoryCount())
+	{
+		navigation.coolDownMagnet();
+	}
+
 	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget)
 	{
 		navigation.setMode(NavMode::nav);
@@ -149,17 +154,31 @@ Ingredient AIBrain::findClosestTarget()
 		switch (currentRecipe->list[i])
 		{
 		case Ingredient::Cheese:
-			if (inventory.cheese == 0 && navigation.distanceFromVehicle(tracker.getCheeseLocation().position) < distance_)
+			//if (inventory.cheese == 0 && navigation.distanceFromVehicle(tracker.getCheeseLocation().position) < distance_)
+			if(inventory.cheese == 0)
 			{
 				bestTarget = Ingredient::Cheese;
-				distance_ = navigation.distanceFromVehicle(tracker.getCheeseLocation().position);
+				float temp = navigation.distanceFromVehicle(tracker.getCheeseLocation().position);
+				distance_ = 50;
+				if (temp < distance_)
+				{
+					distance_ = temp;
+				}
+				//distance_ = navigation.distanceFromVehicle(tracker.getCheeseLocation().position);
 			}
 			break;
 		case Ingredient::Dough:
-			if (inventory.dough == 0 && navigation.distanceFromVehicle(tracker.getDoughLocation().position) < distance_)
+			//if (inventory.dough == 0 && navigation.distanceFromVehicle(tracker.getDoughLocation().position) < distance_)
+			if(inventory.dough == 0)
 			{
 				bestTarget = Ingredient::Dough;
-				distance_ = navigation.distanceFromVehicle(tracker.getDoughLocation().position);
+				float temp = navigation.distanceFromVehicle(tracker.getDoughLocation().position);
+				distance_ = 50;
+				if (temp < distance_)
+				{
+					distance_ = temp;
+				}
+				//distance_ = navigation.distanceFromVehicle(tracker.getDoughLocation().position);
 			}
 			break;
 		case Ingredient::Sausage:
@@ -170,10 +189,17 @@ Ingredient AIBrain::findClosestTarget()
 			}
 			break;
 		case Ingredient::Tomato:
-			if (inventory.tomato == 0 && navigation.distanceFromVehicle(tracker.getTomatoLocation().position) < distance_)
+			//if (inventory.tomato == 0 && navigation.distanceFromVehicle(tracker.getTomatoLocation().position) < distance_)
+			if (inventory.tomato == 0)
 			{
 				bestTarget = Ingredient::Tomato;
-				distance_ = navigation.distanceFromVehicle(tracker.getTomatoLocation().position);
+				float temp = navigation.distanceFromVehicle(tracker.getTomatoLocation().position);
+				distance_ = 50;
+				if (temp < distance_)
+				{
+					distance_ = temp;
+				}
+				//distance_ = navigation.distanceFromVehicle(tracker.getTomatoLocation().position);
 			}
 			break;
 		case Ingredient::Carrot:
@@ -184,10 +210,17 @@ Ingredient AIBrain::findClosestTarget()
 			}
 			break;
 		case Ingredient::Lettuce:
-			if (inventory.lettuce == 0 && navigation.distanceFromVehicle(tracker.getLettuceLocation().position) < distance_)
+			//if (inventory.lettuce == 0 && navigation.distanceFromVehicle(tracker.getLettuceLocation().position) < distance_)
+			if(inventory.lettuce == 0)
 			{
 				bestTarget = Ingredient::Lettuce;
-				distance_ = navigation.distanceFromVehicle(tracker.getLettuceLocation().position);
+				float temp = navigation.distanceFromVehicle(tracker.getLettuceLocation().position);
+				distance_ = 200;
+				if (temp > distance_)
+				{
+					distance_ = temp;
+				}
+				//distance_ = navigation.distanceFromVehicle(tracker.getLettuceLocation().position);
 			}
 			break;
 		case Ingredient::Parsnip:

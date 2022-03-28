@@ -22,6 +22,7 @@ public:
 	void setMode(NavMode mode);
 	float distanceFromVehicle(position target);
 	bool hasPath();
+	void coolDownMagnet();
 
 	bool lostPath();
 	bool queryReset();
@@ -43,4 +44,6 @@ private:
 
 	position currentTarget_;
 	NavMode currentMode_;
+
+	int magnetCooldown_;
 };
