@@ -188,10 +188,14 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		if (BACK_button_pressed) {
 			gameLoop->showPauseMenuTimeoutStart = currentTime;
 			gameLoop->showPauseMenu = !gameLoop->showPauseMenu;
+			if (gameLoop->showPauseMenu) {
+				gameLoop->isPaused = true;
+			}
 		}
-		else if (A_button_pressed && gameLoop->showPauseMenu) {
-			gameLoop->isPauseMenuItemSelected = true;
-		}
+	}
+
+	if (A_button_pressed && gameLoop->showPauseMenu) {
+		gameLoop->isPauseMenuItemSelected = true;
 	}
 
 	// Respawn player

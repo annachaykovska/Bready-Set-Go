@@ -15,7 +15,7 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 , isGameEnded(false)
 , mainMenuTimeoutStart(-1)
 , returnToMainMenuTimeoutStart(-1)
-, mainMenuTimeoutLength(3)
+, mainMenuTimeoutLength(1)
 , returnToMainMenuTimeoutLength(1)
 , endScreenGenerated(-1)
 , isPaused(false)
@@ -56,12 +56,13 @@ void GameLoopManager::updateGameStageFromPause() {
 		isPauseMenuItemSelected = false;
 		showPauseMenu = false;
 		showPauseMenuTimeoutStart = glfwGetTime();
+		isPaused = false;
 	}
-	else if (menuSelectionNumber == 2) { // exit
+	else if (pauseMenuSelection == 2) { // exit
 		gameStage = 1;
 		isBackToMenuSelected = true;
 		isPauseMenuItemSelected = false;
-		mainMenuTimeoutStart = glfwGetTime();
+		showPauseMenuTimeoutStart = glfwGetTime();
 	}
 	return;
 }
