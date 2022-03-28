@@ -302,28 +302,29 @@ void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pa
     float faded = 0.4f;
     float opaque = 1.f;
 
-    float invScale = scX(0.04);
+    float invScaleX = scX(0.04);
+    float invScaleY = scY(0.06);
     float invXOffset = scX(0.12);
     float invYOffset = scY(0.4);
     float invBlockOffset = scY(0.097);
-    float recipeYOffset = scY(0.55);
+    float recipeYOffset = scY(0.53);
 
     alpha = (p1Inv->tomato) ? opaque : faded;
-    renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScale, invScale, 0, alpha);
+    renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
 
     alpha = (p1Inv->cheese) ? opaque : faded;
-    renderImage(imageShader, cheese, invXOffset, invYOffset - (1 * invBlockOffset), invScale, invScale, 0, alpha);
+    renderImage(imageShader, cheese, invXOffset, invYOffset - (1 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
     
     alpha = (p1Inv->dough) ? opaque : faded;
-    renderImage(imageShader, dough, invXOffset, invYOffset - (2 * invBlockOffset), invScale, invScale, 0, alpha);
+    renderImage(imageShader, dough, invXOffset, invYOffset - (2 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
 
     alpha = (p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScale, invScale, 0, alpha);
+    renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
 
     alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scX(0.06), 0, alpha);
+    renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
-    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.32), 0, 1.f);
+    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 
 }
 
