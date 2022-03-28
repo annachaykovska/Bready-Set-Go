@@ -35,6 +35,15 @@ public:
 	std::string otherPlayerInCollision;
 	float collisionCooldownStart;
 
+	// Grab ability variables
+	float magnetDistanceSquared;
+
+	float magnetCooldown;
+	float lastMagnetUse; // Time at which the magnet ability was used last
+
+	float stolenFromGracePeriod;
+	float lastStolenFrom;
+
 private:
 
 	std::unordered_map<std::string, Component*> components;
