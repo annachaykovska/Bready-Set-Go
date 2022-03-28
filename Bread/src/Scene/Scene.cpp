@@ -25,11 +25,12 @@ void Scene::createEntities()
 	createEntity("egg");
 	createEntity("chicken");
 	createEntity("peas");
-	createEntity("soupbase");
-	createEntity("pumpkin");
+	//createEntity("soupbase");
+	//createEntity("pumpkin");
 
 	// World
 	createEntity("countertop");
+	createEntity("fan");
 
 	// Debug Entities
 	createEntity("navmesh-debug");

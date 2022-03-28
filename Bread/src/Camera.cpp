@@ -47,7 +47,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 	float theta = 225.f;
 	float cameraRotationOffset = 0.f;
 
-	float elasticForce = 0.8f; // Lower = more resistance
+	float elasticForce = 0.2f; // Lower = more resistance
 
 	float vehicleSpeed = 0;
 	float vehicleTurn = 0;

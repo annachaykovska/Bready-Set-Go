@@ -201,11 +201,7 @@ void Profiler::shadows()
 	Orthogonal& ort = g_systems.render->ort;
 	glm::vec3& lightDir = g_systems.render->lightDir;
 	glm::vec3& lightPos = g_systems.render->lightPos;
-	float& maxBias = g_systems.render->maxBias;
-	float& minBias = g_systems.render->minBias;
-	float& maxRoughBias = g_systems.render->maxRoughBias;
-	float& minRoughBias = g_systems.render->minRoughBias;
-
+	
 	if (ImGui::CollapsingHeader("Shadows"))
 	{
 		ImGui::InputInt("DepthMap Render", &depthMap);
@@ -213,7 +209,15 @@ void Profiler::shadows()
 		if (depthMap == 0)
 			g_systems.renderDebug = false;
 		if (depthMap == 1)
+		{
 			g_systems.renderDebug = true;
+			g_systems.render->shadowDebugMode = 1;
+		}
+		if (depthMap == 2)
+		{
+			g_systems.renderDebug = true;
+			g_systems.render->shadowDebugMode = 2;
+		}
 
 		ImGui::InputFloat("orthoProj.left", &(ort.left), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("orthoProj.right", &(ort.right), 1.f, 10.f, "%.3f");
@@ -225,11 +229,14 @@ void Profiler::shadows()
 		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
+		
+		//float& maxBias = g_systems.render->maxBias;
 
-		ImGui::InputFloat("maxBias", &(maxBias), 0.0001f, 0.01f, "%.5f");
-		ImGui::InputFloat("minBias", &(minBias), 0.0001f, 0.01f, "%.5f");
-		ImGui::InputFloat("maxRoughBias", &(maxRoughBias), 0.0001f, 0.01f, "%.5f");
-		ImGui::InputFloat("minRoughBias", &(minRoughBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("maxBias", &(maxBias), 0.0001f, 0.01f,  "%.5f");
+		//ImGui::InputFloat("maxBias", &(g_systems.render->maxBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("minBias", &(g_systems.render->minBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("maxRoughBias", &(g_systems.render->maxRoughBias), 0.0001f, 0.01f, "%.5f");
+		//ImGui::InputFloat("minRoughBias", &(g_systems.render->minRoughBias), 0.0001f, 0.01f, "%.5f");
 	}
 }
 
@@ -253,30 +260,37 @@ void Profiler::physicsValues() {
 	//physSys->mVehiclePlayer1
 	//std::cout << physSys->chassis_mass << std::endl;
 	if (ImGui::CollapsingHeader("Physics Values")) {
-		// gSteerVsForwardSpeedData
-		//ImGui::InputFloat("Chassis Mass", &(physSys->chassis_mass), 10.f, 100.f, "%.3f");	// Chassis Mass
-		ImGui::InputFloat("Wheel Mass", &(physSys->wheel_mass), 10.f, 100.f, "%.3f");		// WheelMass
-		ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");			// WheelMOI
-		ImGui::InputFloat("Damping Rate", &(physSys->wheel_damping_rate), 10.f, 100.f, "%.3f");	// Damping Rate
-		ImGui::InputFloat("Max hand brake torque", &(physSys->max_hand_brake_torque), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 10.f, 100.f, "%.3f");	// Damping Rate
-		
-		ImGui::InputFloat("Camber at rest", &(physSys->camber_at_rest), 3.14/60.f, 3.14f/6.f, "%.3f");
-
-		//ImGui::InputFloat3("Chassis MOI", physSys->chassis_moi, "%.3f");					// Chassis MOI
-		ImGui::InputFloat("Chassis MOI y", &(physSys->chassis_moi_y), 0.01f, 0.1f, "%.3f");	// Chassis MOI y
-
-		// engine
-		ImGui::InputFloat("Peak Torque", &(physSys->peak_torque), 10.f, 100.f, "%.3f");	// enging peak torque
-		ImGui::InputFloat("Max Omega", &(physSys->max_omega), 10.f, 100.f, "%.3f");		// engine max Omega
-		ImGui::InputFloat("Max Brake Torque", &(physSys->max_brake_torque), 10.f, 100.f, "%.3f");	// enging peak torque
 		if (ImGui::Button("Reload", ImVec2(100, 30))) {	// Restarts game
-			//g_systems.physics->cleanupPhysics(); // Causes an exception 
-			//g_systems.physics->initialize(); //The old models are still kicking around if this is called alone
 			g_systems.physics->updateCar();
 		}
-		if (ImGui::Button("Reload but Harder", ImVec2(300,30))) {
-			g_systems.physics->initialize();
+		//if (ImGui::Button("Reload but Harder", ImVec2(300, 30))) {
+		//	g_systems.physics->initialize();
+		//}
+		if (ImGui::CollapsingHeader("Wheels")) {
+			ImGui::InputFloat("Wheel Mass", &(physSys->wheel_mass), 10.f, 100.f, "%.3f");		// WheelMass
+			ImGui::InputFloat("Wheel MOI", &(physSys->wheel_moi), 10.f, 100.f, "%.3f");			// WheelMOI
+			ImGui::InputFloat("Damping Rate", &(physSys->wheel_damping_rate), 10.f, 100.f, "%.3f");	// Damping Rate
+			ImGui::InputFloat("Max hand brake torque", &(physSys->max_hand_brake_torque), 10.f, 100.f, "%.3f");
+			ImGui::InputFloat("Max Steer", &(physSys->max_steer), 3.14 / 60.f, 3.14f / 6.f, "%.3f");
+			ImGui::InputFloat("Max Brake Torque", &(physSys->max_brake_torque), 10.f, 100.f, "%.3f");	
+		}
+		if (ImGui::CollapsingHeader("Suspension")) {
+			ImGui::InputFloat("Spring Strength", &(physSys->spring_strength), 100.f, 1000.f, "%.3f");
+			ImGui::InputFloat("Max Compression", &(physSys->max_compression), .01f, .1f, "%.3f");
+			ImGui::InputFloat("Max Droop", &(physSys->max_droop), 0.01f, .1f, "%.3f");
+			//ImGui::InputFloat("Spring Min", &(physSys->spring_strength), 10.f, 100.f, "%.3f");
+
+
+			ImGui::InputFloat("Camber at rest", &(physSys->camber_at_rest), 3.14 / 60.f, 3.14f / 6.f, "%.3f");
+		}
+
+		if (ImGui::CollapsingHeader("Engine")) {
+			// engine
+			ImGui::InputFloat("Peak Torque", &(physSys->peak_torque), 10.f, 100.f, "%.3f");	// enging peak torque
+			ImGui::InputFloat("Max Omega", &(physSys->max_omega), 10.f, 100.f, "%.3f");		// engine max Omega
+		}
+		if (ImGui::CollapsingHeader("Chassis")) {
+			ImGui::InputFloat("Chassis MOI y", &(physSys->chassis_moi_y), 0.01f, 0.1f, "%.3f");	// Chassis MOI y
 		}
 	}
 }
@@ -285,10 +299,10 @@ void Profiler::cameraValues() {
 	auto camera = g_scene.camera;
 	if (ImGui::CollapsingHeader("Camera Values")) {
 		//FIXME: THESE DOESNT CHANGE THE VALUES
-		ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
-		ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
+		//ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
 	}
 }
 
@@ -296,7 +310,7 @@ void Profiler::update()
 {
 	begin();
 	fps();
-	player1Inventory();
+	//player1Inventory();
 	//cameraValues(); //doesn't really work rn I DONT KNOW WHY
 	physicsValues();
 	player1Transform();

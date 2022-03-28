@@ -9,13 +9,15 @@ namespace
 	position INVALID_POS = position(0.f, -99999999.f, 0.f);
 }
 
-WaypointUpdater::WaypointUpdater(Entity& entity)
+WaypointUpdater::WaypointUpdater(Entity& entity, NavMesh& navMesh)
 	: entity_(entity)
+	, navMesh_(navMesh)
 	, replanFlag_(false)
+	, offPath_(false)
 {
 }
 
-void WaypointUpdater::setWaypoints(std::vector<position> waypoints)
+void WaypointUpdater::setWaypoints(std::vector<NavMesh::MeshSegment*> waypoints)
 {
 	waypoints_ = waypoints;
 }
@@ -23,29 +25,40 @@ void WaypointUpdater::setWaypoints(std::vector<position> waypoints)
 void WaypointUpdater::setTarget(position target)
 {
 	currentTarget_ = target;
-	waypoints_.insert(waypoints_.begin(), target);
+	//waypoints_.insert(waypoints_.begin(), target);
 }
 
 void WaypointUpdater::updateWaypoints()
 {
 	if (waypoints_.size() > 0)
 	{
-		//std::cout << entity_.getTransform()->position.x << ", " << entity_.getTransform()->position.y << ", " << entity_.getTransform()->position.z << std::endl;
-		if (length(entity_.getTransform()->position - currentWaypoint()) < THRESHOLD)
+		/*if (length(entity_.getTransform()->position - currentWaypoint()) < THRESHOLD)*/
+		if (!waypointInPath(currentWaypoint()))
+		{
+			//offPath_ = true;
+		}
+		if(navMesh_.currentMeshSegment(entity_.getTransform()->position) == currentWaypoint())
 		{
 			waypoints_.pop_back();
 		}
-		for (int i = 1; i < waypoints_.size(); i++)
-		{
-			if (futureWaypoint(i) != INVALID_POS)
-			{
-				if (length(entity_.getTransform()->position - futureWaypoint(i)) < length(entity_.getTransform()->position - currentWaypoint()))
-				{
-					waypoints_.pop_back();
-				}
-			}
-		}
+		//for (int i = 1; i < waypoints_.size(); i++)
+		//{
+		//	if (futureWaypoint(i) != INVALID_POS)
+		//	{
+		//		if (length(entity_.getTransform()->position - futureWaypoint(i)) < length(entity_.getTransform()->position - currentWaypoint()))
+		//		{
+		//			waypoints_.pop_back();
+		//		}
+		//	}
+		//}
 	}
+}
+
+bool WaypointUpdater::offPath()
+{
+	bool temp = offPath_;
+	offPath_ = false;
+	return temp;
 }
 
 bool WaypointUpdater::pathComplete()
@@ -66,7 +79,7 @@ int WaypointUpdater::numWaypoints()
 	return waypoints_.size();
 }
 
-position WaypointUpdater::currentWaypoint()
+NavMesh::MeshSegment* WaypointUpdater::currentWaypoint()
 {
 	if (waypoints_.size() > 0)
 	{
@@ -74,41 +87,54 @@ position WaypointUpdater::currentWaypoint()
 	}
 	else
 	{
-		return glm::vec3(0.f, 0.f, 0.f);
+		return nullptr;
 	}
 }
 
-position WaypointUpdater::futureWaypoint(int iter)
+NavMesh::MeshSegment* WaypointUpdater::futureWaypoint(int iter)
 {
 	if (waypoints_.size() - (iter + 1) > 0)
 	{
 		return waypoints_.at(waypoints_.size() - (iter + 1));
 	}
-	return INVALID_POS;
+	return nullptr;
 }
 
 position WaypointUpdater::interpolator()
 {
 	interpolator_ = entity_.getTransform()->position;
-	position target = currentWaypoint();
-	int targetIndex = waypoints_.size() - 1;
+	//NavMesh::MeshSegment* target = currentWaypoint();
+	//int targetIndex = waypoints_.size() - 1;
 
-	float distance = length(interpolator_ - entity_.getTransform()->position);
-	glm::vec3 direction = normalize(target - interpolator_);
+	//float distance = length(interpolator_ - entity_.getTransform()->position);
+	//glm::vec3 direction = normalize(target - interpolator_);
 
-	while (distance < LEAD_DISTANCE)
-	{
-		interpolator_ += direction;
-		distance += 1;
-		if (length(target - interpolator_) < INTERPOLATOR_THRESHOLD)
-		{
-			targetIndex--;
-			if (targetIndex > -1)
-			{
-				target = waypoints_.at(targetIndex);
-			}
-		}
-		direction = normalize(target - interpolator_);
-	}
+	//while (distance < LEAD_DISTANCE)
+	//{
+	//	interpolator_ += direction;
+	//	distance += 1;
+	//	if (length(target - interpolator_) < INTERPOLATOR_THRESHOLD)
+	//	{
+	//		targetIndex--;
+	//		if (targetIndex > -1)
+	//		{
+	//			target = waypoints_.at(targetIndex);
+	//		}
+	//	}
+	//	direction = normalize(target - interpolator_);
+	//}
 	return interpolator_;
+}
+
+bool WaypointUpdater::waypointInPath(NavMesh::MeshSegment* segment)
+{
+	bool inPath = false;
+	for (NavMesh::MeshSegment* seg : waypoints_)
+	{
+		if (segment == seg)
+		{
+			inPath = true;
+		}
+	}
+	return inPath;
 }

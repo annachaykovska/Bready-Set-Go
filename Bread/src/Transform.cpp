@@ -35,13 +35,13 @@ void Transform::update(physx::PxTransform transform)
 	this->position.z = transform.p.z;
 
 	if (this->owner->name == "player1")
-		this->position.y -= 2.0f;
+		this->position.y -= 1.0f;
 	if (this->owner->name == "player2")
-		this->position.y -= 2.0f;
+		this->position.y -= 1.0f;
 	if (this->owner->name == "player3")
-		this->position.y -= 2.0f;
+		this->position.y -= 1.0f;
 	if (this->owner->name == "player4")
-		this->position.y -= 2.0f;
+		this->position.y -= 1.0f;
 
 	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.f), this->position);
 

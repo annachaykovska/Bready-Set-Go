@@ -5,9 +5,10 @@
 
 using namespace std;
 
-XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem) : forwards(true), menuItemSelected(false), menuSelection(1) {
+XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem, GameLoopManager* gameLoopManager) : forwards(true) {
 	this->physics = physicsSystem;
 	this->ui = uiSystem;
+	this->gameLoop = gameLoopManager;
 }
 
 void XboxController::checkControllers() {
@@ -95,25 +96,28 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 	// A button
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
 
-	if (A_button_pressed) {
-		menuItemSelected = true;
+	float newTime = glfwGetTime();
+	if (newTime - gameLoop->returnTimeoutStart > gameLoop->returnTimeoutLength) {
+		gameLoop->returnTimeoutStart = -1;
+		if (A_button_pressed) {
+			gameLoop->isMenuItemSelected = true; 
+		}
 	}
 
 	if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
-		if (menuSelection == 2) {
-			menuSelection = 1;
+		if (gameLoop->menuSelectionNumber == 2) {
+			gameLoop->menuSelectionNumber = 1;
 		}
 		
 	}
 	else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
-		if (menuSelection == 1) {
-			menuSelection = 2;
+		if (gameLoop->menuSelectionNumber == 1) {
+			gameLoop->menuSelectionNumber = 2;
 		}
 	}
-	printf("menu: %d\n", menuSelection);
 }
 
-void XboxController::setButtonStateFromControllerDriving(int controllerId) {
+void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted) {
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
 	if (controllerId == 1)
@@ -146,6 +150,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 
 	// Other buttons
 	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // UNUSED FOR NOW
+	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 
 	if (X_button_pressed)
@@ -157,14 +162,23 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 		input->setAnalogHandbrake(0.0f);
 	}
 
+	// Accept exit conditions back to the menu
+	float currentTime = glfwGetTime();
+	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
+		if (A_button_pressed && gameCompleted) {
+			gameLoop->isBackToMenuSelected = true;
+		}
+	}
+
 	// Respawn player
 	if (START_button_pressed)
 	{
 		physics->respawnPlayer(controllerId + 1);
 	}
-	//std::cout << physics->mVehiclePlayer1->computeForwardSpeed() << std::endl;
 
 	float analogVal;
+	float analogVal2;
 	if (thumbRightX <= 0) { // left
 		physics->setViewDirectionalInfluence(thumbRightDeadZone);
 	}
@@ -175,22 +189,23 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 
 	// TRIGGER PRESSED
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
-		analogVal = triggerLeft / 255.0f;
-		float step = analogVal * 2;
-		analogVal = -(1 / (10 * (step - 2.1))) - 0.048;
-		if (analogVal > 1)
-		{
-			analogVal = 1;
+		if (physics->mVehiclePlayer1->computeForwardSpeed()<0) {
+			analogVal = triggerRight / 255.0f;
+			analogVal2 = triggerLeft / 255.0f;
 		}
-		else if (analogVal < 0)
-		{
-			analogVal = 0;
+		else {
+			analogVal = triggerLeft / 255.0f;
+			analogVal2 = triggerRight / 255.0f;
 		}
+		//analogVal = std::max(std::min(powf(analogVal, 1.0001), 1.0f),0.f);
+		//std::cout << analogVal<<std::endl;
+		//float step = analogVal * 2;
+		//analogVal = -(1 / (10 * (step - 2.1))) - 0.048;
 		input->setAnalogBrake(analogVal);
+		input->setAnalogAccel(analogVal2);
 	}
 	else if (triggerRight > 0.1) { // Forward/Break when backwards
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eREVERSE ||
-			physics->mVehiclePlayer1->mDriveDynData.mCurrentGear == snippetvehicle::PxVehicleGearsData::eNEUTRAL)
+		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
 			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 		
 		if (physics->mVehiclePlayer1->computeForwardSpeed() < -30)
@@ -198,10 +213,6 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId) {
 			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
 			input->setAnalogBrake(1.f);
 		}
-		//else if (physics->mVehiclePlayer1->computeForwardSpeed() > -2 && physics->mVehiclePlayer1->computeForwardSpeed() < -2)
-		//{
-		//	physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
-		//}
 		else if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
 		{
 			analogVal = triggerRight / 255;

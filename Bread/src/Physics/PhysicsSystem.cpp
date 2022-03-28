@@ -16,28 +16,43 @@
 #include "PhysicsSystem.h"
 #include "CollisionCallback.h"
 #include "../Scene/Scene.h"
+#include "../Scene/SpawnLocations.h"
 #include "../Transform.h"
 #include "../Scene/Entity.h"
+#include <random>
+#include <algorithm>
 #include <Windows.h>
+#include <algorithm>
+#include <random>
+#include "../Scene/SpawnLocations.h"
+
+#define PI 3.14159f
 
 using namespace snippetvehicle;
 using namespace physx;
+
+namespace
+{
+	int spawnLocations[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+}
 
 extern Scene g_scene;
 extern SystemManager g_systems;
 
 CollisionCallback gCollisionCallback;
 
-PxF32 gSteerVsForwardSpeedData[2 * 8] =
+PxF32 gSteerVsForwardSpeedData[2 * 10] =
 {
-	0.0f,		0.2f,
-	5.0f,		0.6f,
-	30.0f,		0.8f,
-	120.0f,		1.f,
+	0.0f,		0.0f,
+	10.0f,		0.2f,
+	20.0f,		0.6f,
+	30.0f,		1.0f,
+	40.0f,		0.7f,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
 	PX_MAX_F32, PX_MAX_F32,
-	PX_MAX_F32, PX_MAX_F32
+	PX_MAX_F32, PX_MAX_F32,
+	PX_MAX_F32, PX_MAX_F32,
 };
 PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4);
 
@@ -45,14 +60,14 @@ PxVehicleKeySmoothingData gKeySmoothingData =
 {
 	{
 		10.0f,	//rise rate eANALOG_INPUT_ACCEL
-		6.0f,	//rise rate eANALOG_INPUT_BRAKE		
+		100.0f,	//rise rate eANALOG_INPUT_BRAKE		
 		6.0f,	//rise rate eANALOG_INPUT_HANDBRAKE	
 		2.5f,	//rise rate eANALOG_INPUT_STEER_LEFT
 		2.5f,	//rise rate eANALOG_INPUT_STEER_RIGHT
 	},
 	{
 		10.0f,	//fall rate eANALOG_INPUT_ACCEL
-		10.0f,	//fall rate eANALOG_INPUT_BRAKE		
+		100.0f,	//fall rate eANALOG_INPUT_BRAKE		
 		10.0f,	//fall rate eANALOG_INPUT_HANDBRAKE	
 		5.0f,	//fall rate eANALOG_INPUT_STEER_LEFT
 		5.0f	//fall rate eANALOG_INPUT_STEER_RIGHT
@@ -188,16 +203,18 @@ void PhysicsSystem::updateCar() {
 			wheelData.mMaxBrakeTorque = max_brake_torque;
 			wheelData.mToeAngle = 0.f;
 			wheelData.mDampingRate = wheel_damping_rate;
-
+			
 			// Suspension
 			suspData.mSpringStrength = spring_strength;
+			suspData.mMaxCompression = max_compression;
+			suspData.mMaxDroop = max_droop;
 
 			// Properties dependent on position
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eREAR_RIGHT) { // Rear changes
 				wheelData.mMaxHandBrakeTorque = max_hand_brake_torque;
 			}
 			else { // Front changes
-
+				wheelData.mMaxSteer = max_steer;
 			}
 
 			if (wheel == PxVehicleDrive4WWheelOrder::eREAR_LEFT || wheel == PxVehicleDrive4WWheelOrder::eFRONT_LEFT) { // Left changes
@@ -207,7 +224,7 @@ void PhysicsSystem::updateCar() {
 				suspData.mCamberAtRest = -camber_at_rest;
 			}
 			// Updating
-			cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
+			//cars[car]->mWheelsSimData.setSuspTravelDirection(wheel, PxVec3(0, -1, 0));
 			cars[car]->mWheelsSimData.setSuspensionData(wheel, suspData);
 			cars[car]->mWheelsSimData.setWheelData(wheel, wheelData);
 		}
@@ -222,17 +239,6 @@ void PhysicsSystem::updateCar() {
 		// Update chassis
 		//PxVehicleChassisData gaming = cars[car]->
 	}
-}
-
-void PhysicsSystem::updateEngine() {
-	PxVehicleEngineData engine;
-	engine.mPeakTorque = peak_torque;
-	engine.mMaxOmega = max_omega;//approx 6000 rpm
-
-	mVehiclePlayer1->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer2->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer3->mDriveSimData.setEngineData(engine);
-	mVehiclePlayer4->mDriveSimData.setEngineData(engine);
 }
 
 void PhysicsSystem::initializeActors() {
@@ -280,8 +286,6 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer2 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
-
-	updateEngine();
 
 	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
 	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
@@ -340,76 +344,103 @@ void PhysicsSystem::initializeActors() {
 	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
+	randomizeIngredientLocations();
+}
+
+void PhysicsSystem::randomizeIngredientLocations()
+{
 	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
 	// Note: Physx actor name must match Entity name
-	
+
+	std::random_device r;
+	std::seed_seq seed{ r(), r(), r(), r(), r(), r(), r(), r() };
+	std::mt19937 eng(seed);
+
+	std::shuffle(std::begin(spawnLocations), std::end(spawnLocations), eng);
+
 	float halfExtent = 1.0f;
+	glm::vec3 loc;
 
 	// CHEESE
-	PxTransform cheeseTransform(PxVec3(-220, 3, -130));
+	loc = LOCATIONS[spawnLocations[0]];
+	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
 
 	// SAUSAGE
-	PxTransform sausageTransform(PxVec3(-110, 3, 175));
+	loc = LOCATIONS[spawnLocations[1]];
+	PxTransform sausageTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
 
 	// TOMATO
-	PxTransform tomatoTransform(PxVec3(95, 3, 170));
+	loc = LOCATIONS[spawnLocations[2]];
+	PxTransform tomatoTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
 
 	// DOUGH
-	PxTransform doughTransform(PxVec3(-105, 3, -8));
+	loc = LOCATIONS[spawnLocations[3]];
+	PxTransform doughTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
 
 	// CARROT
-	PxTransform carrotTransform(PxVec3(-5, 3, 0));
+	loc = LOCATIONS[spawnLocations[4]];
+	PxTransform carrotTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->carrot = createFoodBlock(carrotTransform, halfExtent, "carrot");
 
 	// LETTUCE
-	PxTransform lettuceTransform(PxVec3(-10, 3, 0));
+	loc = LOCATIONS[spawnLocations[5]];
+	PxTransform lettuceTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->lettuce = createFoodBlock(lettuceTransform, halfExtent, "lettuce");
 
 	// PARSNIP
-	PxTransform parsnipTransform(PxVec3(-15, 3, 0));
+	loc = LOCATIONS[spawnLocations[6]];
+	PxTransform parsnipTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->parsnip = createFoodBlock(parsnipTransform, halfExtent, "parsnip");
 
 	// RICE
-	PxTransform riceTransform(PxVec3(-20, 3, 0));
+	loc = LOCATIONS[spawnLocations[7]];
+	PxTransform riceTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->rice = createFoodBlock(riceTransform, halfExtent, "rice");
 
 	// EGG
-	PxTransform eggTransform(PxVec3(-25, 3, 0));
+	loc = LOCATIONS[spawnLocations[8]];
+	PxTransform eggTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->egg = createFoodBlock(eggTransform, halfExtent, "egg");
 
 	// CHICKEN
-	PxTransform chickenTransform(PxVec3(-30, 3, 0));
+	loc = LOCATIONS[spawnLocations[9]];
+	PxTransform chickenTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->chicken = createFoodBlock(chickenTransform, halfExtent, "chicken");
 
 	// PEAS
-	PxTransform peasTransform(PxVec3(-35, 3, 0));
+	loc = LOCATIONS[spawnLocations[10]];
+	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
 
-	// SOUPBASE
-	PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
-	this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
+	//// SOUPBASE
+	//PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
+	//this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
 
-	// PUMPKIN
-	PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
-	this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
+	//// PUMPKIN
+	//PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
+	//this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
+// Constructor
 PhysicsSystem::PhysicsSystem() :
 	chassis_mass(400.f)
 	, peak_torque(100000.f)
 	, max_omega(1000.f)
 	, wheel_mass(800.f)
 	, wheel_damping_rate(20.f)
-	, wheel_moi(100.f)//wheel_moi(1440.f)
+	, wheel_moi(100.f)
 	, chassis_moi_y(0.25f)
 	, max_brake_torque(100000.f)
-	, max_hand_brake_torque(50000.f)
+	, max_hand_brake_torque(15000.f)
 	, camber_at_rest(0.2f)
-	, spring_strength(100.f)
+	, spring_strength(35000.f)
+	, max_compression(.5f)
+	, max_droop(0.1f)
+	, max_steer(PI/2.f)
 {
 	// Foundation
 	this->mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
@@ -569,7 +600,7 @@ float PhysicsSystem::getTurnDirectionalInfluence()
 	return turnDirectionalInfluence;
 }
 
-void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep) {
+void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage) {
 	// Update the control inputs for the vehicle
 	if (useAnalogInputs) {
 		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, inputData, timestep, isVehicleInAir, *player);
@@ -589,38 +620,39 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
-
-	if (player1->verifyPlayerCollision) {
-		if (player1->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player1->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
-		else if (player1->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player2->verifyPlayerCollision) {
-		if (player2->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player2->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
-		else if (player2->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player3->verifyPlayerCollision) {
-		if (player3->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player3->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player3->otherPlayerInCollision == "player4")
-			playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
-	}
-	else if (player4->verifyPlayerCollision) {
-		if (player4->otherPlayerInCollision == "player1")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
-		else if (player4->otherPlayerInCollision == "player2")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
-		else if (player4->otherPlayerInCollision == "player3")
-			playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+	if (gameStage != 3) {
+		if (player1->verifyPlayerCollision) {
+			if (player1->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player1->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer3);
+			else if (player1->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player2->verifyPlayerCollision) {
+			if (player2->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player2->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer3);
+			else if (player2->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player2, mVehiclePlayer2, g_scene.getEntity(player2->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player3->verifyPlayerCollision) {
+			if (player3->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player3->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player3->otherPlayerInCollision == "player4")
+				playerCollisionRaycast(player3, mVehiclePlayer3, g_scene.getEntity(player3->otherPlayerInCollision), mVehiclePlayer4);
+		}
+		else if (player4->verifyPlayerCollision) {
+			if (player4->otherPlayerInCollision == "player1")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer1);
+			else if (player4->otherPlayerInCollision == "player2")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer2);
+			else if (player4->otherPlayerInCollision == "player3")
+				playerCollisionRaycast(player4, mVehiclePlayer4, g_scene.getEntity(player4->otherPlayerInCollision), mVehiclePlayer3);
+		}
 	}
 
 	// Vehicle update
@@ -691,7 +723,7 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	playerTransform->update(player->getRigidDynamicActor()->getGlobalPose());
 }
 
-void PhysicsSystem::update(const float dt)
+void PhysicsSystem::update(const float dt, int gameStage)
 {
 	// Only update if more than 1/120th of a second has passed since last update
 	// Making the constant much larger than 1/120th causes a significant jitter
@@ -731,10 +763,10 @@ void PhysicsSystem::update(const float dt)
 	this->mScene->fetchResults(true);
 
 	// Update the players
-	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep);
-	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep);
-	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep);
-	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep);
+	updateVehicle(this->mVehiclePlayer1, this->mIsVehicleInAirPlayer1, this->mVehicleInputDataPlayer1, "player1", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer2, this->mIsVehicleInAirPlayer2, this->mVehicleInputDataPlayer2, "player2", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer3, this->mIsVehicleInAirPlayer3, this->mVehicleInputDataPlayer3, "player3", timestep, gameStage);
+	updateVehicle(this->mVehiclePlayer4, this->mIsVehicleInAirPlayer4, this->mVehicleInputDataPlayer4, "player4", timestep, gameStage);
 
 	// Update kitchen position
 	g_scene.getEntity("countertop")->getTransform()->update(kitchen->getGlobalPose());
@@ -778,11 +810,11 @@ void PhysicsSystem::updateFoodTransforms()
 	// Peas
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
 
-	// Soupbase
-	g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
+	//// Soupbase
+	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
 
-	// Pumpkin
-	g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
+	//// Pumpkin
+	//g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()
