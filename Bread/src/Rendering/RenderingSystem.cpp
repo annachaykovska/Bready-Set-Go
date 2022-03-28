@@ -273,11 +273,11 @@ void RenderingSystem::loadModels()
 	g_scene.getEntity("player2")->attachComponent(&(this->models[1]), "model");
 
 	// Player 3
-	this->models.emplace_back(Model(&baguettebusPath[0]));
+	this->models.emplace_back(Model(&cakebusPath[0]));
 	g_scene.getEntity("player3")->attachComponent(&(this->models[2]), "model");
 
 	// Player 4
-	this->models.emplace_back(Model(&cakebusPath[0]));
+	this->models.emplace_back(Model(&baguettebusPath[0]));
 	g_scene.getEntity("player4")->attachComponent(&(this->models[3]), "model");
 
 	//-----------------------------------------------------------------------------------
@@ -554,15 +554,13 @@ void RenderingSystem::renderScene()
 			models[i].owner->getTransform()->update();
 		}
 
-		if (i < 4) // Use material info for player models
+		if (i < 3) // Use material info for player models
 		{
 			glUniform1i(texLoc, 0);
 			models[i].draw(this->shader);
 		}
-		else if (i >= 4) // Use texture images for everything else
+		else // Use texture images for everything else
 		{
-			//ownerTransform->update();
-
 			glUniform1i(texLoc, 1);
 			models[i].draw(this->shader);
 		}
