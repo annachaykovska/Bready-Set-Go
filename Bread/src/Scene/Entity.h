@@ -14,6 +14,7 @@ class Entity {
 public:
 	std::string name;
 	physx::PxVehicleDrive4W* vehicle;
+	physx::PxTransform originalSpawn;
 	
 	Entity(std::string name);
 	Entity();
