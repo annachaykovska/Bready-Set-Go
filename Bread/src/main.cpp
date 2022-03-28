@@ -38,7 +38,7 @@ int main()
 	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
 	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
 
-	bool fullScreen = true;
+	bool fullScreen = false;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
@@ -240,7 +240,7 @@ int main()
 	double accumulator = 0.0;
 
 	// Change to 1 for submission
-	gameLoop.gameStage = 1;
+	gameLoop.gameStage = 2;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)

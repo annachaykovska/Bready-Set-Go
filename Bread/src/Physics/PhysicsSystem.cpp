@@ -287,10 +287,13 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
-	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
-	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
-	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
-	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	glm::quat rotate = glm::angleAxis(glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+	PxQuat initQuat = PxQuat(rotate.x, rotate.y, rotate.z, rotate.w);
+
+	startTransformPlayer1 = PxTransform(PxVec3(33, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
+	startTransformPlayer2 = PxTransform(PxVec3(11, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
+	startTransformPlayer3 = PxTransform(PxVec3(-31, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
+	startTransformPlayer4 = PxTransform(PxVec3(-11.5, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
 	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
 	mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
