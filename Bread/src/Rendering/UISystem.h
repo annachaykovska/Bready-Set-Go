@@ -36,10 +36,10 @@ public:
 	UISystem();
 	~UISystem();
 
-	void updateGame(int endScreenValue, bool pause = false);
+	void updateGame(int endScreenValue, int pauseMenuItemSelected, bool pause = false);
 	void updateMainMenu(int itemSelected);
 	void updateEndGame(int endScreenValue);
-	void showPauseMenu();
+	void showPauseMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);

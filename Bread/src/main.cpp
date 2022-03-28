@@ -259,7 +259,7 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			if (!gameLoop.isPaused || gameLoop.showPauseMenu) {
+			if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
 				g_systems.physics->update(dt, gameLoop.gameStage);
 			}
 			accumulator -= dt;
@@ -302,7 +302,7 @@ int main()
 			if (!g_systems.renderDebug)
 			{
 				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame(gameLoop.endScreenGenerated, gameLoop.showPauseMenu);
+				ui.updateGame(gameLoop.endScreenGenerated, gameLoop.pauseMenuSelection, gameLoop.showPauseMenu);
 			}
 
 			// Update the ImGUI profiler
@@ -332,8 +332,11 @@ int main()
 			audio.playGameMusic(countertopAudioSource);
 			gameLoop.isPaused = false;
 		}
-
-		// RESET game if end of game and menu selected
+		// PAUSE MENU
+		else if (gameLoop.isPauseMenuItemSelected && !gameLoop.isBackToMenuSelected) {
+			gameLoop.updateGameStageFromPause();
+		}
+		// RESET game if end of game or pause menu and menu selected
 		else if (gameLoop.isBackToMenuSelected) {
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
