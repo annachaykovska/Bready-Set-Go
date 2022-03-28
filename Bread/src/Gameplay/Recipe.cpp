@@ -69,3 +69,12 @@ void Recipe::updateRecipeProgress(Inventory& inv)
 		complete = false;
 	}
 }
+
+bool Recipe::checkRecipeForIngredient(Ingredient ingredient) {
+	for (int i = 0; i < 4; i++) {
+		if (list[i] == ingredient) {
+			return true;
+		}
+	}
+	return false;
+}
