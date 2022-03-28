@@ -259,7 +259,7 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			if (!gameLoop.isPaused) {
+			if (!gameLoop.isPaused || gameLoop.showPauseMenu) {
 				g_systems.physics->update(dt, gameLoop.gameStage);
 			}
 			accumulator -= dt;
@@ -302,7 +302,7 @@ int main()
 			if (!g_systems.renderDebug)
 			{
 				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame(gameLoop.endScreenGenerated);
+				ui.updateGame(gameLoop.endScreenGenerated, gameLoop.showPauseMenu);
 			}
 
 			// Update the ImGUI profiler

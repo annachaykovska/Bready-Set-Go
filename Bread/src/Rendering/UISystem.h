@@ -36,9 +36,10 @@ public:
 	UISystem();
 	~UISystem();
 
-	void updateGame(int endScreenValue);
+	void updateGame(int endScreenValue, bool pause = false);
 	void updateMainMenu(int itemSelected);
 	void updateEndGame(int endScreenValue);
+	void showPauseMenu();
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
@@ -94,6 +95,11 @@ private:
 	ImageTexture exitButtonNormal;
 	ImageTexture exitButtonPressed;
 
+	// Pause Menu
+	ImageTexture pauseMenu;
+	ImageTexture continueButton;
+	ImageTexture continueButtonPressed;
+
 	// End Game
 	ImageTexture gameOverPlayer1_1;
 	ImageTexture gameOverPlayer1_2;
@@ -102,6 +108,7 @@ private:
 	ImageTexture gameOverPlayer2;
 	ImageTexture gameOverPlayer3;
 	ImageTexture gameOverPlayer4;
+	ImageTexture backToMainMenuButton;
 	ImageTexture backToMainMenuButtonPressed;
 
 	//Constants needed to render

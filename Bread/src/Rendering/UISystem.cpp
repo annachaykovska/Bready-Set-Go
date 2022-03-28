@@ -53,9 +53,13 @@ UISystem::UISystem()
     , gameOverPlayer2("resources/textures/game_over_screen_player_2.png", GL_NEAREST)
     , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
     , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
+    , backToMainMenuButton("resources/textures/button_back_to_main_menu.png", GL_NEAREST)
     , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
     , map_x(0.126)
     , map_sx(0.190)
+    , pauseMenu("resources/textures/pause_screen.png", GL_NEAREST)
+    , continueButton("resources/textures/button_continue.png", GL_NEAREST)
+    , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -190,8 +194,18 @@ void UISystem::updateEndGame(int endScreenValue) {
         renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
 }
 
+void UISystem::showPauseMenu() {
+    renderImage(imageShader, continueButtonPressed, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+    renderImage(imageShader, backToMainMenuButton, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+    renderImage(imageShader, pauseMenu, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+}
 
-void UISystem::updateGame(int endScreenValue) {
+
+void UISystem::updateGame(int endScreenValue, bool pause) {
+    if (pause) {
+        showPauseMenu();
+    }
+
     if (checkForWin() != 0)
     {
         updateEndGame(endScreenValue);

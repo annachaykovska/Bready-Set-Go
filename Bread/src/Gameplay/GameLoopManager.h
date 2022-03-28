@@ -27,6 +27,7 @@ public:
 
 	// Mid game things
 	bool isPaused;
+	bool showPauseMenu;
 
 	// End game things
 	bool isGameExitSelected;

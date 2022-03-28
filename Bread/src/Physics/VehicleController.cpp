@@ -154,6 +154,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
 	bool Y_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0); // Magnet ability
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
+	bool BACK_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0); // pause
 
 	if (Y_button_pressed && !y_held) {
 		physics->magnet(1);
@@ -185,6 +186,11 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	if (START_button_pressed)
 	{
 		physics->respawnPlayer(controllerId + 1);
+	}
+
+	// Pause menu
+	if (BACK_button_pressed) {
+		gameLoop->showPauseMenu = !gameLoop->showPauseMenu;
 	}
 
 	float analogVal;
