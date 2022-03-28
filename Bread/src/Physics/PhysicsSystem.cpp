@@ -1088,51 +1088,90 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 
 void PhysicsSystem::magnet(int stealer_id)
 {
-	if (!(stealer_id > 0 && stealer_id < 5)) return; // stealer index should be one of the four players
-
 	// Get the entity that is stealing, and the entities that can be stolen from
 	Entity* stealer;
+	PxVehicleDrive4W* stealer_vehicle;
+
+	std::vector<PxVehicleDrive4W*> victim_vehicles = {
+		mVehiclePlayer1,
+		mVehiclePlayer2,
+		mVehiclePlayer3,
+		mVehiclePlayer4};
+
 	std::vector<Entity*> victims = {
-		g_scene.getEntity("player 1"),
-		g_scene.getEntity("player 2"),
-		g_scene.getEntity("player 3"),
-		g_scene.getEntity("player 4") };
+		g_scene.getEntity("player1"),
+		g_scene.getEntity("player2"),
+		g_scene.getEntity("player3"),
+		g_scene.getEntity("player4")};
 	switch (stealer_id) {
 	case 1:
-		stealer = g_scene.getEntity("player 1");
+		stealer = g_scene.getEntity("player1");
+		stealer_vehicle = mVehiclePlayer1;
 		victims.erase(victims.begin());
+		victim_vehicles.erase(victim_vehicles.begin());
 		break;
 	case 2:
-		stealer = g_scene.getEntity("player 2");
+		stealer = g_scene.getEntity("player2");
+		stealer_vehicle = mVehiclePlayer2;
 		victims.erase(victims.begin() + 1);
+		victim_vehicles.erase(victim_vehicles.begin()+1);
 		break;
 	case 3:
-		stealer = g_scene.getEntity("player 3");
+		stealer = g_scene.getEntity("player3");
+		stealer_vehicle = mVehiclePlayer3;
 		victims.erase(victims.begin() + 2);
+		victim_vehicles.erase(victim_vehicles.begin()+2);
 		break;
 	case 4:
-		stealer = g_scene.getEntity("player 4");
+		stealer = g_scene.getEntity("player4");
+		stealer_vehicle = mVehiclePlayer4;
 		victims.erase(victims.begin() + 3);
+		victim_vehicles.erase(victim_vehicles.begin()+3);
 		break;
 	default:
+		return;
 		break;
 	}
+
 	// See if the stealer can steal (cooldown)
-	if (true) return;
+	float currentTime = glfwGetTime();
+	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) return;
+
+
+	
+	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
+	for (int i = 0; i < victims.size();) {
+		//TODO: right now only the location is checked
+		// See the victims that are in range
+		PxVec3 victim_pos = victim_vehicles[i]->getRigidDynamicActor()->getGlobalPose().p;
+		if ((victim_pos - stealer_pos).magnitudeSquared() > stealer->magnetDistanceSquared) {
+			victims.erase(victims.begin() + i);
+			victim_vehicles.erase(victim_vehicles.begin() + i);
+			continue;
+		}
+		// See if the stealer is in the correct position to steal from a victim
+		//if (true) {
+
+		//}
+		//// see if stealer is in correct orientation
+		//if (true) {
+
+		//}
+
+		++i;
+	}
+	if (victims.empty()) return;
 
 	// See the victims that can be stolen from
 	
-	if (victims.empty()) return;
 
-	// See the victims that are in range
+	// See if victim has item of interest
 
-	if (victims.empty()) return;
-
-	// See if the stealer is in the correct position to steal from a victim
-
-	if (victims.empty()) return;
-
-	for (Entity* victim : victims) {
+	// Stealing the items
+	stealer->lastMagnetUse = currentTime;
+	std::cout << " stealing from ";
+	for (auto victim : victims) {
+		victim->lastStolenFrom = currentTime;
 		std::cout << victim->name << " ";
 	}
 	std::cout << std::endl;

@@ -32,6 +32,8 @@ private:
 	UISystem* ui;
 	GameLoopManager* gameLoop;
 	bool forwards;
+
+	bool y_held;
 };
 
 class MovementCallbacks : public CallbackInterface

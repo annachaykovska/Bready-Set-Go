@@ -19,8 +19,6 @@ public:
 
 	Breadmobile(Entity,Inventory,int);
 	void checkProgress();
-	
-	
 
 private:
 
@@ -28,6 +26,6 @@ private:
 	Recipe recipes[3];
 	int progress; //Starts at 0, once it gets to 3 the player in question wins!!!
 
-	// Grab ability variables
+
 
 };

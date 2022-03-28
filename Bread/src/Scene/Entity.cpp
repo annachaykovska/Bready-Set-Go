@@ -17,6 +17,14 @@ Entity::Entity(std::string name)
 	this->verifyPlayerCollision = false;
 	this->otherPlayerInCollision = "";
 	this->collisionCooldownStart = -1;
+
+	//Magnet variables
+	this->magnetDistanceSquared = 200.f;
+	this->magnetCooldown = 3.0f;
+	this->lastMagnetUse = 0;
+	this->stolenFromGracePeriod = 6.0f;
+	this->lastStolenFrom = 0;
+
 }
 
 Entity::Entity(){
@@ -25,7 +33,14 @@ Entity::Entity(){
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
 	this->otherPlayerInCollision = "";
-	this->collisionCooldownStart = -1;
+	this->collisionCooldownStart = 0;
+
+	//Magnet variables
+	this->magnetDistanceSquared = 200.f;
+	this->magnetCooldown = 3.0f;
+	this->lastMagnetUse = 0;
+	this->stolenFromGracePeriod = 6.0f;
+	this->lastStolenFrom = 0;
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)
