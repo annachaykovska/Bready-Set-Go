@@ -231,23 +231,37 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, miniMap, scX(0.125), scY(0.8), 400.f, 400.f, 0, 1.f);
 
     glm::vec3 IngLocation;
-    IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
-    renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
 
-    IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
-    renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-
-    IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
-    renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-
-    IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
-    renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-
-    // Drawing Inventory
     Entity* player1 = g_scene.getEntity("player1");
     Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
+
+    if (!p1Inv->cheese)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
+        renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    if (!p1Inv->tomato)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
+        renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    if (!p1Inv->dough)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
+        renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    if (!p1Inv->sausage)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
+        renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    // Drawing Inventory
     float alpha;
-    float faded = 0.5f;
+    float faded = 0.4f;
     float opaque = 1.f;
 
     float invScale = scX(0.04);

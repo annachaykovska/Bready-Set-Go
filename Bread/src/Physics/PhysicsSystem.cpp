@@ -773,40 +773,62 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	updateFoodTransforms();
 }
 
-void PhysicsSystem::updateFoodTransforms()
+void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
 {
 	// Cheese
 	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("cheese")->removeFlag = false;
 
 	// Sausage
 	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("sausage")->removeFlag = false;
 
 	// Tomato
 	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("tomato")->removeFlag = false;
 
 	// Dough
 	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("dough")->removeFlag = false;
 
 	// Carrot
 	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("carrot")->removeFlag = false;
 
 	// Lettuce
 	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("lettuce")->removeFlag = false;
 
 	// Parsnip
 	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("parsnip")->removeFlag = false;
 
 	// Rice
 	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("rice")->removeFlag = false;
 
 	// Egg
 	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("egg")->removeFlag = false;
 
 	// Chicken
 	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("chicken")->removeFlag = false;
 
 	// Peas
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
+	if (setAllVisible)
+		g_scene.getEntity("peas")->removeFlag = false;
 
 	//// Soupbase
 	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
