@@ -6,12 +6,13 @@ Double click the file in the Bread/ directory called "BreadySetGo!!!.exe"
 ## Controls (XBox Controller, plug-n-play)
 - **LT**: Brake/Reverse
 - **RT**: Accelerate
-- **L Thumb**: Steering
+- **L Thumb**: Steering and menu selection
 - **R Thumb**: Camera Directional Influence (Rocket League Style)
 - **A**: Menu accept
 - **X**: Handbrake
 - **Y**: Vacuum ability
 - **START**: Reset position to start
+- **BACK**: Pause menu
 
 ## Controls (Keyboard - *Currently unsupported*)
 - **W**: Drive forwards
@@ -20,7 +21,7 @@ Double click the file in the Bread/ directory called "BreadySetGo!!!.exe"
 - **D**: Drive right
 - **R**: Reset position to spawn
 
-Note: Keyboard controls were broken sometime during the merge-fest of this milestone. The functionnality is not important as it was meant for debug purposes for the most part.
+Note: Keyboard controls were broken sometime during the merge-fest of the previous milestone. The functionnality is not important as it was meant for debug purposes for the most part, so we ignored the issue.
 
 ## New Features and Changes Included
 - **Level Design and Gameplay:**
@@ -30,16 +31,17 @@ Note: Keyboard controls were broken sometime during the merge-fest of this miles
     - Different recipes per AI/Player each with some ingredient overlap.
   - New vacuum ability to steal ingredients from other breadmobiles.
   - Randomized location for ingredient spawns. 
+  - If ingredients are pushed off the edge of the map, they respawn (violently) to avoid an unwinnable state.
 
 - **Driving:**
   - Faster acceleration.
   - More responsive braking.
   - Speed dissipation.
   - Handbrake, for drifting. :0
-  - tighter turn radius, affected by the speed of breadmobile.
+  - Tighter turn radius, affected by the speed of breadmobile.
 
 - **Camera:**
-  - More exaggerated camera, fov and rotation is now quicker.
+  - More exaggerated camera, FOV and rotation is now quicker.
   - FOV response is now non-linear, having a large jump part way through speeding up.
   - Capped maximum change in camera per frame, when crashing it should be less jarring.
 
@@ -64,7 +66,7 @@ Note: Keyboard controls were broken sometime during the merge-fest of this miles
   
 - **Rendering:**
   - Improved near and far shadows for both the environment and actors within.
-  - Skybox.
+  - Skybox for the kitchen background.
   - More natural lighting.
   - Textures for the environment.
   - New and different models for the vehicles.
@@ -83,15 +85,15 @@ Note: Keyboard controls were broken sometime during the merge-fest of this miles
   - More varied recipes.
   - Vehicle flipping, to recover from tipping over.
   - Punishments for falling off of map.
+  - Make the game even more visually compelling.
 
 ## Known Feature Limitations Identified While Testing (To Be Addressed In Next Milestone):
   - Some bridges and ramps are difficult to traverse.
-  - Vacuum ability is too instant too feel fair
+  - Vacuum ability is too instant too feel fair.
   - Ingredient location indicators can be confusing when the ingredient is lower or higher than the player.
-  - Player can collide with ingredients not in their recipe, and knock them off the edge.
 
 ## Known Bugs Identified While Testing (To Be Addressed In Next Milestone):
 - Camera becomes obscured when going down a ramp.
 - There are some shadow artifacts on the back of the fridge wall, as well as the top of some ramps.
-- Keyboard controls no longer entirely work
+- Keyboard controls no longer entirely work.
 
