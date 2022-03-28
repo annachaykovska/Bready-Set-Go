@@ -204,6 +204,7 @@ int main()
 	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
 	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
 	Recipe omlette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omlette");
+	//Recipe omlette(Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, "Omlette");
 
 	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;

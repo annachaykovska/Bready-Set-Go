@@ -9,6 +9,7 @@ XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem,
 	this->physics = physicsSystem;
 	this->ui = uiSystem;
 	this->gameLoop = gameLoopManager;
+	this->y_held = false;
 }
 
 void XboxController::checkControllers() {
@@ -149,9 +150,18 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	float triggerRight = state.Gamepad.bRightTrigger;
 
 	// Other buttons
-	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // UNUSED FOR NOW
+	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // Hand brake
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
+	bool Y_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0); // Magnet ability
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
+
+	if (Y_button_pressed && !y_held) {
+		physics->magnet(1);
+		y_held = true;
+	}
+	if (!Y_button_pressed) {
+		y_held = false;
+	}
 
 	if (X_button_pressed)
 	{
