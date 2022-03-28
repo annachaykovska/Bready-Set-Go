@@ -16,7 +16,7 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 , mainMenuTimeoutStart(-1)
 , returnToMainMenuTimeoutStart(-1)
 , mainMenuTimeoutLength(3)
-, returnToMainMenuTimeoutLength(3)
+, returnToMainMenuTimeoutLength(1)
 , endScreenGenerated(-1)
 , isPaused(false)
 {}
