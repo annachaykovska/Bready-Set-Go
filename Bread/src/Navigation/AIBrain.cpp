@@ -182,10 +182,10 @@ Ingredient AIBrain::findClosestTarget()
 			}
 			break;
 		case Ingredient::Sausage:
-			if (inventory.sausage == 0 && navigation.distanceFromVehicle(tracker.getDoughLocation().position) < distance_)
+			if (inventory.sausage == 0 && navigation.distanceFromVehicle(tracker.getSausageLocation().position) < distance_)
 			{
 				bestTarget = Ingredient::Dough;
-				distance_ = navigation.distanceFromVehicle(tracker.getDoughLocation().position);
+				distance_ = navigation.distanceFromVehicle(tracker.getSausageLocation().position);
 			}
 			break;
 		case Ingredient::Tomato:

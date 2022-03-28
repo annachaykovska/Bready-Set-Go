@@ -201,7 +201,7 @@ int main()
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
 	Recipe pizza(Ingredient::Cheese, Ingredient::Dough, Ingredient::Sausage, Ingredient::Tomato, "Pizza");
-	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
+	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Lettuce, Ingredient::Dough, "Wrap");
 	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
 	Recipe omelette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omelette");
 
