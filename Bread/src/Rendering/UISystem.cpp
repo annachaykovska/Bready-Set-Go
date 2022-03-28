@@ -247,14 +247,14 @@ void UISystem::updateGame(int endScreenValue) {
     Entity* player1 = g_scene.getEntity("player1");
     Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
     float alpha;
-    float faded = 0.2f;
+    float faded = 0.5f;
     float opaque = 1.f;
 
     float invScale = scX(0.04);
     float invXOffset = scX(0.12);
     float invYOffset = scY(0.4);
     float invBlockOffset = scY(0.097);
-    float recipeYOffset = scY(0.54);
+    float recipeYOffset = scY(0.55);
 
     alpha = (p1Inv->tomato) ? opaque : faded;
     renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScale, invScale, 0, alpha);
@@ -269,7 +269,7 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScale, invScale, 0, alpha);
 
     alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, pizza, invXOffset, recipeYOffset, invScale, invScale, 0, alpha);
+    renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scX(0.06), 0, alpha);
 
     renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.32), 0, 1.f);
 
