@@ -9,7 +9,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 #include "Transform.h"
-#include "Rendering/DebugOverlay.h"
+//#include "Rendering/DebugOverlay.h"
 #include "Rendering/RenderingSystem.h"
 #include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
@@ -20,6 +20,7 @@
 #include "DebugSettings.h"
 #include "Navigation/IngredientTracker.h"
 #include "Navigation/AIBrain.h"
+#include "Gameplay/Recipe.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -71,8 +72,8 @@ int main()
 	Entity* egg = g_scene.getEntity("egg");
 	Entity* chicken = g_scene.getEntity("chicken");
 	Entity* peas = g_scene.getEntity("peas");
-	Entity* soupbase = g_scene.getEntity("soupbase");
-	Entity* pumpkin = g_scene.getEntity("pumpkin");
+	//Entity* soupbase = g_scene.getEntity("soupbase");
+	//Entity* pumpkin = g_scene.getEntity("pumpkin");
 
 	// World
 	Entity* countertop = g_scene.getEntity("countertop");
@@ -128,8 +129,8 @@ int main()
 	egg->attachComponent(&transforms[12], "transform");
 	chicken->attachComponent(&transforms[13], "transform");
 	peas->attachComponent(&transforms[14], "transform");
-	soupbase->attachComponent(&transforms[15], "transform");
-	pumpkin->attachComponent(&transforms[16], "transform");
+	//soupbase->attachComponent(&transforms[15], "transform");
+	//pumpkin->attachComponent(&transforms[16], "transform");
 
 	// World
 	countertop->attachComponent(&transforms[17], "transform");
@@ -167,10 +168,10 @@ int main()
 	chicken->getTransform()->position = glm::vec3(-25, 5, 0);
 	peas->getTransform()->scale = glm::vec3(30, 30, 30);
 	peas->getTransform()->position = glm::vec3(-30, 5, 0);
-	soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	soupbase->getTransform()->position = glm::vec3(-35, 5, 0);
-	pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
-	pumpkin->getTransform()->position = glm::vec3(-40, 5, 0);
+	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
+	//soupbase->getTransform()->position = glm::vec3(-35, 5, 0);
+	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
+	//pumpkin->getTransform()->position = glm::vec3(-40, 5, 0);
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
@@ -202,7 +203,7 @@ int main()
 	window.setCallbacks(movementCallbacks);
 
 	// Track Ingredient Locations
-	IngredientTracker ingredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
+	IngredientTracker ingredientTracker;
 	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up game loop manager
@@ -214,18 +215,38 @@ int main()
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
+	Recipe pizza(Ingredient::Cheese, Ingredient::Dough, Ingredient::Sausage, Ingredient::Tomato, "Pizza");
+	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
+	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
+	Recipe omlette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omlette");
+
 	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
 	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
 
-	//debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
+	NavigationSystem p3NavSystem(*player3, physics, navMesh, 3);
+	AIBrain p3Brain(p3Inv, ingredientTracker, p3NavSystem);
+
+	NavigationSystem p4NavSystem(*player4, physics, navMesh, 4);
+	AIBrain p4Brain(p4Inv, ingredientTracker, p4NavSystem);
+	
 	player1->attachComponent(&p1Inv, "inventory");
+	player1->attachComponent(&pizza, "recipe");
+
 	player2->attachComponent(&p2Inv, "inventory");
 	player2->attachComponent(&p2NavSystem, "navigation");
+	player2->attachComponent(&omlette, "recipe");
+	p2Brain.setRecipe(&omlette);
+
 	player3->attachComponent(&p3Inv, "inventory");
+	player3->attachComponent(&wrap, "recipe");
+	p3Brain.setRecipe(&wrap);
+
 	player4->attachComponent(&p4Inv, "inventory");
+	player4->attachComponent(&salad, "recipe");
+	p4Brain.setRecipe(&salad);
 
 	// Track time
 	double t = 0.0;
@@ -271,6 +292,13 @@ int main()
 			window.swapBuffer();
 		}
 		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			// TODO: Move out of main and make less dependent
+			pizza.updateRecipeProgress(p1Inv);
+			omlette.updateRecipeProgress(p2Inv);
+			wrap.updateRecipeProgress(p3Inv);
+			salad.updateRecipeProgress(p4Inv);
+
+			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
 			int winner = ui.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();
@@ -296,8 +324,10 @@ int main()
 			window.swapBuffer();
 
 			// AI + Navigation
-			p2Brain.update();
 			ingredientTracker.update();
+			p2Brain.update();
+			p3Brain.update();
+			p4Brain.update();
 
 			// AUDIO
 			audio.update();

@@ -1,6 +1,7 @@
 #include "UISystem.h"
 #include "../Inventory.h"
 #include "../Scene/Entity.h"
+#include "../Gameplay/Recipe.h"
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -69,7 +70,7 @@ UISystem::UISystem()
 
     //Initializing font 
     //TODO: (perhaps this could be abstracted to use multiple fonts)
-	if (FT_New_Face(ft, "resources/fonts/arial.ttf", 0, &face))
+	if (FT_New_Face(ft, "resources/fonts/Night Action.ttf", 0, &face))
 	{
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
@@ -202,14 +203,32 @@ void UISystem::updateGame(int endScreenValue) {
 
     renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
 
+    Recipe* p1Recipe = (Recipe*)g_scene.getEntity("player1")->getComponent("recipe");
+    Recipe* p2Recipe = (Recipe*)g_scene.getEntity("player2")->getComponent("recipe");
+    Recipe* p3Recipe = (Recipe*)g_scene.getEntity("player3")->getComponent("recipe");
+    Recipe* p4Recipe = (Recipe*)g_scene.getEntity("player4")->getComponent("recipe");
+
+    if (p1Recipe != nullptr)
+    {
+        // Recipe States
+        renderText(textShader, "Recipe Progress", scX(0.8), scY(0.9), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "P1 ", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 0, 0));
+        renderText(textShader, "P2 ", scX(0.8), scY(0.8), 1.f, glm::vec3(0, 0, 1));
+        renderText(textShader, "P3 ", scX(0.8), scY(0.75), 1.f, glm::vec3(0, 1, 0));
+        renderText(textShader, "P4" , scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 0));
+        renderText(textShader, "(Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.83), scY(0.85), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Omlette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.83), scY(0.75), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.83), scY(0.7), 1.f, glm::vec3(1, 1, 1));
+    }
 
     // Drawing minimap
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15), scX(0.15), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), 400.f, 400.f, 0, 1.f);
 
     glm::vec3 IngLocation;
     IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
@@ -228,14 +247,14 @@ void UISystem::updateGame(int endScreenValue) {
     Entity* player1 = g_scene.getEntity("player1");
     Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
     float alpha;
-    float faded = 0.2f;
+    float faded = 0.5f;
     float opaque = 1.f;
 
     float invScale = scX(0.04);
     float invXOffset = scX(0.12);
     float invYOffset = scY(0.4);
     float invBlockOffset = scY(0.097);
-    float recipeYOffset = scY(0.54);
+    float recipeYOffset = scY(0.55);
 
     alpha = (p1Inv->tomato) ? opaque : faded;
     renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScale, invScale, 0, alpha);
@@ -250,9 +269,9 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScale, invScale, 0, alpha);
 
     alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, pizza, invXOffset, recipeYOffset, invScale, invScale, 0, alpha);
+    renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scX(0.06), 0, alpha);
 
-    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.3), 0, 1.f);
+    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.32), 0, 1.f);
 
 }
 
@@ -308,15 +327,14 @@ void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Tra
 
 glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
 {
-    // TODO: Fix mini map with new kitchen layout
     float x;
     float z;
     glm::vec2 location;
-    x = ((150.f) / (150.f + 310.f)) * (transform.position.x + 310.f);
-    z = ((150.f) / (220.f + 235.f)) * (transform.position.z + 235.f);
+    x = 0 + ((400.f - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
+    z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
     location = glm::vec2(x, z);
-    location.y = 200.f - location.y;
-    location += glm::vec2(25.f, 380.f);
+    location.y = 400.f - location.y;
+    location += glm::vec2(scX(0.04), scY(0.65));
     return location;
 }
 

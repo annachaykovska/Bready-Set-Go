@@ -135,10 +135,10 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	}
 
 	// Check for completed recipes
-	if (playerInventory->checkPizza())
-		this->getAudioSource()->play("ding.wav");
+	//if (playerInventory->checkPizza())
+	//	this->getAudioSource()->play("ding.wav");
 
-	return;
+	//return;
 }
 
 void Entity::checkPlayerCollision(Entity* otherEntity) {

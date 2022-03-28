@@ -22,6 +22,9 @@
 #include <random>
 #include <algorithm>
 #include <Windows.h>
+#include <algorithm>
+#include <random>
+#include "../Scene/SpawnLocations.h"
 
 #define PI 3.14159f
 
@@ -413,13 +416,13 @@ void PhysicsSystem::randomizeIngredientLocations()
 	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
 
-	// SOUPBASE
-	PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
-	this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
+	//// SOUPBASE
+	//PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
+	//this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
 
-	// PUMPKIN
-	PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
-	this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
+	//// PUMPKIN
+	//PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
+	//this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
 // Constructor
@@ -807,11 +810,11 @@ void PhysicsSystem::updateFoodTransforms()
 	// Peas
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
 
-	// Soupbase
-	g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
+	//// Soupbase
+	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
 
-	// Pumpkin
-	g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
+	//// Pumpkin
+	//g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
 }
 
 void PhysicsSystem::cleanupPhysics()
@@ -1064,17 +1067,17 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		Inventory* player1Inventory = (Inventory*)firstActor->getComponent("inventory");
 		Inventory* player2Inventory = (Inventory*)secondActor->getComponent("inventory");
 		if (collisionWinner == 1) {
-			int ingredient = player2Inventory->removeRandomPizzaIngredient(player1Inventory->cheese, player1Inventory->dough, player1Inventory->sausage, player1Inventory->tomato);
-			player1Inventory->setIngredientFromId(ingredient);
+			//int ingredient = player2Inventory->removeRandomPizzaIngredient(player1Inventory->cheese, player1Inventory->dough, player1Inventory->sausage, player1Inventory->tomato);
+			//player1Inventory->setIngredientFromId(ingredient);
 			firstActor->collisionCooldownStart = glfwGetTime();
-			printf("%s took food id %d from %s\n", firstActor->name.c_str(), ingredient, secondActor->name.c_str());
+			//printf("%s took food id %d from %s\n", firstActor->name.c_str(), ingredient, secondActor->name.c_str());
 			
 		}
 		else if (collisionWinner == 2) {
-			int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
-			player2Inventory->setIngredientFromId(ingredient);
+			//int ingredient = player1Inventory->removeRandomPizzaIngredient(player2Inventory->cheese, player2Inventory->dough, player2Inventory->sausage, player2Inventory->tomato);
+			//player2Inventory->setIngredientFromId(ingredient);
 			secondActor->collisionCooldownStart = glfwGetTime();
-			printf("%s took food id %d from %s\n\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
+			//printf("%s took food id %d from %s\n\n", secondActor->name.c_str(), ingredient, firstActor->name.c_str());
 			
 		}
 	}
