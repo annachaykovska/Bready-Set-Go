@@ -203,7 +203,7 @@ int main()
 	Recipe pizza(Ingredient::Cheese, Ingredient::Dough, Ingredient::Sausage, Ingredient::Tomato, "Pizza");
 	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
 	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
-	Recipe omlette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omlette");
+	Recipe omelette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omelette");
 
 	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
@@ -222,8 +222,8 @@ int main()
 
 	player2->attachComponent(&p2Inv, "inventory");
 	player2->attachComponent(&p2NavSystem, "navigation");
-	player2->attachComponent(&omlette, "recipe");
-	p2Brain.setRecipe(&omlette);
+	player2->attachComponent(&omelette, "recipe");
+	p2Brain.setRecipe(&omelette);
 
 	player3->attachComponent(&p3Inv, "inventory");
 	player3->attachComponent(&wrap, "recipe");
@@ -282,7 +282,7 @@ int main()
 		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
 			// TODO: Move out of main and make less dependent
 			pizza.updateRecipeProgress(p1Inv);
-			omlette.updateRecipeProgress(p2Inv);
+			omelette.updateRecipeProgress(p2Inv);
 			wrap.updateRecipeProgress(p3Inv);
 			salad.updateRecipeProgress(p4Inv);
 
