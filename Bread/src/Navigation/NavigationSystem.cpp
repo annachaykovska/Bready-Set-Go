@@ -33,14 +33,19 @@ void NavigationSystem::update()
 	switch (currentMode_)
 	{
 	case nav:
-		//steering_.updateSteering(waypointUpdater_.interpolator());
 		lostPath_ = waypointUpdater_.offPath();
 		if (waypointUpdater_.currentWaypoint() != nullptr)
 		{
-			steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
+			if (steering_.locked())
+			{
+				std::cout << "Respawning tipped player" << std::endl;
+				physics_.respawnPlayer(id_);
+			}
+			else
+			{
+				steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
+			}
 		}
-		//std::cout << waypointUpdater_.interpolator().x << " " << waypointUpdater_.interpolator().y << " " << waypointUpdater_.interpolator().z << std::endl;
-		//std::cout << waypointUpdater_.currentWaypoint().x << " " << waypointUpdater_.currentWaypoint().y << " " << waypointUpdater_.currentWaypoint().z << std::endl;
 		waypointUpdater_.updateWaypoints();
 		if (waypointUpdater_.pathComplete())
 		{
