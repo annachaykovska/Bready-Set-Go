@@ -45,6 +45,7 @@ AudioSystem::AudioSystem()
 	load("slurp.wav");
 	load("fart.wav");
 	load("suck.wav");
+	load("power.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
@@ -264,6 +265,13 @@ void AudioSystem::endSlurp(AudioSource* source, bool success) {
 }
 
 void AudioSystem::ingredientSuck(AudioSource* source)
+{
+	source->stop();
+	source->loop = false;
+	source->play("suck.wav");
+}
+
+void AudioSystem::powerReady(AudioSource* source)
 {
 	source->stop();
 	source->loop = false;
