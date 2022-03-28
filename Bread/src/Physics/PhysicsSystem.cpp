@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <random>
 #include "../Scene/SpawnLocations.h"
+#include "../Gameplay/Recipe.h"
 
 #define PI 3.14159f
 
@@ -235,9 +236,6 @@ void PhysicsSystem::updateCar() {
 		engineData.mMaxOmega = max_omega;
 		//q1
 		cars[car]->mDriveSimData.setEngineData(engineData);
-
-		// Update chassis
-		//PxVehicleChassisData gaming = cars[car]->
 	}
 }
 
@@ -1064,7 +1062,7 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		}
 		else {
 			cooldownIncomplete = true;
-			printf("Cooldown for %s is not over yet.\n", firstActor->name.c_str());
+			//printf("Cooldown for %s is not over yet.\n", firstActor->name.c_str());
 		}
 	}
 	else if (buf.nbTouches < buf2.nbTouches || firstVehicle->getRigidDynamicActor()->getLinearVelocity() == PxVec3(0.0f)) {
@@ -1074,7 +1072,7 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		}
 		else {
 			cooldownIncomplete = true;
-			printf("Cooldown for %s is not over yet.\n", secondActor->name.c_str());
+			//printf("Cooldown for %s is not over yet.\n", secondActor->name.c_str());
 		}
 	}
 	
@@ -1082,8 +1080,8 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	// RESOLVE COLLISION INGREDIENT EXCHANGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	if (collisionWinner == 0) {
 		// No winners (headon collision)
-		if (!cooldownIncomplete)
-			printf("No collision winners. No ingredients moved.\n");
+		if (!cooldownIncomplete);
+			//printf("No collision winners. No ingredients moved.\n");
 	}
 	else {
 		Inventory* player1Inventory = (Inventory*)firstActor->getComponent("inventory");
@@ -1109,4 +1107,176 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	secondActor->verifyPlayerCollision = false;
 	firstActor->otherPlayerInCollision = "";
 	secondActor->otherPlayerInCollision = "";
+}
+
+void PhysicsSystem::magnet(int stealer_id)
+{
+	// Get the entity that is stealing, and the entities that can be stolen from
+	Entity* stealer;
+	PxVehicleDrive4W* stealer_vehicle;
+
+	std::vector<PxVehicleDrive4W*> victim_vehicles = {
+		mVehiclePlayer1,
+		mVehiclePlayer2,
+		mVehiclePlayer3,
+		mVehiclePlayer4};
+
+	std::vector<Entity*> victims = {
+		g_scene.getEntity("player1"),
+		g_scene.getEntity("player2"),
+		g_scene.getEntity("player3"),
+		g_scene.getEntity("player4")};
+	switch (stealer_id) {
+	case 1:
+		stealer = g_scene.getEntity("player1");
+		stealer_vehicle = mVehiclePlayer1;
+		victims.erase(victims.begin());
+		victim_vehicles.erase(victim_vehicles.begin());
+		break;
+	case 2:
+		stealer = g_scene.getEntity("player2");
+		stealer_vehicle = mVehiclePlayer2;
+		victims.erase(victims.begin() + 1);
+		victim_vehicles.erase(victim_vehicles.begin()+1);
+		break;
+	case 3:
+		stealer = g_scene.getEntity("player3");
+		stealer_vehicle = mVehiclePlayer3;
+		victims.erase(victims.begin() + 2);
+		victim_vehicles.erase(victim_vehicles.begin()+2);
+		break;
+	case 4:
+		stealer = g_scene.getEntity("player4");
+		stealer_vehicle = mVehiclePlayer4;
+		victims.erase(victims.begin() + 3);
+		victim_vehicles.erase(victim_vehicles.begin()+3);
+		break;
+	default:
+		return;
+		break;
+	}
+
+	// See if the stealer can steal (cooldown)
+	float currentTime = glfwGetTime();
+	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) return;
+
+
+	
+	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
+	auto stealer_recipe = (Recipe*) stealer->getComponent("recipe");
+	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
+	for (int i = 0; i < victims.size();) {
+		//TODO: right now only the location is checked
+		// See the victims that are in range
+		PxVec3 victim_pos = victim_vehicles[i]->getRigidDynamicActor()->getGlobalPose().p;
+		if ((victim_pos - stealer_pos).magnitudeSquared() > stealer->magnetDistanceSquared) {
+			victims.erase(victims.begin() + i);
+			victim_vehicles.erase(victim_vehicles.begin() + i);
+			continue;
+		}
+
+		// See if victim can be stolen from
+		if (currentTime - victims[i]->lastStolenFrom < stealer->stolenFromGracePeriod) {
+			victims.erase(victims.begin() + i);
+			victim_vehicles.erase(victim_vehicles.begin() + i);
+			continue;
+		}
+		
+		// Steal item in our recipe if victim has one
+		// This is extremely gross
+		auto victim_inventory = (Inventory*)victims[i]->getComponent("inventory");
+		for (Ingredient ing : stealer_recipe->list) {
+			switch (ing){
+			case Cheese:
+				if (stealer_inventory->cheese != 0) break; // already have this no need to steal
+				if (victim_inventory->cheese != 0) {
+					victim_inventory->cheese--;
+					stealer_inventory->cheese++;
+				}
+				break;
+			case Dough:
+				if (stealer_inventory->dough != 0) break; // already have this no need to steal
+				if (victim_inventory->dough != 0) {
+					victim_inventory->dough--;
+					stealer_inventory->dough++;
+				}
+				break;
+			case Sausage:
+				if (stealer_inventory->sausage != 0) break; // already have this no need to steal
+				if (victim_inventory->sausage != 0) {
+					victim_inventory->sausage--;
+					stealer_inventory->sausage++;
+				}
+				break;
+			case Tomato:
+				if (stealer_inventory->tomato != 0) break; // already have this no need to steal
+				if (victim_inventory->tomato != 0) {
+					victim_inventory->tomato--;
+					stealer_inventory->tomato++;
+				}
+				break;
+			case Carrot:
+				if (stealer_inventory->carrot != 0) break; // already have this no need to steal
+				if (victim_inventory->carrot != 0) {
+					victim_inventory->carrot--;
+					stealer_inventory->carrot++;
+				}
+				break;
+			case Lettuce:
+				if (stealer_inventory->lettuce != 0) break; // already have this no need to steal
+				if (victim_inventory->lettuce != 0) {
+					victim_inventory->lettuce--;
+					stealer_inventory->lettuce++;
+				}
+				break;
+			case Parsnip:
+				if (stealer_inventory->parsnip != 0) break; // already have this no need to steal
+				if (victim_inventory->parsnip != 0) {
+					victim_inventory->parsnip--;
+					stealer_inventory->parsnip++;
+				}
+				break;
+			case Rice:
+				if (stealer_inventory->rice != 0) break; // already have this no need to steal
+				if (victim_inventory->rice != 0) {
+					victim_inventory->rice--;
+					stealer_inventory->rice++;
+				}
+				break;
+			case Egg:
+				if (stealer_inventory->egg != 0) break; // already have this no need to steal
+				if (victim_inventory->egg != 0) {
+					victim_inventory->egg--;
+					stealer_inventory->egg++;
+				}
+				break;
+			case Chicken:
+				if (stealer_inventory->chicken != 0) break; // already have this no need to steal
+				if (victim_inventory->chicken != 0) {
+					victim_inventory->chicken--;
+					stealer_inventory->chicken++;
+				}
+				break;
+			case Peas:
+				if (stealer_inventory->peas != 0) break; // already have this no need to steal
+				if (victim_inventory->peas != 0) {
+					victim_inventory->peas--;
+					stealer_inventory->peas++;
+				}
+				break;
+			}
+		}
+		++i;
+	}
+	if (victims.empty()) return;
+
+
+	// Stealing the items
+	stealer->lastMagnetUse = currentTime;
+	std::cout << " stealing from ";
+	for (auto victim : victims) {
+		victim->lastStolenFrom = currentTime;
+		std::cout << victim->name << " ";
+	}
+	std::cout << std::endl;
 }
