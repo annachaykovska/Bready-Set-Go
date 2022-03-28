@@ -54,6 +54,8 @@ UISystem::UISystem()
     , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
     , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
     , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
+    , map_x(0.126)
+    , map_sx(0.190)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -234,7 +236,7 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15625), scY(0.3), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(map_x), scY(0.8), scX(map_sx), scY(0.325), 0, 1.f);
 
     glm::vec3 IngLocation;
 

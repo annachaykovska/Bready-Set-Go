@@ -29,6 +29,10 @@ class UISystem
 {
 public:
 
+	//for tweaking
+	float map_x;
+	float map_sx;
+
 	UISystem();
 	~UISystem();
 

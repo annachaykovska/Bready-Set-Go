@@ -10,6 +10,7 @@
 #include "Inventory.h"
 #include "SystemManager.h"
 #include "Rendering/RenderingSystem.h"
+#include "Rendering/UISystem.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -256,6 +257,8 @@ void Profiler::meshScale()
 }
 
 void Profiler::physicsValues() {
+	ImGui::InputFloat("x", &(g_systems.ui->map_x), 0.01f, .1f, "%.3f");		// WheelMass
+	ImGui::InputFloat("sx", &(g_systems.ui->map_sx), 0.01f, .1f, "%.3f");		// WheelMass
 	PhysicsSystem* physSys = g_systems.physics;
 	//physSys->mVehiclePlayer1
 	//std::cout << physSys->chassis_mass << std::endl;
