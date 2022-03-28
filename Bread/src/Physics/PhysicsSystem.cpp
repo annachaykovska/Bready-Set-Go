@@ -366,56 +366,67 @@ void PhysicsSystem::randomizeIngredientLocations()
 	loc = LOCATIONS[spawnLocations[0]];
 	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
+	g_scene.getEntity("cheese")->originalSpawn = cheeseTransform;
 
 	// SAUSAGE
 	loc = LOCATIONS[spawnLocations[1]];
 	PxTransform sausageTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
+	g_scene.getEntity("sausage")->originalSpawn = sausageTransform;
 
 	// TOMATO
 	loc = LOCATIONS[spawnLocations[2]];
 	PxTransform tomatoTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
+	g_scene.getEntity("tomato")->originalSpawn = tomatoTransform;
 
 	// DOUGH
 	loc = LOCATIONS[spawnLocations[3]];
 	PxTransform doughTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
+	g_scene.getEntity("dough")->originalSpawn = doughTransform;
 
 	// CARROT
 	loc = LOCATIONS[spawnLocations[4]];
 	PxTransform carrotTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->carrot = createFoodBlock(carrotTransform, halfExtent, "carrot");
+	g_scene.getEntity("carrot")->originalSpawn = carrotTransform;
 
 	// LETTUCE
 	loc = LOCATIONS[spawnLocations[5]];
 	PxTransform lettuceTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->lettuce = createFoodBlock(lettuceTransform, halfExtent, "lettuce");
+	g_scene.getEntity("lettuce")->originalSpawn = lettuceTransform;
 
 	// PARSNIP
 	loc = LOCATIONS[spawnLocations[6]];
 	PxTransform parsnipTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->parsnip = createFoodBlock(parsnipTransform, halfExtent, "parsnip");
+	g_scene.getEntity("parsnip")->originalSpawn = parsnipTransform;
 
 	// RICE
 	loc = LOCATIONS[spawnLocations[7]];
 	PxTransform riceTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->rice = createFoodBlock(riceTransform, halfExtent, "rice");
+	g_scene.getEntity("rice")->originalSpawn = riceTransform;
 
 	// EGG
 	loc = LOCATIONS[spawnLocations[8]];
 	PxTransform eggTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->egg = createFoodBlock(eggTransform, halfExtent, "egg");
+	g_scene.getEntity("egg")->originalSpawn = eggTransform;
 
 	// CHICKEN
 	loc = LOCATIONS[spawnLocations[9]];
 	PxTransform chickenTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->chicken = createFoodBlock(chickenTransform, halfExtent, "chicken");
+	g_scene.getEntity("chicken")->originalSpawn = chickenTransform;
 
 	// PEAS
 	loc = LOCATIONS[spawnLocations[10]];
 	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
 	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
+	g_scene.getEntity("peas")->originalSpawn = peasTransform;
 
 	//// SOUPBASE
 	//PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
@@ -736,7 +747,6 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	this->mAccumulator -= timestep;
 
 	PxTransform trans = PxTransform(PxVec3(0, -100, 0));
-	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
 	if (g_scene.getEntity("tomato")->removeFlag)
 		this->tomato->setGlobalPose(trans);
 	if (g_scene.getEntity("cheese")->removeFlag)
@@ -759,8 +769,8 @@ void PhysicsSystem::update(const float dt, int gameStage)
 		this->chicken->setGlobalPose(trans);
 	if (g_scene.getEntity("peas")->removeFlag)
 		this->peas->setGlobalPose(trans);
-	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
-		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
+
+	resetOutOfBoundsObjects();
 
 	trans = this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose();
 	g_scene.getEntity("player1")->speed = (float)mVehiclePlayer1->computeForwardSpeed();
@@ -956,6 +966,44 @@ bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
 		break;
 	}
 	return false;
+}
+
+void PhysicsSystem::resetOutOfBoundsObjects() {
+	// Players
+	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
+	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
+	if (this->mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+		this->mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(reset);
+	if (this->mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+		this->mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(reset);
+	if (this->mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+		this->mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(reset);
+
+	// Ingredients
+	if (this->cheese->getGlobalPose().p.y < -75.0f && this->cheese->getGlobalPose().p.y > -99.0f)
+		this->cheese->setGlobalPose(g_scene.getEntity("cheese")->originalSpawn);
+	if (this->sausage->getGlobalPose().p.y < -75.0f && this->sausage->getGlobalPose().p.y > -99.0f)
+		this->sausage->setGlobalPose(g_scene.getEntity("sausage")->originalSpawn);
+	if (this->tomato->getGlobalPose().p.y < -75.0f && this->tomato->getGlobalPose().p.y > -99.0f)
+		this->tomato->setGlobalPose(g_scene.getEntity("tomato")->originalSpawn);
+	if (this->dough->getGlobalPose().p.y < -75.0f && this->dough->getGlobalPose().p.y > -99.0f)
+		this->dough->setGlobalPose(g_scene.getEntity("dough")->originalSpawn);
+	if (this->carrot->getGlobalPose().p.y < -75.0f && this->carrot->getGlobalPose().p.y > -99.0f)
+		this->carrot->setGlobalPose(g_scene.getEntity("carrot")->originalSpawn);
+	if (this->lettuce->getGlobalPose().p.y < -75.0f && this->lettuce->getGlobalPose().p.y > -99.0f)
+		this->lettuce->setGlobalPose(g_scene.getEntity("lettuce")->originalSpawn);
+	if (this->parsnip->getGlobalPose().p.y < -75.0f && this->parsnip->getGlobalPose().p.y > -99.0f)
+		this->parsnip->setGlobalPose(g_scene.getEntity("parsnip")->originalSpawn);
+	if (this->rice->getGlobalPose().p.y < -75.0f && this->rice->getGlobalPose().p.y > -99.0f)
+		this->rice->setGlobalPose(g_scene.getEntity("rice")->originalSpawn);
+	if (this->egg->getGlobalPose().p.y < -75.0f && this->egg->getGlobalPose().p.y > -99.0f)
+		this->egg->setGlobalPose(g_scene.getEntity("egg")->originalSpawn);
+	if (this->chicken->getGlobalPose().p.y < -75.0f && this->chicken->getGlobalPose().p.y > -99.0f)
+		this->chicken->setGlobalPose(g_scene.getEntity("chicken")->originalSpawn);
+	if (this->peas->getGlobalPose().p.y < -75.0f && this->peas->getGlobalPose().p.y > -99.0f)
+		this->peas->setGlobalPose(g_scene.getEntity("peas")->originalSpawn);
+	updateFoodTransforms();
 }
 
 void PhysicsSystem::respawnPlayer(int playerNumber) {

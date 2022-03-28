@@ -13,6 +13,7 @@ using namespace std;
 Entity::Entity(std::string name)
 {
 	this->name = name;
+	this->originalSpawn;
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
@@ -30,6 +31,7 @@ Entity::Entity(std::string name)
 
 Entity::Entity(){
 	this->name = "default";
+	this->originalSpawn;
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
