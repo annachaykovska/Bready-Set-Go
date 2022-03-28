@@ -86,11 +86,13 @@ Note: Keyboard controls were broken sometime during the merge-fest of the previo
   - Vehicle flipping, to recover from tipping over.
   - Punishments for falling off of map.
   - Make the game even more visually compelling.
+  - Return ingredients back to start for better level interactivity.
 
 ## Known Feature Limitations Identified While Testing (To Be Addressed In Next Milestone):
   - Some bridges and ramps are difficult to traverse.
   - Vacuum ability is too instant too feel fair.
   - Ingredient location indicators can be confusing when the ingredient is lower or higher than the player.
+  - Ingredient hit boxes are inconsistent.
 
 ## Known Bugs Identified While Testing (To Be Addressed In Next Milestone):
 - Camera becomes obscured when going down a ramp.
