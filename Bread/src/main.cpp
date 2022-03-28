@@ -141,38 +141,24 @@ int main()
 	test->attachComponent(&transforms[19], "transform");
 
 	// Initialize transform components
-	Transform* counterTrans = countertop->getTransform();
-	counterTrans->position.y = -78.0f;
-	counterTrans->position.z = 50.0f;
-	counterTrans->update();
-
 	fan->getTransform()->position = glm::vec3(0.0f, 150.0f, -50.0f);
 	fan->getTransform()->scale = glm::vec3(15.0f);
 	fan->getTransform()->update();
 
+	// Set rendered ingredient scales
 	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
 	sausage->getTransform()->scale = glm::vec3(30, 30, 30);
 	tomato->getTransform()->scale = glm::vec3(30, 30, 30);
 	dough->getTransform()->scale = glm::vec3(30, 30, 30);
-
 	carrot->getTransform()->scale = glm::vec3(30, 30, 30);
-	carrot->getTransform()->position = glm::vec3(0, 5, 0);
 	lettuce->getTransform()->scale = glm::vec3(30, 30, 30);
-	lettuce->getTransform()->position = glm::vec3(-5, 5, 0);
 	parsnip->getTransform()->scale = glm::vec3(30, 30, 30);
-	parsnip->getTransform()->position = glm::vec3(-10, 5, 0);
 	rice->getTransform()->scale = glm::vec3(30, 30, 30);
-	rice->getTransform()->position = glm::vec3(-15, 5, 0);
 	egg->getTransform()->scale = glm::vec3(30, 30, 30);
-	egg->getTransform()->position = glm::vec3(-20, 5, 0);
 	chicken->getTransform()->scale = glm::vec3(30, 30, 30);
-	chicken->getTransform()->position = glm::vec3(-25, 5, 0);
 	peas->getTransform()->scale = glm::vec3(30, 30, 30);
-	peas->getTransform()->position = glm::vec3(-30, 5, 0);
 	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	//soupbase->getTransform()->position = glm::vec3(-35, 5, 0);
 	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
-	//pumpkin->getTransform()->position = glm::vec3(-40, 5, 0);
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
