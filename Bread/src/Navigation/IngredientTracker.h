@@ -7,23 +7,44 @@
 class IngredientTracker
 {
 public:
-	IngredientTracker(Transform* cheese, Transform* tomato, Transform* dough, Transform* sausage);
+	IngredientTracker();
 
 	void update();
 
 	void updateCheeseTransformSource(Transform* source);
-	void updateTomatoTransformSource(Transform* source);
 	void updateDoughTransformSource(Transform* source);
 	void updateSausageTransformSource(Transform* source);
+	void updateTomatoTransformSource(Transform* source);
+	void updateCarrotTransformSource(Transform* source);
+	void updateLettuceTransformSource(Transform* source);
+	void updateParsnipTransformSource(Transform* source);
+	void updateRiceTransformSource(Transform* source);
+	void updateEggTransformSource(Transform* source);
+	void updateChickenTransformSource(Transform* source);
+	void updatePeasTransformSource(Transform* source);
 
 	Transform getCheeseLocation();
-	Transform getTomatoLocation();
 	Transform getDoughLocation();
 	Transform getSausageLocation();
+	Transform getTomatoLocation();
+	Transform getCarrotLocation();
+	Transform getLettuceLocation();
+	Transform getParsnipLocation();
+	Transform getRiceLocation();
+	Transform getEggLocation();
+	Transform getChickenLocation();
+	Transform getPeasLocation();
 
 private:
 	Transform* cheeseLocation;
-	Transform* tomatoLocation;
 	Transform* doughLocation;
 	Transform* sausageLocation;
+	Transform* tomatoLocation;
+	Transform* carrotLocation;
+	Transform* lettuceLocation;
+	Transform* parsnipLocation;
+	Transform* riceLocation;
+	Transform* eggLocation;
+	Transform* chickenLocation;
+	Transform* peasLocation;
 };
