@@ -20,6 +20,7 @@ UISystem::UISystem()
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
+    , vacuum("resources/textures/vacuum.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , tomato("resources/textures/tomato.png", GL_NEAREST)
@@ -45,6 +46,7 @@ UISystem::UISystem()
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
     , speedometer_theta(MIN_SPEED_THETA)
+    , powerReady(true)
     , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
     , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
     , gameOverPlayer1_3("resources/textures/game_over_screen_player_1_3.png", GL_NEAREST)
@@ -52,7 +54,13 @@ UISystem::UISystem()
     , gameOverPlayer2("resources/textures/game_over_screen_player_2.png", GL_NEAREST)
     , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
     , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
+    , backToMainMenuButton("resources/textures/button_back_to_main_menu.png", GL_NEAREST)
     , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
+    , map_x(0.126)
+    , map_sx(0.190)
+    , pauseMenu("resources/textures/pause_screen.png", GL_NEAREST)
+    , continueButton("resources/textures/button_continue.png", GL_NEAREST)
+    , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -103,22 +111,22 @@ UISystem::UISystem()
             GL_UNSIGNED_BYTE,
             face->glyph->bitmap.buffer
         );
-        // set texture options
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        // now store character for later use
-        Character character = {
-            texture,
-            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-            face->glyph->advance.x
-        };
-        //test print
+// set texture options
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// now store character for later use
+Character character = {
+    texture,
+    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+    face->glyph->advance.x
+};
+//test print
 
 
-        Characters.insert(std::pair<char, Character>(c, character));
+Characters.insert(std::pair<char, Character>(c, character));
     }
 
     //Cleaning up the freetype variables
@@ -141,7 +149,7 @@ UISystem::UISystem()
     glBindVertexArray(0);
 }
 
-UISystem::~UISystem(){
+UISystem::~UISystem() {
 
 }
 
@@ -187,8 +195,24 @@ void UISystem::updateEndGame(int endScreenValue) {
         renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
 }
 
+void UISystem::showPauseMenu(int itemSelected) {
+    if (itemSelected == 1) {
+        renderImage(imageShader, continueButtonPressed, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButton, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+    }
+    else if (itemSelected == 2) {
+        renderImage(imageShader, continueButton, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+    }
+    renderImage(imageShader, pauseMenu, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+}
 
-void UISystem::updateGame(int endScreenValue) {
+
+void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pause) {
+    if (pause) {
+        showPauseMenu(pauseMenuItemSelected);
+    }
+
     if (checkForWin() != 0)
     {
         updateEndGame(endScreenValue);
@@ -198,10 +222,24 @@ void UISystem::updateGame(int endScreenValue) {
     // Player 1 UI (eventually abstract to a draw player UI method)
     // Drawing speedometer
     float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
-    speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
-    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
+    speedometer_theta += std::min(std::max((speedometer_goal_theta - speedometer_theta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
+    renderImage(imageShader, needle, scX(0.875), scY(0.19), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
-    renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
+    auto p1_ent = g_scene.getEntity("player1");
+    if ((glfwGetTime() - p1_ent->lastMagnetUse) / p1_ent->magnetCooldown > 0.99f && powerReady == false)
+    {
+        g_systems.audio->powerReady(p1_ent->getAudioSource());
+        powerReady = true;
+    }
+    else if ((glfwGetTime() - p1_ent->lastMagnetUse) / p1_ent->magnetCooldown < 0.99f && powerReady == true)
+    {
+        powerReady = false;
+    }
+    renderImage(imageShader, vacuum, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, (glfwGetTime()-p1_ent->lastMagnetUse)/p1_ent->magnetCooldown);
+
+    renderImage(imageShader, speedometer, scX(0.875), scY(0.19), scX(0.225), scY(0.3), 0.f, 1.f);
+
+    
 
     Recipe* p1Recipe = (Recipe*)g_scene.getEntity("player1")->getComponent("recipe");
     Recipe* p2Recipe = (Recipe*)g_scene.getEntity("player2")->getComponent("recipe");
@@ -228,7 +266,7 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15625), scY(0.3), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(map_x), scY(0.8), scX(map_sx), scY(0.325), 0, 1.f);
 
     glm::vec3 IngLocation;
 

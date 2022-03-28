@@ -7,7 +7,7 @@
 
 #include "Camera.h"
 
-#define CAMERA_DISTANCE 10.0
+#define CAMERA_DISTANCE 12.0
 #define CAMERA_GROUND_HEIGHT 5.0
 #define TOP_SPEED 40.f
 #define EULER 2.71828f

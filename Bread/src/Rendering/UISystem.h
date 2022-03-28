@@ -7,6 +7,7 @@
 #include "../Scene/Scene.h"
 #include "../Physics/PhysicsSystem.h"
 #include "../Navigation/IngredientTracker.h"
+#include "../Audio/AudioSystem.h"
 #include <iostream>
 #include <map>
 #include <ft2build.h>
@@ -29,12 +30,17 @@ class UISystem
 {
 public:
 
+	//for tweaking
+	float map_x;
+	float map_sx;
+
 	UISystem();
 	~UISystem();
 
-	void updateGame(int endScreenValue);
+	void updateGame(int endScreenValue, int pauseMenuItemSelected, bool pause = false);
 	void updateMainMenu(int itemSelected);
 	void updateEndGame(int endScreenValue);
+	void showPauseMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
 	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
@@ -56,7 +62,9 @@ private:
 
 	ImageTexture speedometer;
 	float speedometer_theta;
+	bool powerReady;
 	ImageTexture needle;
+	ImageTexture vacuum;
 	ImageTexture miniMap;
 	ImageTexture inventory;
 
@@ -89,6 +97,11 @@ private:
 	ImageTexture exitButtonNormal;
 	ImageTexture exitButtonPressed;
 
+	// Pause Menu
+	ImageTexture pauseMenu;
+	ImageTexture continueButton;
+	ImageTexture continueButtonPressed;
+
 	// End Game
 	ImageTexture gameOverPlayer1_1;
 	ImageTexture gameOverPlayer1_2;
@@ -97,6 +110,7 @@ private:
 	ImageTexture gameOverPlayer2;
 	ImageTexture gameOverPlayer3;
 	ImageTexture gameOverPlayer4;
+	ImageTexture backToMainMenuButton;
 	ImageTexture backToMainMenuButtonPressed;
 
 	//Constants needed to render

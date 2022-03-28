@@ -38,7 +38,7 @@ public:
 
 	float getPlayerSpeed(int playerNumber);
 	bool getIsVehicleInAir(int playerNumber);
-
+	void resetOutOfBoundsObjects();
 	void respawnPlayer(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 

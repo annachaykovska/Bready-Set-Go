@@ -13,6 +13,7 @@ using namespace std;
 Entity::Entity(std::string name)
 {
 	this->name = name;
+	this->originalSpawn;
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
@@ -20,8 +21,8 @@ Entity::Entity(std::string name)
 	this->collisionCooldownStart = -1;
 
 	//Magnet variables
-	this->magnetDistanceSquared = 200.f;
-	this->magnetCooldown = 3.0f;
+	this->magnetDistanceSquared = 400.f;
+	this->magnetCooldown = 6.0f;
 	this->lastMagnetUse = 0;
 	this->stolenFromGracePeriod = 6.0f;
 	this->lastStolenFrom = 0;
@@ -30,6 +31,7 @@ Entity::Entity(std::string name)
 
 Entity::Entity(){
 	this->name = "default";
+	this->originalSpawn;
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
@@ -38,7 +40,7 @@ Entity::Entity(){
 
 	//Magnet variables
 	this->magnetDistanceSquared = 200.f;
-	this->magnetCooldown = 3.0f;
+	this->magnetCooldown = 6.0f;
 	this->lastMagnetUse = 0;
 	this->stolenFromGracePeriod = 6.0f;
 	this->lastStolenFrom = 0;
