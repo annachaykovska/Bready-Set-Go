@@ -85,7 +85,7 @@ AudioSystem::AudioSystem()
 	bgMusic->pitch = 1.0f;
 
 	p1Engine->loop = true;
-	p1Engine->gain = 0.1f;
+	p1Engine->gain = 0.7f;
 	p1Engine->pitch = 1.0f;
 
 	p2Engine->loop = true;
@@ -244,6 +244,8 @@ AudioSource* AudioSystem::createAudioSource()
 
 void AudioSystem::update(const float dt)
 {
+	AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
+	bgMusic->play("bg.wav");
 
 	Transform* trans = g_scene.getEntity("player1")->getTransform();
 	glm::vec3 pos = trans->position;
@@ -265,19 +267,19 @@ void AudioSystem::update(const float dt)
 
 	if (accumulator > 0.25f)
 	{
-		p1Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(1) / 80.0f) + 1.0f;
+		p1Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(1) / 60.0f) + 1.0f;
 		p1Engine->stop();
 		p1Engine->play("idle.wav");
 
-		p2Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(2) / 80.0f) + 1.0f;
+		p2Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(2) / 60.0f) + 1.0f;
 		p2Engine->stop();
 		p2Engine->play("idle.wav");
 
-		p3Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(3) / 80.0f) + 1.0f;
+		p3Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(3) / 60.0f) + 1.0f;
 		p3Engine->stop();
 		p3Engine->play("idle.wav");
 
-		p4Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(4) / 80.0f) + 1.0f;
+		p4Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(4) / 60.0f) + 1.0f;
 		p4Engine->stop();
 		p4Engine->play("idle.wav");
 
