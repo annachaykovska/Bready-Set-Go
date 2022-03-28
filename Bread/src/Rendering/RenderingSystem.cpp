@@ -208,12 +208,12 @@ skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFrag
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeMap);
 
 	std::vector<std::string> faces;
-	faces.push_back("resources/textures/skybox/cubemap/nx.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/px.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/py.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/ny.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/nz.jpg");
-	faces.push_back("resources/textures/skybox/cubemap/pz.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/z.jpg");
+	faces.push_back("resources/textures/skybox/x.jpg");
+	faces.push_back("resources/textures/skybox/z.jpg");
+	faces.push_back("resources/textures/skybox/z.jpg");
 
 	int width, height, nrChannels;
 	unsigned char* data;
@@ -235,8 +235,8 @@ skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFrag
 	NavMesh navMeshPoints;
 	navMesh = navMeshPoints.getWireframe();
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -259,22 +259,25 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Player models
 	//-----------------------------------------------------------------------------------
-	std::string breadmobilePath = "resources/models/breadbus/breadbus.obj";
+	std::string breadbusPath = "resources/models/breadbus/breadbus.obj";
+	std::string pancakebusPath = "resources/models/breadbus/pancakebus.obj";
+	std::string baguettebusPath = "resources/models/breadbus/baguettebus.obj";
+	std::string cakebusPath = "resources/models/breadbus/cakebus.obj";
 
 	// Player 1
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&breadbusPath[0]));
 	g_scene.getEntity("player1")->attachComponent(&(this->models[0]), "model");
 
 	// Player 2
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&pancakebusPath[0]));
 	g_scene.getEntity("player2")->attachComponent(&(this->models[1]), "model");
 
 	// Player 3
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&cakebusPath[0]));
 	g_scene.getEntity("player3")->attachComponent(&(this->models[2]), "model");
 
 	// Player 4
-	this->models.emplace_back(Model(&breadmobilePath[0]));
+	this->models.emplace_back(Model(&baguettebusPath[0]));
 	g_scene.getEntity("player4")->attachComponent(&(this->models[3]), "model");
 
 	//-----------------------------------------------------------------------------------
@@ -551,15 +554,13 @@ void RenderingSystem::renderScene()
 			models[i].owner->getTransform()->update();
 		}
 
-		if (i < 4) // Use material info for player models
+		if (i < 3) // Use material info for player models
 		{
 			glUniform1i(texLoc, 0);
 			models[i].draw(this->shader);
 		}
-		else if (i >= 4) // Use texture images for everything else
+		else // Use texture images for everything else
 		{
-			//ownerTransform->update();
-
 			glUniform1i(texLoc, 1);
 			models[i].draw(this->shader);
 		}

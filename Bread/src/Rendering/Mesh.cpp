@@ -138,14 +138,14 @@ void Mesh::draw(Shader &shader)
 	glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 
 	unsigned int lightColorLoc = glGetUniformLocation(shader.getId(), "light.color");
-	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
+	glUniform3f(lightColorLoc, 0.9529f, 0.9529f, 0.7765f);
 
 	unsigned int lightDirLoc = glGetUniformLocation(shader.getId(), "light.direction");
 	glm::vec3 lightDir = g_systems.render->lightDir;
 	glUniform3f(lightDirLoc, lightDir.x, lightDir.y, lightDir.z);
 
 	unsigned int aIntensityLoc = glGetUniformLocation(shader.getId(), "light.ambient");
-	glUniform3f(aIntensityLoc, 0.3f, 0.3f, 0.3f);
+	glUniform3f(aIntensityLoc, 0.4f, 0.4f, 0.4f);
 
 	unsigned int dIntensityLoc = glGetUniformLocation(shader.getId(), "light.diffuse");
 	glUniform3f(dIntensityLoc, 1.0f, 1.0f, 1.0f);
