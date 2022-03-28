@@ -333,5 +333,5 @@ void AudioSystem::powerReady(AudioSource* source)
 {
 	source->stop();
 	source->loop = false;
-	source->play("suck.wav");
+	source->play("power.wav");
 }
