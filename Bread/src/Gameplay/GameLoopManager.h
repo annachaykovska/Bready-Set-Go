@@ -1,6 +1,7 @@
 #pragma once
 #include "../Inventory.h"
 #include "../Physics/PhysicsSystem.h"
+#include "../Navigation/IngredientTracker.h"
 
 
 class GameLoopManager {
@@ -9,7 +10,7 @@ public:
 	void resetGameLoopValues();
 	void updateGameStageFromMenu();
 	void setEndStage();
-	void gameActorsReset(PhysicsSystem* physics, Inventory* p1Inv, Inventory* p2Inv, Inventory* p3Inv, Inventory* p4Inv);
+	void gameActorsReset(PhysicsSystem* physics, IngredientTracker* ingredientTracker, Inventory* p1Inv, Inventory* p2Inv, Inventory* p3Inv, Inventory* p4Inv);
 
 	// Constants
 	const float mainMenuTimeoutLength;

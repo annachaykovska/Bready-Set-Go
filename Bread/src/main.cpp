@@ -21,6 +21,7 @@
 #include "Navigation/IngredientTracker.h"
 #include "Navigation/AIBrain.h"
 #include "Gameplay/Recipe.h"
+#include "Gameplay/GameLoopManager.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -349,10 +350,11 @@ int main()
 		// RESET game if end of game and menu selected
 		else if (gameLoop.isBackToMenuSelected) {
 			gameLoop.resetGameLoopValues();
-			gameLoop.gameActorsReset(&physics, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
+			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 
 			audio.stopMusic(countertopAudioSource);
 			audio.playMainMenuMusic(countertopAudioSource);
+
 			gameLoop.isPaused = true;
 		}
 	}
