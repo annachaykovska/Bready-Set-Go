@@ -307,7 +307,7 @@ int UISystem::checkForWin()
     Entity* player2 = g_scene.getEntity("player2");
     Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
 
-    if (p2Inv->rice && p2Inv->chicken && p2Inv->dough && p2Inv->lettuce)
+    if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce)
     {
         return 2;
     }
@@ -315,7 +315,7 @@ int UISystem::checkForWin()
     Entity* player3 = g_scene.getEntity("player3");
     Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
 
-    if (p3Inv->lettuce && p3Inv->tomato && p3Inv->cheese && p3Inv->carrot)
+    if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce)
     {
         return 3;
     }
@@ -323,7 +323,7 @@ int UISystem::checkForWin()
     Entity* player4 = g_scene.getEntity("player4");
     Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
 
-    if (p4Inv->egg && p4Inv->lettuce && p4Inv->cheese && p4Inv->peas)
+    if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce)
     {
         return 4;
     }
@@ -348,7 +348,6 @@ glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
     //z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
     x = 0 + ((scX(0.15625) - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
     z = 0 + ((scY(0.28) - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
-    //std::cout << g_systems.width << std::endl;
     location = glm::vec2(x, z);
     location.y = scY(0.3) - location.y;
     location += glm::vec2(scX(0.04), scY(0.62));

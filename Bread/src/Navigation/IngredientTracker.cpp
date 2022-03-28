@@ -55,31 +55,31 @@ void IngredientTracker::update()
 		}
 		if (inventories[i]->carrot)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updateCarrotTransformSource(players[i]->getTransform());
 		}
 		if (inventories[i]->lettuce)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updateLettuceTransformSource(players[i]->getTransform());
 		}
 		if (inventories[i]->parsnip)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updateParsnipTransformSource(players[i]->getTransform());
 		}
 		if (inventories[i]->rice)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updateRiceTransformSource(players[i]->getTransform());
 		}
 		if (inventories[i]->egg)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updateEggTransformSource(players[i]->getTransform());
 		}
 		if (inventories[i]->chicken)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updateChickenTransformSource(players[i]->getTransform());
 		}
 		if (inventories[i]->peas)
 		{
-			updateTomatoTransformSource(players[i]->getTransform());
+			updatePeasTransformSource(players[i]->getTransform());
 		}
 	}
 }
