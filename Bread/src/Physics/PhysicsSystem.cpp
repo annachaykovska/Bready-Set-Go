@@ -27,6 +27,9 @@
 #include "../Scene/SpawnLocations.h"
 #include "../Gameplay/Recipe.h"
 
+#include "../Audio/AudioSource.h"
+#include "../Audio/AudioSystem.h"
+
 #define PI 3.14159f
 
 using namespace snippetvehicle;
@@ -1184,13 +1187,13 @@ void PhysicsSystem::magnet(int stealer_id)
 		mVehiclePlayer1,
 		mVehiclePlayer2,
 		mVehiclePlayer3,
-		mVehiclePlayer4};
+		mVehiclePlayer4 };
 
 	std::vector<Entity*> victims = {
 		g_scene.getEntity("player1"),
 		g_scene.getEntity("player2"),
 		g_scene.getEntity("player3"),
-		g_scene.getEntity("player4")};
+		g_scene.getEntity("player4") };
 	switch (stealer_id) {
 	case 1:
 		stealer = g_scene.getEntity("player1");
@@ -1202,19 +1205,19 @@ void PhysicsSystem::magnet(int stealer_id)
 		stealer = g_scene.getEntity("player2");
 		stealer_vehicle = mVehiclePlayer2;
 		victims.erase(victims.begin() + 1);
-		victim_vehicles.erase(victim_vehicles.begin()+1);
+		victim_vehicles.erase(victim_vehicles.begin() + 1);
 		break;
 	case 3:
 		stealer = g_scene.getEntity("player3");
 		stealer_vehicle = mVehiclePlayer3;
 		victims.erase(victims.begin() + 2);
-		victim_vehicles.erase(victim_vehicles.begin()+2);
+		victim_vehicles.erase(victim_vehicles.begin() + 2);
 		break;
 	case 4:
 		stealer = g_scene.getEntity("player4");
 		stealer_vehicle = mVehiclePlayer4;
 		victims.erase(victims.begin() + 3);
-		victim_vehicles.erase(victim_vehicles.begin()+3);
+		victim_vehicles.erase(victim_vehicles.begin() + 3);
 		break;
 	default:
 		return;
@@ -1226,9 +1229,9 @@ void PhysicsSystem::magnet(int stealer_id)
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) return;
 
 
-	
+
 	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
-	auto stealer_recipe = (Recipe*) stealer->getComponent("recipe");
+	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
 	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
 	for (int i = 0; i < victims.size();) {
 		//TODO: right now only the location is checked
@@ -1246,17 +1249,19 @@ void PhysicsSystem::magnet(int stealer_id)
 			victim_vehicles.erase(victim_vehicles.begin() + i);
 			continue;
 		}
-		
+
 		// Steal item in our recipe if victim has one
 		// This is extremely gross
 		auto victim_inventory = (Inventory*)victims[i]->getComponent("inventory");
+		boolean stole = false;
 		for (Ingredient ing : stealer_recipe->list) {
-			switch (ing){
+			switch (ing) {
 			case Cheese:
 				if (stealer_inventory->cheese != 0) break; // already have this no need to steal
 				if (victim_inventory->cheese != 0) {
 					victim_inventory->cheese--;
 					stealer_inventory->cheese++;
+					stole = true;
 				}
 				break;
 			case Dough:
@@ -1264,6 +1269,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->dough != 0) {
 					victim_inventory->dough--;
 					stealer_inventory->dough++;
+					stole = true;
 				}
 				break;
 			case Sausage:
@@ -1271,6 +1277,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->sausage != 0) {
 					victim_inventory->sausage--;
 					stealer_inventory->sausage++;
+					stole = true;
 				}
 				break;
 			case Tomato:
@@ -1278,6 +1285,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->tomato != 0) {
 					victim_inventory->tomato--;
 					stealer_inventory->tomato++;
+					stole = true;
 				}
 				break;
 			case Carrot:
@@ -1285,6 +1293,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->carrot != 0) {
 					victim_inventory->carrot--;
 					stealer_inventory->carrot++;
+					stole = true;
 				}
 				break;
 			case Lettuce:
@@ -1292,6 +1301,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->lettuce != 0) {
 					victim_inventory->lettuce--;
 					stealer_inventory->lettuce++;
+					stole = true;
 				}
 				break;
 			case Parsnip:
@@ -1299,6 +1309,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->parsnip != 0) {
 					victim_inventory->parsnip--;
 					stealer_inventory->parsnip++;
+					stole = true;
 				}
 				break;
 			case Rice:
@@ -1306,6 +1317,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->rice != 0) {
 					victim_inventory->rice--;
 					stealer_inventory->rice++;
+					stole = true;
 				}
 				break;
 			case Egg:
@@ -1313,6 +1325,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->egg != 0) {
 					victim_inventory->egg--;
 					stealer_inventory->egg++;
+					stole = true;
 				}
 				break;
 			case Chicken:
@@ -1320,6 +1333,7 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->chicken != 0) {
 					victim_inventory->chicken--;
 					stealer_inventory->chicken++;
+					stole = true;
 				}
 				break;
 			case Peas:
@@ -1327,21 +1341,21 @@ void PhysicsSystem::magnet(int stealer_id)
 				if (victim_inventory->peas != 0) {
 					victim_inventory->peas--;
 					stealer_inventory->peas++;
+					stole = true;
 				}
 				break;
 			}
+			if (stole) {
+				stealer->lastMagnetUse = currentTime;
+				victims[i]->lastStolenFrom = currentTime;
+				g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+				return;
+			}
 		}
+
 		++i;
 	}
-	if (victims.empty()) return;
 
-
-	// Stealing the items
 	stealer->lastMagnetUse = currentTime;
-	std::cout << " stealing from ";
-	for (auto victim : victims) {
-		victim->lastStolenFrom = currentTime;
-		std::cout << victim->name << " ";
-	}
-	std::cout << std::endl;
+	g_systems.audio->endSlurp(stealer->getAudioSource(), false);
 }

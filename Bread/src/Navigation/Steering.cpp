@@ -11,6 +11,9 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics, int id)
 	, physics_(physics)
 	, id_(id)
 	, finalApproach_(false)
+	, stuckTimer_(0)
+	, stuck_(false)
+	, procedureTimer_(0)
 {
 	switch (id_)
 	{
@@ -38,10 +41,30 @@ void Steering::park()
 	vehicle_->mWheelsDynData.setToRestState();
 }
 
+void Steering::evasiveAction()
+{
+	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+	input_->setAnalogAccel(0.3f);
+	std::cout << procedureTimer_ << std::endl;
+	if (procedureTimer_ > 200)
+	{
+		stuck_ = false;
+		procedureTimer_ = 0;
+	}
+	procedureTimer_++;
+}
+
 void Steering::updateSteering(position target)
 {
+	if (stuck_)
+	{
+		evasiveAction();
+		return;
+	}
+	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 	glm::vec3 vectorA = target - entity_.getTransform()->position;
 	float distance = length(vectorA);
+
 	distance /= 20;
 	if (distance > 1)
 	{
@@ -53,6 +76,21 @@ void Steering::updateSteering(position target)
 	float theta = acos(dot(vectorB, vectorA) / (length(vectorA) * length(vectorB)));
 	glm::vec3 upVector = cross(vectorB, vectorA);
 
+	if (vehicle_->computeForwardSpeed() < 5)
+	{
+		stuckTimer_++;
+	}
+	else
+	{
+		stuckTimer_ = 0;
+	}
+
+	if (stuckTimer_ > 600)
+	{
+		stuckTimer_ = 0;
+		stuck_ = true;
+	}
+
 	int max = 25;
 	if (vehicle_->computeForwardSpeed() < max)
 	{
@@ -62,28 +100,12 @@ void Steering::updateSteering(position target)
 	{
 		input_->setAnalogAccel(0.f);
 	}
-	//if (abs(theta) > TURN_THRESHOLD)
-	//{
-		/*
-		if (abs(theta) > PI / 4.0f)
-		{
-			theta = PI / 4.0f;
-		}
-		*/
-		if (upVector.y < 0)
-		{
-			//input_->setAnalogSteer(theta / (PI / 4.0f));
-			input_->setAnalogSteer(1.0f);
-		}
-		else
-		{
-			//input_->setAnalogSteer(-theta / (PI / 4.0f));
-			input_->setAnalogSteer(-1.0f);
-		}
-	//}
-	//else
-	//{
-	//	std::cout << "Shouldn't stay here long" << std::endl;
-	//	input_->setAnalogSteer(0.f);
-	//}
+	if (upVector.y < 0)
+	{
+		input_->setAnalogSteer(1.0f);
+	}
+	else
+	{
+		input_->setAnalogSteer(-1.0f);
+	}
 }
