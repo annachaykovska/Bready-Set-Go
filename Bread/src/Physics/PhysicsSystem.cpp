@@ -742,6 +742,20 @@ void PhysicsSystem::update(const float dt, int gameStage)
 		this->sausage->setGlobalPose(trans);
 	if (g_scene.getEntity("dough")->removeFlag)
 		this->dough->setGlobalPose(trans);
+	if (g_scene.getEntity("carrot")->removeFlag)
+		this->carrot->setGlobalPose(trans);
+	if (g_scene.getEntity("lettuce")->removeFlag)
+		this->lettuce->setGlobalPose(trans);
+	if (g_scene.getEntity("parsnip")->removeFlag)
+		this->parsnip->setGlobalPose(trans);
+	if (g_scene.getEntity("rice")->removeFlag)
+		this->rice->setGlobalPose(trans);
+	if (g_scene.getEntity("egg")->removeFlag)
+		this->egg->setGlobalPose(trans);
+	if (g_scene.getEntity("chicken")->removeFlag)
+		this->chicken->setGlobalPose(trans);
+	if (g_scene.getEntity("peas")->removeFlag)
+		this->peas->setGlobalPose(trans);
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -100.0)
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
 
