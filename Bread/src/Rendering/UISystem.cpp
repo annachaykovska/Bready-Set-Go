@@ -228,7 +228,7 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), 400.f, 400.f, 0, 1.f);
+    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15625), scY(0.3), 0, 1.f);
 
     glm::vec3 IngLocation;
 
@@ -344,11 +344,14 @@ glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
     float x;
     float z;
     glm::vec2 location;
-    x = 0 + ((400.f - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
-    z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
+    //x = 0 + ((400.f - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
+    //z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
+    x = 0 + ((scX(0.15625) - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
+    z = 0 + ((scY(0.28) - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
+    std::cout << g_systems.width << std::endl;
     location = glm::vec2(x, z);
-    location.y = 400.f - location.y;
-    location += glm::vec2(scX(0.04), scY(0.65));
+    location.y = scY(0.3) - location.y;
+    location += glm::vec2(scX(0.04), scY(0.62));
     return location;
 }
 
