@@ -11,6 +11,7 @@ NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavM
 	, resetFlag_(false)
 	, currentMode_(nav)
 	, magnetCooldown_(0)
+	, searchWatchdog_(0)
 {
 }
 
@@ -61,10 +62,16 @@ void NavigationSystem::update()
 		waypointUpdater_.updateWaypoints();
 		if (waypointUpdater_.pathComplete())
 		{
-			currentMode_ = search;
+			setMode(search);
 		}
 		break;
 	case search:
+		searchWatchdog_++;
+		if (searchWatchdog_ > 500)
+		{
+			steering_.pause();
+			searchWatchdog_ = 0;
+		}
 		steering_.updateSteering(currentTarget_);
 		break;
 	}
@@ -78,6 +85,10 @@ void NavigationSystem::update()
 
 void NavigationSystem::setMode(NavMode mode)
 {
+	if (mode == search)
+	{
+		searchWatchdog_ = 0;
+	}
 	currentMode_ = mode;
 }
 

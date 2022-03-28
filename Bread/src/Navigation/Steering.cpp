@@ -14,6 +14,7 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics, int id)
 	, stuckTimer_(0)
 	, stuck_(false)
 	, locked_(false)
+	, pause_(false)
 	, procedureTimer_(0)
 	, positionDelta_(glm::vec3(0, 0, 0))
 	, deltaTimer_(0)
@@ -56,6 +57,34 @@ void Steering::evasiveAction()
 	procedureTimer_++;
 }
 
+void Steering::brakeAction()
+{
+	if (procedureTimer_ <= 30)
+	{
+		input_->setAnalogAccel(0.f);
+		input_->setAnalogBrake(1.f);
+	}
+	else if (procedureTimer_ > 30 && procedureTimer_ < 100)
+	{
+		vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		input_->setAnalogBrake(0.f);
+		input_->setAnalogAccel(0.3f);
+		input_->setAnalogSteer(1.0f);
+	}
+	else
+	{
+		pause_ = false;
+		procedureTimer_ = 0;
+		input_->setAnalogBrake(0.f);
+	}
+	procedureTimer_++;
+}
+
+void Steering::pause()
+{
+	pause_ = true;
+}
+
 bool Steering::locked()
 {
 	bool temp = locked_;
@@ -74,6 +103,12 @@ void Steering::updateSteering(position target)
 		}
 		positionDelta_ = entity_.getTransform()->position;
 		deltaTimer_ = 0;
+	}
+
+	if (pause_)
+	{
+		brakeAction();
+		return;
 	}
 
 	if (stuck_)

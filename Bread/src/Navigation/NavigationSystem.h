@@ -33,7 +33,6 @@ private:
 	Entity& vehicle_;
 	NavMesh& navmesh_;
 
-	//LocationTracker locationTracker_;
 	WaypointUpdater waypointUpdater_;
 	PathFinder pathFinder_;
 
@@ -46,4 +45,5 @@ private:
 	NavMode currentMode_;
 
 	int magnetCooldown_;
+	int searchWatchdog_;
 };
