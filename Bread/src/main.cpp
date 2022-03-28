@@ -9,7 +9,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 #include "Transform.h"
-#include "Rendering/DebugOverlay.h"
+//#include "Rendering/DebugOverlay.h"
 #include "Rendering/RenderingSystem.h"
 #include "Rendering/UISystem.h"
 #include "Audio/AudioSystem.h"
@@ -71,8 +71,8 @@ int main()
 	Entity* egg = g_scene.getEntity("egg");
 	Entity* chicken = g_scene.getEntity("chicken");
 	Entity* peas = g_scene.getEntity("peas");
-	Entity* soupbase = g_scene.getEntity("soupbase");
-	Entity* pumpkin = g_scene.getEntity("pumpkin");
+	//Entity* soupbase = g_scene.getEntity("soupbase");
+	//Entity* pumpkin = g_scene.getEntity("pumpkin");
 
 	// World
 	Entity* countertop = g_scene.getEntity("countertop");
@@ -128,8 +128,8 @@ int main()
 	egg->attachComponent(&transforms[12], "transform");
 	chicken->attachComponent(&transforms[13], "transform");
 	peas->attachComponent(&transforms[14], "transform");
-	soupbase->attachComponent(&transforms[15], "transform");
-	pumpkin->attachComponent(&transforms[16], "transform");
+	//soupbase->attachComponent(&transforms[15], "transform");
+	//pumpkin->attachComponent(&transforms[16], "transform");
 
 	// World
 	countertop->attachComponent(&transforms[17], "transform");
@@ -155,8 +155,8 @@ int main()
 	egg->getTransform()->scale = glm::vec3(30, 30, 30);
 	chicken->getTransform()->scale = glm::vec3(30, 30, 30);
 	peas->getTransform()->scale = glm::vec3(30, 30, 30);
-	soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
+	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
+	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
@@ -205,7 +205,7 @@ int main()
 
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
 	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
-
+	
 	//debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 	player1->attachComponent(&p1Inv, "inventory");
 	player2->attachComponent(&p2Inv, "inventory");
@@ -257,6 +257,7 @@ int main()
 			window.swapBuffer();
 		}
 		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
 			int winner = ui.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();

@@ -204,12 +204,12 @@ void UISystem::updateGame(int endScreenValue) {
 
 
     // Drawing minimap
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, scX(0.01875), scX(0.01875), 0, 1.f);
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15), scX(0.15), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), 400.f, 400.f, 0, 1.f);
 
     glm::vec3 IngLocation;
     IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
@@ -252,7 +252,7 @@ void UISystem::updateGame(int endScreenValue) {
     alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
     renderImage(imageShader, pizza, invXOffset, recipeYOffset, invScale, invScale, 0, alpha);
 
-    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.3), 0, 1.f);
+    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.32), 0, 1.f);
 
 }
 
@@ -308,15 +308,14 @@ void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Tra
 
 glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
 {
-    // TODO: Fix mini map with new kitchen layout
     float x;
     float z;
     glm::vec2 location;
-    x = ((150.f) / (150.f + 310.f)) * (transform.position.x + 310.f);
-    z = ((150.f) / (220.f + 235.f)) * (transform.position.z + 235.f);
+    x = 0 + ((400.f - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
+    z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
     location = glm::vec2(x, z);
-    location.y = 200.f - location.y;
-    location += glm::vec2(25.f, 380.f);
+    location.y = 400.f - location.y;
+    location += glm::vec2(scX(0.04), scY(0.65));
     return location;
 }
 

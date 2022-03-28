@@ -60,8 +60,8 @@ public:
 	PxRigidDynamic* egg;
 	PxRigidDynamic* chicken;
 	PxRigidDynamic* peas;
-	PxRigidDynamic* soupbase;
-	PxRigidDynamic* pumpkin;
+	//PxRigidDynamic* soupbase;
+	//PxRigidDynamic* pumpkin;
 
 
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;
