@@ -744,7 +744,7 @@ void PhysicsSystem::update(const float dt, int gameStage)
 		this->sausage->setGlobalPose(trans);
 	if (g_scene.getEntity("dough")->removeFlag)
 		this->dough->setGlobalPose(trans);
-	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -100.0)
+	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
 
 	trans = this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose();
@@ -756,7 +756,7 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	g_scene.getEntity("player3")->speed = (float)mVehiclePlayer3->computeForwardSpeed();
 	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
 
-	mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
+	//mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
 
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
