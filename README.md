@@ -96,4 +96,5 @@ Note: Keyboard controls were broken sometime during the merge-fest of the previo
 - Camera becomes obscured when going down a ramp.
 - There are some shadow artifacts on the back of the fridge wall, as well as the top of some ramps.
 - Keyboard controls no longer entirely work.
+- Engine noise continues playing when back to menu.
 
