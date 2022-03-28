@@ -38,7 +38,7 @@ public:
 	void ingredientSuck(AudioSource* source);
 	void powerReady(AudioSource* source);
 
-	void update();
+	void update(const float dt);
 
 private:
 
@@ -48,6 +48,8 @@ private:
 	ALCdevice* device;
 	ALCcontext* context;
 	std::string dir;
+
+	float accumulator;
 
 	struct  WavHeader
 	{
