@@ -191,7 +191,7 @@ std::vector<NavMesh::MeshSegment*> PathFinder::findPath(position start, position
 		// if current is the target node // path has been found
 		if (stepContainsTarget(end, current))
 		{
-			printPath(current);
+			//printPath(current);
 
 			std::vector<NavMesh::MeshSegment*> finalPath;
 

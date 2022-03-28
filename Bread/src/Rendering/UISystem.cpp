@@ -1,6 +1,7 @@
 #include "UISystem.h"
 #include "../Inventory.h"
 #include "../Scene/Entity.h"
+#include "../Gameplay/Recipe.h"
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -69,7 +70,7 @@ UISystem::UISystem()
 
     //Initializing font 
     //TODO: (perhaps this could be abstracted to use multiple fonts)
-	if (FT_New_Face(ft, "resources/fonts/arial.ttf", 0, &face))
+	if (FT_New_Face(ft, "resources/fonts/Night Action.ttf", 0, &face))
 	{
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
@@ -202,6 +203,24 @@ void UISystem::updateGame(int endScreenValue) {
 
     renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
 
+    Recipe* p1Recipe = (Recipe*)g_scene.getEntity("player1")->getComponent("recipe");
+    Recipe* p2Recipe = (Recipe*)g_scene.getEntity("player2")->getComponent("recipe");
+    Recipe* p3Recipe = (Recipe*)g_scene.getEntity("player3")->getComponent("recipe");
+    Recipe* p4Recipe = (Recipe*)g_scene.getEntity("player4")->getComponent("recipe");
+
+    if (p1Recipe != nullptr)
+    {
+        // Recipe States
+        renderText(textShader, "Recipe Progress", scX(0.8), scY(0.9), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "P1 ", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 0, 0));
+        renderText(textShader, "P2 ", scX(0.8), scY(0.8), 1.f, glm::vec3(0, 0, 1));
+        renderText(textShader, "P3 ", scX(0.8), scY(0.75), 1.f, glm::vec3(0, 1, 0));
+        renderText(textShader, "P4" , scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 0));
+        renderText(textShader, "(Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.83), scY(0.85), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Omlette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.83), scY(0.75), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.83), scY(0.7), 1.f, glm::vec3(1, 1, 1));
+    }
 
     // Drawing minimap
     renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 20.f, 20.f, 0, 1.f);

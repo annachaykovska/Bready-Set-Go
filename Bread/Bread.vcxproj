@@ -116,7 +116,6 @@
     <ClCompile Include="src\Audio\AudioSource.cpp" />
     <ClCompile Include="src\Gameplay\Breadmobile.cpp" />
     <ClCompile Include="src\Gameplay\GameLoopManager.cpp" />
-    <ClCompile Include="src\Gameplay\Ingredient.cpp" />
     <ClCompile Include="src\Gameplay\Recipe.cpp" />
     <ClCompile Include="src\Navigation\AIBrain.cpp" />
     <ClCompile Include="src\Navigation\IngredientTracker.cpp" />
@@ -854,7 +853,6 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Gameplay\Breadmobile.h" />
     <ClInclude Include="src\Gameplay\GameLoopManager.h" />
-    <ClInclude Include="src\Gameplay\Ingredient.h" />
     <ClInclude Include="src\Gameplay\Recipe.h" />
     <ClInclude Include="src\Inventory.h" />
     <ClInclude Include="src\Navigation\AIBrain.h" />
