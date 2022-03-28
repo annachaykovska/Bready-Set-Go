@@ -287,10 +287,13 @@ void PhysicsSystem::initializeActors() {
 	mVehiclePlayer3 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 	mVehiclePlayer4 = createVehicle4W(vehicleDesc, mPhysics, mCooking);
 
-	startTransformPlayer1 = PxTransform(PxVec3(10, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
-	startTransformPlayer2 = PxTransform(PxVec3(30, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -20), PxQuat(PxIdentity));
-	startTransformPlayer3 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), -10), PxQuat(PxIdentity));
-	startTransformPlayer4 = PxTransform(PxVec3(-20, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 20), PxQuat(PxIdentity));
+	glm::quat rotate = glm::angleAxis(glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+	PxQuat initQuat = PxQuat(rotate.x, rotate.y, rotate.z, rotate.w);
+
+	startTransformPlayer1 = PxTransform(PxVec3(33, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
+	startTransformPlayer2 = PxTransform(PxVec3(11, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
+	startTransformPlayer3 = PxTransform(PxVec3(-31, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
+	startTransformPlayer4 = PxTransform(PxVec3(-11.5, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 5.0f), 60), initQuat);
 	mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(startTransformPlayer1);
 	mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
 	mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
@@ -744,7 +747,21 @@ void PhysicsSystem::update(const float dt, int gameStage)
 		this->sausage->setGlobalPose(trans);
 	if (g_scene.getEntity("dough")->removeFlag)
 		this->dough->setGlobalPose(trans);
-	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -100.0)
+	if (g_scene.getEntity("carrot")->removeFlag)
+		this->carrot->setGlobalPose(trans);
+	if (g_scene.getEntity("lettuce")->removeFlag)
+		this->lettuce->setGlobalPose(trans);
+	if (g_scene.getEntity("parsnip")->removeFlag)
+		this->parsnip->setGlobalPose(trans);
+	if (g_scene.getEntity("rice")->removeFlag)
+		this->rice->setGlobalPose(trans);
+	if (g_scene.getEntity("egg")->removeFlag)
+		this->egg->setGlobalPose(trans);
+	if (g_scene.getEntity("chicken")->removeFlag)
+		this->chicken->setGlobalPose(trans);
+	if (g_scene.getEntity("peas")->removeFlag)
+		this->peas->setGlobalPose(trans);
+	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
 
 	trans = this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose();
@@ -756,7 +773,7 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	g_scene.getEntity("player3")->speed = (float)mVehiclePlayer3->computeForwardSpeed();
 	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
 
-	mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
+	//mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
 
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);

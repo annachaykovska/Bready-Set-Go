@@ -141,7 +141,8 @@ vec3 dirLight()
 
 	// Shadows
 	float shadow = shadows(norm, lightDir);
-	vec3 result = (ambient + (1.0 - shadow) * (diffuse +	 specular));
+	vec3 result;
+	result = (ambient + (1.0 - shadow) * (diffuse +	 specular));
 
 	return result;
 }
@@ -188,8 +189,9 @@ void main()
 	vec3 result = dirLight();// + pointLight();
 
 	// Phong light model
-	vec3 phong = result * objectColor;
+	vec3 phong = result * objectColor * light.color;
 
+	// Toon shading
 	vec3 norm = normalize(ourNormal);
 	vec3 lightDir = normalize(light.position - fragPos);
 	float intensity = dot(lightDir, norm);
@@ -200,8 +202,4 @@ void main()
 		fragColor = vec4(0.9 * phong, 1.0);
 	else
 		fragColor = vec4(0.8 * phong, 1.0);
-	
-
-	// Final
-	//fragColor = vec4(phong, 1.0);
 }
