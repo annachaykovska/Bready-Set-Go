@@ -1,8 +1,10 @@
 #include "AudioSystem.h"
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
+#include "../SystemManager.h"
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 AudioSystem::AudioSystem()
 {
@@ -50,21 +52,53 @@ AudioSystem::AudioSystem()
 	// Create AudioSource Components
 	AudioSource* countertopAudioSource = createAudioSource();
 	AudioSource* p1AudioSource = createAudioSource();
+	AudioSource* bgMusic = createAudioSource();
+	AudioSource* p1Engine = createAudioSource();
 	AudioSource* p2AudioSource = createAudioSource();
+	AudioSource* p2Engine = createAudioSource();
 	AudioSource* p3AudioSource = createAudioSource();
+	AudioSource* p3Engine = createAudioSource();
 	AudioSource* p4AudioSource = createAudioSource();
+	AudioSource* p4Engine = createAudioSource();
 
 	// Attach AudioSource Components to Entities
 	Entity* countertop = g_scene.getEntity("countertop");
 	countertop->attachComponent(countertopAudioSource, "audio");
 	Entity* player1 = g_scene.getEntity("player1");
 	player1->attachComponent(p1AudioSource, "audio");
+	player1->attachComponent(bgMusic, "bg");
+	player1->attachComponent(p1Engine, "engineAudio");
 	Entity* player2 = g_scene.getEntity("player2");
 	player2->attachComponent(p2AudioSource, "audio");
+	player2->attachComponent(p2Engine, "engineAudio");
 	Entity* player3 = g_scene.getEntity("player3");
 	player3->attachComponent(p3AudioSource, "audio");
+	player3->attachComponent(p3Engine, "engineAudio");
 	Entity* player4 = g_scene.getEntity("player4");
 	player4->attachComponent(p4AudioSource, "audio");
+	player4->attachComponent(p4Engine, "engineAudio");
+
+	bgMusic->loop = true;
+	bgMusic->gain = 0.1f;
+	bgMusic->pitch = 1.0f;
+
+	p1Engine->loop = true;
+	p1Engine->gain = 0.1f;
+	p1Engine->pitch = 1.0f;
+
+	p2Engine->loop = true;
+	p2Engine->gain = 1.0f;
+	p2Engine->pitch = 1.0f;
+
+	p3Engine->loop = true;
+	p3Engine->gain = 1.0f;
+	p3Engine->pitch = 1.0f;
+
+	p4Engine->loop = true;
+	p4Engine->gain = 1.0f;
+	p4Engine->pitch = 1.0f;
+
+	this->accumulator = 0.0f;
 }
 
 AudioSystem::~AudioSystem()
@@ -206,27 +240,49 @@ AudioSource* AudioSystem::createAudioSource()
 		return nullptr;
 }
 
-void AudioSystem::update()
+void AudioSystem::update(const float dt)
 {
-	for (auto it = this->audioSources.begin(); it < this->audioSources.end(); it++)
+
+	Transform* trans = g_scene.getEntity("player1")->getTransform();
+	glm::vec3 pos = trans->position;
+	alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+	glm::vec3 heading = glm::normalize(g_scene.getEntity("player1")->orientation);
+	float orientation[] = { -heading.x, -heading.y, -heading.z, 0, 1, 0 };
+	alListenerfv(AL_ORIENTATION, orientation);
+	glm::vec3 velocity = heading * g_scene.getEntity("player1")->speed;
+	alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+
+	AudioSource* p1Engine = (AudioSource*)g_scene.getEntity("player1")->getComponent("engineAudio");
+	p1Engine->update();
+	AudioSource* p2Engine = (AudioSource*)g_scene.getEntity("player2")->getComponent("engineAudio");
+	p2Engine->update();
+	AudioSource* p3Engine = (AudioSource*)g_scene.getEntity("player3")->getComponent("engineAudio");
+	p3Engine->update();
+	AudioSource* p4Engine = (AudioSource*)g_scene.getEntity("player4")->getComponent("engineAudio");
+	p4Engine->update();
+
+	if (accumulator > 0.25f)
 	{
-		if (it->owner->name == "player1")
-		{
-			Transform* trans = it->owner->getTransform();
-			glm::vec3 pos = trans->position;
-			alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
-			glm::vec3 heading = glm::normalize(it->owner->orientation);
-			float orientation[] = { -heading.x, -heading.y, -heading.z, 0, 1, 0 };
-			alListenerfv(AL_ORIENTATION, orientation);
-			glm::vec3 velocity = heading * it->owner->speed;
-			alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
-		}
-		else
-		{
-			it->update();
-			it->play("idle.wav");
-		}
+		p1Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(1) / 80.0f) + 1.0f;
+		p1Engine->stop();
+		p1Engine->play("idle.wav");
+
+		p2Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(2) / 80.0f) + 1.0f;
+		p2Engine->stop();
+		p2Engine->play("idle.wav");
+
+		p3Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(3) / 80.0f) + 1.0f;
+		p3Engine->stop();
+		p3Engine->play("idle.wav");
+
+		p4Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(4) / 80.0f) + 1.0f;
+		p4Engine->stop();
+		p4Engine->play("idle.wav");
+
+		accumulator = 0.0f;
 	}
+
+	accumulator += dt;
 }
 
 void AudioSystem::playGameMusic(AudioSource* source) {

@@ -318,7 +318,7 @@ int main()
 			p4Brain.update();
 
 			// AUDIO
-			audio.update();
+			audio.update(dt);
 		}
 
 		if (ui.checkForWin() != 0) {
