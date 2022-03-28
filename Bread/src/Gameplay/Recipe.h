@@ -3,7 +3,7 @@
 #include "../Inventory.h"
 #include "../Scene/Component.h"
 
-enum Ingredient {Cheese, Dough, Sausage, Tomato, Carrot, Lettuce, Parsnip, Rice, Egg, Chicken, Peas};
+enum Ingredient {Cheese, Dough, Sausage, Tomato, Carrot, Lettuce, Parsnip, Rice, Egg, Chicken, Peas, NONE};
 
 class Recipe : public Component {
 
@@ -19,8 +19,5 @@ public:
 
 	std::string name;
 
-private:
-
 	Ingredient list[4];
-
 };

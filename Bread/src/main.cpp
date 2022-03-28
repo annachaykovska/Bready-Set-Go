@@ -203,7 +203,7 @@ int main()
 	window.setCallbacks(movementCallbacks);
 
 	// Track Ingredient Locations
-	IngredientTracker ingredientTracker(cheese->getTransform(), tomato->getTransform(), dough->getTransform(), sausage->getTransform());
+	IngredientTracker ingredientTracker;
 	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up game loop manager
@@ -226,12 +226,13 @@ int main()
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
 	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
 	
-	//debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 	player1->attachComponent(&p1Inv, "inventory");
+	player1->attachComponent(&pizza, "recipe");
 
 	player2->attachComponent(&p2Inv, "inventory");
 	player2->attachComponent(&p2NavSystem, "navigation");
-	player3->attachComponent(&pizza, "recipe");
+	player2->attachComponent(&omlette, "recipe");
+	p2Brain.setRecipe(&omlette);
 
 	player3->attachComponent(&p3Inv, "inventory");
 	player3->attachComponent(&wrap, "recipe");
@@ -283,6 +284,12 @@ int main()
 			window.swapBuffer();
 		}
 		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+			// TODO: Move out of main and make less dependent
+			pizza.updateRecipeProgress(p1Inv);
+			omlette.updateRecipeProgress(p2Inv);
+			wrap.updateRecipeProgress(p3Inv);
+			salad.updateRecipeProgress(p4Inv);
+
 			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
 			int winner = ui.checkForWin();
 			if (winner != 0) {
@@ -309,8 +316,8 @@ int main()
 			window.swapBuffer();
 
 			// AI + Navigation
-			p2Brain.update();
 			ingredientTracker.update();
+			p2Brain.update();
 
 			// AUDIO
 			audio.update();
