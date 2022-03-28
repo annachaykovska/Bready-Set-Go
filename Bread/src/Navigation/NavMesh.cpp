@@ -15,7 +15,7 @@ NavMesh::NavMesh()
 	vert n101, n102, n103, n104, n105, n106, n107, n108, n109, n110;
 	vert n111, n112, n113, n114, n115, n116, n117, n118, n119, n120;
 	vert n121, n122, n123, n124, n125, n126, n127, n128, n129, n130;
-	vert n131, n132;
+	vert n131, n132, n133, n134;
 
 	//KITCHEN COUNTER
 	n1 = vert(90, 2, -145);
@@ -166,6 +166,8 @@ NavMesh::NavMesh()
 
 	n131 = vert(245, -64, -121);
 	n132 = vert(162, -64, -121);
+	n133 = vert(243, -64, 72);
+	n134 = vert(253, -64, 90);
 
 	// KITCHEN COUNTER
 	MeshSegment* m1 = new MeshSegment(n8, n1, n7);
@@ -350,13 +352,17 @@ NavMesh::NavMesh()
 
 	MeshSegment* m146 = new MeshSegment(n126, n128, n127);
 	MeshSegment* m147 = new MeshSegment(n125, n129, n128);
-	MeshSegment* m148 = new MeshSegment(n125, n130, n129);
+	MeshSegment* m148 = new MeshSegment(n125, n133, n129);
 	MeshSegment* m149 = new MeshSegment(n127, n128, n132);
 	MeshSegment* m150 = new MeshSegment(n128, n131, n132);
 
 	MeshSegment* m151 = new MeshSegment(n128, n129, n131);
 	MeshSegment* m152 = new MeshSegment(n129, n130, n63);
 	MeshSegment* m153 = new MeshSegment(n130, n66, n63);
+	MeshSegment* m154 = new MeshSegment(n125, n134, n133);
+	MeshSegment* m155 = new MeshSegment(n134, n130, n133);
+
+	MeshSegment* m156 = new MeshSegment(n133, n130, n129);
 
 	// KITCHEN COUNTER
 	mesh_.push_back(m1);
@@ -700,6 +706,13 @@ NavMesh::NavMesh()
 	mesh_.back()->id_ = 152;
 	mesh_.push_back(m153);
 	mesh_.back()->id_ = 153;
+	mesh_.push_back(m154);
+	mesh_.back()->id_ = 154;
+	mesh_.push_back(m155);
+	mesh_.back()->id_ = 155;
+
+	mesh_.push_back(m156);
+	mesh_.back()->id_ = 156;
 
 	setupVisualizer();
 	connectMesh();

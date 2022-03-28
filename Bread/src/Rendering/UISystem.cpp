@@ -217,7 +217,7 @@ void UISystem::updateGame(int endScreenValue) {
         renderText(textShader, "P3 ", scX(0.8), scY(0.75), 1.f, glm::vec3(0, 1, 0));
         renderText(textShader, "P4" , scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 0));
         renderText(textShader, "(Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.83), scY(0.85), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "(Omlette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Omelette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
         renderText(textShader, "(Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.83), scY(0.75), 1.f, glm::vec3(1, 1, 1));
         renderText(textShader, "(Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.83), scY(0.7), 1.f, glm::vec3(1, 1, 1));
     }
@@ -307,7 +307,7 @@ int UISystem::checkForWin()
     Entity* player2 = g_scene.getEntity("player2");
     Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
 
-    if (p2Inv->tomato && p2Inv->cheese && p2Inv->dough && p2Inv->sausage)
+    if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce)
     {
         return 2;
     }
@@ -315,7 +315,7 @@ int UISystem::checkForWin()
     Entity* player3 = g_scene.getEntity("player3");
     Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
 
-    if (p3Inv->tomato && p3Inv->cheese && p3Inv->dough && p3Inv->sausage)
+    if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce)
     {
         return 3;
     }
@@ -323,7 +323,7 @@ int UISystem::checkForWin()
     Entity* player4 = g_scene.getEntity("player4");
     Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
 
-    if (p4Inv->tomato && p4Inv->cheese && p4Inv->dough && p4Inv->sausage)
+    if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce)
     {
         return 4;
     }
@@ -348,7 +348,6 @@ glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
     //z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
     x = 0 + ((scX(0.15625) - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
     z = 0 + ((scY(0.28) - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
-    std::cout << g_systems.width << std::endl;
     location = glm::vec2(x, z);
     location.y = scY(0.3) - location.y;
     location += glm::vec2(scX(0.04), scY(0.62));

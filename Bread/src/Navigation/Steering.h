@@ -15,6 +15,7 @@ public:
 	void park();
 	void updateSteering(position target);
 	void setFinalApproach(bool status);
+	void evasiveAction();
 
 private:
 	Entity& entity_;
@@ -23,4 +24,9 @@ private:
 	physx::PxVehicleDrive4WRawInputData* input_;
 	int id_;
 	bool finalApproach_;
+
+	int stuckTimer_;
+	bool stuck_;
+
+	int procedureTimer_;
 };

@@ -1145,7 +1145,16 @@
   <ItemGroup>
     <Media Include="resources\audio\bg.wav" />
     <Media Include="resources\audio\bread.wav" />
+    <Media Include="resources\audio\ding.wav" />
+    <Media Include="resources\audio\fart.wav" />
     <Media Include="resources\audio\horn.wav" />
+    <Media Include="resources\audio\idle.wav" />
+    <Media Include="resources\audio\le_festin.wav" />
+    <Media Include="resources\audio\pickup.wav" />
+    <Media Include="resources\audio\slurp.wav" />
+    <Media Include="resources\audio\thump.wav" />
+    <Media Include="resources\audio\thump2.mp3" />
+    <Media Include="resources\audio\thumpdull.wav" />
     <Media Include="resources\audio\tone.wav" />
   </ItemGroup>
   <ItemGroup>
