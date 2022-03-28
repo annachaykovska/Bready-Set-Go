@@ -348,7 +348,6 @@ glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
     //z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
     x = 0 + ((scX(0.15625) - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
     z = 0 + ((scY(0.28) - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
-    std::cout << g_systems.width << std::endl;
     location = glm::vec2(x, z);
     location.y = scY(0.3) - location.y;
     location += glm::vec2(scX(0.04), scY(0.62));

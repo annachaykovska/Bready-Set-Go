@@ -38,7 +38,7 @@ int main()
 	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
 	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
 
-	bool fullScreen = true;
+	bool fullScreen = false;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
@@ -203,8 +203,8 @@ int main()
 	Recipe pizza(Ingredient::Cheese, Ingredient::Dough, Ingredient::Sausage, Ingredient::Tomato, "Pizza");
 	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
 	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
-	Recipe omlette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omlette");
-	//Recipe omlette(Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, "Omlette");
+	//Recipe omlette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omlette");
+	Recipe omlette(Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, "Omlette");
 
 	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
@@ -314,8 +314,8 @@ int main()
 
 			// AI + Navigation
 			ingredientTracker.update();
-			p2Brain.update();
-			p3Brain.update();
+			//p2Brain.update();
+			//p3Brain.update();
 			p4Brain.update();
 
 			// AUDIO
