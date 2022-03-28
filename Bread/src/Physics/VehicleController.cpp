@@ -154,6 +154,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
 	bool Y_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0); // Magnet ability
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
+	bool BACK_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0); // pause
 
 	if (Y_button_pressed && !y_held) {
 		physics->magnet(1);
@@ -179,6 +180,22 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		if (A_button_pressed && gameCompleted) {
 			gameLoop->isBackToMenuSelected = true;
 		}
+	}
+
+	// Pause menu
+	if (currentTime - gameLoop->showPauseMenuTimeoutStart > gameLoop->showPauseMenuTimeoutLength) {
+		gameLoop->showPauseMenuTimeoutStart = -1;
+		if (BACK_button_pressed) {
+			gameLoop->showPauseMenuTimeoutStart = currentTime;
+			gameLoop->showPauseMenu = !gameLoop->showPauseMenu;
+			if (gameLoop->showPauseMenu) {
+				gameLoop->isPaused = true;
+			}
+		}
+	}
+
+	if (A_button_pressed && gameLoop->showPauseMenu) {
+		gameLoop->isPauseMenuItemSelected = true;
 	}
 
 	// Respawn player
@@ -263,42 +280,58 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		}
 	}
 
-	if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
-		float step = thumbLeftDeadZone * 2;
-		if (step > 0.143)
-		{
-			// Using this trial-and-error found function to make steering more natural
-			thumbLeftDeadZone = -(1 / (10 * (step - 2.1))) - 0.048;
+	if (gameLoop->showPauseMenu) {
+		if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
+			if (gameLoop->pauseMenuSelection == 2) {
+				gameLoop->pauseMenuSelection = 1;
+			}
+
 		}
-		else
-		{
-			thumbLeftDeadZone = 0;
+		else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
+			if (gameLoop->pauseMenuSelection == 1) {
+				gameLoop->pauseMenuSelection = 2;
+			}
 		}
-		if (thumbLeftDeadZone > 1)
-		{
-			thumbLeftDeadZone = 1;
-		}
-		input->setAnalogSteer(thumbLeftDeadZone);
-		physics->setTurnDirectionalInfluence(thumbLeftDeadZone);
 	}
-	if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
-		float step = thumbLeftDeadZone * 2;
-		if (step > 0.143)
-		{
-			// Using this trial-and-error found function to make steering more natural
-			thumbLeftDeadZone = -(1 / (10 * (step - 2.1))) - 0.048;
+	else {
+		if (thumbLeftX <= 0 && thumbLeftDeadZone > 0.1) { // left
+			float step = thumbLeftDeadZone * 2;
+			if (step > 0.143)
+			{
+				// Using this trial-and-error found function to make steering more natural
+				thumbLeftDeadZone = -(1 / (10 * (step - 2.1))) - 0.048;
+			}
+			else
+			{
+				thumbLeftDeadZone = 0;
+			}
+			if (thumbLeftDeadZone > 1)
+			{
+				thumbLeftDeadZone = 1;
+			}
+			input->setAnalogSteer(thumbLeftDeadZone);
+			physics->setTurnDirectionalInfluence(thumbLeftDeadZone);
+
 		}
-		else
-		{
-			thumbLeftDeadZone = 0;
+		if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
+			float step = thumbLeftDeadZone * 2;
+			if (step > 0.143)
+			{
+				// Using this trial-and-error found function to make steering more natural
+				thumbLeftDeadZone = -(1 / (10 * (step - 2.1))) - 0.048;
+			}
+			else
+			{
+				thumbLeftDeadZone = 0;
+			}
+			if (thumbLeftDeadZone > 1)
+			{
+				thumbLeftDeadZone = 1;
+			}
+			analogVal = -1.0 * thumbLeftDeadZone;
+			input->setAnalogSteer(analogVal);
+			physics->setTurnDirectionalInfluence(analogVal);
 		}
-		if (thumbLeftDeadZone > 1)
-		{
-			thumbLeftDeadZone = 1;
-		}
-		analogVal = -1.0 * thumbLeftDeadZone;
-		input->setAnalogSteer(analogVal);
-		physics->setTurnDirectionalInfluence(analogVal);
 	}
 
 	// KEY RELEASED
