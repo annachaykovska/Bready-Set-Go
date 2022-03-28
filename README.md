@@ -88,6 +88,7 @@ Note: Keyboard controls were broken sometime during the merge-fest of this miles
   - Some bridges and ramps are difficult to traverse.
   - Vacuum ability is too instant too feel fair
   - Ingredient location indicators can be confusing when the ingredient is lower or higher than the player.
+  - Player can collide with ingredients not in their recipe, and knock them off the edge.
 
 ## Known Bugs Identified While Testing (To Be Addressed In Next Milestone):
 - Camera becomes obscured when going down a ramp.
