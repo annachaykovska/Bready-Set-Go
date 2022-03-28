@@ -27,8 +27,9 @@ public:
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
 
-private:
 	PhysicsSystem* physics;
+
+private:
 	UISystem* ui;
 	GameLoopManager* gameLoop;
 	bool forwards;

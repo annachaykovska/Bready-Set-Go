@@ -41,6 +41,9 @@ AudioSystem::AudioSystem()
 	load("pickup.wav");
 	load("thump.wav");
 	load("idle.wav");
+	load("le_festin.wav");
+	load("slurp.wav");
+	load("fart.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
@@ -223,5 +226,38 @@ void AudioSystem::update()
 			it->update();
 			it->play("idle.wav");
 		}
+	}
+}
+
+void AudioSystem::playGameMusic(AudioSource* source) {
+	source->gain = 0.01f; // Volume control
+	source->loop = true;
+	source->play("bg.wav"); // Comment this out to turn off the music on load
+}
+
+void AudioSystem::playMainMenuMusic(AudioSource* source) {
+	source->gain = 0.08f; // Volume control
+	source->loop = true;
+	source->play("le_festin.wav"); // Comment this out to turn off the music on load
+}
+
+void AudioSystem::stopMusic(AudioSource* source) {
+	source->stop();
+}
+
+void AudioSystem::playSlurp(AudioSource* source) {
+	source->gain = 0.01f; // Volume control
+	source->loop = true;
+	source->play("slurp.wav"); // Comment this out to turn off the music on load
+}
+
+void AudioSystem::endSlurp(AudioSource* source, bool success) {
+	source->stop();
+	source->loop = false;
+	if (success) {
+		source->play("ding.wav");
+	}
+	else {
+		source->play("fart.wav");
 	}
 }
