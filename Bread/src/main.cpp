@@ -38,7 +38,7 @@ int main()
 	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
 	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
 
-	bool fullScreen = true;
+	bool fullScreen = false;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
