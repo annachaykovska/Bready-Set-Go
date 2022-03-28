@@ -69,7 +69,7 @@ UISystem::UISystem()
 
     //Initializing font 
     //TODO: (perhaps this could be abstracted to use multiple fonts)
-	if (FT_New_Face(ft, "resources/fonts/arial.ttf", 0, &face))
+	if (FT_New_Face(ft, "resources/fonts/Night Action.ttf", 0, &face))
 	{
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
@@ -202,6 +202,12 @@ void UISystem::updateGame(int endScreenValue) {
 
     renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
 
+    // Recipe States
+    renderText(textShader, "Recipe Progress", scX(0.8), scY(0.9), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "P1 (Pizza):", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "P2 (Omlette):", scX(0.8), scY(0.8), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "P3 (Wrap):", scX(0.8), scY(0.75), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "P4 (Salad):", scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 1));
 
     // Drawing minimap
     renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 20.f, 20.f, 0, 1.f);

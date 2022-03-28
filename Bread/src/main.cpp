@@ -20,6 +20,7 @@
 #include "DebugSettings.h"
 #include "Navigation/IngredientTracker.h"
 #include "Navigation/AIBrain.h"
+#include "Gameplay/Recipe.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -214,6 +215,11 @@ int main()
 	//-----------------------------------------------------------------------------------
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
+	Recipe pizza(Ingredient::Cheese, Ingredient::Dough, Ingredient::Sausage, Ingredient::Tomato, "Pizza");
+	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
+	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
+	Recipe omlette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omlette");
+
 	NavMesh navMesh;
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 
@@ -222,10 +228,16 @@ int main()
 	
 	//debugOverlay.addDebugMesh(navMesh.getWireframe(), DEBUG_NAV_MESH);
 	player1->attachComponent(&p1Inv, "inventory");
+
 	player2->attachComponent(&p2Inv, "inventory");
 	player2->attachComponent(&p2NavSystem, "navigation");
+	player3->attachComponent(&pizza, "recipe");
+
 	player3->attachComponent(&p3Inv, "inventory");
+	player3->attachComponent(&wrap, "recipe");
+
 	player4->attachComponent(&p4Inv, "inventory");
+	player4->attachComponent(&salad, "recipe");
 
 	// Track time
 	double t = 0.0;
