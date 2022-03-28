@@ -2,389 +2,704 @@
 
 NavMesh::NavMesh()
 {
-	vert n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16;
-	vert n17, n18, n19, n20, n21, n22, n23, n24, n25, n26, n27, n28, n29, n30, n31, n32;
-	vert n33, n34, n35, n36, n37, n38, n39, n40, n41, n42, n43, n44, n45, n46, n47, n48;
-	vert n49, n50, n51, n52, n53, n54, n55, n56, n57, n58, n59, n60, n61, n62, n63, n64;
-	vert n65, n66, n67, n68, n69, n70, n71, n72, n73, n74, n75, n76, n77, n78, n79, n80;
+	vert n1, n2, n3, n4, n5, n6, n7, n8, n9, n10;
+	vert n11, n12, n13, n14, n15, n16, n17, n18, n19, n20;
+	vert n21, n22, n23, n24, n25, n26, n27, n28, n29, n30;
+	vert n31, n32, n33, n34, n35, n36, n37, n38, n39, n40;
+	vert n41, n42, n43, n44, n45, n46, n47, n48, n49, n50;
+	vert n51, n52, n53, n54, n55, n56, n57, n58, n59, n60;
+	vert n61, n62, n63, n64, n65, n66, n67, n68, n69, n70;
+	vert n71, n72, n73, n74, n75, n76, n77, n78, n79, n80;
+	vert n81, n82, n83, n84, n85, n86, n87, n88, n89, n90;
+	vert n91, n92, n93, n94, n95, n96, n97, n98, n99, n100;
+	vert n101, n102, n103, n104, n105, n106, n107, n108, n109, n110;
+	vert n111, n112, n113, n114, n115, n116, n117, n118, n119, n120;
+	vert n121, n122, n123, n124, n125, n126, n127, n128, n129, n130;
+	vert n131, n132;
 
-	n1 = vert(140.0f, 5.0f, 210.0f);
-	n2 = vert(140.0f, 5.0f, 170.0f);
-	n3 = vert(88.0f, 5.0f, 170.0f);
-	n4 = vert(88.0f, 5.0f, 210.0f);
-	n5 = vert(36.0f, 5.0f, 210.0f);
+	//KITCHEN COUNTER
+	n1 = vert(90, 2, -145);
+	n2 = vert(96, 2, -86);
+	n3 = vert(102, 2, 1);
+	n4 = vert(92, 2, 56);
+	n5 = vert(75, 2, 21);
+	n6 = vert(70, 2, -45);
+	n7 = vert(41, 2, -147);
+	n8 = vert(41, 2, -127);
+	n9 = vert(41, 2, -90);
+	n10 = vert(41, 2, 1);
+	n11 = vert(68, 2, 62);
+	n12 = vert(2, 2, 30);
+	n13 = vert(5, 2, -52);
+	n14 = vert(-27, 2, -90);
+	n15 = vert(-27, 2, 1);
+	n16 = vert(-55, 2, 32);
+	n17 = vert(-55, 2, 65);
+	n18 = vert(-69, 2, 31);
+	n19 = vert(-71, 2, -20);
+	n20 = vert(-87, 2, -51);
+	n21 = vert(-100, 2, -80);
+	n22 = vert(-50, 2, -117);
+	n23 = vert(-70, 2, -150);
+	n24 = vert(-96, 2, -120);
+	n25 = vert(-100, 2, 1);
+	n26 = vert(-90, 2, 31);
+	n27 = vert(-120, 2, -75);
+	n28 = vert(-120, 2, -34);
+	n29 = vert(-210, 2, -30);
+	n30 = vert(-210, 2, -70);
+	n31 = vert(-260, 2, -35);
+	n32 = vert(-225, 2, -75);
+	n33 = vert(-225, 2, -113);
+	n34 = vert(-260, 2, -140);
+	n35 = vert(-230, 2, -155);
+	n36 = vert(96, 2, -58);
+	n37 = vert(-150, 2, -150);
+	n38 = vert(-160, 2, -120);
 
-	n6 = vert(36.0f, 5.0f, 170.0f);
-	n7 = vert(80.0f, 5.0f, 135.0f);
-	n8 = vert(10.0f, 5.0f, 130.0f);
-	n9 = vert(80.0f, 5.0f, 90.0f);
-	n10 = vert(10.0f, 5.0f, 82.0f);
+	// COUNTER RAMPS
+	n39 = vert(163, 6, -82);
+	n40 = vert(165, 6, -58);
+	n41 = vert(-85, 58, 144);
+	n42 = vert(-69, 58, 141);
+	n43 = vert(92, 6, 167);
+	n44 = vert(72, 6, 167);
 
-	n11 = vert(80.0f, 5.0f, 45.0f);
-	n12 = vert(10.0f, 5.0f, 35.0f);
-	n13 = vert(80.0f, 5.0f, 0.0f);
-	n14 = vert(10.0f, 5.0f, -12.0f);
-	n15 = vert(36.0f, 5.0f, -45.0f);
+	// COUNTER LEVEL SHELVES
+	n45 = vert(-10, 6, 162);
+	n46 = vert(-90, 6, 162);
+	n47 = vert(-90, 6, 203);
+	n48 = vert(-10, 6, 203);
+	n49 = vert(72, 6, 203);
+	n50 = vert(82, 6, 185);
+	n51 = vert(92, 6, 203);
+	n52 = vert(205, 6, 203);
+	n53 = vert(173, 6, 165);
+	n54 = vert(205, 6, 165);
+	n55 = vert(195, 6, 131);
+	n56 = vert(199, 6, 101);
+	n57 = vert(191, 6, 101);
+	n58 = vert(195, 6, 70);
+	n59 = vert(225, 6, 41);
+	n60 = vert(166, 6, 41);
+	n61 = vert(221, 6, -51);
+	n62 = vert(195, 6, -66);
+	n63 = vert(237, 6, -60);
+	n64 = vert(221, 6, -150);
+	n65 = vert(170, 6, -150);
+	n66 = vert(259, 6, -63);
 
-	n16 = vert(80.0f, 5.0f, -40.0f);
-	n17 = vert(-24.0f, 5.0f, 0.0f);
-	n18 = vert(-24.0f, 5.0f, 70.0f);
-	n19 = vert(-24.0f, 5.0f, 130.0f);
-	n20 = vert(-82.0f, 5.0f, 130.0f);
+	// SHELVES
+	n67 = vert(-96, 58, 184);
+	n68 = vert(-43, 58, 179);
+	n69 = vert(-43, 58, 205);
+	n70 = vert(20, 81, 205);
+	n71 = vert(20, 81, 179);
+	n72 = vert(93, 108, 179);
+	n73 = vert(93, 108, 205);
+	n74 = vert(123, 108, 206);
+	n75 = vert(93, 108, 143);
+	n76 = vert(126, 108, 143);
+	n77 = vert(156, 108, 168);
+	n78 = vert(206, 108, 205);
+	n79 = vert(206, 108, 143);
+	n80 = vert(164, 108, 143);
+	n81 = vert(172, 108, 91);
+	n82 = vert(206, 108, 91);
+	n83 = vert(267, 108, 91);
+	n84 = vert(219, 108, -35);
+	n85 = vert(172, 108, -159);
+	n86 = vert(267, 108, -159);
+	n87 = vert(-40, 108, 143);
+	n88 = vert(-40, 108, 174);
+	n89 = vert(194, 58, 143);
+	n90 = vert(194, 58, 179);
 
-	n21 = vert(-82.0f, 5.0f, 70.0f);
-	n22 = vert(-82.0f, 5.0f, 0.0f);
-	n23 = vert(-122.0f, 5.0f, 0.0f);
-	n24 = vert(-122.0f, 5.0f, 60.0f);
-	n25 = vert(-122.0f, 5.0f, 130.0f);
+	// UNDER
+	n91 = vert(-61, -27, -149);
+	n92 = vert(-61, -27, -129);
+	n93 = vert(-99, -30, -146);
+	n94 = vert(-99, -30, -134);
+	n95 = vert(-143, -39, -146);
 
-	n26 = vert(-122.0f, 5.0f, 172.0f);
-	n27 = vert(-82.0f, 5.0f, 172.0f);
-	n28 = vert(-82.0f, 5.0f, 215.0f);
-	n29 = vert(-122.0f, 5.0f, 215.0f);
-	n30 = vert(-162.0f, 5.0f, 215.0f);
+	n96 = vert(-143, -39, -134);
+	n97 = vert(-192, -63, -146);
+	n98 = vert(-192, -63, -132);
+	n99 = vert(-264, -63, -153);
+	n100 = vert(-226, -63, -112);
 
-	n31 = vert(-162.0f, 5.0f, 172.0f);
-	n32 = vert(-162.0f, 5.0f, 130.0f);
-	n33 = vert(-170.0f, 5.0f, 100.0f);
-	n34 = vert(-175.0f, 5.0f, 70.0f);
-	n35 = vert(-150.0f, 5.0f, 30.0f);
+	n101 = vert(-264, -63, -106);
+	n102 = vert(-226, -63, -74);
+	n103 = vert(-264, -63, -32);
+	n104 = vert(-114, -63, -32);
+	n105 = vert(-114, -63, -70);
 
-	n36 = vert(-150.0f, 5.0f, -15.0f);
-	n37 = vert(-122.0f, 5.0f, -30.0f);
-	n38 = vert(-150.0f, 5.0f, -45.0f);
-	n39 = vert(-122.0f, 5.0f, -60.0f);
-	n40 = vert(-143.0f, 5.0f, -70.0f);
+	n106 = vert(-61, -63, -79);
+	n107 = vert(-76, -63, -50);
+	n108 = vert(-68, -63, -15);
+	n109 = vert(-88, -63, -15);
+	//n110 = vert();
 
-	n41 = vert(-130.0f, 5.0f, -90.0f);
-	n42 = vert(-150.0f, 5.0f, -135.0f);
-	n43 = vert(-160.0f, 5.0f, -120.0f);
-	n44 = vert(-190.0f, 5.0f, -170.0f);
-	n45 = vert(-175.0f, 5.0f, -175.0f);
+	n111 = vert(-104, -63, 26);
+	n112 = vert(-58, -63, 26);
+	n113 = vert(-77, -63, 26);
+	n114 = vert(-73, -63, 67);
+	n115 = vert(-80, -63, 67);
 
-	n46 = vert(-152.0f, 5.0f, -225.0f);
-	n47 = vert(-106.0f, 5.0f, -180.0f);
-	n48 = vert(-106.0f, 5.0f, -225.0f);
-	n49 = vert(-60.0f, 5.0f, -225.0f);
-	n50 = vert(-60.0f, 5.0f, -180.0f);
+	n116 = vert(-83, -63, 150);
+	n117 = vert(-76, -63, 151);
+	n118 = vert(-79, -63, 174);
+	n119 = vert(-98, -63, 203);
+	n120 = vert(-49, -63, 208);
 
-	n51 = vert(-14.0f, 5.0f, -180.0f);
-	n52 = vert(-14.0f, 5.0f, -225.0f);
-	n53 = vert(32.0f, 5.0f, -180.0f);
-	n54 = vert(32.0f, 5.0f, -225.0f);
-	n55 = vert(80.0f, 5.0f, -180.0f);
+	n121 = vert(220, -63, 200);
+	n122 = vert(222, -63, 158);
+	n123 = vert(166, -63, 157);
+	n124 = vert(193, -63, 135);
+	n125 = vert(200, -63, 100);
 
-	n56 = vert(80.0f, 5.0f, -225.0f);
-	n57 = vert(-220.0f, 5.0f, -180.0f);
-	n58 = vert(-198.0f, 5.0f, -225.0f);
-	n59 = vert(-224.0f, 5.0f, -225.0f);
-	n60 = vert(-290.0f, 5.0f, -225.0f);
+	n126 = vert(187, -63, 100);
+	n127 = vert(162, -64, 58);
+	n128 = vert(196, -64, 57);
+	n129 = vert(233, -64, 50);
+	n130 = vert(260, -64, 49);
 
-	n61 = vert(-260.0f, 5.0f, -180.0f);
-	n62 = vert(-260.0f, 5.0f, -135.0f);
-	n63 = vert(-290.0f, 5.0f, -180.0f);
-	n64 = vert(-290.0f, 5.0f, -135.0f);
-	n65 = vert(-260.0f, 5.0f, -90.0f);
+	n131 = vert(245, -64, -121);
+	n132 = vert(162, -64, -121);
 
-	n66 = vert(-260.0f, 5.0f, -45.0f);
-	n67 = vert(-290.0f, 5.0f, -90.0f);
-	n68 = vert(-290.0f, 5.0f, -45.0f);
-	n69 = vert(-260.0f, 5.0f, 0.0f);
-	n70 = vert(-290.0f, 5.0f, 0.0f);
+	// KITCHEN COUNTER
+	MeshSegment* m1 = new MeshSegment(n8, n1, n7);
+	MeshSegment* m2 = new MeshSegment(n2, n1, n8);
+	MeshSegment* m3 = new MeshSegment(n9, n2, n8);
+	MeshSegment* m4 = new MeshSegment(n6, n2, n9);
+	MeshSegment* m5 = new MeshSegment(n6, n36, n2);
 
-	n71 = vert(-260.0f, 5.0f, 45.0f);
-	n72 = vert(-290.0f, 5.0f, 45.0f);
-	n73 = vert(-290.0f, 5.0f, 90.0f);
-	n74 = vert(-290.0f, 5.0f, 135.0f);
-	n75 = vert(-220.0f, 5.0f, 120.0f);
+	MeshSegment* m6 = new MeshSegment(n3, n36, n6);
+	MeshSegment* m7 = new MeshSegment(n10, n3, n6);
+	MeshSegment* m8 = new MeshSegment(n10, n6, n9);
+	MeshSegment* m9 = new MeshSegment(n5, n3, n10);
+	MeshSegment* m10 = new MeshSegment(n5, n4, n3);
 
-	n76 = vert(-240.0f, 5.0f, 90.0f);
-	n77 = vert(36.0f, 25.0f, -85.0f);
-	n78 = vert(60.0f, 25.0f, -85.0f);
-	n79 = vert(50.0f, 45.0f, -134.0f);
-	n80 = vert(25.0f, 45.0f, -134.0f);
+	MeshSegment* m11 = new MeshSegment(n11, n4, n5);
+	MeshSegment* m12 = new MeshSegment(n11, n5, n10);
+	MeshSegment* m13 = new MeshSegment(n11, n10, n12);
+	MeshSegment* m14 = new MeshSegment(n17, n11, n12);
+	MeshSegment* m15 = new MeshSegment(n17, n12, n16);
 
-	MeshSegment* m1 = new MeshSegment(n1, n2, n4);
-	MeshSegment* m2 = new MeshSegment(n4, n2, n3);
-	MeshSegment* m3 = new MeshSegment(n4, n3, n6);
-	MeshSegment* m4 = new MeshSegment(n5, n4, n6);
-	MeshSegment* m5 = new MeshSegment(n3, n7, n6);
+	MeshSegment* m16 = new MeshSegment(n16, n12, n15);
+	MeshSegment* m17 = new MeshSegment(n18, n16, n15);
+	MeshSegment* m18 = new MeshSegment(n12, n10, n15);
+	MeshSegment* m19 = new MeshSegment(n15, n10, n13);
+	MeshSegment* m20 = new MeshSegment(n10, n9, n13);
 
-	MeshSegment* m6 = new MeshSegment(n6, n7, n8);
-	MeshSegment* m7 = new MeshSegment(n8, n7, n9);
-	MeshSegment* m8 = new MeshSegment(n8, n9, n10);
-	MeshSegment* m9 = new MeshSegment(n10, n9, n12);
-	MeshSegment* m10 = new MeshSegment(n9, n11, n12);
+	MeshSegment* m21 = new MeshSegment(n13, n9, n14);
+	MeshSegment* m22 = new MeshSegment(n15, n13, n14);
+	MeshSegment* m23 = new MeshSegment(n15, n14, n20);
+	MeshSegment* m24 = new MeshSegment(n15, n20, n19);
+	MeshSegment* m25 = new MeshSegment(n25, n15, n19);
 
-	MeshSegment* m11 = new MeshSegment(n12, n11, n13);
-	MeshSegment* m12 = new MeshSegment(n12, n13, n14);
-	MeshSegment* m13 = new MeshSegment(n14, n13, n15);
-	MeshSegment* m14 = new MeshSegment(n13, n16, n15);
-	MeshSegment* m15 = new MeshSegment(n12, n14, n17);
+	MeshSegment* m26 = new MeshSegment(n18, n15, n25);
+	MeshSegment* m27 = new MeshSegment(n18, n25, n26);
+	MeshSegment* m28 = new MeshSegment(n20, n14, n21);
+	MeshSegment* m29 = new MeshSegment(n20, n21, n27);
+	MeshSegment* m30 = new MeshSegment(n20, n27, n28);
 
-	MeshSegment* m16 = new MeshSegment(n10, n12, n17);
-	MeshSegment* m17 = new MeshSegment(n18, n10, n17);
-	MeshSegment* m18 = new MeshSegment(n19, n10, n18);
-	MeshSegment* m19 = new MeshSegment(n19, n8, n10);
-	MeshSegment* m20 = new MeshSegment(n20, n19, n21);
+	MeshSegment* m31 = new MeshSegment(n28, n27, n30);
+	MeshSegment* m32 = new MeshSegment(n28, n30, n29);
+	MeshSegment* m33 = new MeshSegment(n29, n30, n32);
+	MeshSegment* m34 = new MeshSegment(n29, n32, n31);
+	MeshSegment* m35 = new MeshSegment(n31, n32, n34);
 
-	MeshSegment* m21 = new MeshSegment(n19, n18, n21);
-	MeshSegment* m22 = new MeshSegment(n21, n18, n17);
-	MeshSegment* m23 = new MeshSegment(n21, n17, n22);
-	MeshSegment* m24 = new MeshSegment(n21, n22, n23);
-	MeshSegment* m25 = new MeshSegment(n24, n21, n23);
+	MeshSegment* m36 = new MeshSegment(n32, n33, n34);
+	MeshSegment* m37 = new MeshSegment(n33, n35, n34);
+	MeshSegment* m38 = new MeshSegment(n33, n38, n35);
+	MeshSegment* m39 = new MeshSegment(n38, n37, n35);
+	MeshSegment* m40 = new MeshSegment(n38, n24, n37);
 
-	MeshSegment* m26 = new MeshSegment(n25, n21, n24);
-	MeshSegment* m27 = new MeshSegment(n25, n20, n21);
-	MeshSegment* m28 = new MeshSegment(n26, n20, n25);
-	MeshSegment* m29 = new MeshSegment(n26, n27, n20);
-	MeshSegment* m30 = new MeshSegment(n29, n27, n26);
+	MeshSegment* m41 = new MeshSegment(n24, n23, n37);
+	MeshSegment* m42 = new MeshSegment(n24, n22, n23);
+	MeshSegment* m43 = new MeshSegment(n21, n22, n24);
+	MeshSegment* m44 = new MeshSegment(n21, n14, n22);
 
-	MeshSegment* m31 = new MeshSegment(n29, n28, n27);
-	MeshSegment* m32 = new MeshSegment(n30, n29, n31);
-	MeshSegment* m33 = new MeshSegment(n31, n29, n26);
-	MeshSegment* m34 = new MeshSegment(n31, n26, n32);
-	MeshSegment* m35 = new MeshSegment(n32, n26, n25);
+	// COUNTER RAMPS
+	MeshSegment* m45 = new MeshSegment(n36, n40, n2);
 
-	MeshSegment* m36 = new MeshSegment(n32, n25, n33);
-	MeshSegment* m37 = new MeshSegment(n33, n25, n25);
-	MeshSegment* m38 = new MeshSegment(n33, n24, n34);
-	MeshSegment* m39 = new MeshSegment(n34, n24, n35);
-	MeshSegment* m40 = new MeshSegment(n24, n23, n35);
+	MeshSegment* m46 = new MeshSegment(n40, n39, n2);
+	MeshSegment* m47 = new MeshSegment(n42, n18, n26);
+	MeshSegment* m48 = new MeshSegment(n41, n42, n26);
+	MeshSegment* m49 = new MeshSegment(n43, n4, n11);
+	MeshSegment* m50 = new MeshSegment(n44, n43, n11);
 
-	MeshSegment* m41 = new MeshSegment(n35, n23, n36);
-	MeshSegment* m42 = new MeshSegment(n36, n23, n37);
-	MeshSegment* m43 = new MeshSegment(n36, n37, n39);
-	MeshSegment* m44 = new MeshSegment(n38, n36, n39);
-	MeshSegment* m45 = new MeshSegment(n38, n39, n40);
+	// COUNTER LEVEL SHELVES
+	MeshSegment* m51 = new MeshSegment(n50, n43, n44);
+	MeshSegment* m52 = new MeshSegment(n49, n50, n44);
+	MeshSegment* m53 = new MeshSegment(n48, n49, n44);
+	MeshSegment* m54 = new MeshSegment(n48, n44, n45);
+	MeshSegment* m55 = new MeshSegment(n48, n45, n46);
 
-	MeshSegment* m46 = new MeshSegment(n40, n39, n41);
-	MeshSegment* m47 = new MeshSegment(n40, n41, n42);
-	MeshSegment* m48 = new MeshSegment(n43, n40, n42);
-	MeshSegment* m49 = new MeshSegment(n44, n43, n42);
-	MeshSegment* m50 = new MeshSegment(n44, n42, n45);
+	MeshSegment* m56 = new MeshSegment(n48, n46, n47);
+	MeshSegment* m57 = new MeshSegment(n49, n51, n50);
+	MeshSegment* m58 = new MeshSegment(n51, n43, n50);
+	MeshSegment* m59 = new MeshSegment(n51, n53, n43);
+	MeshSegment* m60 = new MeshSegment(n51, n52, n53);
 
-	MeshSegment* m51 = new MeshSegment(n44, n45, n46);
-	MeshSegment* m52 = new MeshSegment(n57, n44, n46);
-	MeshSegment* m53 = new MeshSegment(n46, n45, n47);
-	MeshSegment* m54 = new MeshSegment(n46, n47, n48);
-	MeshSegment* m55 = new MeshSegment(n48, n47, n49);
+	MeshSegment* m61 = new MeshSegment(n52, n54, n53);
+	MeshSegment* m62 = new MeshSegment(n53, n54, n55);
+	MeshSegment* m63 = new MeshSegment(n53, n55, n57);
+	MeshSegment* m64 = new MeshSegment(n54, n56, n55);
+	MeshSegment* m65 = new MeshSegment(n55, n56, n57);
 
-	MeshSegment* m56 = new MeshSegment(n47, n50, n49);
-	MeshSegment* m57 = new MeshSegment(n49, n50, n51);
-	MeshSegment* m58 = new MeshSegment(n49, n51, n52);
-	MeshSegment* m59 = new MeshSegment(n52, n51, n53);
-	MeshSegment* m60 = new MeshSegment(n51, n54, n53);
+	MeshSegment* m66 = new MeshSegment(n57, n56, n58);
+	MeshSegment* m67 = new MeshSegment(n57, n58, n60);
+	MeshSegment* m68 = new MeshSegment(n56, n59, n58);
+	MeshSegment* m69 = new MeshSegment(n58, n59, n60);
+	MeshSegment* m70 = new MeshSegment(n60, n59, n61);
+	
+	MeshSegment* m71 = new MeshSegment(n60, n61, n40);
+	MeshSegment* m72 = new MeshSegment(n40, n61, n62);
+	MeshSegment* m73 = new MeshSegment(n40, n62, n39);
+	MeshSegment* m74 = new MeshSegment(n61, n63, n62);
+	MeshSegment* m75 = new MeshSegment(n62, n63, n39);
 
-	MeshSegment* m61 = new MeshSegment(n53, n54, n55);
-	MeshSegment* m62 = new MeshSegment(n53, n55, n56);
-	MeshSegment* m63 = new MeshSegment(n58, n57, n46);
-	MeshSegment* m64 = new MeshSegment(n59, n57, n58);
-	MeshSegment* m65 = new MeshSegment(n59, n61, n57);
+	MeshSegment* m76 = new MeshSegment(n39, n63, n65);
+	MeshSegment* m77 = new MeshSegment(n63, n64, n65);
+	MeshSegment* m78 = new MeshSegment(n66, n64, n63);
 
-	MeshSegment* m66 = new MeshSegment(n60, n61, n59);
-	MeshSegment* m67 = new MeshSegment(n60, n63, n61);
-	MeshSegment* m68 = new MeshSegment(n63, n62, n61);
-	MeshSegment* m69 = new MeshSegment(n64, n62, n63);
-	MeshSegment* m70 = new MeshSegment(n64, n65, n62);
+	// SHELVES
+	MeshSegment* m79 = new MeshSegment(n68, n42, n41);
+	MeshSegment* m80 = new MeshSegment(n67, n68, n41);
 
-	MeshSegment* m71 = new MeshSegment(n64, n67, n65);
-	MeshSegment* m72 = new MeshSegment(n67, n68, n65);
-	MeshSegment* m73 = new MeshSegment(n68, n66, n65);
-	MeshSegment* m74 = new MeshSegment(n68, n69, n66);
-	MeshSegment* m75 = new MeshSegment(n68, n70, n69);
+	MeshSegment* m81 = new MeshSegment(n67, n69, n68);
+	MeshSegment* m82 = new MeshSegment(n69, n71, n68);
+	MeshSegment* m83 = new MeshSegment(n69, n70, n71);
+	MeshSegment* m84 = new MeshSegment(n70, n73, n71);
+	MeshSegment* m85 = new MeshSegment(n73, n72, n71);
 
-	MeshSegment* m76 = new MeshSegment(n70, n72, n69);
-	MeshSegment* m77 = new MeshSegment(n72, n71, n69);
-	MeshSegment* m78 = new MeshSegment(n72, n76, n71);
-	MeshSegment* m79 = new MeshSegment(n72, n73, n76);
-	MeshSegment* m80 = new MeshSegment(n73, n74, n76);
+	//MeshSegment* m86 = new MeshSegment();
+	MeshSegment* m87 = new MeshSegment(n73, n74, n72);
+	MeshSegment* m88 = new MeshSegment(n74, n76, n72);
+	MeshSegment* m89 = new MeshSegment(n72, n76, n75);
+	MeshSegment* m90 = new MeshSegment(n74, n77, n76);
 
-	MeshSegment* m81 = new MeshSegment(n74, n75, n76);
-	MeshSegment* m82 = new MeshSegment(n76, n75, n33);
-	MeshSegment* m83 = new MeshSegment(n76, n33, n34);
-	MeshSegment* m84 = new MeshSegment(n15, n16, n78);
-	MeshSegment* m85 = new MeshSegment(n15, n78, n77);
+	MeshSegment* m91 = new MeshSegment(n74, n78, n77);
+	MeshSegment* m92 = new MeshSegment(n78, n79, n77);
+	MeshSegment* m93 = new MeshSegment(n77, n80, n76);
+	MeshSegment* m94 = new MeshSegment(n77, n79, n80);
+	MeshSegment* m95 = new MeshSegment(n79, n81, n80);
 
-	MeshSegment* m86 = new MeshSegment(n77, n78, n80);
-	MeshSegment* m87 = new MeshSegment(n80, n78, n79);
+	MeshSegment* m96 = new MeshSegment(n79, n82, n81);
+	MeshSegment* m97 = new MeshSegment(n81, n82, n84);
+	MeshSegment* m98 = new MeshSegment(n82, n83, n84);
+	MeshSegment* m99 = new MeshSegment(n83, n86, n84);
+	MeshSegment* m100 = new MeshSegment(n81, n84, n85);
 
+	MeshSegment* m101 = new MeshSegment(n84, n86, n85);
+	MeshSegment* m102 = new MeshSegment(n72, n75, n87);
+	MeshSegment* m103 = new MeshSegment(n88, n72, n87);
+	MeshSegment* m104 = new MeshSegment(n68, n89, n42);
+	MeshSegment* m105 = new MeshSegment(n68, n90, n89);
 
-	m1->id_ = 1;
-	m2->id_ = 2;
-	m3->id_ = 3;
-	m4->id_ = 4;
-	m5->id_ = 5;
-	m6->id_ = 6;
-	m7->id_ = 7;
-	m8->id_ = 8;
-	m9->id_ = 9;
-	m10->id_ = 10;
-	m11->id_ = 11;
-	m12->id_ = 12;
-	m13->id_ = 13;
-	m14->id_ = 14;
-	m15->id_ = 15;
-	m16->id_ = 16;
-	m17->id_ = 17;
-	m18->id_ = 18;
-	m19->id_ = 19;
-	m20->id_ = 20;
-	m21->id_ = 21;
-	m22->id_ = 22;
-	m23->id_ = 23;
-	m24->id_ = 24;
-	m25->id_ = 25;
-	m26->id_ = 26;
-	m27->id_ = 27;
-	m28->id_ = 28;
-	m29->id_ = 29;
-	m30->id_ = 30;
-	m31->id_ = 31;
-	m32->id_ = 32;
-	m33->id_ = 33;
-	m34->id_ = 34;
-	m35->id_ = 35;
-	m36->id_ = 36;
-	m37->id_ = 37;
-	m38->id_ = 38;
-	m39->id_ = 39;
-	m40->id_ = 40;
-	m41->id_ = 41;
-	m42->id_ = 42;
-	m43->id_ = 43;
-	m44->id_ = 44;
-	m45->id_ = 45;
-	m46->id_ = 46;
-	m47->id_ = 47;
-	m48->id_ = 48;
-	m49->id_ = 49;
-	m50->id_ = 50;
-	m51->id_ = 51;
-	m52->id_ = 52;
-	m53->id_ = 53;
-	m54->id_ = 54;
-	m55->id_ = 55;
-	m56->id_ = 56;
-	m57->id_ = 57;
-	m58->id_ = 58;
-	m59->id_ = 59;
-	m60->id_ = 60;
-	m61->id_ = 61;
-	m62->id_ = 62;
-	m63->id_ = 63;
-	m64->id_ = 64;
-	m65->id_ = 65;
-	m66->id_ = 66;
-	m67->id_ = 67;
-	m68->id_ = 68;
-	m69->id_ = 69;
-	m70->id_ = 70;
-	m71->id_ = 71;
-	m72->id_ = 72;
-	m73->id_ = 73;
-	m74->id_ = 74;
-	m75->id_ = 75;
-	m76->id_ = 76;
-	m77->id_ = 77;
-	m78->id_ = 78;
-	m79->id_ = 79;
-	m80->id_ = 80;
-	m81->id_ = 81;
-	m82->id_ = 82;
-	m83->id_ = 83;
-	m84->id_ = 84;
-	m85->id_ = 85;
-	m86->id_ = 86;
-	m87->id_ = 87;
+	// UNDER
+	MeshSegment* m106 = new MeshSegment(n8, n7, n91);
+	MeshSegment* m107 = new MeshSegment(n92, n8, n91);
+	MeshSegment* m108 = new MeshSegment(n94, n92, n91);
+	MeshSegment* m109 = new MeshSegment(n94, n91, n93);
+	MeshSegment* m110 = new MeshSegment(n95, n94, n93);
 
+	MeshSegment* m111 = new MeshSegment(n96, n94, n95);
+	MeshSegment* m112 = new MeshSegment(n98, n96, n95);
+	MeshSegment* m113 = new MeshSegment(n98, n95, n97);
+	MeshSegment* m114 = new MeshSegment(n98, n97, n99);
+	MeshSegment* m115 = new MeshSegment(n100, n98, n99);
+
+	MeshSegment* m116 = new MeshSegment(n101, n100, n99);
+	MeshSegment* m117 = new MeshSegment(n102, n100, n101);
+	MeshSegment* m118 = new MeshSegment(n103, n102, n101);
+	MeshSegment* m119 = new MeshSegment(n103, n104, n102);
+	MeshSegment* m120 = new MeshSegment(n104, n105, n102);
+
+	MeshSegment* m121 = new MeshSegment(n104, n107, n105);
+	MeshSegment* m122 = new MeshSegment(n107, n106, n105);
+	MeshSegment* m123 = new MeshSegment(n108, n106, n107);
+	MeshSegment* m124 = new MeshSegment(n104, n109, n107);
+	MeshSegment* m125 = new MeshSegment(n109, n108, n107);
+
+	MeshSegment* m126 = new MeshSegment(n113, n108, n109);
+	MeshSegment* m127 = new MeshSegment(n111, n113, n109);
+	MeshSegment* m128 = new MeshSegment(n113, n112, n108);
+	MeshSegment* m129 = new MeshSegment(n115, n113, n111);
+	MeshSegment* m130 = new MeshSegment(n115, n114, n113);
+
+	MeshSegment* m131 = new MeshSegment(n114, n112, n113);
+	MeshSegment* m132 = new MeshSegment(n117, n114, n115);
+	MeshSegment* m133 = new MeshSegment(n116, n117, n115);
+	MeshSegment* m134 = new MeshSegment(n118, n117, n116);
+	MeshSegment* m135 = new MeshSegment(n119, n118, n116);
+
+	MeshSegment* m136 = new MeshSegment(n120, n117, n118);
+	MeshSegment* m137 = new MeshSegment(n119, n120, n118);
+	MeshSegment* m138 = new MeshSegment(n120, n123, n117);
+	MeshSegment* m139 = new MeshSegment(n120, n121, n123);
+	MeshSegment* m140 = new MeshSegment(n121, n122, n123);
+
+	MeshSegment* m141 = new MeshSegment(n123, n122, n124);
+	MeshSegment* m142 = new MeshSegment(n123, n124, n126);
+	MeshSegment* m143 = new MeshSegment(n122, n125, n124);
+	MeshSegment* m144 = new MeshSegment(n124, n125, n126);
+	MeshSegment* m145 = new MeshSegment(n126, n125, n128);
+
+	MeshSegment* m146 = new MeshSegment(n126, n128, n127);
+	MeshSegment* m147 = new MeshSegment(n125, n129, n128);
+	MeshSegment* m148 = new MeshSegment(n125, n130, n129);
+	MeshSegment* m149 = new MeshSegment(n127, n128, n132);
+	MeshSegment* m150 = new MeshSegment(n128, n131, n132);
+
+	MeshSegment* m151 = new MeshSegment(n128, n129, n131);
+	MeshSegment* m152 = new MeshSegment(n129, n130, n63);
+	MeshSegment* m153 = new MeshSegment(n130, n66, n63);
+
+	// KITCHEN COUNTER
 	mesh_.push_back(m1);
+	mesh_.back()->id_ = 1;
 	mesh_.push_back(m2);
+	mesh_.back()->id_ = 2;
 	mesh_.push_back(m3);
+	mesh_.back()->id_ = 3;
 	mesh_.push_back(m4);
+	mesh_.back()->id_ = 4;
 	mesh_.push_back(m5);
+	mesh_.back()->id_ = 5;
+
 	mesh_.push_back(m6);
+	mesh_.back()->id_ = 6;
 	mesh_.push_back(m7);
+	mesh_.back()->id_ = 7;
 	mesh_.push_back(m8);
+	mesh_.back()->id_ = 8;
 	mesh_.push_back(m9);
+	mesh_.back()->id_ = 9;
 	mesh_.push_back(m10);
+	mesh_.back()->id_ = 10;
+
 	mesh_.push_back(m11);
+	mesh_.back()->id_ = 11;
 	mesh_.push_back(m12);
+	mesh_.back()->id_ = 12;
 	mesh_.push_back(m13);
+	mesh_.back()->id_ = 13;
 	mesh_.push_back(m14);
+	mesh_.back()->id_ = 14;
 	mesh_.push_back(m15);
+	mesh_.back()->id_ = 15;
+
 	mesh_.push_back(m16);
+	mesh_.back()->id_ = 16;
 	mesh_.push_back(m17);
+	mesh_.back()->id_ = 17;
 	mesh_.push_back(m18);
+	mesh_.back()->id_ = 18;
 	mesh_.push_back(m19);
+	mesh_.back()->id_ = 19;
 	mesh_.push_back(m20);
+	mesh_.back()->id_ = 20;
+
 	mesh_.push_back(m21);
+	mesh_.back()->id_ = 21;
 	mesh_.push_back(m22);
+	mesh_.back()->id_ = 22;
 	mesh_.push_back(m23);
+	mesh_.back()->id_ = 23;
 	mesh_.push_back(m24);
+	mesh_.back()->id_ = 24;
 	mesh_.push_back(m25);
+	mesh_.back()->id_ = 25;
+	
 	mesh_.push_back(m26);
+	mesh_.back()->id_ = 26;
 	mesh_.push_back(m27);
+	mesh_.back()->id_ = 27;
 	mesh_.push_back(m28);
+	mesh_.back()->id_ = 28;
 	mesh_.push_back(m29);
+	mesh_.back()->id_ = 29;
 	mesh_.push_back(m30);
+	mesh_.back()->id_ = 30;
+
 	mesh_.push_back(m31);
+	mesh_.back()->id_ = 31;
 	mesh_.push_back(m32);
+	mesh_.back()->id_ = 32;
 	mesh_.push_back(m33);
+	mesh_.back()->id_ = 33;
 	mesh_.push_back(m34);
+	mesh_.back()->id_ = 34;
 	mesh_.push_back(m35);
+	mesh_.back()->id_ = 35;
+
 	mesh_.push_back(m36);
+	mesh_.back()->id_ = 36;
 	mesh_.push_back(m37);
+	mesh_.back()->id_ = 37;
 	mesh_.push_back(m38);
+	mesh_.back()->id_ = 38;
 	mesh_.push_back(m39);
+	mesh_.back()->id_ = 39;
 	mesh_.push_back(m40);
+	mesh_.back()->id_ = 40;
+
 	mesh_.push_back(m41);
+	mesh_.back()->id_ = 41;
 	mesh_.push_back(m42);
+	mesh_.back()->id_ = 42;
 	mesh_.push_back(m43);
+	mesh_.back()->id_ = 43;
 	mesh_.push_back(m44);
+	mesh_.back()->id_ = 44;
+
+	// COUNTER RAMPS
 	mesh_.push_back(m45);
+	mesh_.back()->id_ = 45;
+
 	mesh_.push_back(m46);
+	mesh_.back()->id_ = 46;
 	mesh_.push_back(m47);
+	mesh_.back()->id_ = 47;
 	mesh_.push_back(m48);
+	mesh_.back()->id_ = 48;
 	mesh_.push_back(m49);
+	mesh_.back()->id_ = 49;
 	mesh_.push_back(m50);
+	mesh_.back()->id_ = 50;
+
+	// COUNTER LEVEL SHELVES
 	mesh_.push_back(m51);
+	mesh_.back()->id_ = 51;
 	mesh_.push_back(m52);
+	mesh_.back()->id_ = 52;
 	mesh_.push_back(m53);
+	mesh_.back()->id_ = 53;
 	mesh_.push_back(m54);
+	mesh_.back()->id_ = 54;
 	mesh_.push_back(m55);
+	mesh_.back()->id_ = 55;
+
 	mesh_.push_back(m56);
+	mesh_.back()->id_ = 56;
 	mesh_.push_back(m57);
+	mesh_.back()->id_ = 56;
 	mesh_.push_back(m58);
+	mesh_.back()->id_ = 58;
 	mesh_.push_back(m59);
+	mesh_.back()->id_ = 59;
 	mesh_.push_back(m60);
+	mesh_.back()->id_ = 60;
+
 	mesh_.push_back(m61);
+	mesh_.back()->id_ = 61;
 	mesh_.push_back(m62);
+	mesh_.back()->id_ = 62;
 	mesh_.push_back(m63);
+	mesh_.back()->id_ = 63;
 	mesh_.push_back(m64);
+	mesh_.back()->id_ = 64;
 	mesh_.push_back(m65);
+	mesh_.back()->id_ = 65;
+
 	mesh_.push_back(m66);
+	mesh_.back()->id_ = 66;
 	mesh_.push_back(m67);
+	mesh_.back()->id_ = 67;
 	mesh_.push_back(m68);
+	mesh_.back()->id_ = 68;
 	mesh_.push_back(m69);
+	mesh_.back()->id_ = 69;
 	mesh_.push_back(m70);
+	mesh_.back()->id_ = 70;
+
 	mesh_.push_back(m71);
+	mesh_.back()->id_ = 71;
 	mesh_.push_back(m72);
+	mesh_.back()->id_ = 72;
 	mesh_.push_back(m73);
+	mesh_.back()->id_ = 73;
 	mesh_.push_back(m74);
+	mesh_.back()->id_ = 74;
 	mesh_.push_back(m75);
+	mesh_.back()->id_ = 75;
+
 	mesh_.push_back(m76);
+	mesh_.back()->id_ = 76;
 	mesh_.push_back(m77);
+	mesh_.back()->id_ = 77;
 	mesh_.push_back(m78);
+	mesh_.back()->id_ = 78;
+
+	// SHELVES
 	mesh_.push_back(m79);
+	mesh_.back()->id_ = 79;
 	mesh_.push_back(m80);
+	mesh_.back()->id_ = 80;
+
 	mesh_.push_back(m81);
+	mesh_.back()->id_ = 81;
 	mesh_.push_back(m82);
+	mesh_.back()->id_ = 82;
 	mesh_.push_back(m83);
+	mesh_.back()->id_ = 83;
 	mesh_.push_back(m84);
+	mesh_.back()->id_ = 84;
 	mesh_.push_back(m85);
-	mesh_.push_back(m86);
+	mesh_.back()->id_ = 85;
+
+	//mesh_.push_back(m86);
 	mesh_.push_back(m87);
+	mesh_.back()->id_ = 87;
+	mesh_.push_back(m88);
+	mesh_.back()->id_ = 88;
+	mesh_.push_back(m89);
+	mesh_.back()->id_ = 89;
+	mesh_.push_back(m90);
+	mesh_.back()->id_ = 90;
+
+	mesh_.push_back(m91);
+	mesh_.back()->id_ = 91;
+	mesh_.push_back(m92);
+	mesh_.back()->id_ = 92;
+	mesh_.push_back(m93);
+	mesh_.back()->id_ = 93;
+	mesh_.push_back(m94);
+	mesh_.back()->id_ = 94;
+	mesh_.push_back(m95);
+	mesh_.back()->id_ = 95;
+
+	mesh_.push_back(m96);
+	mesh_.back()->id_ = 96;
+	mesh_.push_back(m97);
+	mesh_.back()->id_ = 97;
+	mesh_.push_back(m98);
+	mesh_.back()->id_ = 98;
+	mesh_.push_back(m99);
+	mesh_.back()->id_ = 99;
+	mesh_.push_back(m100);
+	mesh_.back()->id_ = 100;
+
+	mesh_.push_back(m101);
+	mesh_.back()->id_ = 101;
+	mesh_.push_back(m102);
+	mesh_.back()->id_ = 102;
+	mesh_.push_back(m103);
+	mesh_.back()->id_ = 103;
+	mesh_.push_back(m104);
+	mesh_.back()->id_ = 104;
+	mesh_.push_back(m105);
+	mesh_.back()->id_ = 105;
+
+	// UNDER
+	mesh_.push_back(m106);
+	mesh_.back()->id_ = 106;
+	mesh_.push_back(m107);
+	mesh_.back()->id_ = 107;
+	mesh_.push_back(m108);
+	mesh_.back()->id_ = 108;
+	mesh_.push_back(m109);
+	mesh_.back()->id_ = 109;
+	mesh_.push_back(m110);
+	mesh_.back()->id_ = 110;
+
+	mesh_.push_back(m111);
+	mesh_.back()->id_ = 111;
+	mesh_.push_back(m112);
+	mesh_.back()->id_ = 112;
+	mesh_.push_back(m113);
+	mesh_.back()->id_ = 113;
+	mesh_.push_back(m114);
+	mesh_.back()->id_ = 114;
+	mesh_.push_back(m115);
+	mesh_.back()->id_ = 115;
+
+	mesh_.push_back(m116);
+	mesh_.back()->id_ = 116;
+	mesh_.push_back(m117);
+	mesh_.back()->id_ = 117;
+	mesh_.push_back(m118);
+	mesh_.back()->id_ = 118;
+	mesh_.push_back(m119);
+	mesh_.back()->id_ = 119;
+	mesh_.push_back(m120);
+	mesh_.back()->id_ = 120;
+
+	mesh_.push_back(m121);
+	mesh_.back()->id_ = 121;
+	mesh_.push_back(m122);
+	mesh_.back()->id_ = 122;
+	mesh_.push_back(m123);
+	mesh_.back()->id_ = 123;
+	mesh_.push_back(m124);
+	mesh_.back()->id_ = 124;
+	mesh_.push_back(m125);
+	mesh_.back()->id_ = 125;
+
+	mesh_.push_back(m126);
+	mesh_.back()->id_ = 126;
+	mesh_.push_back(m127);
+	mesh_.back()->id_ = 127;
+	mesh_.push_back(m128);
+	mesh_.back()->id_ = 128;
+	mesh_.push_back(m129);
+	mesh_.back()->id_ = 129;
+	mesh_.push_back(m130);
+	mesh_.back()->id_ = 130;
+
+	mesh_.push_back(m131);
+	mesh_.back()->id_ = 131;
+	mesh_.push_back(m132);
+	mesh_.back()->id_ = 132;
+	mesh_.push_back(m133);
+	mesh_.back()->id_ = 133;
+	mesh_.push_back(m134);
+	mesh_.back()->id_ = 134;
+	mesh_.push_back(m135);
+	mesh_.back()->id_ = 135;
+
+	mesh_.push_back(m136);
+	mesh_.back()->id_ = 136;
+	mesh_.push_back(m137);
+	mesh_.back()->id_ = 137;
+	mesh_.push_back(m138);
+	mesh_.back()->id_ = 138;
+	mesh_.push_back(m139);
+	mesh_.back()->id_ = 139;
+	mesh_.push_back(m140);
+	mesh_.back()->id_ = 140;
+
+	mesh_.push_back(m141);
+	mesh_.back()->id_ = 141;
+	mesh_.push_back(m142);
+	mesh_.back()->id_ = 142;
+	mesh_.push_back(m143);
+	mesh_.back()->id_ = 143;
+	mesh_.push_back(m144);
+	mesh_.back()->id_ = 144;
+	mesh_.push_back(m145);
+	mesh_.back()->id_ = 145;
+
+	mesh_.push_back(m146);
+	mesh_.back()->id_ = 146;
+	mesh_.push_back(m147);
+	mesh_.back()->id_ = 147;
+	mesh_.push_back(m148);
+	mesh_.back()->id_ = 148;
+	mesh_.push_back(m149);
+	mesh_.back()->id_ = 149;
+	mesh_.push_back(m150);
+	mesh_.back()->id_ = 150;
+
+	mesh_.push_back(m151);
+	mesh_.back()->id_ = 151;
+	mesh_.push_back(m152);
+	mesh_.back()->id_ = 152;
+	mesh_.push_back(m153);
+	mesh_.back()->id_ = 153;
 
 	setupVisualizer();
 	connectMesh();
@@ -489,4 +804,31 @@ bool NavMesh::alreadyContainsNeighbor(MeshSegment* segment, MeshSegment* neighbo
 		}
 	}
 	return false;
+}
+
+NavMesh::MeshSegment* NavMesh::currentMeshSegment(vert position)
+{
+	float min = 999999;
+	MeshSegment* bestSeg = nullptr;
+
+	for (int i = 0; i < mesh_.size(); i++)
+	{
+		float summedAngle = 0;
+
+		glm::vec3 vectorA = mesh_.at(i)->v0_ - position;
+		glm::vec3 vectorB = mesh_.at(i)->v1_ - position;
+		glm::vec3 vectorC = mesh_.at(i)->v2_ - position;
+
+		summedAngle += acos(dot(vectorA, vectorB) / (length(vectorA) * length(vectorB)));
+		summedAngle += acos(dot(vectorA, vectorC) / (length(vectorA) * length(vectorC)));
+		summedAngle += acos(dot(vectorB, vectorC) / (length(vectorB) * length(vectorC)));
+
+		if (abs(summedAngle - (2 * 3.1415926)) < min)
+		{
+			min = abs(summedAngle - (2 * 3.1415926));
+			bestSeg = mesh_.at(i);
+		}
+	}
+	//std::cout << minInd << " " << min << std::endl;
+	return bestSeg;
 }

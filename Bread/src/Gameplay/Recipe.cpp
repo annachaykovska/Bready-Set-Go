@@ -29,8 +29,8 @@ Recipe::Recipe(int id) {
 	Ingredient chicken = Ingredient(9, 1);
 
 	Ingredient peas = Ingredient(10, 1);
-	Ingredient soupbase = Ingredient(11, 1);
-	Ingredient pumpkin = Ingredient(12, 1);
+	//Ingredient soupbase = Ingredient(11, 1);
+	//Ingredient pumpkin = Ingredient(12, 1);
 
 	//Initialize recipe ingredients depending on recipe type id....
 	//0==pizza,1==salad,2==soup,3==rice bowl
@@ -57,8 +57,8 @@ Recipe::Recipe(int id) {
 
 	case 3:
 		this->ingredients[0] = peas;
-		this->ingredients[1] = soupbase;
-		this->ingredients[2] = pumpkin;
+		//this->ingredients[1] = soupbase;
+		//this->ingredients[2] = pumpkin;
 		this->ingredients[3] = carrot;
 	}
 }
@@ -88,11 +88,11 @@ void Recipe::updateRecipeProgress(Inventory in) {
 			this->complete = true;
 		}
 
-	case 3:
-		if (in.peas == 1 && in.soupbase == 1 && in.pumpkin == 1 && in.carrot == 1) {
-			this->active = false;
-			this->complete = true;
-		}
+	//case 3:
+	//	if (in.peas == 1 && in.soupbase == 1 && in.pumpkin == 1 && in.carrot == 1) {
+	//		this->active = false;
+	//		this->complete = true;
+	//	}
 	}
 
 }

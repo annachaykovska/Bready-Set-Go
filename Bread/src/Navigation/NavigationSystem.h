@@ -8,6 +8,8 @@
 #include "../Scene/Entity.h"
 #include "../Physics/PhysicsSystem.h"
 
+enum NavMode { nav, search };
+
 class NavigationSystem : public Component
 {
 public:
@@ -17,9 +19,11 @@ public:
 	void pause();
 	void update();
 
+	void setMode(NavMode mode);
 	float distanceFromVehicle(position target);
 	bool hasPath();
 
+	bool lostPath();
 	bool queryReset();
 
 	PhysicsSystem& physics_;
@@ -34,7 +38,9 @@ private:
 
 	int id_;
 	bool resetFlag_;
+	bool lostPath_;
 	Steering steering_;
 
 	position currentTarget_;
+	NavMode currentMode_;
 };
