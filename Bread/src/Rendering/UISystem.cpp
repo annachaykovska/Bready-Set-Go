@@ -212,10 +212,14 @@ void UISystem::updateGame(int endScreenValue) {
     {
         // Recipe States
         renderText(textShader, "Recipe Progress", scX(0.8), scY(0.9), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "P1 (Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "P2 (Omlette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.8), scY(0.8), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "P3 (Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.8), scY(0.75), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "P4 (Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "P1 ", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 0, 0));
+        renderText(textShader, "P2 ", scX(0.8), scY(0.8), 1.f, glm::vec3(0, 0, 1));
+        renderText(textShader, "P3 ", scX(0.8), scY(0.75), 1.f, glm::vec3(0, 1, 0));
+        renderText(textShader, "P4" , scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 0));
+        renderText(textShader, "(Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.83), scY(0.85), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Omlette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.83), scY(0.75), 1.f, glm::vec3(1, 1, 1));
+        renderText(textShader, "(Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.83), scY(0.7), 1.f, glm::vec3(1, 1, 1));
     }
 
     // Drawing minimap

@@ -225,6 +225,12 @@ int main()
 
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
 	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
+
+	NavigationSystem p3NavSystem(*player3, physics, navMesh, 3);
+	AIBrain p3Brain(p3Inv, ingredientTracker, p3NavSystem);
+
+	NavigationSystem p4NavSystem(*player4, physics, navMesh, 4);
+	AIBrain p4Brain(p4Inv, ingredientTracker, p4NavSystem);
 	
 	player1->attachComponent(&p1Inv, "inventory");
 	player1->attachComponent(&pizza, "recipe");
@@ -236,9 +242,11 @@ int main()
 
 	player3->attachComponent(&p3Inv, "inventory");
 	player3->attachComponent(&wrap, "recipe");
+	p3Brain.setRecipe(&wrap);
 
 	player4->attachComponent(&p4Inv, "inventory");
 	player4->attachComponent(&salad, "recipe");
+	p4Brain.setRecipe(&salad);
 
 	// Track time
 	double t = 0.0;
@@ -318,6 +326,8 @@ int main()
 			// AI + Navigation
 			ingredientTracker.update();
 			p2Brain.update();
+			p3Brain.update();
+			p4Brain.update();
 
 			// AUDIO
 			audio.update();

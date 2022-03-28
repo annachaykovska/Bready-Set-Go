@@ -86,7 +86,7 @@ glm::mat4 Camera::getViewMatrix(Transform* playerTransform)
 		
 		float max_rot=2.f; //FIXME: THIS VARIABLE IS A CONSTANT
 		if (!physics->getIsVehicleInAir(1)) {
-			cameraRotationOffset = vehicleSpeed * vehicleTurn * 2.2f;
+			cameraRotationOffset = vehicleSpeed * vehicleTurn / 1.5f;
 		}
 		if (cameraRotationOffset - oldCameraRotationOffset > max_rot) cameraRotationOffset = oldCameraRotationOffset + max_rot;
 		else if (cameraRotationOffset - oldCameraRotationOffset < -max_rot) cameraRotationOffset = oldCameraRotationOffset - max_rot;
