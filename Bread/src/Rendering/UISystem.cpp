@@ -200,7 +200,7 @@ void UISystem::updateGame(int endScreenValue) {
     // Drawing speedometer
     float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
     speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
-    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
+    renderImage(imageShader, needle, scX(0.875), scY(0.19), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
     auto p1_ent =  g_scene.getEntity("player1");
     renderImage(imageShader, vacuum, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, (glfwGetTime()-p1_ent->lastMagnetUse)/p1_ent->magnetCooldown);
