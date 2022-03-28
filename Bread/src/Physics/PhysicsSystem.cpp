@@ -1348,7 +1348,14 @@ void PhysicsSystem::magnet(int stealer_id)
 			if (stole) {
 				stealer->lastMagnetUse = currentTime;
 				victims[i]->lastStolenFrom = currentTime;
-				g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+				if (stealer_id == 1)
+				{
+					g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+				}
+				if (victims[i] == g_scene.getEntity("player1"))
+				{
+					g_systems.audio->ingredientSuck(stealer->getAudioSource());
+				}
 				return;
 			}
 		}
@@ -1357,5 +1364,8 @@ void PhysicsSystem::magnet(int stealer_id)
 	}
 
 	stealer->lastMagnetUse = currentTime;
-	g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+	if (stealer_id == 1)
+	{
+		g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+	}
 }

@@ -35,7 +35,6 @@ void NavigationSystem::update()
 	{
 		magnetCooldown_--;
 	}
-	std::cout << "MAGNET COOLDOWN: " << magnetCooldown_ << std::endl;
 	if (length(currentTarget_ - vehicle_.getTransform()->position) < 20)
 	{
 		if (magnetCooldown_ < 1)
