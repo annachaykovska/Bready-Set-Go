@@ -20,6 +20,7 @@ UISystem::UISystem()
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
+    , vacuum("resources/textures/vacuum.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , tomato("resources/textures/tomato.png", GL_NEAREST)
@@ -201,7 +202,12 @@ void UISystem::updateGame(int endScreenValue) {
     speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
     renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
-    renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
+    auto p1_ent =  g_scene.getEntity("player1");
+    renderImage(imageShader, vacuum, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, (glfwGetTime()-p1_ent->lastMagnetUse)/p1_ent->magnetCooldown);
+
+    renderImage(imageShader, speedometer, scX(0.875), scY(0.19), scX(0.225), scY(0.3), 0.f, 1.f);
+
+    
 
     Recipe* p1Recipe = (Recipe*)g_scene.getEntity("player1")->getComponent("recipe");
     Recipe* p2Recipe = (Recipe*)g_scene.getEntity("player2")->getComponent("recipe");

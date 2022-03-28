@@ -57,6 +57,7 @@ private:
 	ImageTexture speedometer;
 	float speedometer_theta;
 	ImageTexture needle;
+	ImageTexture vacuum;
 	ImageTexture miniMap;
 	ImageTexture inventory;
 
