@@ -22,7 +22,7 @@ Entity::Entity(std::string name)
 
 	//Magnet variables
 	this->magnetDistanceSquared = 200.f;
-	this->magnetCooldown = 3.0f;
+	this->magnetCooldown = 6.0f;
 	this->lastMagnetUse = 0;
 	this->stolenFromGracePeriod = 6.0f;
 	this->lastStolenFrom = 0;
@@ -40,7 +40,7 @@ Entity::Entity(){
 
 	//Magnet variables
 	this->magnetDistanceSquared = 200.f;
-	this->magnetCooldown = 3.0f;
+	this->magnetCooldown = 6.0f;
 	this->lastMagnetUse = 0;
 	this->stolenFromGracePeriod = 6.0f;
 	this->lastStolenFrom = 0;

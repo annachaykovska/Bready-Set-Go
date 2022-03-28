@@ -29,6 +29,10 @@ class UISystem
 {
 public:
 
+	//for tweaking
+	float map_x;
+	float map_sx;
+
 	UISystem();
 	~UISystem();
 
@@ -57,6 +61,7 @@ private:
 	ImageTexture speedometer;
 	float speedometer_theta;
 	ImageTexture needle;
+	ImageTexture vacuum;
 	ImageTexture miniMap;
 	ImageTexture inventory;
 

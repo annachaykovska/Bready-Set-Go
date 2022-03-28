@@ -20,6 +20,7 @@ UISystem::UISystem()
     , imageShader("resources/shaders/imageVertex.txt", "resources/shaders/imageFragment.txt")
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
+    , vacuum("resources/textures/vacuum.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , tomato("resources/textures/tomato.png", GL_NEAREST)
@@ -53,6 +54,8 @@ UISystem::UISystem()
     , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
     , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
     , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
+    , map_x(0.126)
+    , map_sx(0.190)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -199,9 +202,14 @@ void UISystem::updateGame(int endScreenValue) {
     // Drawing speedometer
     float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
     speedometer_theta += std::min(std::max((speedometer_goal_theta-speedometer_theta),-MAX_NEEDLE_DELTA),MAX_NEEDLE_DELTA);
-    renderImage(imageShader, needle, scX(0.875), scY(0.2), scX(0.225), scY(0.3), speedometer_theta, 1.f);
+    renderImage(imageShader, needle, scX(0.875), scY(0.19), scX(0.225), scY(0.3), speedometer_theta, 1.f);
 
-    renderImage(imageShader, speedometer, scX(0.875), scY(0.2), scX(0.225), scY(0.3), 0.f, 1.f);
+    auto p1_ent =  g_scene.getEntity("player1");
+    renderImage(imageShader, vacuum, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, (glfwGetTime()-p1_ent->lastMagnetUse)/p1_ent->magnetCooldown);
+
+    renderImage(imageShader, speedometer, scX(0.875), scY(0.19), scX(0.225), scY(0.3), 0.f, 1.f);
+
+    
 
     Recipe* p1Recipe = (Recipe*)g_scene.getEntity("player1")->getComponent("recipe");
     Recipe* p2Recipe = (Recipe*)g_scene.getEntity("player2")->getComponent("recipe");
@@ -228,7 +236,7 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
     renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    renderImage(imageShader, miniMap, scX(0.125), scY(0.8), scX(0.15625), scY(0.3), 0, 1.f);
+    renderImage(imageShader, miniMap, scX(map_x), scY(0.8), scX(map_sx), scY(0.325), 0, 1.f);
 
     glm::vec3 IngLocation;
 
