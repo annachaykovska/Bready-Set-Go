@@ -30,6 +30,12 @@ public:
 	bool load(std::string filePath);
 	AudioSource* createAudioSource();
 
+	void playGameMusic(AudioSource* source);
+	void playMainMenuMusic(AudioSource* source);
+	void stopMusic(AudioSource* source);
+	void playSlurp(AudioSource* source);
+	void endSlurp(AudioSource* source, bool success);
+
 	void update();
 
 private:

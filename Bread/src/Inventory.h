@@ -22,6 +22,10 @@ public:
 
 	Inventory()
 	{
+		clearAllIngredients();
+	}
+
+	void clearAllIngredients() {
 		this->cheese = 0;
 		this->dough = 0;
 		this->sausage = 0;
@@ -33,5 +37,7 @@ public:
 		this->egg = 0;
 		this->chicken = 0;
 		this->peas = 0;
+		//this->soupbase = 0;
+		//this->pumpkin = 0;
 	}
 };

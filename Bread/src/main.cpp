@@ -21,6 +21,7 @@
 #include "Navigation/IngredientTracker.h"
 #include "Navigation/AIBrain.h"
 #include "Gameplay/Recipe.h"
+#include "Gameplay/GameLoopManager.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -37,7 +38,7 @@ int main()
 	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
 	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
 
-	bool fullScreen = false;
+	bool fullScreen = true;
 
 	// Create viewport window
 	Window window(g_systems.width, g_systems.height, "Bready Set Go!!!", fullScreen);
@@ -167,9 +168,7 @@ int main()
 	// Get a reference to the countertop's AudioSource to play background music
 	// Leaving this here for now so people can turn the music on/off easily
 	AudioSource* countertopAudioSource = countertop->getAudioSource();
-	countertopAudioSource->gain = 0.01f; // Volume control
-	countertopAudioSource->loop = true;
-	countertopAudioSource->play("bg.wav"); // Comment this out to turn off the music on load
+	audio.playMainMenuMusic(countertopAudioSource);
 	
 	AudioSource* p2Audio = player2->getAudioSource();
 	AudioSource* p3Audio = player3->getAudioSource();
@@ -240,7 +239,8 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
-	gameLoop.gameStage = 2;
+	// Change to 1 for submission
+	gameLoop.gameStage = 1;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -259,7 +259,9 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			g_systems.physics->update(dt, gameLoop.gameStage);
+			if (!gameLoop.isPaused) {
+				g_systems.physics->update(dt, gameLoop.gameStage);
+			}
 			accumulator -= dt;
 			t += dt;
 		}
@@ -326,11 +328,20 @@ int main()
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu();
+			audio.stopMusic(countertopAudioSource);
+			audio.playGameMusic(countertopAudioSource);
+			gameLoop.isPaused = false;
 		}
 
 		// RESET game if end of game and menu selected
 		else if (gameLoop.isBackToMenuSelected) {
-			gameLoop.resetBackToStart();
+			gameLoop.resetGameLoopValues();
+			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
+
+			audio.stopMusic(countertopAudioSource);
+			audio.playMainMenuMusic(countertopAudioSource);
+
+			gameLoop.isPaused = true;
 		}
 	}
 

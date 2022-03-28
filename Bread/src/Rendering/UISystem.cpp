@@ -231,30 +231,44 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, miniMap, scX(0.125), scY(0.8), 400.f, 400.f, 0, 1.f);
 
     glm::vec3 IngLocation;
-    IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
-    renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
 
-    IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
-    renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-
-    IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
-    renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-
-    IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
-    renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-
-    // Drawing Inventory
     Entity* player1 = g_scene.getEntity("player1");
     Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
+
+    if (!p1Inv->cheese)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
+        renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    if (!p1Inv->tomato)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
+        renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    if (!p1Inv->dough)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
+        renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    if (!p1Inv->sausage)
+    {
+        IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
+        renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    }
+
+    // Drawing Inventory
     float alpha;
-    float faded = 0.2f;
+    float faded = 0.4f;
     float opaque = 1.f;
 
     float invScale = scX(0.04);
     float invXOffset = scX(0.12);
     float invYOffset = scY(0.4);
     float invBlockOffset = scY(0.097);
-    float recipeYOffset = scY(0.54);
+    float recipeYOffset = scY(0.55);
 
     alpha = (p1Inv->tomato) ? opaque : faded;
     renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScale, invScale, 0, alpha);
@@ -269,7 +283,7 @@ void UISystem::updateGame(int endScreenValue) {
     renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScale, invScale, 0, alpha);
 
     alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, pizza, invXOffset, recipeYOffset, invScale, invScale, 0, alpha);
+    renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scX(0.06), 0, alpha);
 
     renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scX(0.32), 0, 1.f);
 
