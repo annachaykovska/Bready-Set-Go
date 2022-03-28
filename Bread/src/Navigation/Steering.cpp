@@ -45,7 +45,6 @@ void Steering::evasiveAction()
 {
 	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
 	input_->setAnalogAccel(0.3f);
-	std::cout << procedureTimer_ << std::endl;
 	if (procedureTimer_ > 200)
 	{
 		stuck_ = false;
