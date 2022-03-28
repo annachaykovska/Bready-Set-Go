@@ -21,7 +21,7 @@ Entity::Entity(std::string name)
 	this->collisionCooldownStart = -1;
 
 	//Magnet variables
-	this->magnetDistanceSquared = 200.f;
+	this->magnetDistanceSquared = 400.f;
 	this->magnetCooldown = 6.0f;
 	this->lastMagnetUse = 0;
 	this->stolenFromGracePeriod = 6.0f;

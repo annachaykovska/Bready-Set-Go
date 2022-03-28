@@ -66,7 +66,6 @@ bool Steering::locked()
 void Steering::updateSteering(position target)
 {
 	deltaTimer_++;
-	std::cout << deltaTimer_ << std::endl;
 	if (deltaTimer_ > 800)
 	{
 		if (length(entity_.getTransform()->position - positionDelta_) < 1.f)

@@ -126,6 +126,11 @@ void AIBrain::update()
 		break;
 	}
 
+	if (oldInventoryCount > getInventoryCount())
+	{
+		navigation.coolDownMagnet();
+	}
+
 	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget)
 	{
 		navigation.setMode(NavMode::nav);

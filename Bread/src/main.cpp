@@ -201,8 +201,7 @@ int main()
 	// GameLogic stuff - will go in GameLogic eventually
 	//-----------------------------------------------------------------------------------
 	Recipe pizza(Ingredient::Cheese, Ingredient::Dough, Ingredient::Sausage, Ingredient::Tomato, "Pizza");
-	//Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
-	Recipe wrap(Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, Ingredient::Cheese, "Wrap");
+	Recipe wrap(Ingredient::Rice, Ingredient::Chicken, Ingredient::Dough, Ingredient::Lettuce, "Wrap");
 	Recipe salad(Ingredient::Lettuce, Ingredient::Tomato, Ingredient::Parsnip, Ingredient::Carrot, "Salad");
 	Recipe omelette(Ingredient::Egg, Ingredient::Lettuce, Ingredient::Cheese, Ingredient::Peas, "Omelette");
 
@@ -292,6 +291,7 @@ int main()
 			if (winner != 0) {
 				gameLoop.setEndStage();
 			}
+
 			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
 			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
@@ -314,9 +314,12 @@ int main()
 
 			// AI + Navigation
 			ingredientTracker.update();
-			p2Brain.update();
-			p3Brain.update();
-			p4Brain.update();
+			if (!gameLoop.isGameEnded)
+			{
+				p2Brain.update();
+				p3Brain.update();
+				p4Brain.update();
+			}
 
 			// AUDIO
 			audio.update();

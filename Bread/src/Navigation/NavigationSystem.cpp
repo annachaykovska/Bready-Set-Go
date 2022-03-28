@@ -10,6 +10,7 @@ NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavM
 	, waypointUpdater_(vehicle_, navmesh_)
 	, resetFlag_(false)
 	, currentMode_(nav)
+	, magnetCooldown_(0)
 {
 }
 
@@ -30,6 +31,18 @@ void NavigationSystem::pause()
 
 void NavigationSystem::update()
 {
+	if (magnetCooldown_ > 0)
+	{
+		magnetCooldown_--;
+	}
+	std::cout << "MAGNET COOLDOWN: " << magnetCooldown_ << std::endl;
+	if (length(currentTarget_ - vehicle_.getTransform()->position) < 20)
+	{
+		if (magnetCooldown_ < 1)
+		{
+			physics_.magnet(id_);
+		}
+	}
 	switch (currentMode_)
 	{
 	case nav:
@@ -81,6 +94,11 @@ bool NavigationSystem::hasPath()
 		return false;
 	}
 	return true;
+}
+
+void NavigationSystem::coolDownMagnet()
+{
+	magnetCooldown_ = 400;
 }
 
 bool NavigationSystem::lostPath()
