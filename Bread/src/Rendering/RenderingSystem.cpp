@@ -8,6 +8,7 @@
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
 #include <stbi/stb_image.h>
+#include "../Timer.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -37,10 +38,19 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->roughOrt.nearPlane = 0.1f;
 	this->roughOrt.farPlane = 1400.0f;
 
+	glm::mat4 lightProjMatrix = glm::ortho(this->roughOrt.left,
+		this->roughOrt.right,
+		this->roughOrt.bottom,
+		this->roughOrt.top,
+		this->roughOrt.nearPlane,
+		this->roughOrt.farPlane);
+
 	// Directional light position
 	this->lightPos = glm::vec3(-0.1f, 1000.0f, -200.0f);
 	this->lightDir = glm::normalize(glm::vec3(0) - this->lightPos);
 	this->lightViewMatrix = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	this->loResLightSpaceMatrix = lightProjMatrix * this->lightViewMatrix;
 
 	// Shadow map viewport size
 	this->shadowHiRes = 4096;
@@ -402,21 +412,9 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 
 void RenderingSystem::createLoResShadowMap()
 {
-	glm::mat4 lightProjMatrix, lightSpaceMatrix;
-
-	lightProjMatrix = glm::ortho(this->roughOrt.left, 
-								 this->roughOrt.right, 
-								 this->roughOrt.bottom, 
-								 this->roughOrt.top, 
-								 this->roughOrt.nearPlane, 
-								 this->roughOrt.farPlane);
-
-	// TODO this does not need to be calculated every frame
-	this->loResLightSpaceMatrix = lightProjMatrix * this->lightViewMatrix;
-
 	// Switch to depth map shader and set thew new light space matrix uniform
 	depthShader.use();
-	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	depthShader.setMat4("lightSpaceMatrix", this->loResLightSpaceMatrix);
 
 	// Change viewport for shadow map settings
 	glViewport(0, 0, this->shadowLoRes, this->shadowLoRes);
@@ -547,13 +545,11 @@ void RenderingSystem::renderScene(const std::string name)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
 
-	/*
 	// Set shadow bias uniforms
 	shader.setFloat("maxBias", this->maxBias);
 	shader.setFloat("minBias", this->minBias);
 	shader.setFloat("maxRoughBias", this->maxRoughBias);
 	shader.setFloat("minRoughBias", this->minRoughBias);
-	*/
 
 	if (DEBUG_NAVMESH)
 	{
@@ -600,24 +596,14 @@ void RenderingSystem::update()
 
 	// Step 3. Render scene as normal
 	// TODO generalize for number of players
-	renderScene("player1");
-	
-	//renderScene();
+	if (!g_systems.renderDebug)
+		renderScene("player1");
+	else
+		renderDebugShadowMap();
 
 	// Step 4. Add the skybox to the scene
-	drawSkybox();
-
-	// Regular render pass -------------------------------------------------------------
-	// Debug code for rendering the depthMap to viewport
-	//if (g_systems.renderDebug)
-		//renderDebugShadowMap();
-	//else
-	//{
-		// Render scene as normal using the generated depth/shadow map
-
-	
-	//}
-
+	if (!g_systems.renderDebug)
+		drawSkybox();
 }
 
 void RenderingSystem::renderDebugShadowMap()
@@ -641,8 +627,6 @@ Model* RenderingSystem::getKitchenModel()
 {
 	return g_scene.getEntity("countertop")->getModel();
 }
-
-
 
 void RenderingSystem::renderTexturedQuad()
 {

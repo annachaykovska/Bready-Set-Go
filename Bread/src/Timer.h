@@ -7,7 +7,7 @@ class Timer {
 public:
 	Timer()
 	{
-		std::chrono::high_resolution_clock::now();
+		startTime = std::chrono::high_resolution_clock::now();
 	}
 
 	~Timer()
@@ -24,7 +24,7 @@ public:
 		auto duration = end - start;
 		
 		double ms = duration * 0.001;
-		std::cout << ms << " ms\n";
+		std::cout << ms << std::endl; // Prints the time in milliseconds
 	}
 
 private:

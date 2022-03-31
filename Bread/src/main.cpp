@@ -22,6 +22,7 @@
 #include "Navigation/AIBrain.h"
 #include "Gameplay/Recipe.h"
 #include "Gameplay/GameLoopManager.h"
+#include "Timer.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;

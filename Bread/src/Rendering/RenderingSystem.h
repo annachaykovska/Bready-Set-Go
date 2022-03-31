@@ -26,28 +26,14 @@ public:
 	RenderingSystem();
 	~RenderingSystem();
 
-	void initShadows();
-	void initSkybox();
+	void update();
 
 	unsigned int getShaderId();
 	Shader& getShader();
 
-	void loadModels();
-
 	void setupCameras(Transform* playerTransform);
 
-	void createLoResShadowMap();
-	void createHiResShadowMap(const std::string name);
-	void renderShadowMap();
-
-	void renderScene(const std::string name);
-
-	void update();
-
 	Model* getKitchenModel();
-	
-	void renderTexturedQuad();
-	void renderDebugShadowMap();
 
 	Orthogonal roughOrt;
 	glm::mat4 lightViewMatrix;
@@ -112,5 +98,18 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 
+	void initShadows();
+	void initSkybox();
+	void loadModels();
+
+	void createLoResShadowMap();
+	void createHiResShadowMap(const std::string name);
+	void renderShadowMap();
+
+	void renderScene(const std::string name);
+
 	void drawSkybox();
+
+	void renderTexturedQuad();
+	void renderDebugShadowMap();
 };
