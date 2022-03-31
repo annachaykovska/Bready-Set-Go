@@ -93,7 +93,7 @@ int main()
 	//DebugOverlay debugOverlay;
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
-	g_systems.physics->initialize(); // Needs to happen after renderer loads the models
+	g_systems.physics->initialize(); // Needs to happen after renderer is constructed
 
 	AudioSystem audio;
 	g_systems.audio = &audio;
@@ -104,8 +104,9 @@ int main()
 	g_scene.init(&physics);
 
 	//-----------------------------------------------------------------------------------
-	// INITIALIZE TRANSFORMS - will be handled by PhysicsSystem eventually
+	// INITIALIZE TRANSFORMS
 	//-----------------------------------------------------------------------------------
+	// TODO Move out of main
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;

@@ -98,9 +98,16 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 
+	unsigned int fourPlayerVAO;
+	unsigned int fourPlayerVBO;
+	unsigned int fourPlayerFBO;
+	unsigned int fourPlayerTex;
+
 	void initShadows();
 	void initSkybox();
 	void loadModels();
+	void initDebugQuad();
+	void init4PlayerQuad();
 
 	void createLoResShadowMap();
 	void createHiResShadowMap(const std::string name);
@@ -111,5 +118,6 @@ private:
 	void drawSkybox();
 
 	void renderTexturedQuad();
+	void renderFourPlayerQuad();
 	void renderDebugShadowMap();
 };

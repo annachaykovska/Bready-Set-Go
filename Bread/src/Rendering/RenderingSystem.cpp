@@ -50,9 +50,10 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->lightDir = glm::normalize(glm::vec3(0) - this->lightPos);
 	this->lightViewMatrix = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+	// Lo-res shadow map light space matrix
 	this->loResLightSpaceMatrix = lightProjMatrix * this->lightViewMatrix;
 
-	// Shadow map viewport size
+	// Shadow map viewport sizes
 	this->shadowHiRes = 4096;
 	this->shadowLoRes = 2048;
 
@@ -61,8 +62,9 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->maxRoughBias = 0.005f;
 	this->minRoughBias = 0.0005f;
 
-	this->models.reserve(g_scene.entityCount() * 2); // Create space for models
-	loadModels(); // Load model files into the models vector
+	// Populate the models
+	this->models.reserve(g_scene.entityCount());
+	loadModels();
 
 	glEnable(GL_DEPTH_TEST); // Turn on depth testing
 	glDepthFunc(GL_LESS); // Should be default but make it explicit
@@ -88,35 +90,26 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// Initialize skybox
 	this->initSkybox();
 
-	/*
-	// --------------------------------------------------------------------------------------------
-	// QUAD FOR RENDERING FINAL PASS
-	// --------------------------------------------------------------------------------------------
-	// Create quad VAO for final default framebuffer image render
-	float quadVerts[] = {
-		// Position   // Tex Coords
-		-1.0f,  1.0f, 0.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 0.0f,
-		 1.0f, -1.0f, 1.0f, 0.0f,
-
-		-1.0f,  1.0f, 0.0f, 1.0f,
-		 1.0f, -1.0f, 1.0f, 0.0f,
-		 1.0f,  1.0f, 1.0f, 1.0f,
-	};
-
-	glGenVertexArrays(1, &this->quadVAO);
-	glGenBuffers(1, &this->quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-	*/
-
 	NavMesh navMeshPoints;
 	navMesh = navMeshPoints.getWireframe();
+
+	// Multiplayer test
+	glGenFramebuffers(1, &this->fourPlayerFBO);
+	glGenTextures(1, &this->fourPlayerTex);
+	glActiveTexture(GL_TEXTURE16);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width / 2, g_systems.height / 2, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fourPlayerTex, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 RenderingSystem::~RenderingSystem() { }
@@ -390,6 +383,79 @@ void RenderingSystem::loadModels()
 	g_scene.getEntity("test")->attachComponent(&(this->models[index++]), "model");
 }
 
+void RenderingSystem::initDebugQuad()
+{
+	// Create quad VAO for final default framebuffer image render
+	float quadVerts[] = {
+		// Position   // Tex Coords
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+	};
+
+	glGenVertexArrays(1, &this->quadVAO);
+	glGenBuffers(1, &this->quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
+void RenderingSystem::init4PlayerQuad()
+{
+	float fourPlayerVerts[] = {
+		// Position   // Tex Coords
+		// First quad
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f,  0.0f, 0.0f, 0.0f,
+		 0.0f,  0.0f, 1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f, 1.0f, 0.0f,
+		 0.0f,  1.0f, 1.0f, 1.0f,
+
+		// Second quad
+		 0.0f,  1.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f, 0.0f, 0.0f, 
+		 1.0f,  0.0f, 1.0f, 0.0f,
+		 0.0f,  1.0f, 0.0f, 1.0f, 
+		 1.0f,  0.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+
+		// Third quad
+		-1.0f,  0.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 0.0f, -1.0f, 1.0f, 0.0f,
+		-1.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 1.0f, 0.0f,
+		 0.0f,  0.0f, 1.0f, 1.0f,
+
+		// Forth quad
+		 0.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 0.0f,  0.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  0.0f, 1.0f, 1.0f,
+	};
+
+	glGenVertexArrays(1, &this->fourPlayerVAO);
+	glGenBuffers(1, &this->fourPlayerVBO);
+	glBindVertexArray(fourPlayerVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, fourPlayerVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fourPlayerVerts), &fourPlayerVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
 void RenderingSystem::setupCameras(Transform* player1Transform)
 {
 	// Get view matrix from Camera and update the Shader
@@ -523,7 +589,8 @@ void RenderingSystem::renderScene(const std::string name)
 	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
 
 	// Reset viewport
-	glViewport(0, 0, g_systems.width, g_systems.height);
+	// TODO generalize viewport dimensions for multiplayer
+	glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Update camera (MVP matrices)
@@ -559,6 +626,9 @@ void RenderingSystem::renderScene(const std::string name)
 		navMesh.draw(getShader());
 	}
 
+	// TODO Multiplayer test
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
+
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
 	{
@@ -583,6 +653,8 @@ void RenderingSystem::renderScene(const std::string name)
 			models[i].draw(this->shader);
 		}
 	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Reset to default FBO
 }
 
 void RenderingSystem::update()
@@ -596,14 +668,40 @@ void RenderingSystem::update()
 
 	// Step 3. Render scene as normal
 	// TODO generalize for number of players
+	// TODO render scene to FBO and save as texture for multiplayer
 	if (!g_systems.renderDebug)
 		renderScene("player1");
 	else
 		renderDebugShadowMap();
 
+	// Step 3.5 Render to final quad
+	renderFourPlayerQuad();
+
 	// Step 4. Add the skybox to the scene
-	if (!g_systems.renderDebug)
-		drawSkybox();
+	//if (!g_systems.renderDebug)
+		//drawSkybox();
+}
+
+void RenderingSystem::renderFourPlayerQuad()
+{
+	this->simpleShader.use();
+
+	glActiveTexture(GL_TEXTURE16);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
+
+	// Draw to default framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Render scene to viewport by applying textures to 2D quads
+	this->simpleShader.setInt("screenTexture", 16);
+	glBindVertexArray(this->quadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glBindVertexArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void RenderingSystem::renderDebugShadowMap()
