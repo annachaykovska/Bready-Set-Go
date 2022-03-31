@@ -241,7 +241,7 @@ int main()
 	double accumulator = 0.0;
 
 	// Change to 1 for submission
-	gameLoop.gameStage = 1;
+	gameLoop.gameStage = 2;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
