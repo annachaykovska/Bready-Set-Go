@@ -95,19 +95,18 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 
 	// Multiplayer test
 	glGenFramebuffers(1, &this->fourPlayerFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
 	glGenTextures(1, &this->fourPlayerTex);
 	glActiveTexture(GL_TEXTURE16);
 	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width / 2, g_systems.height / 2, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fourPlayerTex, 0);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer did not complete.\n";
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -567,6 +566,9 @@ void RenderingSystem::renderShadowMap()
 
 void RenderingSystem::renderScene(const std::string name)
 {
+	// TODO test for multiplayer
+	//glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerTex);
+
 	// Switch to the regular shader
 	this->shader.use();
 
@@ -590,7 +592,7 @@ void RenderingSystem::renderScene(const std::string name)
 
 	// Reset viewport
 	// TODO generalize viewport dimensions for multiplayer
-	glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+	glViewport(0, 0, g_systems.width, g_systems.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Update camera (MVP matrices)
@@ -625,9 +627,6 @@ void RenderingSystem::renderScene(const std::string name)
 		navMesh.setWireframe(true);
 		navMesh.draw(getShader());
 	}
-
-	// TODO Multiplayer test
-	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
 
 	// Iterate through all the models in the scene and render them at their new transforms
 	for (int i = 0; i < models.size(); i++)
@@ -675,32 +674,34 @@ void RenderingSystem::update()
 		renderDebugShadowMap();
 
 	// Step 3.5 Render to final quad
-	renderFourPlayerQuad();
+	//renderFourPlayerQuad();
 
 	// Step 4. Add the skybox to the scene
-	//if (!g_systems.renderDebug)
-		//drawSkybox();
+	if (!g_systems.renderDebug)
+		drawSkybox();
 }
 
 void RenderingSystem::renderFourPlayerQuad()
 {
 	this->simpleShader.use();
 
-	glActiveTexture(GL_TEXTURE16);
-	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
-
 	// Draw to default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, g_systems.width, g_systems.height);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);//; | GL_DEPTH_BUFFER_BIT);
+
+	// Bind rendered texture
+	glActiveTexture(GL_TEXTURE16);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
 
 	// Render scene to viewport by applying textures to 2D quads
 	this->simpleShader.setInt("screenTexture", 16);
-	glBindVertexArray(this->quadVAO);
+	glBindVertexArray(this->fourPlayerVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 24);
 	glBindVertexArray(0);
 
+	// Unbind texture
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
