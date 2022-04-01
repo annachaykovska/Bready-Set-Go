@@ -975,7 +975,10 @@ void PhysicsSystem::resetOutOfBoundsObjects() {
 	// Players
 	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player1")->getInventory()->clearRandomIngredient();
+	}
 	if (this->mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 		this->mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(reset);
 	if (this->mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
@@ -1006,6 +1009,7 @@ void PhysicsSystem::resetOutOfBoundsObjects() {
 		this->chicken->setGlobalPose(g_scene.getEntity("chicken")->originalSpawn);
 	if (this->peas->getGlobalPose().p.y < -75.0f && this->peas->getGlobalPose().p.y > -99.0f)
 		this->peas->setGlobalPose(g_scene.getEntity("peas")->originalSpawn);
+
 	updateFoodTransforms();
 }
 

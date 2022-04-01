@@ -117,6 +117,7 @@
     <ClCompile Include="src\Gameplay\Breadmobile.cpp" />
     <ClCompile Include="src\Gameplay\GameLoopManager.cpp" />
     <ClCompile Include="src\Gameplay\Recipe.cpp" />
+    <ClCompile Include="src\Inventory.cpp" />
     <ClCompile Include="src\Navigation\AIBrain.cpp" />
     <ClCompile Include="src\Navigation\IngredientTracker.cpp" />
     <ClCompile Include="src\Navigation\LocationTracker.cpp" />

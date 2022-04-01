@@ -192,6 +192,7 @@ int main()
 
 	// Track Ingredient Locations
 	IngredientTracker ingredientTracker;
+	g_systems.tracker = &ingredientTracker;
 	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up game loop manager
