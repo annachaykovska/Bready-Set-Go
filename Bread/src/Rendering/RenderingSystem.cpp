@@ -90,25 +90,34 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// Initialize skybox
 	this->initSkybox();
 
+	this->initDebugQuad();
+
 	NavMesh navMeshPoints;
 	navMesh = navMeshPoints.getWireframe();
 
 	// Multiplayer test
 	glGenFramebuffers(1, &this->fourPlayerFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
-	glGenTextures(1, &this->fourPlayerTex);
+
 	glActiveTexture(GL_TEXTURE16);
+	glGenTextures(1, &this->fourPlayerTex);
 	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width / 2, g_systems.height / 2, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width, g_systems.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fourPlayerTex, 0);
 
+	glGenRenderbuffers(1, &this->fourPlayerRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, this->fourPlayerRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->fourPlayerRBO);
+
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Framebuffer did not complete.\n";
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 RenderingSystem::~RenderingSystem() { }
@@ -141,23 +150,89 @@ void RenderingSystem::initShadows()
 
 	// High resolution shadows ---------------------------------------------------------------------
 	// Configure depth map FBO
-	glGenFramebuffers(1, &this->depthMapFBO);
+	glGenFramebuffers(1, &this->p1ShadowsFBO);
 
 	// Create depth texture
-	glGenTextures(1, &this->depthMapTex);
+	glGenTextures(1, &this->p1ShadowsTex);
 	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes, this->shadowHiRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor2[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor2);
+	float borderColor3[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
 
 	// Attach depth texture as FBO's depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMapTex, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p1ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p1ShadowsTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->p2ShadowsFBO);
+
+	// Create depth texture
+	glGenTextures(1, &this->p2ShadowsTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->p2ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
+
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p2ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p2ShadowsTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->p3ShadowsFBO);
+
+	// Create depth texture
+	glGenTextures(1, &this->p3ShadowsTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->p3ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
+
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p3ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p3ShadowsTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->p4ShadowsFBO);
+
+	// Create depth texture
+	glGenTextures(1, &this->p4ShadowsTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
+
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p4ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p4ShadowsTex, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -398,8 +473,8 @@ void RenderingSystem::initDebugQuad()
 
 	glGenVertexArrays(1, &this->quadVAO);
 	glGenBuffers(1, &this->quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBindVertexArray(this->quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->quadVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
@@ -521,23 +596,34 @@ void RenderingSystem::createHiResShadowMap(const std::string name)
 	lightSpaceMatrix = lightProjMatrix * this->lightViewMatrix;
 
 	if (name == "player1")
+	{
 		this->p1LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p1ShadowsFBO);
+	}
 	else if (name == "player2")
+	{
 		this->p2LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p2ShadowsFBO);
+	}	
 	else if (name == "player3")
+	{
 		this->p3LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p3ShadowsFBO);
+	}	
 	else if (name == "player4")
+	{
 		this->p4LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p4ShadowsFBO);
+	}	
 
 	// Switch to depth map shader and update it's light space matrix uniform
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 	// Resize the viewport for hi-res shadows
-	glViewport(0, 0, this->shadowHiRes, this->shadowHiRes);
+	glViewport(0, 0, this->shadowHiRes / 4, this->shadowHiRes / 4);
 
 	// Draw to a FBO (texture)
-	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glCullFace(GL_FRONT);
 	renderShadowMap();
@@ -567,7 +653,13 @@ void RenderingSystem::renderShadowMap()
 void RenderingSystem::renderScene(const std::string name)
 {
 	// TODO test for multiplayer
-	//glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerTex);
+	//glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
+
+	// Reset viewport
+	// TODO generalize viewport dimensions for multiplayer
+	//glViewport(0, 0, g_systems.width, g_systems.height);
+	glClearColor(1.0f, 0.7f, 0.7f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Switch to the regular shader
 	this->shader.use();
@@ -576,24 +668,39 @@ void RenderingSystem::renderScene(const std::string name)
 	glm::vec3 pos;
 
 	if (name == "player1")
+	{
+		glActiveTexture(GL_TEXTURE25);
+		glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
 		lightSpaceMatrix = this->p1LightSpaceMatrix;
+		glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+	}
 	else if (name == "player2")
+	{
+		glActiveTexture(GL_TEXTURE25);
+		glBindTexture(GL_TEXTURE_2D, this->p2ShadowsTex);
 		lightSpaceMatrix = this->p2LightSpaceMatrix;
+		glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+	}	
 	else if (name == "player3")
+	{
+		glActiveTexture(GL_TEXTURE25);
+		glBindTexture(GL_TEXTURE_2D, this->p3ShadowsTex);
 		lightSpaceMatrix = this->p3LightSpaceMatrix;
+		glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+	}	
 	else if (name == "player4")
+	{
+		glActiveTexture(GL_TEXTURE25);
+		glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
 		lightSpaceMatrix = this->p4LightSpaceMatrix;
+		glViewport(g_systems.width / 2, 0, g_systems.width / 2, g_systems.height / 2);
+	}
 
 	// Update uniforms
 	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	this->shader.setMat4("roughLightSpaceMatrix", this->loResLightSpaceMatrix);
 	this->shader.setVec3("playerPos", g_scene.getEntity(name)->getTransform()->position);
 	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
-
-	// Reset viewport
-	// TODO generalize viewport dimensions for multiplayer
-	glViewport(0, 0, g_systems.width, g_systems.height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Update camera (MVP matrices)
 	Transform* transform = g_scene.getEntity(name)->getTransform();
@@ -608,8 +715,7 @@ void RenderingSystem::renderScene(const std::string name)
 	glBindTexture(GL_TEXTURE, 0);
 
 	// Bind high res shadow map texture
-	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
+	
 	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
@@ -652,7 +758,9 @@ void RenderingSystem::renderScene(const std::string name)
 			models[i].draw(this->shader);
 		}
 	}
-
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Reset to default FBO
 }
 
@@ -664,32 +772,71 @@ void RenderingSystem::update()
 	// Step 2. Create the hi-res shadow maps for the players
 	// TODO generalize for number of players
 	createHiResShadowMap("player1");
+	createHiResShadowMap("player2");
+	createHiResShadowMap("player3");
+	createHiResShadowMap("player4");
 
 	// Step 3. Render scene as normal
 	// TODO generalize for number of players
 	// TODO render scene to FBO and save as texture for multiplayer
-	if (!g_systems.renderDebug)
-		renderScene("player1");
-	else
-		renderDebugShadowMap();
+	//if (!g_systems.renderDebug)
+	renderScene("player1");
+	drawSkybox();
+
+	renderScene("player2");
+	drawSkybox();
+
+	renderScene("player3");
+	drawSkybox();
+
+	renderScene("player4");
+	//else
+		//renderDebugShadowMap();
 
 	// Step 3.5 Render to final quad
 	//renderFourPlayerQuad();
+	//renderOnePlayerQuad();
 
 	// Step 4. Add the skybox to the scene
-	if (!g_systems.renderDebug)
-		drawSkybox();
+	//if (!g_systems.renderDebug)
+	drawSkybox();
+}
+
+void RenderingSystem::renderOnePlayerQuad()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	glDisable(GL_DEPTH_TEST);
+
+	glClearColor(0.1f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	this->simpleShader.use();
+	this->simpleShader.setInt("screenTexture", 16);
+
+	glBindVertexArray(this->quadVAO);
+	glActiveTexture(GL_TEXTURE16);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void RenderingSystem::renderFourPlayerQuad()
 {
 	this->simpleShader.use();
 
+	// Bind VAO
+	glBindVertexArray(this->fourPlayerVAO);
+
+	// Turn depth testing off for 2D rendering
+	glDisable(GL_DEPTH_TEST);
+
 	// Draw to default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, g_systems.width, g_systems.height);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);//; | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT); //; | GL_DEPTH_BUFFER_BIT);
 
 	// Bind rendered texture
 	glActiveTexture(GL_TEXTURE16);
@@ -697,12 +844,14 @@ void RenderingSystem::renderFourPlayerQuad()
 
 	// Render scene to viewport by applying textures to 2D quads
 	this->simpleShader.setInt("screenTexture", 16);
-	glBindVertexArray(this->fourPlayerVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 24);
 	glBindVertexArray(0);
 
 	// Unbind texture
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Re-enable depth testing for next frame
+	glEnable(GL_DEPTH_TEST);
 }
 
 void RenderingSystem::renderDebugShadowMap()
