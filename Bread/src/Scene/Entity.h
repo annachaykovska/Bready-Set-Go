@@ -42,8 +42,8 @@ public:
 	float magnetCooldown;
 	float lastMagnetUse; // Time at which the magnet ability was used last
 
-	float stolenFromGracePeriod;
-	float lastStolenFrom;
+	float gracePeriod;
+	float lastGracePeriodStart;
 
 private:
 

@@ -1244,14 +1244,14 @@ void PhysicsSystem::magnet(int stealer_id)
 		}
 
 		// See if victim can be stolen from
-		if (currentTime - victims[i]->lastStolenFrom < stealer->stolenFromGracePeriod) {
+		if (currentTime - victims[i]->lastGracePeriodStart < stealer->gracePeriod) {
 			victims.erase(victims.begin() + i);
 			victim_vehicles.erase(victim_vehicles.begin() + i);
 			continue;
 		}
 
 		// Steal item in our recipe if victim has one
-		// This is extremely gross
+		// This is extremely messy but oh well
 		auto victim_inventory = (Inventory*)victims[i]->getComponent("inventory");
 		boolean stole = false;
 		for (Ingredient ing : stealer_recipe->list) {
@@ -1347,12 +1347,13 @@ void PhysicsSystem::magnet(int stealer_id)
 			}
 			if (stole) {
 				stealer->lastMagnetUse = currentTime;
-				victims[i]->lastStolenFrom = currentTime;
+				stealer->lastGracePeriodStart = currentTime; // Prevents instant stealbacks
+				victims[i]->lastGracePeriodStart = currentTime;
 				if (stealer_id == 1)
 				{
 					g_systems.audio->endSlurp(stealer->getAudioSource(), true);
 				}
-				if (victims[i] == g_scene.getEntity("player1"))
+				if (victims[i] == g_scene.getEntity("player1")) // TODO: This needs to change for multiplayer
 				{
 					g_systems.audio->ingredientSuck(stealer->getAudioSource());
 				}
