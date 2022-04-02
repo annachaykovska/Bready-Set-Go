@@ -24,6 +24,7 @@ void Inventory::clearAllIngredients()
 	//this->pumpkin = 0;
 }
 
+// Removes a random ingredient from this player's inventory
 void Inventory::clearRandomIngredient()
 {
 	int ingredientNumbers[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -32,11 +33,12 @@ void Inventory::clearRandomIngredient()
 	std::seed_seq seed{ r(), r(), r(), r(), r(), r(), r(), r() };
 	std::mt19937 eng(seed);
 
+	// Not actually using this
 	std::shuffle(std::begin(ingredientNumbers), std::end(ingredientNumbers), eng);
 
 	for (int i = 0; i < 11; i++)
 	{
-		switch (i)
+		switch (ingredientNumbers[i])
 		{
 		case 0:
 			if (this->cheese == 1)

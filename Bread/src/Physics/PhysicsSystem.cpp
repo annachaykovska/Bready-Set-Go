@@ -980,11 +980,20 @@ void PhysicsSystem::resetOutOfBoundsObjects() {
 		g_scene.getEntity("player1")->getInventory()->clearRandomIngredient();
 	}
 	if (this->mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player2")->getInventory()->clearRandomIngredient();
+	}
 	if (this->mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player3")->getInventory()->clearRandomIngredient();
+	}
 	if (this->mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player4")->getInventory()->clearRandomIngredient();
+	}
 
 	// Ingredients
 	if (this->cheese->getGlobalPose().p.y < -75.0f && this->cheese->getGlobalPose().p.y > -99.0f)
