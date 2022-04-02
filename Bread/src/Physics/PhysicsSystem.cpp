@@ -1369,3 +1369,48 @@ void PhysicsSystem::magnet(int stealer_id)
 		g_systems.audio->endSlurp(stealer->getAudioSource(), false);
 	}
 }
+
+void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
+	PxTransform placeTransform;
+	switch (playerNumber)
+	{
+	case (1):
+		placeTransform = mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(placeTransform);
+		mVehiclePlayer1->setToRestState();
+		break;
+	case (2):
+		placeTransform = mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+		mVehiclePlayer2->setToRestState();
+		break;
+	case (3):
+		placeTransform = mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+		mVehiclePlayer3->setToRestState();
+		break;
+	case (4):
+		placeTransform = mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
+		mVehiclePlayer4->setToRestState();
+		break;
+	default:
+		break;
+	}
+}

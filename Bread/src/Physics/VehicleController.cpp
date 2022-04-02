@@ -153,6 +153,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // Hand brake
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
 	bool Y_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0); // Magnet ability
+	bool B_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0); // Unflip vehicle
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 	bool BACK_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0); // pause
 
@@ -173,8 +174,27 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		input->setAnalogHandbrake(0.0f);
 	}
 
-	// Accept exit conditions back to the menu
+	// Flip car
 	float currentTime = glfwGetTime();
+	if (B_button_pressed) {
+		if (b_held) {
+			if (currentTime - b_buttonTimeStart > 2) {
+				b_held = false;
+				physics->respawnPlayerInPlace(controllerId + 1);
+				b_buttonTimeStart = -1;
+				printf("RESPAWN\n");
+			}
+		}
+		else {
+			b_held = true;
+			b_buttonTimeStart = currentTime;
+		}
+	}
+	if (!B_button_pressed) {
+		b_held = false;
+	}
+
+	// Accept exit conditions back to the menu
 	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
 		gameLoop->mainMenuTimeoutStart = -1;
 		if (A_button_pressed && gameCompleted) {
