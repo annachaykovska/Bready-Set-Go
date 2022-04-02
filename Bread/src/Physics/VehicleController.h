@@ -35,6 +35,8 @@ private:
 	bool forwards;
 
 	bool y_held;
+	bool b_held;
+	float b_buttonTimeStart = -1;
 };
 
 class MovementCallbacks : public CallbackInterface
