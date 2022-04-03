@@ -800,8 +800,55 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	// Update the food transforms
 	updateFoodTransforms();
 
+	// Detect if cameras go behind walls
+	raycastCamera(this->mVehiclePlayer1, "player1");
+	if (g_scene.numPlayers > 3)
+		raycastCamera(this->mVehiclePlayer1, "player4");
+	if (g_scene.numPlayers > 2)
+		raycastCamera(this->mVehiclePlayer1, "player3");
+	if (g_scene.numPlayers > 1)
+		raycastCamera(this->mVehiclePlayer1, "player2");
+}
+
+void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
+{
 	// Check if camera is behind a wall
-	//this->mScene->raycast(mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p)
+	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
+	trans.p.y += 2.0f;
+	g_systems.render->setupCameras(g_scene.getEntity(name)->getTransform());
+	glm::vec3 p1Pos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
+	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - p1Pos);
+	float distance = glm::distance(g_scene.camera.position, p1Pos);
+	physx::PxVec3 unitDirPx = physx::PxVec3(unitDir.x, unitDir.y, unitDir.z);
+	physx::PxRaycastBuffer hit;
+	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
+	Transform* p1 = g_scene.getEntity(name)->getTransform();
+
+	if (status)
+	{
+		if (name == "player1")
+		{
+			this->p1CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p1CameraHit = true;
+		}
+		else if (name == "player2")
+		{
+			this->p2CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p2CameraHit = true;
+		}
+		else if (name == "player3")
+		{
+			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p3CameraHit = true;
+		}
+		else if (name == "player4")
+		{
+			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p3CameraHit = true;
+		}
+	}
+	else
+		this->p1CameraHit = false;
 }
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
