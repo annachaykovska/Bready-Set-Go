@@ -199,7 +199,7 @@ void Profiler::testTransform()
 
 void Profiler::shadows()
 {
-	Orthogonal& ort = g_systems.render->ort;
+	Orthogonal& ort = g_systems.render->roughOrt;
 	glm::vec3& lightDir = g_systems.render->lightDir;
 	glm::vec3& lightPos = g_systems.render->lightPos;
 	
@@ -232,7 +232,6 @@ void Profiler::shadows()
 		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
 		
 		//float& maxBias = g_systems.render->maxBias;
-
 		//ImGui::InputFloat("maxBias", &(maxBias), 0.0001f, 0.01f,  "%.5f");
 		//ImGui::InputFloat("maxBias", &(g_systems.render->maxBias), 0.0001f, 0.01f, "%.5f");
 		//ImGui::InputFloat("minBias", &(g_systems.render->minBias), 0.0001f, 0.01f, "%.5f");

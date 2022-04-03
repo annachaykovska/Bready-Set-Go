@@ -49,6 +49,7 @@
     <ClCompile Include="src\Rendering\DebugOverlay.cpp" />
     <ClCompile Include="src\Gameplay\GameLoopManager.cpp" />
     <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\AL\al.h" />
@@ -788,6 +789,7 @@
     <ClInclude Include="src\Navigation\NavigationSystem.h" />
     <ClInclude Include="src\Rendering\DebugOverlay.h" />
     <ClInclude Include="src\Gameplay\GameLoopManager.h" />
+    <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />

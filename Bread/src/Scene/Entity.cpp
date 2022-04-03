@@ -9,7 +9,6 @@ extern Scene g_scene;
 
 using namespace std;
 
-
 Entity::Entity(std::string name)
 {
 	this->name = name;
@@ -85,6 +84,11 @@ Model* Entity::getModel()
 AudioSource* Entity::getAudioSource()
 {
 	return (AudioSource*)(this->getComponent("audio"));
+}
+
+Inventory* Entity::getInventory()
+{
+	return (Inventory*)this->getComponent("inventory");
 }
 
 std::vector<std::string> Entity::getOtherPlayers() {

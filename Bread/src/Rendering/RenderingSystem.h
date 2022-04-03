@@ -25,22 +25,24 @@ public:
 
 	RenderingSystem();
 	~RenderingSystem();
+
+	void update();
+
 	unsigned int getShaderId();
 	Shader& getShader();
-	void loadModels();
+
 	void setupCameras(Transform* playerTransform);
-	void update();
+
 	Model* getKitchenModel();
-	void renderScene();
-	void renderShadowMap();
-	void renderTexturedQuad();
-	void renderDebugShadowMap();
 
-	void updateOrtho(glm::mat4 lightView);
-	void updateRoughOrtho();
-	glm::mat4 calculateOrthoProjection();
+	Orthogonal roughOrt;
+	glm::mat4 lightViewMatrix;
+	glm::mat4 loResLightSpaceMatrix;
+	glm::mat4 p1LightSpaceMatrix;
+	glm::mat4 p2LightSpaceMatrix;
+	glm::mat4 p3LightSpaceMatrix;
+	glm::mat4 p4LightSpaceMatrix;
 
-	Orthogonal ort;
 	glm::vec3 lightPos;
 	glm::vec3 lightDir;
 	float shadowHiRes;
@@ -62,6 +64,9 @@ private:
 
 	//DebugOverlay& debugOverlay;
 
+	// List of all the models to be rendered
+	std::vector<Model> models;
+
 	unsigned int modelLoc;
 	unsigned int texLoc;
 	unsigned int viewLoc;
@@ -74,8 +79,6 @@ private:
 	Shader depthShader;
 	Shader debugShader;
 	Shader skyboxShader;
-
-	std::vector<Model> models;
 
 	Mesh navMesh;
 
@@ -95,5 +98,26 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 
+	unsigned int fourPlayerVAO;
+	unsigned int fourPlayerVBO;
+	unsigned int fourPlayerFBO;
+	unsigned int fourPlayerTex;
+
+	void initShadows();
+	void initSkybox();
+	void loadModels();
+	void initDebugQuad();
+	void init4PlayerQuad();
+
+	void createLoResShadowMap();
+	void createHiResShadowMap(const std::string name);
+	void renderShadowMap();
+
+	void renderScene(const std::string name);
+
 	void drawSkybox();
+
+	void renderTexturedQuad();
+	void renderFourPlayerQuad();
+	void renderDebugShadowMap();
 };
