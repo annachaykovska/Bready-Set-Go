@@ -49,7 +49,7 @@ int main()
 	Profiler profiler(window);
 
 	// TODO change this at runtime in the main menu
-	g_scene.numPlayers = 3;
+	g_scene.numPlayers = 1;
 
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
