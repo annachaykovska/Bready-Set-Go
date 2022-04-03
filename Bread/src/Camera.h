@@ -26,6 +26,9 @@ public:
 	glm::mat4 getViewMatrix(Transform* playerTransform);
 	void updateCameraVectors(Transform* playerTransform);
 
+	void updateCameraPosition(const glm::vec3 pos);
+	glm::mat4 recalculateViewMatrix();
+
 	float getPerspective();
 
 	void initPhysics(PhysicsSystem* physicsSystem);
@@ -46,6 +49,7 @@ private:
 	glm::vec3 up;
 	glm::vec3 right;
 	glm::vec3 worldUp;
+	glm::vec3 lookAhead;
 
 	float lastOffset;
 	float lastSpeed;

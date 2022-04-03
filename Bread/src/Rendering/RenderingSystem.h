@@ -60,6 +60,11 @@ public:
 	glm::mat4 projMatrix;
 	glm::mat4 viewMatrix;
 
+	glm::vec3 p1CameraPos;
+	glm::vec3 p2CameraPos;
+	glm::vec3 p3CameraPos;
+	glm::vec3 p4CameraPos;
+
 private:
 
 	//DebugOverlay& debugOverlay;

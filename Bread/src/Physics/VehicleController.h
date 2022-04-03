@@ -33,7 +33,6 @@ private:
 	UISystem* ui;
 	GameLoopManager* gameLoop;
 	bool forwards;
-
 	bool y_held1;
 	bool y_held2;
 	bool y_held3;
