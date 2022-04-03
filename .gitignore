@@ -1,5 +1,6 @@
 # Project specific 
 bin-int/
+bin/Release-x64/Bread/resources/
 
 # Visual Studio cache/options directory
 .vs/

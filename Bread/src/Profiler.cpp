@@ -199,7 +199,7 @@ void Profiler::testTransform()
 
 void Profiler::shadows()
 {
-	Orthogonal& ort = g_systems.render->ort;
+	Orthogonal& ort = g_systems.render->roughOrt;
 	glm::vec3& lightDir = g_systems.render->lightDir;
 	glm::vec3& lightPos = g_systems.render->lightPos;
 	
