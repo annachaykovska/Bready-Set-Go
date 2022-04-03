@@ -45,8 +45,8 @@ public:
 
 	glm::vec3 lightPos;
 	glm::vec3 lightDir;
-	float shadowHiRes;
-	float shadowLoRes;
+	int shadowHiRes;
+	int shadowLoRes;
 
 	int shadowDebugMode;
 
@@ -98,10 +98,20 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 
+	unsigned int p1ShadowsFBO;
+	unsigned int p1ShadowsTex;
+	unsigned int p2ShadowsFBO;
+	unsigned int p2ShadowsTex;
+	unsigned int p3ShadowsFBO;
+	unsigned int p3ShadowsTex;
+	unsigned int p4ShadowsFBO;
+	unsigned int p4ShadowsTex;
+
 	unsigned int fourPlayerVAO;
 	unsigned int fourPlayerVBO;
 	unsigned int fourPlayerFBO;
 	unsigned int fourPlayerTex;
+	unsigned int fourPlayerRBO;
 
 	void initShadows();
 	void initSkybox();
@@ -118,6 +128,7 @@ private:
 	void drawSkybox();
 
 	void renderTexturedQuad();
+	void renderOnePlayerQuad();
 	void renderFourPlayerQuad();
 	void renderDebugShadowMap();
 };
