@@ -33,10 +33,18 @@ private:
 	UISystem* ui;
 	GameLoopManager* gameLoop;
 	bool forwards;
-
-	bool y_held;
-	bool b_held;
-	float b_buttonTimeStart = -1;
+	bool y_held1;
+	bool y_held2;
+	bool y_held3;
+	bool y_held4;
+	bool b_held1;
+	bool b_held2;
+	bool b_held3;
+	bool b_held4;
+	float b_buttonTimeStart1 = -1;
+	float b_buttonTimeStart2 = -1;
+	float b_buttonTimeStart3 = -1;
+	float b_buttonTimeStart4 = -1;
 };
 
 class MovementCallbacks : public CallbackInterface
