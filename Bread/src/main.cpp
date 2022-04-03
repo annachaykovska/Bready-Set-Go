@@ -38,8 +38,6 @@ int main()
 	// Set window size
 	g_systems.width = GetSystemMetrics(SM_CXSCREEN);
 	g_systems.height = GetSystemMetrics(SM_CYSCREEN);
-	g_systems.width = 1024;
-	g_systems.height = 1024;
 
 	bool fullScreen = false;
 
