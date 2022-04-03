@@ -37,6 +37,7 @@ public:
 	void endSlurp(AudioSource* source, bool success);
 	void ingredientSuck(AudioSource* source);
 	void powerReady(AudioSource* source);
+	void turnOffAllAudio();
 
 	void update(const float dt);
 

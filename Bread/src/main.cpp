@@ -333,8 +333,8 @@ int main()
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu();
-			audio.stopMusic(countertopAudioSource);
-			audio.playGameMusic(countertopAudioSource);
+			audio.turnOffAllAudio();
+			// The game audio is played by the update function, no need to play it here
 			gameLoop.isPaused = false;
 		}
 		// PAUSE MENU
@@ -346,7 +346,7 @@ int main()
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 
-			audio.stopMusic(countertopAudioSource);
+			audio.turnOffAllAudio();
 			audio.playMainMenuMusic(countertopAudioSource);
 
 			gameLoop.isPaused = true;
