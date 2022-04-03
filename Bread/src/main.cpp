@@ -243,7 +243,7 @@ int main()
 	double accumulator = 0.0;
 
 	// Change to 1 for submission
-	gameLoop.gameStage = 2;
+	gameLoop.gameStage = 1;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -274,9 +274,9 @@ int main()
 
 		if (gameLoop.gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
 			
 			// RENDER
 			ui.updateMainMenu(gameLoop.menuSelectionNumber);
@@ -296,9 +296,9 @@ int main()
 			}
 
 			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerDriving(1, winner); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerDriving(2, winner); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerDriving(3, winner); // Getting the input from player 4 controller
 			
 			// RENDER
 			renderer.update();
@@ -319,7 +319,7 @@ int main()
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
-				p2Brain.update();
+				//p2Brain.update();
 				p3Brain.update();
 				p4Brain.update();
 			}
