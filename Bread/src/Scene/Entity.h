@@ -23,6 +23,7 @@ public:
 	Component* getComponent(std::string);
 	Transform* getTransform();
 	Model* getModel();
+	Inventory* getInventory();
 	AudioSource* getAudioSource();
 	std::vector<std::string> getOtherPlayers();
 	void checkIngredientCollision(Entity* otherEntity);

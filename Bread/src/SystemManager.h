@@ -1,4 +1,5 @@
 #pragma once
+#include "Navigation/IngredientTracker.h"
 //#include "Audio/AudioSystem.h"
 //#include "Physics/PhysicsSystem.h"
 //#include "Rendering/RenderingSystem.h"
@@ -19,6 +20,7 @@ public:
 		render = nullptr;
 		ui = nullptr;
 		renderDebug = false;
+		tracker = nullptr;
 	}
 
 	SystemManager(SystemManager& rhs) = delete; // No copy constructor
@@ -28,6 +30,7 @@ public:
 	PhysicsSystem* physics;
 	RenderingSystem* render;
 	UISystem* ui;
+	IngredientTracker* tracker;
 
 	int height;
 	int width;

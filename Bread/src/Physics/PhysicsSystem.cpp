@@ -784,8 +784,6 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	g_scene.getEntity("player3")->speed = (float)mVehiclePlayer3->computeForwardSpeed();
 	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
 
-	//mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
-
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
@@ -801,6 +799,56 @@ void PhysicsSystem::update(const float dt, int gameStage)
 
 	// Update the food transforms
 	updateFoodTransforms();
+
+	// Detect if cameras go behind walls
+	raycastCamera(this->mVehiclePlayer1, "player1");
+	if (g_scene.numPlayers > 3)
+		raycastCamera(this->mVehiclePlayer1, "player4");
+	if (g_scene.numPlayers > 2)
+		raycastCamera(this->mVehiclePlayer1, "player3");
+	if (g_scene.numPlayers > 1)
+		raycastCamera(this->mVehiclePlayer1, "player2");
+}
+
+void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
+{
+	// Check if camera is behind a wall
+	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
+	trans.p.y += 2.0f;
+	g_systems.render->setupCameras(g_scene.getEntity(name)->getTransform());
+	glm::vec3 p1Pos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
+	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - p1Pos);
+	float distance = glm::distance(g_scene.camera.position, p1Pos);
+	physx::PxVec3 unitDirPx = physx::PxVec3(unitDir.x, unitDir.y, unitDir.z);
+	physx::PxRaycastBuffer hit;
+	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
+	Transform* p1 = g_scene.getEntity(name)->getTransform();
+
+	if (status)
+	{
+		if (name == "player1")
+		{
+			this->p1CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p1CameraHit = true;
+		}
+		else if (name == "player2")
+		{
+			this->p2CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p2CameraHit = true;
+		}
+		else if (name == "player3")
+		{
+			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p3CameraHit = true;
+		}
+		else if (name == "player4")
+		{
+			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
+			this->p3CameraHit = true;
+		}
+	}
+	else
+		this->p1CameraHit = false;
 }
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
@@ -975,13 +1023,25 @@ void PhysicsSystem::resetOutOfBoundsObjects() {
 	// Players
 	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player1")->getInventory()->clearRandomIngredient();
+	}
 	if (this->mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player2")->getInventory()->clearRandomIngredient();
+	}
 	if (this->mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player3")->getInventory()->clearRandomIngredient();
+	}
 	if (this->mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
+	{
 		this->mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(reset);
+		g_scene.getEntity("player4")->getInventory()->clearRandomIngredient();
+	}
 
 	// Ingredients
 	if (this->cheese->getGlobalPose().p.y < -75.0f && this->cheese->getGlobalPose().p.y > -99.0f)
@@ -1006,6 +1066,7 @@ void PhysicsSystem::resetOutOfBoundsObjects() {
 		this->chicken->setGlobalPose(g_scene.getEntity("chicken")->originalSpawn);
 	if (this->peas->getGlobalPose().p.y < -75.0f && this->peas->getGlobalPose().p.y > -99.0f)
 		this->peas->setGlobalPose(g_scene.getEntity("peas")->originalSpawn);
+
 	updateFoodTransforms();
 }
 
@@ -1691,3 +1752,47 @@ void PhysicsSystem::makeVictimsList(int stealer_id, std::vector<Entity*>& victim
 	}
 }
 
+void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
+	PxTransform placeTransform;
+	switch (playerNumber)
+	{
+	case (1):
+		placeTransform = mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(placeTransform);
+		mVehiclePlayer1->setToRestState();
+		break;
+	case (2):
+		placeTransform = mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+		mVehiclePlayer2->setToRestState();
+		break;
+	case (3):
+		placeTransform = mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+		mVehiclePlayer3->setToRestState();
+		break;
+	case (4):
+		placeTransform = mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose();
+		placeTransform.p.y += 3.0f;
+		placeTransform.q.x = 0;
+		placeTransform.q.z = 0;
+		placeTransform.q.normalize();
+		mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
+		mVehiclePlayer4->setToRestState();
+		break;
+	default:
+		break;
+	}
+}

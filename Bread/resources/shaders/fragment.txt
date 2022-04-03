@@ -45,6 +45,7 @@ uniform int textured;
 
 uniform sampler2D shadowMap;
 uniform sampler2D roughShadowMap;
+
 uniform float maxBias;
 uniform float minBias;
 uniform float maxRoughBias;

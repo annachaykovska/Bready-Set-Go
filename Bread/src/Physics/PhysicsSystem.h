@@ -1,13 +1,13 @@
 #pragma once
 #include <vector>
-
+#include <string.h>
 #include <iostream>
 
 #include <PxPhysicsAPI.h>
 #include <snippetvehiclecommon/SnippetVehicleSceneQuery.h>
+#include <glm/glm.hpp>
 
 #include "PhysicsEnums.h"
-#include <string.h>
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -40,6 +40,7 @@ public:
 	bool getIsVehicleInAir(int playerNumber);
 	void resetOutOfBoundsObjects();
 	void respawnPlayer(int playerNumber);
+	void respawnPlayerInPlace(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
 
@@ -79,7 +80,6 @@ public:
 	//PxRigidDynamic* soupbase;
 	//PxRigidDynamic* pumpkin;
 
-
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer1;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer2;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
@@ -110,7 +110,18 @@ public:
 	
 	// End of tweaking variables
 
+	bool p1CameraHit;
+	glm::vec3 p1CameraHitPos;
+	bool p2CameraHit;
+	glm::vec3 p2CameraHitPos;
+	bool p3CameraHit;
+	glm::vec3 p3CameraHitPos;
+	bool p4CameraHit;
+	glm::vec3 p4CameraHitPos;
+
 private:
+
+	void raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name);
 
 	float mAccumulator;
 

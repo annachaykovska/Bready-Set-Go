@@ -9,7 +9,14 @@ XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem,
 	this->physics = physicsSystem;
 	this->ui = uiSystem;
 	this->gameLoop = gameLoopManager;
-	this->y_held = false;
+	this->y_held1 = false;
+	this->y_held2 = false;
+	this->y_held3 = false;
+	this->y_held4 = false;
+	this->b_held1 = false;
+	this->b_held2 = false;
+	this->b_held3 = false;
+	this->b_held4 = false;
 }
 
 void XboxController::checkControllers() {
@@ -77,15 +84,6 @@ float XboxController::getDeadZone(float x, float y, float deadzone) {
 }
 
 void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
-	physx::PxVehicleDrive4WRawInputData* input;
-	if (controllerId == 1)
-		input = &physics->mVehicleInputDataPlayer2;
-	else if (controllerId == 2)
-		input = &physics->mVehicleInputDataPlayer3;
-	else if (controllerId == 3)
-		input = &physics->mVehicleInputDataPlayer4;
-	else
-		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
@@ -121,14 +119,38 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted) {
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
-	if (controllerId == 1)
+	physx::PxVehicleDrive4W* vehiclePhysics;
+	bool* y_held;
+	bool* b_held;
+	float* b_buttonTimeStart;
+	if (controllerId == 1) {
 		input = &physics->mVehicleInputDataPlayer2;
-	else if (controllerId == 2)
+		vehiclePhysics = physics->mVehiclePlayer2;
+		y_held = &y_held2;
+		b_held = &b_held2;
+		b_buttonTimeStart = &b_buttonTimeStart2;
+	}
+	else if (controllerId == 2) {
 		input = &physics->mVehicleInputDataPlayer3;
-	else if (controllerId == 3)
+		vehiclePhysics = physics->mVehiclePlayer3;
+		y_held = &y_held3;
+		b_held = &b_held3;
+		b_buttonTimeStart = &b_buttonTimeStart3;
+	}
+	else if (controllerId == 3) {
 		input = &physics->mVehicleInputDataPlayer4;
-	else
+		vehiclePhysics = physics->mVehiclePlayer4;
+		y_held = &y_held4;
+		b_held = &b_held4;
+		b_buttonTimeStart = &b_buttonTimeStart4;
+	}
+	else {
 		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
+		vehiclePhysics = physics->mVehiclePlayer1;
+		y_held = &y_held1;
+		b_held = &b_held1;
+		b_buttonTimeStart = &b_buttonTimeStart1;
+	}
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
@@ -153,21 +175,22 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	bool X_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0); // Hand brake
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // Accept game over back to main menu
 	bool Y_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0); // Magnet ability
+	bool B_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0); // Unflip vehicle
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 	bool BACK_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0); // pause
 
 	if (Y_button_pressed && !y_held) { // y just pressed
 		//physics->magnet(1);
-		physics->magnetCheckStealing(1, Y_button_pressed, !y_held);
-		y_held = true;
+		physics->magnetCheckStealing(1, Y_button_pressed, !(*y_held));
+		*y_held = true;
 	}
 	else if (Y_button_pressed) { // y held
 		//physics->magnet(1);
-		physics->magnetCheckStealing(1, Y_button_pressed, !y_held);
+		physics->magnetCheckStealing(1, Y_button_pressed, !(*y_held));
 	}
 	else { // y not pressed
-		physics->magnetCheckStealing(1, Y_button_pressed, !y_held);
-		y_held = false;
+		physics->magnetCheckStealing(1, Y_button_pressed, !(*y_held));
+		*y_held = false;
 	}
 
 	if (X_button_pressed)
@@ -179,8 +202,27 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		input->setAnalogHandbrake(0.0f);
 	}
 
-	// Accept exit conditions back to the menu
+	// Flip car
 	float currentTime = glfwGetTime();
+	if (B_button_pressed) {
+		if (b_held) {
+			if (currentTime - *b_buttonTimeStart > 2) {
+				*b_held = false;
+				physics->respawnPlayerInPlace(controllerId + 1);
+				*b_buttonTimeStart = -1;
+				printf("RESPAWN\n");
+			}
+		}
+		else {
+			*b_held = true;
+			*b_buttonTimeStart = currentTime;
+		}
+	}
+	if (!B_button_pressed) {
+		*b_held = false;
+	}
+
+	// Accept exit conditions back to the menu
 	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
 		gameLoop->mainMenuTimeoutStart = -1;
 		if (A_button_pressed && gameCompleted) {
@@ -222,7 +264,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 
 	// TRIGGER PRESSED
 	if (triggerLeft > 0.1 && triggerRight > 0.1) { // brake
-		if (physics->mVehiclePlayer1->computeForwardSpeed()<0) {
+		if (vehiclePhysics->computeForwardSpeed()<0) {
 			analogVal = triggerRight / 255.0f;
 			analogVal2 = triggerLeft / 255.0f;
 		}
@@ -238,15 +280,15 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		input->setAnalogAccel(analogVal2);
 	}
 	else if (triggerRight > 0.1) { // Forward/Break when backwards
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
+		if (vehiclePhysics->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eFIRST)
+			vehiclePhysics->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 		
-		if (physics->mVehiclePlayer1->computeForwardSpeed() < -30)
+		if (vehiclePhysics->computeForwardSpeed() < -30)
 		{
-			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
+			vehiclePhysics->mDriveDynData.setEngineRotationSpeed(0.f);
 			input->setAnalogBrake(1.f);
 		}
-		else if (physics->mVehiclePlayer1->computeForwardSpeed() < 45)
+		else if (vehiclePhysics->computeForwardSpeed() < 45)
 		{
 			analogVal = triggerRight / 255;
 			input->setAnalogAccel(analogVal);
@@ -259,14 +301,14 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 	else if (triggerLeft > 0.1){ // Reverse/Break when forward
 
-		if (physics->mVehiclePlayer1->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
-			physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-		if (physics->mVehiclePlayer1->computeForwardSpeed() > 50)
+		if (vehiclePhysics->mDriveDynData.mCurrentGear != snippetvehicle::PxVehicleGearsData::eREVERSE)
+			vehiclePhysics->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
+		if (vehiclePhysics->computeForwardSpeed() > 50)
 		{
-			physics->mVehiclePlayer1->mDriveDynData.setEngineRotationSpeed(0.f);
+			vehiclePhysics->mDriveDynData.setEngineRotationSpeed(0.f);
 			input->setAnalogBrake(1.f);
 		}
-		else if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 20)
+		else if (abs(vehiclePhysics->computeForwardSpeed()) < 20)
 		{
 			analogVal = triggerLeft / 255;
 			input->setAnalogAccel(analogVal);
@@ -279,10 +321,10 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 	else
 	{
-		physics->mVehiclePlayer1->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);	
-		if (abs(physics->mVehiclePlayer1->computeForwardSpeed()) < 1)
+		vehiclePhysics->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eNEUTRAL);
+		if (abs(vehiclePhysics->computeForwardSpeed()) < 1)
 		{
-			physics->mVehiclePlayer1->mWheelsDynData.setToRestState();
+			vehiclePhysics->mWheelsDynData.setToRestState();
 		}
 	}
 

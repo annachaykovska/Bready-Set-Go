@@ -22,6 +22,7 @@
 #include "Navigation/AIBrain.h"
 #include "Gameplay/Recipe.h"
 #include "Gameplay/GameLoopManager.h"
+#include "Timer.h"
 
 // Global Scene holds all the Entities for easy reference
 Scene g_scene;
@@ -46,6 +47,9 @@ int main()
 
 	// ImGui profiler for debugging
 	Profiler profiler(window);
+
+	// TODO change this at runtime in the main menu
+	g_scene.numPlayers = 1;
 
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
@@ -92,7 +96,7 @@ int main()
 	//DebugOverlay debugOverlay;
 	RenderingSystem renderer;
 	g_systems.render = &renderer;
-	g_systems.physics->initialize(); // Needs to happen after renderer loads the models
+	g_systems.physics->initialize(); // Needs to happen after renderer is constructed
 
 	AudioSystem audio;
 	g_systems.audio = &audio;
@@ -103,8 +107,9 @@ int main()
 	g_scene.init(&physics);
 
 	//-----------------------------------------------------------------------------------
-	// INITIALIZE TRANSFORMS - will be handled by PhysicsSystem eventually
+	// INITIALIZE TRANSFORMS
 	//-----------------------------------------------------------------------------------
+	// TODO Move out of main
 	// Create a container for Transform Components (will be handled by a system in the future)
 	// and add some some new Transforms to it for the Entities
 	std::vector<Transform> transforms;
@@ -190,6 +195,7 @@ int main()
 
 	// Track Ingredient Locations
 	IngredientTracker ingredientTracker;
+	g_systems.tracker = &ingredientTracker;
 	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up game loop manager
@@ -272,9 +278,9 @@ int main()
 
 		if (gameLoop.gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
 			
 			// RENDER
 			ui.updateMainMenu(gameLoop.menuSelectionNumber);
@@ -294,9 +300,9 @@ int main()
 			}
 
 			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerDriving(1); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerDriving(2); // Getting the input from player 1 controller
-			//controllers.setButtonStateFromControllerDriving(3); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerDriving(1, winner); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerDriving(2, winner); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerDriving(3, winner); // Getting the input from player 4 controller
 			
 			// RENDER
 			renderer.update();
@@ -317,7 +323,7 @@ int main()
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
-				p2Brain.update();
+				//p2Brain.update();
 				p3Brain.update();
 				p4Brain.update();
 			}
@@ -333,8 +339,8 @@ int main()
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu();
-			audio.stopMusic(countertopAudioSource);
-			audio.playGameMusic(countertopAudioSource);
+			audio.turnOffAllAudio();
+			// The game audio is played by the update function, no need to play it here
 			gameLoop.isPaused = false;
 		}
 		// PAUSE MENU
@@ -346,7 +352,7 @@ int main()
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 
-			audio.stopMusic(countertopAudioSource);
+			audio.turnOffAllAudio();
 			audio.playMainMenuMusic(countertopAudioSource);
 
 			gameLoop.isPaused = true;
