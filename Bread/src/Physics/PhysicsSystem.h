@@ -40,6 +40,7 @@ public:
 	bool getIsVehicleInAir(int playerNumber);
 	void resetOutOfBoundsObjects();
 	void respawnPlayer(int playerNumber);
+	void respawnPlayerInPlace(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
 	void magnet(int stealer_id);
