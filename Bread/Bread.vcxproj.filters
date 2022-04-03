@@ -788,6 +788,7 @@
     <ClInclude Include="src\Navigation\NavigationSystem.h" />
     <ClInclude Include="src\Rendering\DebugOverlay.h" />
     <ClInclude Include="src\Gameplay\GameLoopManager.h" />
+    <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\lib\assimp-vc142-mtd.lib" />

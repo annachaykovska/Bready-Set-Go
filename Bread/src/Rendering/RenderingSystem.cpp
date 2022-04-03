@@ -8,6 +8,7 @@
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
 #include <stbi/stb_image.h>
+#include "../Timer.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -18,30 +19,41 @@ namespace
 }
 
 RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "resources/shaders/fragment.txt"),
-lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
-borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
-simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
-depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
-debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt"),
-skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFragment.txt")
+									 lightShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/lightSourceFragment.txt"),
+									 borderShader("resources/shaders/lightSourceVertex.txt", "resources/shaders/borderFragment.txt"),
+									 simpleShader("resources/shaders/simpleVertex.txt", "resources/shaders/simpleFragment.txt"),
+									 depthShader("resources/shaders/depthVertex.txt", "resources/shaders/depthFragment.txt"),
+									 debugShader("resources/shaders/debugVertex.txt", "resources/shaders/debugFragment.txt"),
+									 skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFragment.txt")
 {
 	// Initialize matrices
 	this->projMatrix = glm::mat4(1.0f);
 	this->viewMatrix = glm::mat4(1.0f);
 
-	// Orthographic projection for shadow map settings
-	this->ort.left = 281.0f;
-	this->ort.right = -279.0f;
-	this->ort.bottom = -205.0f;
-	this->ort.top = 197.0f;
-	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 2000.0f;
+	// const values for the whole level
+	this->roughOrt.left = 280.0f;
+	this->roughOrt.right = -284.0f;
+	this->roughOrt.bottom = -206.0f;
+	this->roughOrt.top = 241.0f;
+	this->roughOrt.nearPlane = 0.1f;
+	this->roughOrt.farPlane = 1400.0f;
+
+	glm::mat4 lightProjMatrix = glm::ortho(this->roughOrt.left,
+		this->roughOrt.right,
+		this->roughOrt.bottom,
+		this->roughOrt.top,
+		this->roughOrt.nearPlane,
+		this->roughOrt.farPlane);
 
 	// Directional light position
 	this->lightPos = glm::vec3(-0.1f, 1000.0f, -200.0f);
 	this->lightDir = glm::normalize(glm::vec3(0) - this->lightPos);
+	this->lightViewMatrix = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// Shadow map viewport size
+	// Lo-res shadow map light space matrix
+	this->loResLightSpaceMatrix = lightProjMatrix * this->lightViewMatrix;
+
+	// Shadow map viewport sizes
 	this->shadowHiRes = 4096;
 	this->shadowLoRes = 2048;
 
@@ -50,8 +62,9 @@ skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFrag
 	this->maxRoughBias = 0.005f;
 	this->minRoughBias = 0.0005f;
 
-	this->models.reserve(g_scene.entityCount() * 2); // Create space for models
-	loadModels(); // Load model files into the models vector
+	// Populate the models
+	this->models.reserve(g_scene.entityCount());
+	loadModels();
 
 	glEnable(GL_DEPTH_TEST); // Turn on depth testing
 	glDepthFunc(GL_LESS); // Should be default but make it explicit
@@ -71,9 +84,46 @@ skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFrag
 	transform.position = glm::vec3(1.0f);
 	setupCameras(&transform); // Setup the camera
 
-	// --------------------------------------------------------------------------------------------
-	// SHADOWS
-	// --------------------------------------------------------------------------------------------
+	// Initialize shadow maps
+	this->initShadows();
+
+	// Initialize skybox
+	this->initSkybox();
+
+	this->initDebugQuad();
+
+	NavMesh navMeshPoints;
+	navMesh = navMeshPoints.getWireframe();
+
+	// Multiplayer test
+	glGenFramebuffers(1, &this->fourPlayerFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
+
+	glActiveTexture(GL_TEXTURE16);
+	glGenTextures(1, &this->fourPlayerTex);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_systems.width, g_systems.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fourPlayerTex, 0);
+
+	glGenRenderbuffers(1, &this->fourPlayerRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, this->fourPlayerRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, g_systems.width, g_systems.height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->fourPlayerRBO);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer did not complete.\n";
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+RenderingSystem::~RenderingSystem() { }
+
+void RenderingSystem::initShadows()
+{
 	// Rough shadows ------------------------------------------------------------------------------
 	// Configure depth map FBO
 	glGenFramebuffers(1, &this->roughDepthMapFBO);
@@ -100,56 +150,97 @@ skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFrag
 
 	// High resolution shadows ---------------------------------------------------------------------
 	// Configure depth map FBO
-	glGenFramebuffers(1, &this->depthMapFBO);
+	glGenFramebuffers(1, &this->p1ShadowsFBO);
 
 	// Create depth texture
-	glGenTextures(1, &this->depthMapTex);
+	glGenTextures(1, &this->p1ShadowsTex);
 	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes, this->shadowHiRes, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor2[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor2);
+	float borderColor3[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
 
 	// Attach depth texture as FBO's depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMapTex, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p1ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p1ShadowsTex, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// --------------------------------------------------------------------------------------------
-	// QUAD FOR RENDERING FINAL PASS
-	// --------------------------------------------------------------------------------------------
-	// Create quad VAO for final default framebuffer image render
-	float quadVerts[] = {
-		// Position   // Tex Coords
-		-1.0f,  1.0f, 0.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 0.0f,
-		 1.0f, -1.0f, 1.0f, 0.0f,
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->p2ShadowsFBO);
 
-		-1.0f,  1.0f, 0.0f, 1.0f,
-		 1.0f, -1.0f, 1.0f, 0.0f,
-		 1.0f,  1.0f, 1.0f, 1.0f,
-	};
+	// Create depth texture
+	glGenTextures(1, &this->p2ShadowsTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->p2ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
 
-	glGenVertexArrays(1, &this->quadVAO);
-	glGenBuffers(1, &this->quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p2ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p2ShadowsTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// --------------------------------------------------------------------------------------------
-	// SKYBOX
-	// --------------------------------------------------------------------------------------------
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->p3ShadowsFBO);
+
+	// Create depth texture
+	glGenTextures(1, &this->p3ShadowsTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->p3ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
+
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p3ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p3ShadowsTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Configure depth map FBO
+	glGenFramebuffers(1, &this->p4ShadowsFBO);
+
+	// Create depth texture
+	glGenTextures(1, &this->p4ShadowsTex);
+	glActiveTexture(GL_TEXTURE25);
+	glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor3);
+
+	// Attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->p4ShadowsFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->p4ShadowsTex, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void RenderingSystem::initSkybox()
+{
 	float skyboxVertices[] = {
 		// positions          
 		-1.0f,  1.0f, -1.0f,
@@ -232,17 +323,12 @@ skyboxShader("resources/shaders/skyboxVertex.txt", "resources/shaders/skyboxFrag
 		}
 	}
 
-	NavMesh navMeshPoints;
-	navMesh = navMeshPoints.getWireframe();
-
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
-
-RenderingSystem::~RenderingSystem() { }
 
 unsigned int RenderingSystem::getShaderId()
 {
@@ -256,6 +342,8 @@ Shader& RenderingSystem::getShader()
 
 void RenderingSystem::loadModels()
 {
+	unsigned int index = 0;
+
 	//-----------------------------------------------------------------------------------
 	// Player models
 	//-----------------------------------------------------------------------------------
@@ -266,19 +354,19 @@ void RenderingSystem::loadModels()
 
 	// Player 1
 	this->models.emplace_back(Model(&breadbusPath[0]));
-	g_scene.getEntity("player1")->attachComponent(&(this->models[0]), "model");
+	g_scene.getEntity("player1")->attachComponent(&(this->models[index++]), "model");
 
 	// Player 2
 	this->models.emplace_back(Model(&pancakebusPath[0]));
-	g_scene.getEntity("player2")->attachComponent(&(this->models[1]), "model");
+	g_scene.getEntity("player2")->attachComponent(&(this->models[index++]), "model");
 
 	// Player 3
 	this->models.emplace_back(Model(&cakebusPath[0]));
-	g_scene.getEntity("player3")->attachComponent(&(this->models[2]), "model");
+	g_scene.getEntity("player3")->attachComponent(&(this->models[index++]), "model");
 
 	// Player 4
 	this->models.emplace_back(Model(&baguettebusPath[0]));
-	g_scene.getEntity("player4")->attachComponent(&(this->models[3]), "model");
+	g_scene.getEntity("player4")->attachComponent(&(this->models[index++]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Environment models
@@ -286,12 +374,12 @@ void RenderingSystem::loadModels()
 	// Ground
 	std::string groundPath = "resources/models/kitchen/kitchen.obj";
 	this->models.emplace_back(Model(&groundPath[0]));
-	g_scene.getEntity("countertop")->attachComponent(&(this->models[4]), "model");
+	g_scene.getEntity("countertop")->attachComponent(&(this->models[index++]), "model");
 
 	// Fan
 	std::string fanPath = "resources/models/kitchen/fan.obj";
 	this->models.emplace_back(Model(&fanPath[0]));
-	g_scene.getEntity("fan")->attachComponent(&(this->models[5]), "model");
+	g_scene.getEntity("fan")->attachComponent(&(this->models[index++]), "model");
 
 	//-----------------------------------------------------------------------------------
 	// Ingredient models
@@ -299,57 +387,57 @@ void RenderingSystem::loadModels()
 	// Cheese
 	std::string cheesePath = "resources/models/ingredients/cheese.obj";
 	this->models.emplace_back(Model(&cheesePath[0]));
-	g_scene.getEntity("cheese")->attachComponent(&(this->models[6]), "model");
+	g_scene.getEntity("cheese")->attachComponent(&(this->models[index++]), "model");
 
 	// Sausage
 	std::string sausagePath = "resources/models/ingredients/sausage.obj";
 	this->models.emplace_back(Model(&sausagePath[0]));
-	g_scene.getEntity("sausage")->attachComponent(&(this->models[7]), "model");
+	g_scene.getEntity("sausage")->attachComponent(&(this->models[index++]), "model");
 
 	// Tomato
 	std::string tomatoPath = "resources/models/ingredients/tomato.obj";
 	this->models.emplace_back(Model(&tomatoPath[0]));
-	g_scene.getEntity("tomato")->attachComponent(&(this->models[8]), "model");
+	g_scene.getEntity("tomato")->attachComponent(&(this->models[index++]), "model");
 
 	// Dough
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0]));
-	g_scene.getEntity("dough")->attachComponent(&(this->models[9]), "model");
+	g_scene.getEntity("dough")->attachComponent(&(this->models[index++]), "model");
 
 	// Carrot
 	std::string carrotPath = "resources/models/ingredients/carrot.obj";
 	this->models.emplace_back(Model(&carrotPath[0]));
-	g_scene.getEntity("carrot")->attachComponent(&(this->models[10]), "model");
+	g_scene.getEntity("carrot")->attachComponent(&(this->models[index++]), "model");
 
 	// Lettuce
 	std::string lettucePath = "resources/models/ingredients/lettuce.obj";
 	this->models.emplace_back(Model(&lettucePath[0]));
-	g_scene.getEntity("lettuce")->attachComponent(&(this->models[11]), "model");
+	g_scene.getEntity("lettuce")->attachComponent(&(this->models[index++]), "model");
 
 	// Parsnip
 	std::string parsnipPath = "resources/models/ingredients/parsnip.obj";
 	this->models.emplace_back(Model(&parsnipPath[0]));
-	g_scene.getEntity("parsnip")->attachComponent(&(this->models[12]), "model");
+	g_scene.getEntity("parsnip")->attachComponent(&(this->models[index++]), "model");
 
 	// Rice
 	std::string ricePath = "resources/models/ingredients/rice.obj";
 	this->models.emplace_back(Model(&ricePath[0]));
-	g_scene.getEntity("rice")->attachComponent(&(this->models[13]), "model");
+	g_scene.getEntity("rice")->attachComponent(&(this->models[index++]), "model");
 
 	// Egg
 	std::string eggPath = "resources/models/ingredients/egg.obj";
 	this->models.emplace_back(Model(&eggPath[0]));
-	g_scene.getEntity("egg")->attachComponent(&(this->models[14]), "model");
+	g_scene.getEntity("egg")->attachComponent(&(this->models[index++]), "model");
 
 	// Chicken
 	std::string chickenPath = "resources/models/ingredients/chicken.obj";
 	this->models.emplace_back(Model(&chickenPath[0]));
-	g_scene.getEntity("chicken")->attachComponent(&(this->models[15]), "model");
+	g_scene.getEntity("chicken")->attachComponent(&(this->models[index++]), "model");
 
 	// Peas
 	std::string peasPath = "resources/models/ingredients/peas.obj";
 	this->models.emplace_back(Model(&peasPath[0]));
-	g_scene.getEntity("peas")->attachComponent(&(this->models[16]), "model");
+	g_scene.getEntity("peas")->attachComponent(&(this->models[index++]), "model");
 
 	//// Soupbase
 	//std::string soupbasePath = "resources/models/ingredients/soupbase.obj";
@@ -366,7 +454,80 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	std::string testPath = "resources/models/ball/ball.obj";
 	this->models.emplace_back(Model(&testPath[0]));
-	g_scene.getEntity("test")->attachComponent(&(this->models[17]), "model");
+	g_scene.getEntity("test")->attachComponent(&(this->models[index++]), "model");
+}
+
+void RenderingSystem::initDebugQuad()
+{
+	// Create quad VAO for final default framebuffer image render
+	float quadVerts[] = {
+		// Position   // Tex Coords
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+	};
+
+	glGenVertexArrays(1, &this->quadVAO);
+	glGenBuffers(1, &this->quadVBO);
+	glBindVertexArray(this->quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
+void RenderingSystem::init4PlayerQuad()
+{
+	float fourPlayerVerts[] = {
+		// Position   // Tex Coords
+		// First quad
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f,  0.0f, 0.0f, 0.0f,
+		 0.0f,  0.0f, 1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f, 1.0f, 0.0f,
+		 0.0f,  1.0f, 1.0f, 1.0f,
+
+		// Second quad
+		 0.0f,  1.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f, 0.0f, 0.0f, 
+		 1.0f,  0.0f, 1.0f, 0.0f,
+		 0.0f,  1.0f, 0.0f, 1.0f, 
+		 1.0f,  0.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+
+		// Third quad
+		-1.0f,  0.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 0.0f, -1.0f, 1.0f, 0.0f,
+		-1.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 1.0f, 0.0f,
+		 0.0f,  0.0f, 1.0f, 1.0f,
+
+		// Forth quad
+		 0.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 0.0f,  0.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  0.0f, 1.0f, 1.0f,
+	};
+
+	glGenVertexArrays(1, &this->fourPlayerVAO);
+	glGenBuffers(1, &this->fourPlayerVBO);
+	glBindVertexArray(fourPlayerVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, fourPlayerVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fourPlayerVerts), &fourPlayerVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
 void RenderingSystem::setupCameras(Transform* player1Transform)
@@ -389,94 +550,303 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
 }
 
-// Orthographic projection for the depth map that shows the entire level layout for rough shadows at a distance
-void RenderingSystem::updateRoughOrtho()
+void RenderingSystem::createLoResShadowMap()
 {
-	this->ort.left = 280.0f;
-	this->ort.right = -284.0f;
-	this->ort.bottom = -206.0f;
-	this->ort.top = 241.0f;
-	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 1400.0f;
+	// Switch to depth map shader and set thew new light space matrix uniform
+	depthShader.use();
+	depthShader.setMat4("lightSpaceMatrix", this->loResLightSpaceMatrix);
+
+	// Change viewport for shadow map settings
+	glViewport(0, 0, this->shadowLoRes, this->shadowLoRes);
+
+	// Draw to FBO (texture)
+	glBindFramebuffer(GL_FRAMEBUFFER, this->roughDepthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT); // Switch to front face culling to reduce peter panning
+	renderShadowMap();
+	glCullFace(GL_BACK);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind shadow map FBO
 }
 
-// Moves the orthographic projection used for the depth map so that it follows the player for high res shadows
-void RenderingSystem::updateOrtho(glm::mat4 lightView)
+void RenderingSystem::createHiResShadowMap(const std::string name)
 {
-	glm::vec3 p1Pos = g_scene.getEntity("player1")->getTransform()->position;
-	glm::mat4 p1ModelMatrix = g_scene.getEntity("player1")->getTransform()->getModelMatrix();
+	glm::vec3 pos = g_scene.getEntity(name)->getTransform()->position;
 
-	glm::vec4 left = glm::vec4(p1Pos.x + 50.0f, p1Pos.y, p1Pos.z, 1.0f);
-	glm::vec4 right = glm::vec4(p1Pos.x - 50.0f, p1Pos.y, p1Pos.z, 1.0f);
-	glm::vec4 top = glm::vec4(p1Pos.x, p1Pos.y, p1Pos.z + 50.0f, 1.0f);
-	glm::vec4 bottom = glm::vec4(p1Pos.x, p1Pos.y, p1Pos.z + 50.0f, 1.0f);
+	glm::vec4 left = glm::vec4(pos.x + 50.0f, pos.y, pos.z, 1.0f);
+	glm::vec4 right = glm::vec4(pos.x - 50.0f, pos.y, pos.z, 1.0f);
+	glm::vec4 top = glm::vec4(pos.x, pos.y, pos.z + 50.0f, 1.0f);
+	glm::vec4 bottom = glm::vec4(pos.x, pos.y, pos.z + 50.0f, 1.0f);
 
-	left = lightView * left;
-	right = lightView * right;
-	top = lightView * top;
-	bottom = lightView * bottom;
+	left = this->lightViewMatrix * left;
+	right = this->lightViewMatrix * right;
+	top = this->lightViewMatrix * top;
+	bottom = this->lightViewMatrix * bottom;
 
-	this->ort.left = -(p1Pos.x + 50.0f);
-	this->ort.right = -(p1Pos.x - 50.0f);
-	this->ort.top = p1Pos.z + 50.0f;
-	this->ort.bottom = p1Pos.z - 50.0f;;
-	this->ort.nearPlane = 0.1f;
-	this->ort.farPlane = 1400.0f;
+	Orthogonal ort;
+	ort.left = -(pos.x + 50.0f);
+	ort.right = -(pos.x - 50.0f);
+	ort.top = pos.z + 50.0f;
+	ort.bottom = pos.z - 50.0f;;
+	ort.nearPlane = 0.1f;
+	ort.farPlane = 1400.0f;
+
+	glm::mat4 lightProjMatrix, lightSpaceMatrix;
+
+	lightProjMatrix = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
+	lightSpaceMatrix = lightProjMatrix * this->lightViewMatrix;
+
+	if (name == "player1")
+	{
+		this->p1LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p1ShadowsFBO);
+	}
+	else if (name == "player2")
+	{
+		this->p2LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p2ShadowsFBO);
+	}	
+	else if (name == "player3")
+	{
+		this->p3LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p3ShadowsFBO);
+	}	
+	else if (name == "player4")
+	{
+		this->p4LightSpaceMatrix = lightSpaceMatrix;
+		glBindFramebuffer(GL_FRAMEBUFFER, this->p4ShadowsFBO);
+	}	
+
+	// Switch to depth map shader and update it's light space matrix uniform
+	depthShader.use();
+	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+	// Resize the viewport for hi-res shadows
+	glViewport(0, 0, this->shadowHiRes / 4, this->shadowHiRes / 4);
+
+	// Draw to a FBO (texture)
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	renderShadowMap();
+	glCullFace(GL_BACK);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void RenderingSystem::renderShadowMap()
+{
+	// Switch to the depth map shader
+	depthShader.use();
+
+	// Get model unfirom location in shader
+	unsigned int modelLoc = glGetUniformLocation(this->depthShader.getId(), "model");
+
+	// Render scene to depthMapFBO
+	for (auto it = this->models.begin(); it < this->models.end(); it++)
+	{
+		// Update model matrix
+		Transform* ownerTransform = it->owner->getTransform();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		it->drawDepthMap(this->depthShader);
+	}
+}
+
+void RenderingSystem::renderScene(const std::string name)
+{
+	// Reset viewport
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// Switch to the regular shader
+	this->shader.use();
+
+	glm::mat4 lightSpaceMatrix, modelMatrix;
+	glm::vec3 pos;
+
+	glActiveTexture(GL_TEXTURE25);
+
+	if (name == "player1")
+	{
+		glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
+		lightSpaceMatrix = this->p1LightSpaceMatrix;
+
+		if (g_scene.numPlayers == 1)
+			glViewport(0, 0, g_systems.width, g_systems.height);
+		else if (g_scene.numPlayers == 2)
+			glViewport(0, g_systems.height / 2, g_systems.width, g_systems.height / 2);
+		else
+			glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+	}
+	else if (name == "player2")
+	{
+		glBindTexture(GL_TEXTURE_2D, this->p2ShadowsTex);
+		lightSpaceMatrix = this->p2LightSpaceMatrix;
+
+		if (g_scene.numPlayers == 2)
+			glViewport(0, 0, g_systems.width, g_systems.height / 2);
+		else 
+			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+	}	
+	else if (name == "player3")
+	{
+		glBindTexture(GL_TEXTURE_2D, this->p3ShadowsTex);
+		lightSpaceMatrix = this->p3LightSpaceMatrix;
+		glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+
+		if (g_scene.numPlayers == 3)
+			glViewport(g_systems.width / 4, 0, g_systems.width / 2, g_systems.height / 2);
+		else
+			glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+	}	
+	else if (name == "player4")
+	{
+		glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
+		lightSpaceMatrix = this->p4LightSpaceMatrix;
+		glViewport(g_systems.width / 2, 0, g_systems.width / 2, g_systems.height / 2);
+	}
+
+	// Update uniforms
+	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	this->shader.setMat4("roughLightSpaceMatrix", this->loResLightSpaceMatrix);
+	this->shader.setVec3("playerPos", g_scene.getEntity(name)->getTransform()->position);
+	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
+
+	// Update camera (MVP matrices)
+	Transform* transform = g_scene.getEntity(name)->getTransform();
+	g_scene.camera.updateCameraVectors(transform);
+	setupCameras(transform);
+
+	// Bind rough shadow map texture
+	glActiveTexture(GL_TEXTURE24);
+	glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
+	glUniform1i(glGetUniformLocation(this->shader.getId(), "roughShadowMap"), 24);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE, 0);
+
+	// Bind high res shadow map texture
+	
+	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE, 0);
+
+	// Set shadow bias uniforms
+	shader.setFloat("maxBias", this->maxBias);
+	shader.setFloat("minBias", this->minBias);
+	shader.setFloat("maxRoughBias", this->maxRoughBias);
+	shader.setFloat("minRoughBias", this->minRoughBias);
+
+	if (DEBUG_NAVMESH)
+	{
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
+		glUniform1i(texLoc, 0); // Turn textures off
+		navMesh.setWireframe(true);
+		navMesh.draw(getShader());
+	}
+
+	// Iterate through all the models in the scene and render them at their new transforms
+	for (int i = 0; i < models.size(); i++)
+	{
+		Transform* ownerTransform = models[i].owner->getTransform();
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
+
+		// Spin the fan
+		if (models[i].owner->name == "fan")
+		{
+			models[i].owner->getTransform()->rotation = glm::vec3(0.0f, glfwGetTime() * 50.0f, 0.0f);
+			models[i].owner->getTransform()->update();
+		}
+
+		if (i < 3) // Use material info for first 3 player models
+		{
+			glUniform1i(texLoc, 0);
+			models[i].draw(this->shader);
+		}
+		else // Use texture images for everything else
+		{
+			glUniform1i(texLoc, 1);
+			models[i].draw(this->shader);
+		}
+	}
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Reset to default FBO
+
+	drawSkybox();
 }
 
 void RenderingSystem::update()
 {
-	// Rough shadows -----------------------------------------------------------------
-	// Render roughDepthMap to texture (from light's perspective)
-	glm::mat4 lightProjection, lightView, roughLightSpaceMatrix, lightSpaceMatrix;
-	updateRoughOrtho();
-	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
-	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	roughLightSpaceMatrix = lightProjection * lightView;
+	// Step 1. Create the lo-res shadow map for the whole level
+	createLoResShadowMap();
 
-	depthShader.use();
-	depthShader.setMat4("lightSpaceMatrix", roughLightSpaceMatrix);
-
-	glViewport(0, 0, this->shadowLoRes, this->shadowLoRes);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->roughDepthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glCullFace(GL_FRONT);
-	renderShadowMap();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// High res shadows --------------------------------------------------------------
-	// Render depthMap to texture (from light's perspective)
-	lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	updateOrtho(lightView);
-	lightProjection = glm::ortho(ort.left, ort.right, ort.bottom, ort.top, ort.nearPlane, ort.farPlane);
-	lightSpaceMatrix = lightProjection * lightView;
-
-	depthShader.use();
-	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-	glViewport(0, 0, this->shadowHiRes, this->shadowHiRes);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	renderShadowMap();
-	glCullFace(GL_BACK);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// Regular render pass -------------------------------------------------------------
-	// Debug code for rendering the depthMap to viewport
-	if (g_systems.renderDebug)
-		renderDebugShadowMap();
-	else
+	// Step 2. Create the hi-res shadow maps for the players
+	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
 	{
-		// Render scene as normal using the generated depth/shadow map
-		this->shader.use();
-		this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		this->shader.setMat4("roughLightSpaceMatrix", roughLightSpaceMatrix);
-		this->shader.setVec3("playerPos", g_scene.getEntity("player1")->getTransform()->position);
-		this->shader.setMat4("playerModelMatrix", g_scene.getEntity("player1")->getTransform()->getModelMatrix());
-		renderScene();
+		std::string temp = "player";
+		temp += std::to_string(i + 1);
+
+		createHiResShadowMap(temp);
 	}
 
-	drawSkybox();
+	// Step 3. Render the scene from each player's perspective
+	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	{
+		std::string temp = "player";
+		temp += std::to_string(i + 1);
+
+		renderScene(temp);
+	}
+}
+
+void RenderingSystem::renderOnePlayerQuad()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	glDisable(GL_DEPTH_TEST);
+
+	glClearColor(0.1f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	this->simpleShader.use();
+	this->simpleShader.setInt("screenTexture", 16);
+
+	glBindVertexArray(this->quadVAO);
+	glActiveTexture(GL_TEXTURE16);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);
+}
+
+void RenderingSystem::renderFourPlayerQuad()
+{
+	this->simpleShader.use();
+
+	// Bind VAO
+	glBindVertexArray(this->fourPlayerVAO);
+
+	// Turn depth testing off for 2D rendering
+	glDisable(GL_DEPTH_TEST);
+
+	// Draw to default framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, g_systems.width, g_systems.height);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT); //; | GL_DEPTH_BUFFER_BIT);
+
+	// Bind rendered texture
+	glActiveTexture(GL_TEXTURE16);
+	glBindTexture(GL_TEXTURE_2D, this->fourPlayerTex);
+
+	// Render scene to viewport by applying textures to 2D quads
+	this->simpleShader.setInt("screenTexture", 16);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glBindVertexArray(0);
+
+	// Unbind texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Re-enable depth testing for next frame
+	glEnable(GL_DEPTH_TEST);
 }
 
 void RenderingSystem::renderDebugShadowMap()
@@ -501,88 +871,6 @@ Model* RenderingSystem::getKitchenModel()
 	return g_scene.getEntity("countertop")->getModel();
 }
 
-void RenderingSystem::renderScene()
-{
-	// Reset viewport
-	glViewport(0, 0, g_systems.width, g_systems.height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Update camera (MVP matrices)
-	Transform* p1Transform = g_scene.getEntity("player1")->getTransform();
-	g_scene.camera.updateCameraVectors(p1Transform);
-	setupCameras(p1Transform);
-
-	// Bind rough shadow map
-	glActiveTexture(GL_TEXTURE24);
-	glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
-	glUniform1i(glGetUniformLocation(this->shader.getId(), "roughShadowMap"), 24);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE, 0);
-
-	// Bind high res shadow map
-	glActiveTexture(GL_TEXTURE25);
-	glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE, 0);
-
-	glUniform1i(texLoc, 1);
-
-	// Set shadow bias uniforms
-	shader.setFloat("maxBias", this->maxBias);
-	shader.setFloat("minBias", this->minBias);
-	shader.setFloat("maxRoughBias", this->maxRoughBias);
-	shader.setFloat("minRoughBias", this->minRoughBias);
-
-	if (DEBUG_NAVMESH)
-	{
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
-		glUniform1i(texLoc, 0); // Turn textures off
-		navMesh.setWireframe(true);
-		navMesh.draw(getShader());
-	}
-
-	// Iterate through all the models in the scene and render them at their new transforms
-	for (int i = 0; i < models.size(); i++)
-	{
-		Transform* ownerTransform = models[i].owner->getTransform();
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-
-		if (models[i].owner->name == "fan")
-		{
-			models[i].owner->getTransform()->rotation = glm::vec3(0.0f, glfwGetTime() * 50.0f, 0.0f);
-			models[i].owner->getTransform()->update();
-		}
-
-		if (i < 3) // Use material info for player models
-		{
-			glUniform1i(texLoc, 0);
-			models[i].draw(this->shader);
-		}
-		else // Use texture images for everything else
-		{
-			glUniform1i(texLoc, 1);
-			models[i].draw(this->shader);
-		}
-	}
-}
-
-void RenderingSystem::renderShadowMap()
-{
-	// Get model unfirom location in shader
-	unsigned int modelLoc = glGetUniformLocation(this->depthShader.getId(), "model");
-
-	// Render scene to depthMapFBO
-	for (auto it = this->models.begin(); it < this->models.end(); it++)
-	{
-		// Update model matrix
-		Transform* ownerTransform = it->owner->getTransform();
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
-
-		it->drawDepthMap(this->depthShader);
-	}
-}
-
 void RenderingSystem::renderTexturedQuad()
 {
 	// Draw to default framebuffer
@@ -597,78 +885,6 @@ void RenderingSystem::renderTexturedQuad()
 	glBindVertexArray(this->quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
-}
-
-glm::mat4 RenderingSystem::calculateOrthoProjection()
-{
-	// Get the inverse of the view transform
-	glm::mat4 inverseMatrix = glm::inverse(this->projMatrix * this->viewMatrix);
-
-	// Get the frustum corners in world space coordinates
-	std::vector<glm::vec4> corners;
-	for (unsigned int x = 0; x < 2; x++)
-	{
-		for (unsigned int y = 0; y < 2; y++)
-		{
-			for (unsigned int z = 0; z < 2; z++)
-			{
-				glm::vec4 point = inverseMatrix * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
-				corners.push_back(point / point.w); // Why?
-			}
-		}
-	}
-
-	// Find the center point of the regular camer'a frustum
-	glm::vec3 center = glm::vec3(0);
-	for (auto& v : corners)
-	{
-		v /= 5.0;
-		center += glm::vec3(v);
-	}
-
-	center /= corners.size();
-
-	// Calculate the light's view matrix
-	glm::mat4 lightView = glm::lookAt(center + this->lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
-
-	// Transform frustum corner points to light space
-	float minX = std::numeric_limits<float>::max();
-	float maxX = std::numeric_limits<float>::min();
-	float minY = std::numeric_limits<float>::max();
-	float maxY = std::numeric_limits<float>::min();
-	float minZ = std::numeric_limits<float>::max();
-	float maxZ = std::numeric_limits<float>::min();
-
-	for (auto& v : corners)
-	{
-		glm::vec4 transformed = lightView * v;
-		minX = std::min(minX, transformed.x);
-		maxX = std::min(maxX, transformed.x);
-		minY = std::min(minY, transformed.y);
-		maxY = std::min(maxY, transformed.y);
-		minZ = std::min(minZ, transformed.z);
-		maxZ = std::min(maxZ, transformed.z);
-	}
-
-	// Stretch near and far planes
-	float zMult = 10.0f;
-	if (minZ < 0)
-		minZ *= zMult;
-	else
-		minZ /= zMult;
-	if (maxZ < 0)
-		maxZ /= zMult;
-	else
-		maxZ *= zMult;
-
-	this->ort.left = maxX;
-	this->ort.right = minX;
-	this->ort.top = maxY;
-	this->ort.bottom = minY;
-	this->ort.nearPlane = minZ;
-	this->ort.farPlane = maxZ;
-
-	return glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
 }
 
 void RenderingSystem::drawSkybox()
