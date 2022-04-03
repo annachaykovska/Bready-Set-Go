@@ -1370,3 +1370,85 @@ void PhysicsSystem::magnet(int stealer_id)
 		g_systems.audio->endSlurp(stealer->getAudioSource(), false);
 	}
 }
+
+int PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
+	// SETUP
+	// Get the entity that is stealing, and the entities that can be stolen from
+	// TODO: THIS SETUP CAN BE CLEANED UP NO NEED TO COMPUTE EVERY TIME
+	Entity* stealer;
+	PxVehicleDrive4W* stealer_vehicle;
+
+	std::vector<PxVehicleDrive4W*> victim_vehicles = {
+		mVehiclePlayer1,
+		mVehiclePlayer2,
+		mVehiclePlayer3,
+		mVehiclePlayer4 };
+
+	std::vector<Entity*> victims = {
+		g_scene.getEntity("player1"),
+		g_scene.getEntity("player2"),
+		g_scene.getEntity("player3"),
+		g_scene.getEntity("player4") };
+	switch (stealer_id) {
+	case 1:
+		stealer = g_scene.getEntity("player1");
+		stealer_vehicle = mVehiclePlayer1;
+		victims.erase(victims.begin());
+		victim_vehicles.erase(victim_vehicles.begin());
+		break;
+	case 2:
+		stealer = g_scene.getEntity("player2");
+		stealer_vehicle = mVehiclePlayer2;
+		victims.erase(victims.begin() + 1);
+		victim_vehicles.erase(victim_vehicles.begin() + 1);
+		break;
+	case 3:
+		stealer = g_scene.getEntity("player3");
+		stealer_vehicle = mVehiclePlayer3;
+		victims.erase(victims.begin() + 2);
+		victim_vehicles.erase(victim_vehicles.begin() + 2);
+		break;
+	case 4:
+		stealer = g_scene.getEntity("player4");
+		stealer_vehicle = mVehiclePlayer4;
+		victims.erase(victims.begin() + 3);
+		victim_vehicles.erase(victim_vehicles.begin() + 3);
+		break;
+	default:
+		return; // Id passed in does not correspond to a car
+		break;
+	}
+
+	// Check if in Cooldown
+
+	// In Cooldown
+	float currentTime = glfwGetTime();
+	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) { // in Cooldown
+		// TODO: play a cant steal right now noise
+		return 0;
+	}
+	
+	// Not in Cooldown
+	
+	// Trying to start stealing
+	if (steal_button_held && steal_button_just_pressed) {
+		if (true) { // Check if stealer has victims
+			return 3;
+		}
+		return 0;
+	}
+	
+	// Check if currently tethered
+	if (stealer->tethered) {
+
+	}
+	
+	// Check if there are stealer has victims
+	if (true) {
+		return 2;
+	}
+	else {
+		return 1;
+	}
+	
+}

@@ -26,6 +26,7 @@ Entity::Entity(std::string name)
 	this->lastMagnetUse = 0.f;
 	this->gracePeriod = 6.0f;
 	this->lastGracePeriodStart = 0.f;
+	this->tethered = false;
 
 }
 
@@ -44,6 +45,7 @@ Entity::Entity(){
 	this->lastMagnetUse = 0.f;
 	this->gracePeriod = 6.0f;
 	this->lastGracePeriodStart = 0.f;
+	this->tethered = false;
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)

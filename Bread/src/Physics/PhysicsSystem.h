@@ -42,7 +42,17 @@ public:
 	void respawnPlayer(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
+
+	// Functions for magnet ability
 	void magnet(int stealer_id);
+
+	// Returns magnet status
+	// 0 = in cooldown
+	// 1 = ready to steal, not close to target
+	// 2 = ready to steal, close to target
+	// 3 = tethered, and stealing from target
+	int magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed); 
+	//
 
 	void cleanupPhysics();
 
@@ -71,7 +81,7 @@ public:
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
-	// For Tweaking
+	// Start of tweaking variables
 	void updateCar();
 
 	float chassis_mass;
@@ -93,6 +103,8 @@ public:
 	float peak_torque;
 	float max_omega;
 	float max_brake_torque;
+	
+	// End of tweaking variables
 
 private:
 

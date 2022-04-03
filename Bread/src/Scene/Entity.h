@@ -37,13 +37,18 @@ public:
 	float collisionCooldownStart;
 
 	// Grab ability variables
-	float magnetDistanceSquared;
-
+	float magnetDistanceSquared; // Max distance that can be stolen from (squared for faster calculations)
 	float magnetCooldown;
-	float lastMagnetUse; // Time at which the magnet ability was used last
+	float lastMagnetUse;
 
+	// Time period when player cannot be stolen from
 	float gracePeriod;
 	float lastGracePeriodStart;
+
+	// For the tethered vacuum
+	bool tethered;
+	float magnetTimeToSteal;
+	float magnetStartTime;
 
 private:
 
