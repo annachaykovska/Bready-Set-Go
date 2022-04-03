@@ -46,13 +46,17 @@ public:
 	// Functions for magnet ability
 	void magnet(int stealer_id);
 
-	// Returns magnet status
+	// Sets entity magnet status
 	// 0 = in cooldown
 	// 1 = ready to steal, not close to target
 	// 2 = ready to steal, close to target
 	// 3 = tethered, and stealing from target
-	int magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed); 
-	//
+	void magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed); 
+
+	// Updates the victims that can be stolen from
+	void checkVictims(Entity* stealer, std::vector<Entity*>& victims, float currentTime);
+	// Make victims list ( TODO: SHOULD BE PRIVATE)
+	void makeVictimsList(int stealer_id, std::vector<Entity*>& victims);
 
 	void cleanupPhysics();
 

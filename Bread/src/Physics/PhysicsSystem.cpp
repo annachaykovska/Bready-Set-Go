@@ -1371,84 +1371,320 @@ void PhysicsSystem::magnet(int stealer_id)
 	}
 }
 
-int PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
-	// SETUP
-	// Get the entity that is stealing, and the entities that can be stolen from
-	// TODO: THIS SETUP CAN BE CLEANED UP NO NEED TO COMPUTE EVERY TIME
+void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
+	// setting up the stealer entity (see if this can be passed in instead)
 	Entity* stealer;
-	PxVehicleDrive4W* stealer_vehicle;
-
-	std::vector<PxVehicleDrive4W*> victim_vehicles = {
-		mVehiclePlayer1,
-		mVehiclePlayer2,
-		mVehiclePlayer3,
-		mVehiclePlayer4 };
-
-	std::vector<Entity*> victims = {
-		g_scene.getEntity("player1"),
-		g_scene.getEntity("player2"),
-		g_scene.getEntity("player3"),
-		g_scene.getEntity("player4") };
 	switch (stealer_id) {
 	case 1:
 		stealer = g_scene.getEntity("player1");
-		stealer_vehicle = mVehiclePlayer1;
-		victims.erase(victims.begin());
-		victim_vehicles.erase(victim_vehicles.begin());
 		break;
 	case 2:
 		stealer = g_scene.getEntity("player2");
-		stealer_vehicle = mVehiclePlayer2;
-		victims.erase(victims.begin() + 1);
-		victim_vehicles.erase(victim_vehicles.begin() + 1);
 		break;
 	case 3:
 		stealer = g_scene.getEntity("player3");
-		stealer_vehicle = mVehiclePlayer3;
-		victims.erase(victims.begin() + 2);
-		victim_vehicles.erase(victim_vehicles.begin() + 2);
 		break;
 	case 4:
 		stealer = g_scene.getEntity("player4");
-		stealer_vehicle = mVehiclePlayer4;
-		victims.erase(victims.begin() + 3);
-		victim_vehicles.erase(victim_vehicles.begin() + 3);
 		break;
 	default:
 		return; // Id passed in does not correspond to a car
-		break;
 	}
 
 	// Check if in Cooldown
-
-	// In Cooldown
 	float currentTime = glfwGetTime();
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) { // in Cooldown
-		// TODO: play a cant steal right now noise
-		return 0;
-	}
-	
-	// Not in Cooldown
-	
-	// Trying to start stealing
-	if (steal_button_held && steal_button_just_pressed) {
-		if (true) { // Check if stealer has victims
-			return 3;
+		if (steal_button_held && steal_button_just_pressed) {
+			// TODO: play a cant steal right now noise
 		}
-		return 0;
+		stealer->magnetStatus = 0;
 	}
-	
-	// Check if currently tethered
-	if (stealer->tethered) {
+	else { // not in cooldown
+		// Trying to start stealing
+		if (steal_button_held && steal_button_just_pressed) {
+			makeVictimsList(stealer_id, stealer->tethered_victims); // TODO: THIS MIGHT NOT HAVE TO BE A FUNCTION
+			checkVictims(stealer, stealer->tethered_victims, currentTime);
+			if (!stealer->tethered_victims.empty()) { // Check if stealer has victims
+				// TODO: start playing sucking noise
+				stealer->magnetStartTime = currentTime;
+				stealer->tethered = true;
+				stealer->magnetStatus = 3;
+			}
+			else {
+				// TODO: play sucking failed noise
+				stealer->lastMagnetUse = currentTime;
+				stealer->magnetStatus = 0;
+			}
+			return;
+		}
 
+		// Check if currently tethered
+		if (stealer->tethered) {
+			if (steal_button_held) {
+				// Check if tethers still hold
+				checkVictims(stealer, stealer->tethered_victims, currentTime);
+				if (!stealer->tethered_victims.empty()) {
+					if (currentTime - stealer->magnetStartTime > stealer->magnetTimeToSteal) { // Stole succesfully
+						// Pick a victim (should usually be one but to handle the edge case with more players)
+						Entity* victim = stealer->tethered_victims[rand() % stealer->tethered_victims.size()];
+						auto victim_inventory = (Inventory*)victim->getComponent("inventory");
+						auto stealer_inventory = (Inventory*)victim->getComponent("inventory");
+						auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
+						bool stolen = false;
+						// STEAL
+						for (Ingredient ing : stealer_recipe->list) {
+							switch (ing) {
+							case Cheese:
+								if (stealer_inventory->cheese != 0) break;
+								if (victim_inventory->cheese != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Dough:
+								if (stealer_inventory->dough != 0) break;
+								if (victim_inventory->dough != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Sausage:
+								if (stealer_inventory->sausage != 0) break;
+								if (victim_inventory->sausage != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Tomato:
+								if (stealer_inventory->tomato != 0) break;
+								if (victim_inventory->tomato != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Carrot:
+								if (stealer_inventory->carrot != 0) break;
+								if (victim_inventory->carrot != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Lettuce:
+								if (stealer_inventory->lettuce != 0) break;
+								if (victim_inventory->lettuce != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Parsnip:
+								if (stealer_inventory->parsnip != 0) break;
+								if (victim_inventory->parsnip != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Rice:
+								if (stealer_inventory->rice != 0) break;
+								if (victim_inventory->rice != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Egg:
+								if (stealer_inventory->egg != 0) break;
+								if (victim_inventory->egg != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Chicken:
+								if (stealer_inventory->chicken != 0) break;
+								if (victim_inventory->chicken != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							case Peas:
+								if (stealer_inventory->peas != 0) break;
+								if (victim_inventory->peas != 0) {
+									victim_inventory->chicken--;
+									stealer_inventory->chicken++;
+									stolen = true;
+								}
+								break;
+							}
+							if (stolen) break;
+						}
+						//TODO: play a done sound
+
+						// Update stealer/victim variables
+						stealer->lastGracePeriodStart = currentTime;
+						stealer->lastMagnetUse = currentTime;
+						stealer->magnetStatus = 0;
+						victim->lastGracePeriodStart = currentTime;
+					}
+					else {
+						stealer->magnetStatus = 3; // still tethered
+					}
+				}
+				else { // Tethered list is empty
+					stealer->lastMagnetUse = currentTime;
+					stealer->magnetStatus = 0;
+				}
+			}
+			else {
+				stealer->tethered = false;
+				stealer->tethered_victims.clear();
+				stealer->lastMagnetUse = currentTime;
+				stealer->magnetStatus = 0;
+			}
+			return;
+		}
+
+		// Check if there are stealer has victims
+		std::vector<Entity*> victims;
+		makeVictimsList(stealer_id, victims);
+		checkVictims(stealer, victims, currentTime);
+		if (true) {
+		}
+		else {
+		}
 	}
-	
-	// Check if there are stealer has victims
-	if (true) {
-		return 2;
-	}
-	else {
-		return 1;
-	}
-	
 }
+
+void PhysicsSystem::checkVictims(Entity* stealer, std::vector<Entity*>& victims, float currentTime) {
+	// Setup variables to reference easier
+	PxVec3 stealer_pos = stealer->vehicle->getRigidDynamicActor()->getGlobalPose().p;
+	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
+	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
+	for (int i = 0; i < victims.size();) {
+		// See the victims that are in range
+		PxVec3 victim_pos = victims[i]->vehicle->getRigidDynamicActor()->getGlobalPose().p;
+		if ((victim_pos - stealer_pos).magnitudeSquared() > stealer->magnetDistanceSquared) {
+			victims.erase(victims.begin() + i);
+			continue;
+		}
+
+		// See if victim can be stolen from
+		if (currentTime - victims[i]->lastGracePeriodStart < stealer->gracePeriod) {
+			victims.erase(victims.begin() + i);
+			continue;
+		}
+
+		// Steal item in our recipe if victim has one
+		// This is extremely messy but oh well
+		auto victim_inventory = (Inventory*)victims[i]->getComponent("inventory");
+		bool has_item_of_interest = false;
+		for (Ingredient ing : stealer_recipe->list) {
+			switch (ing) {
+			case Cheese:
+				if (stealer_inventory->cheese != 0) break; 
+				if (victim_inventory->cheese != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Dough:
+				if (stealer_inventory->dough != 0) break; 
+				if (victim_inventory->dough != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Sausage:
+				if (stealer_inventory->sausage != 0) break; 
+				if (victim_inventory->sausage != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Tomato:
+				if (stealer_inventory->tomato != 0) break; 
+				if (victim_inventory->tomato != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Carrot:
+				if (stealer_inventory->carrot != 0) break; 
+				if (victim_inventory->carrot != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Lettuce:
+				if (stealer_inventory->lettuce != 0) break; 
+				if (victim_inventory->lettuce != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Parsnip:
+				if (stealer_inventory->parsnip != 0) break; 
+				if (victim_inventory->parsnip != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Rice:
+				if (stealer_inventory->rice != 0) break; 
+				if (victim_inventory->rice != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Egg:
+				if (stealer_inventory->egg != 0) break; 
+				if (victim_inventory->egg != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Chicken:
+				if (stealer_inventory->chicken != 0) break; 
+				if (victim_inventory->chicken != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			case Peas:
+				if (stealer_inventory->peas != 0) break; 
+				if (victim_inventory->peas != 0) {
+					has_item_of_interest = true;
+				}
+				break;
+			}
+		}
+		if (!has_item_of_interest) {
+			victims.erase(victims.begin() + i);
+			continue;
+		}
+		++i;
+	}
+}
+
+void PhysicsSystem::makeVictimsList(int stealer_id, std::vector<Entity*>& victims) {
+	victims.clear();
+	victims = {
+	g_scene.getEntity("player1"),
+	g_scene.getEntity("player2"),
+	g_scene.getEntity("player3"),
+	g_scene.getEntity("player4") };
+	switch (stealer_id) {
+	case 1:
+		victims.erase(victims.begin());
+		break;
+	case 2:
+		victims.erase(victims.begin() + 1);
+		break;
+	case 3:
+		victims.erase(victims.begin() + 2);
+		break;
+	case 4:
+		victims.erase(victims.begin() + 3);
+		break;
+	default:
+		return; // Id passed in does not correspond to a car
+	}
+}
+

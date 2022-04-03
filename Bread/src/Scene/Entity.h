@@ -37,6 +37,7 @@ public:
 	float collisionCooldownStart;
 
 	// Grab ability variables
+	int magnetStatus;
 	float magnetDistanceSquared; // Max distance that can be stolen from (squared for faster calculations)
 	float magnetCooldown;
 	float lastMagnetUse;
@@ -47,6 +48,7 @@ public:
 
 	// For the tethered vacuum
 	bool tethered;
+	std::vector<Entity*> tethered_victims;
 	float magnetTimeToSteal;
 	float magnetStartTime;
 
