@@ -49,6 +49,7 @@
     <ClCompile Include="src\Rendering\DebugOverlay.cpp" />
     <ClCompile Include="src\Gameplay\GameLoopManager.cpp" />
     <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\AL\al.h" />

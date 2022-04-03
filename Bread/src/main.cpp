@@ -48,6 +48,9 @@ int main()
 	// ImGui profiler for debugging
 	Profiler profiler(window);
 
+	// TODO change this at runtime in the main menu
+	g_scene.numPlayers = 1;
+
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
 	//-----------------------------------------------------------------------------------
@@ -192,6 +195,7 @@ int main()
 
 	// Track Ingredient Locations
 	IngredientTracker ingredientTracker;
+	g_systems.tracker = &ingredientTracker;
 	ui.initIngredientTracking(&ingredientTracker);
 
 	// Set up game loop manager

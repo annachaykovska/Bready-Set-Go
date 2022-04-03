@@ -17,6 +17,8 @@ public:
 	int entityCount();
 
 	void init(PhysicsSystem* physics);
+
+	int numPlayers;
 	
 private:
 
