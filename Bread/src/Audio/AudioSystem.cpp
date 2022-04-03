@@ -335,3 +335,9 @@ void AudioSystem::powerReady(AudioSource* source)
 	source->loop = false;
 	source->play("power.wav");
 }
+
+void AudioSystem::turnOffAllAudio() {
+	for (int i = 0; i < audioSources.size(); i++) {
+		audioSources[i].stop();
+	}
+}
