@@ -23,13 +23,13 @@ Entity::Entity(std::string name)
 	//Magnet variables
 	int magnetStatus = 0;
 	this->magnetDistanceSquared = 400.f;
-	this->magnetCooldown = 6.0f;
+	this->magnetCooldown = 4.0f;
 	this->lastMagnetUse = 0.f;
 	this->gracePeriod = 6.0f;
 	this->lastGracePeriodStart = 0.f;
 	this->tethered = false;
 	this->magnetStartTime = 0.f;
-	this->magnetTimeToSteal = 0.5f;
+	this->magnetTimeToSteal = 0.1f;
 
 }
 
@@ -45,13 +45,13 @@ Entity::Entity(){
 	//Magnet variables
 	int magnetStatus = 0;
 	this->magnetDistanceSquared = 200.f;
-	this->magnetCooldown = 6.0f;
+	this->magnetCooldown = 4.0f;
 	this->lastMagnetUse = 0.f;
 	this->gracePeriod = 6.0f;
 	this->lastGracePeriodStart = 0.f;
 	this->tethered = false;
 	this->magnetStartTime = 0.f;
-	this->magnetTimeToSteal = 0.5f;
+	this->magnetTimeToSteal = 0.1f;
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)

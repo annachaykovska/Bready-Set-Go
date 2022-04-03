@@ -1426,10 +1426,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				if (!stealer->tethered_victims.empty()) {
 					if (currentTime - stealer->magnetStartTime > stealer->magnetTimeToSteal) { // Stole succesfully
 						// Pick a victim (should usually be one but to handle the edge case with more players)
+						auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
+
 						Entity* victim = stealer->tethered_victims[rand() % stealer->tethered_victims.size()];
 						auto victim_inventory = (Inventory*)victim->getComponent("inventory");
-						auto stealer_inventory = (Inventory*)victim->getComponent("inventory");
-						auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
+						auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
 						bool stolen = false;
 						// STEAL
 						for (Ingredient ing : stealer_recipe->list) {
@@ -1437,72 +1438,72 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 							case Cheese:
 								if (stealer_inventory->cheese != 0) break;
 								if (victim_inventory->cheese != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->cheese--;
+									stealer_inventory->cheese++;
 									stolen = true;
 								}
 								break;
 							case Dough:
 								if (stealer_inventory->dough != 0) break;
 								if (victim_inventory->dough != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->dough--;
+									stealer_inventory->dough++;
 									stolen = true;
 								}
 								break;
 							case Sausage:
 								if (stealer_inventory->sausage != 0) break;
 								if (victim_inventory->sausage != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->sausage--;
+									stealer_inventory->sausage++;
 									stolen = true;
 								}
 								break;
 							case Tomato:
 								if (stealer_inventory->tomato != 0) break;
 								if (victim_inventory->tomato != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->tomato--;
+									stealer_inventory->tomato++;
 									stolen = true;
 								}
 								break;
 							case Carrot:
 								if (stealer_inventory->carrot != 0) break;
 								if (victim_inventory->carrot != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->carrot--;
+									stealer_inventory->carrot++;
 									stolen = true;
 								}
 								break;
 							case Lettuce:
 								if (stealer_inventory->lettuce != 0) break;
 								if (victim_inventory->lettuce != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->lettuce--;
+									stealer_inventory->lettuce++;
 									stolen = true;
 								}
 								break;
 							case Parsnip:
 								if (stealer_inventory->parsnip != 0) break;
 								if (victim_inventory->parsnip != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->parsnip--;
+									stealer_inventory->parsnip++;
 									stolen = true;
 								}
 								break;
 							case Rice:
 								if (stealer_inventory->rice != 0) break;
 								if (victim_inventory->rice != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->rice--;
+									stealer_inventory->rice++;
 									stolen = true;
 								}
 								break;
 							case Egg:
 								if (stealer_inventory->egg != 0) break;
 								if (victim_inventory->egg != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->egg--;
+									stealer_inventory->egg++;
 									stolen = true;
 								}
 								break;
@@ -1517,13 +1518,15 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 							case Peas:
 								if (stealer_inventory->peas != 0) break;
 								if (victim_inventory->peas != 0) {
-									victim_inventory->chicken--;
-									stealer_inventory->chicken++;
+									victim_inventory->peas--;
+									stealer_inventory->peas++;
 									stolen = true;
 								}
 								break;
 							}
-							if (stolen) break;
+							if (stolen) {
+								break;
+							}
 						}
 						//TODO: play a done sound
 
@@ -1564,13 +1567,13 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 
 void PhysicsSystem::checkVictims(Entity* stealer, std::vector<Entity*>& victims, float currentTime) {
 	// Setup variables to reference easier
-	PxVec3 stealer_pos = stealer->vehicle->getRigidDynamicActor()->getGlobalPose().p;
+	glm::vec3 stealer_pos = stealer->getTransform()->position;//stealer->vehicle->getRigidDynamicActor()->getGlobalPose().p;
 	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
 	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
 	for (int i = 0; i < victims.size();) {
 		// See the victims that are in range
-		PxVec3 victim_pos = victims[i]->vehicle->getRigidDynamicActor()->getGlobalPose().p;
-		if ((victim_pos - stealer_pos).magnitudeSquared() > stealer->magnetDistanceSquared) {
+		glm::vec3 victim_pos = victims[i]->getTransform()->position;
+		if (glm::length2(victim_pos - stealer_pos) > stealer->magnetDistanceSquared) {
 			victims.erase(victims.begin() + i);
 			continue;
 		}
