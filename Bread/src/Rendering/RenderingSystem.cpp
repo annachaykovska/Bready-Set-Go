@@ -652,14 +652,8 @@ void RenderingSystem::renderShadowMap()
 
 void RenderingSystem::renderScene(const std::string name)
 {
-	// TODO test for multiplayer
-	//glBindFramebuffer(GL_FRAMEBUFFER, this->fourPlayerFBO);
-
 	// Reset viewport
-	// TODO generalize viewport dimensions for multiplayer
-	//glViewport(0, 0, g_systems.width, g_systems.height);
-	glClearColor(1.0f, 0.7f, 0.7f, 1.0f);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Switch to the regular shader
 	this->shader.use();
@@ -667,30 +661,43 @@ void RenderingSystem::renderScene(const std::string name)
 	glm::mat4 lightSpaceMatrix, modelMatrix;
 	glm::vec3 pos;
 
+	glActiveTexture(GL_TEXTURE25);
+
 	if (name == "player1")
 	{
-		glActiveTexture(GL_TEXTURE25);
 		glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
 		lightSpaceMatrix = this->p1LightSpaceMatrix;
-		glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+
+		if (g_scene.numPlayers == 1)
+			glViewport(0, 0, g_systems.width, g_systems.height);
+		else if (g_scene.numPlayers == 2)
+			glViewport(0, g_systems.height / 2, g_systems.width, g_systems.height / 2);
+		else
+			glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}
 	else if (name == "player2")
 	{
-		glActiveTexture(GL_TEXTURE25);
 		glBindTexture(GL_TEXTURE_2D, this->p2ShadowsTex);
 		lightSpaceMatrix = this->p2LightSpaceMatrix;
-		glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+
+		if (g_scene.numPlayers == 2)
+			glViewport(0, 0, g_systems.width, g_systems.height / 2);
+		else 
+			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}	
 	else if (name == "player3")
 	{
-		glActiveTexture(GL_TEXTURE25);
 		glBindTexture(GL_TEXTURE_2D, this->p3ShadowsTex);
 		lightSpaceMatrix = this->p3LightSpaceMatrix;
 		glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+
+		if (g_scene.numPlayers == 3)
+			glViewport(g_systems.width / 4, 0, g_systems.width / 2, g_systems.height / 2);
+		else
+			glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
 	}	
 	else if (name == "player4")
 	{
-		glActiveTexture(GL_TEXTURE25);
 		glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
 		lightSpaceMatrix = this->p4LightSpaceMatrix;
 		glViewport(g_systems.width / 2, 0, g_systems.width / 2, g_systems.height / 2);
@@ -762,6 +769,8 @@ void RenderingSystem::renderScene(const std::string name)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Reset to default FBO
+
+	drawSkybox();
 }
 
 void RenderingSystem::update()
@@ -770,36 +779,22 @@ void RenderingSystem::update()
 	createLoResShadowMap();
 
 	// Step 2. Create the hi-res shadow maps for the players
-	// TODO generalize for number of players
-	createHiResShadowMap("player1");
-	createHiResShadowMap("player2");
-	createHiResShadowMap("player3");
-	createHiResShadowMap("player4");
+	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	{
+		std::string temp = "player";
+		temp += std::to_string(i + 1);
 
-	// Step 3. Render scene as normal
-	// TODO generalize for number of players
-	// TODO render scene to FBO and save as texture for multiplayer
-	//if (!g_systems.renderDebug)
-	renderScene("player1");
-	drawSkybox();
+		createHiResShadowMap(temp);
+	}
 
-	renderScene("player2");
-	drawSkybox();
+	// Step 3. Render the scene from each player's perspective
+	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	{
+		std::string temp = "player";
+		temp += std::to_string(i + 1);
 
-	renderScene("player3");
-	drawSkybox();
-
-	renderScene("player4");
-	//else
-		//renderDebugShadowMap();
-
-	// Step 3.5 Render to final quad
-	//renderFourPlayerQuad();
-	//renderOnePlayerQuad();
-
-	// Step 4. Add the skybox to the scene
-	//if (!g_systems.renderDebug)
-	drawSkybox();
+		renderScene(temp);
+	}
 }
 
 void RenderingSystem::renderOnePlayerQuad()
