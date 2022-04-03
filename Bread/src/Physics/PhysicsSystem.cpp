@@ -784,8 +784,6 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	g_scene.getEntity("player3")->speed = (float)mVehiclePlayer3->computeForwardSpeed();
 	g_scene.getEntity("player4")->speed = (float)mVehiclePlayer4->computeForwardSpeed();
 
-	//mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().q;
-
 	// Update scene in physics simulation
 	this->mScene->simulate(timestep);
 	this->mScene->fetchResults(true);
@@ -801,6 +799,9 @@ void PhysicsSystem::update(const float dt, int gameStage)
 
 	// Update the food transforms
 	updateFoodTransforms();
+
+	// Check if camera is behind a wall
+	//this->mScene->raycast(mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p)
 }
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
