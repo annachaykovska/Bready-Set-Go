@@ -15,13 +15,13 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 , isGameEnded(false)
 , mainMenuTimeoutStart(-1)
 , returnToMainMenuTimeoutStart(-1)
-, mainMenuTimeoutLength(1)
-, returnToMainMenuTimeoutLength(1)
+, mainMenuTimeoutLength(0.5)
+, returnToMainMenuTimeoutLength(0.5)
 , endScreenGenerated(-1)
 , isPaused(false)
 , showPauseMenu(false)
 , pauseMenuSelection(1)
-, showPauseMenuTimeoutLength(1)
+, showPauseMenuTimeoutLength(0.5)
 , showPauseMenuTimeoutStart(-1)
 , isPauseMenuItemSelected(false)
 {}
@@ -39,14 +39,38 @@ void GameLoopManager::resetGameLoopValues() {
 	return;
 }
 
-void GameLoopManager::updateGameStageFromMenu() {
-	if (menuSelectionNumber == 1) { // start game selected
-		gameStage = 2;
-		isMenuItemSelected = false;
-		mainMenuTimeoutStart = glfwGetTime();
+void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
+	if (gameStage == 1) {
+		if (menuSelectionNumber == 1) { // start game selected
+			gameStage = 2;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+		}
+		else if (menuSelectionNumber == 2) { // exit
+			isGameExitSelected = true;
+		}
 	}
-	else if (menuSelectionNumber == 2) { // exit
-		isGameExitSelected = true;
+	else if (gameStage == 2) {
+		if (menuSelectionNumber == 1) { // start game selected
+			gameStage = 4;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+			g_scene.numPlayers = 1;
+		}
+		else if (menuSelectionNumber == 2) { // multiplayer
+			gameStage = 3;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+		}
+
+	}
+	else if (gameStage == 3) {
+		if (menuSelectionNumber == 1) { // start game selected
+			gameStage = 4;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+			g_scene.numPlayers = numPlayers;
+		}
 	}
 	return;
 }
@@ -69,7 +93,7 @@ void GameLoopManager::updateGameStageFromPause() {
 
 
 void GameLoopManager::setEndStage() {
-	gameStage = 3;
+	gameStage = 5;
 	if (endScreenGenerated == -1) {
 		// Add some random generation to final message 
 		srand((unsigned)time(0));

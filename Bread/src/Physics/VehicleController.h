@@ -26,6 +26,7 @@ public:
 	void setButtonStateFromControllerMainMenu(int controllerId);
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
+	int getNumberConnectedControllers();
 
 	PhysicsSystem* physics;
 

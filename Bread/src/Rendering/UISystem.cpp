@@ -49,6 +49,15 @@ UISystem::UISystem()
     , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
+    , singlePlayerButtonNormal("resources/textures/button_single_player.png", GL_NEAREST)
+    , singlePlayerButtonPressed("resources/textures/button_single_player_selected.png", GL_NEAREST)
+    , multiPlayerButtonNormal("resources/textures/button_multi_player.png", GL_NEAREST)
+    , multiPlayerButtonPressed("resources/textures/button_multi_player_selected.png", GL_NEAREST)
+    , playerConnected0("resources/textures/player_connected_0.png", GL_NEAREST)
+    , playerConnected1("resources/textures/player_connected_1.png", GL_NEAREST)
+    , playerConnected2("resources/textures/player_connected_2.png", GL_NEAREST)
+    , playerConnected3("resources/textures/player_connected_3.png", GL_NEAREST)
+    , playerConnected4("resources/textures/player_connected_4.png", GL_NEAREST)
     , speedometer_theta(MIN_SPEED_THETA)
     , powerReady(true)
     , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
@@ -64,7 +73,7 @@ UISystem::UISystem()
     , map_sx(0.190)
     , pauseMenu("resources/textures/pause_screen.png", GL_NEAREST)
     , continueButton("resources/textures/button_continue.png", GL_NEAREST)
-    , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST)
+    , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -157,15 +166,46 @@ UISystem::~UISystem() {
 
 }
 
-void UISystem::updateMainMenu(int itemSelected) {
+void UISystem::updateMainMenu(int itemSelected, int gameStage, int numControllers) {
     // Buttons
-    if (itemSelected == 1) { // start game
-        renderImage(imageShader, exitButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+    if (gameStage == 1) {
+        if (itemSelected == 1) { // start game
+            renderImage(imageShader, exitButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
+        else if (itemSelected == 2) { // exit
+            renderImage(imageShader, exitButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, startGameButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
     }
-    else if (itemSelected == 2) { // exit
-        renderImage(imageShader, exitButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, startGameButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+    else if (gameStage == 2) {
+        if (itemSelected == 1) { // single player
+            renderImage(imageShader, multiPlayerButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, singlePlayerButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
+        else if (itemSelected == 2) { // multiplayer
+            renderImage(imageShader, multiPlayerButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, singlePlayerButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
+
+    }
+    else if (gameStage == 3) {
+        if (numControllers == 0) {
+            renderImage(imageShader, playerConnected0, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 1) {
+            renderImage(imageShader, playerConnected1, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 2) {
+            renderImage(imageShader, playerConnected2, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 3) {
+            renderImage(imageShader, playerConnected3, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 4) {
+            renderImage(imageShader, playerConnected4, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
 
     // Background

@@ -609,7 +609,7 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
-	if (gameStage != 3) {
+	if (gameStage != 5) {
 		if (player1->verifyPlayerCollision) {
 			if (player1->otherPlayerInCollision == "player2")
 				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);

@@ -92,14 +92,22 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 
 	float thumbLeftDeadZone = getDeadZone(thumbLeftX, thumbLeftY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
 
-	// A button
+	// Other buttons
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
+	bool B_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0); // return
 
 	float newTime = glfwGetTime();
-	if (newTime - gameLoop->returnToMainMenuTimeoutStart > gameLoop->returnToMainMenuTimeoutLength) {
-		gameLoop->returnToMainMenuTimeoutStart = -1;
+	if (newTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
 		if (A_button_pressed) {
 			gameLoop->isMenuItemSelected = true; 
+		}
+		if (B_button_pressed) {
+			if (gameLoop->gameStage != 1) {
+				gameLoop->gameStage--;
+				gameLoop->menuSelectionNumber = 1;
+				gameLoop->mainMenuTimeoutStart = newTime;
+			}
 		}
 	}
 
@@ -113,7 +121,7 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 		if (gameLoop->menuSelectionNumber == 1) {
 			gameLoop->menuSelectionNumber = 2;
 		}
-	}
+	}	
 }
 
 void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted) {
@@ -391,3 +399,18 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 }
 
+int XboxController::getNumberConnectedControllers() {
+	int numControllers = 0;
+
+	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		XINPUT_STATE state;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+			numControllers++;
+		}
+	}
+	printf("NUM CONTROLLER: %d\n", numControllers);
+	return numControllers;
+}

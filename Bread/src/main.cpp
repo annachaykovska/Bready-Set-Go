@@ -266,8 +266,10 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
-				g_systems.physics->update(dt, gameLoop.gameStage);
+			if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
+				if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
+					g_systems.physics->update(dt, gameLoop.gameStage);
+				}
 			}
 			accumulator -= dt;
 			t += dt;
@@ -276,17 +278,17 @@ int main()
 		// WINDOW
 		window.clear();
 
-		if (gameLoop.gameStage == 1) {
+		if (gameLoop.gameStage == 1 || gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
 			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4  controller
+			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
 			
 			// RENDER
-			ui.updateMainMenu(gameLoop.menuSelectionNumber);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
-		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+		else if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
 			// TODO: Move out of main and make less dependent
 			pizza.updateRecipeProgress(p1Inv);
 			omelette.updateRecipeProgress(p2Inv);
@@ -338,8 +340,9 @@ int main()
 
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
-			gameLoop.updateGameStageFromMenu();
-			audio.turnOffAllAudio();
+			gameLoop.updateGameStageFromMenu(controllers.getNumberConnectedControllers());
+			if (gameLoop.gameStage >= 4)
+				audio.turnOffAllAudio();
 			// The game audio is played by the update function, no need to play it here
 			gameLoop.isPaused = false;
 		}
