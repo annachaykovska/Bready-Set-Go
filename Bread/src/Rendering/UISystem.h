@@ -38,7 +38,7 @@ public:
 	~UISystem();
 
 	void updateGame(int endScreenValue, int pauseMenuItemSelected, bool pause = false);
-	void updateMainMenu(int itemSelected, int gameStage);
+	void updateMainMenu(int itemSelected, int gameStage, int numCntrollers);
 	void updateEndGame(int endScreenValue);
 	void showPauseMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
@@ -102,6 +102,7 @@ private:
 	ImageTexture multiPlayerButtonNormal;
 	ImageTexture multiPlayerButtonPressed;
 
+	ImageTexture playerConnected0;
 	ImageTexture playerConnected1;
 	ImageTexture playerConnected2;
 	ImageTexture playerConnected3;

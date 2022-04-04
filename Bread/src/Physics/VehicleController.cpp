@@ -387,3 +387,18 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 }
 
+int XboxController::getNumberConnectedControllers() {
+	int numControllers = 0;
+
+	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		XINPUT_STATE state;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+			numControllers++;
+		}
+	}
+	printf("NUM CONTROLLER: %d\n", numControllers);
+	return numControllers;
+}

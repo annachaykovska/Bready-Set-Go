@@ -283,7 +283,7 @@ int main()
 			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
 			
 			// RENDER
-			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
 		else if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
