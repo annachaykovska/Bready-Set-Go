@@ -19,7 +19,7 @@ public:
 	const float showPauseMenuTimeoutLength;
 
 	// State of the game
-	// 1 = main menu, 2 = play, 3 = game ended (no collision updates from here)
+	// 1 = main menu, 2 = single/multi screen, 3 = select # multi, 4 = play, 5 = game ended (no collision updates from here)
 	int gameStage;
 
 	// Main menu things

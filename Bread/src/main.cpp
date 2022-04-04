@@ -276,17 +276,17 @@ int main()
 		// WINDOW
 		window.clear();
 
-		if (gameLoop.gameStage == 1) {
+		if (gameLoop.gameStage == 1 || gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
 			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4  controller
+			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
 			
 			// RENDER
-			ui.updateMainMenu(gameLoop.menuSelectionNumber);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage);
 			window.swapBuffer();
 		}
-		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+		else if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
 			// TODO: Move out of main and make less dependent
 			pizza.updateRecipeProgress(p1Inv);
 			omelette.updateRecipeProgress(p2Inv);

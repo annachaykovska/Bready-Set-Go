@@ -41,7 +41,7 @@ void GameLoopManager::resetGameLoopValues() {
 
 void GameLoopManager::updateGameStageFromMenu() {
 	if (menuSelectionNumber == 1) { // start game selected
-		gameStage = 2;
+		gameStage = 4;
 		isMenuItemSelected = false;
 		mainMenuTimeoutStart = glfwGetTime();
 	}
@@ -69,7 +69,7 @@ void GameLoopManager::updateGameStageFromPause() {
 
 
 void GameLoopManager::setEndStage() {
-	gameStage = 3;
+	gameStage = 5;
 	if (endScreenGenerated == -1) {
 		// Add some random generation to final message 
 		srand((unsigned)time(0));
