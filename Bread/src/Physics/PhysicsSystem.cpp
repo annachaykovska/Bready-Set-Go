@@ -162,32 +162,6 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	return body;
 }
 
-/*
-PxRigidDynamic* PhysicsSystem::createObstacle(const PxTransform& t, PxReal halfExtent, std::string name)
-{
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
-	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
-	shape->setSimulationFilterData(cheeseFilter);
-
-	PxTransform localTm(PxVec3(0, 2, 0));
-	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
-	body->attachShape(*shape);
-	PxRigidBodyExt::updateMassAndInertia(*body, 100.f);
-
-	// Set physx actor name
-	body->setName(name.c_str()); // TODO one or both of these are not working correctly?
-
-	// Attach the entity to the physx actor
-	void* vp = static_cast<void*>(new std::string(name));
-	body->userData = vp;
-
-	mScene->addActor(*body);
-	shape->release();
-
-	return body;
-}
-*/
-
 void PhysicsSystem::updateCar() {
 	PxVehicleDrive4W* cars[4];
 	cars[0] = mVehiclePlayer1;
@@ -801,29 +775,35 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	updateFoodTransforms();
 
 	// Detect if cameras go behind walls
-	raycastCamera(this->mVehiclePlayer1, "player1");
 	if (g_scene.numPlayers > 3)
-		raycastCamera(this->mVehiclePlayer1, "player4");
+		raycastCamera(this->mVehiclePlayer4, "player4");
 	if (g_scene.numPlayers > 2)
-		raycastCamera(this->mVehiclePlayer1, "player3");
+		raycastCamera(this->mVehiclePlayer3, "player3");
 	if (g_scene.numPlayers > 1)
-		raycastCamera(this->mVehiclePlayer1, "player2");
+		raycastCamera(this->mVehiclePlayer2, "player2");
+	raycastCamera(this->mVehiclePlayer1, "player1");
 }
 
+// Check if camera is behind a wall and save the position of the wall if it is
 void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
 {
-	// Check if camera is behind a wall
+	// Get this player's current position
 	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
 	trans.p.y += 2.0f;
-	g_systems.render->setupCameras(g_scene.getEntity(name)->getTransform());
-	glm::vec3 p1Pos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
-	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - p1Pos);
-	float distance = glm::distance(g_scene.camera.position, p1Pos);
+
+	// Update the position of this player's camera
+	g_scene.camera.getViewMatrix(g_scene.getEntity(name)->getTransform());
+
+	// Shoot a ray from just above the player to their camera to detect walls
+	glm::vec3 playerPos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
+	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - playerPos);
+	float distance = glm::distance(g_scene.camera.position, playerPos);
 	physx::PxVec3 unitDirPx = physx::PxVec3(unitDir.x, unitDir.y, unitDir.z);
 	physx::PxRaycastBuffer hit;
 	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
-	Transform* p1 = g_scene.getEntity(name)->getTransform();
 
+	// If there was a wall between the player and their camera, save the wall's position
+	// to use as the camera's new position for rendering
 	if (status)
 	{
 		if (name == "player1")
@@ -847,8 +827,14 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 			this->p3CameraHit = true;
 		}
 	}
+	// If there was not wall, do nothing
 	else
+	{
 		this->p1CameraHit = false;
+		this->p2CameraHit = false;
+		this->p3CameraHit = false;
+		this->p4CameraHit = false;
+	}
 }
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
