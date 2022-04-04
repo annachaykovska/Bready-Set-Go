@@ -1452,11 +1452,13 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 		return; // Id passed in does not correspond to a car
 	}
 
+	std::cout << stealer->magnetStatus << std::endl;
+
 	// Check if in Cooldown
 	float currentTime = glfwGetTime();
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) { // in Cooldown
 		if (steal_button_held && steal_button_just_pressed) {
-			// TODO: play a cant steal right now noise
+			// TODO: play a cant steal right now noise (might be annoying actually)
 		}
 		stealer->magnetStatus = 0;
 	}
@@ -1595,17 +1597,22 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 						stealer->lastGracePeriodStart = currentTime;
 						stealer->lastMagnetUse = currentTime;
 						stealer->magnetStatus = 0;
+						stealer->tethered = false;
+
 						victim->lastGracePeriodStart = currentTime;
+						return;
 					}
 					else {
 						stealer->magnetStatus = 3; // still tethered
+						return;
 					}
 				}
 				else { // Tethered list is empty
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+					g_systems.audio->endSlurp(stealer->getAudioSource(), false);
 					stealer->tethered = false;
 					stealer->lastMagnetUse = currentTime;
 					stealer->magnetStatus = 0;
+					return;
 				}
 			}
 			else {
@@ -1614,17 +1621,19 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				stealer->tethered_victims.clear();
 				stealer->lastMagnetUse = currentTime;
 				stealer->magnetStatus = 0;
+				return;
 			}
-			return;
 		}
 
 		// Check if there are stealer has victims
 		std::vector<Entity*> victims;
 		makeVictimsList(stealer_id, victims);
 		checkVictims(stealer, victims, currentTime);
-		if (true) {
+		if (!victims.empty()) { // there are possible victims
+			stealer->magnetStatus = 2;
 		}
 		else {
+			stealer->magnetStatus = 1;
 		}
 	}
 }

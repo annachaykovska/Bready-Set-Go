@@ -54,7 +54,7 @@ public:
 	// 3 = tethered, and stealing from target
 	void magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed); 
 
-	// Updates the victims that can be stolen from
+	// Updates the victims that can be stolen from (TODO: SHOULD BE PRIVATE)
 	void checkVictims(Entity* stealer, std::vector<Entity*>& victims, float currentTime);
 	// Make victims list ( TODO: SHOULD BE PRIVATE)
 	void makeVictimsList(int stealer_id, std::vector<Entity*>& victims);
