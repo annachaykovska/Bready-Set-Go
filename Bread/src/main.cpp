@@ -266,8 +266,10 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
-				g_systems.physics->update(dt, gameLoop.gameStage);
+			if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
+				if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
+					g_systems.physics->update(dt, gameLoop.gameStage);
+				}
 			}
 			accumulator -= dt;
 			t += dt;
