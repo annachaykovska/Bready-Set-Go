@@ -21,6 +21,10 @@ UISystem::UISystem()
     , speedometer("resources/textures/speedometer.png", GL_NEAREST)
     , needle("resources/textures/needle.png", GL_NEAREST)
     , vacuum("resources/textures/vacuum.png", GL_NEAREST)
+    , vacuum_red("resources/textures/vacuum_red.png", GL_NEAREST)
+    , vacuum_blue("resources/textures/vacuum_blue.png", GL_NEAREST)
+    , vacuum_green("resources/textures/vacuum_green.png", GL_NEAREST)
+    , vacuum_yellow("resources/textures/vacuum_yellow.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
     , tomato("resources/textures/tomato.png", GL_NEAREST)
@@ -275,7 +279,17 @@ void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pa
     {
         powerReady = false;
     }
-    renderImage(imageShader, vacuum, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, (glfwGetTime()-p1_ent->lastMagnetUse)/p1_ent->magnetCooldown);
+    // TODO: Needs to be refactored when multiplayer is implemented
+    ImageTexture* vac_status;
+    double vac_alpha = 1.0;
+    if (p1_ent->magnetStatus == 0) {
+        vac_status = &vacuum_red;
+        vac_alpha = ((glfwGetTime() - p1_ent->lastMagnetUse) / p1_ent->magnetCooldown) * 0.75;
+    } else if (p1_ent->magnetStatus == 1) vac_status = &vacuum_yellow;
+    else if (p1_ent->magnetStatus == 2) vac_status = &vacuum_green;
+    else vac_status = &vacuum_blue;
+    
+    renderImage(imageShader, *vac_status, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, vac_alpha);
 
     renderImage(imageShader, speedometer, scX(0.875), scY(0.19), scX(0.225), scY(0.3), 0.f, 1.f);
 
@@ -339,7 +353,7 @@ void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pa
 
     // Drawing Inventory
     float alpha;
-    float faded = 0.4f;
+    float faded = 0.15f;
     float opaque = 1.f;
 
     float invScaleX = scX(0.04);

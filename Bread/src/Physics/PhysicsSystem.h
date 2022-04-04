@@ -43,7 +43,21 @@ public:
 	void respawnPlayerInPlace(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
 
+
+	// Functions for magnet ability
 	void magnet(int stealer_id);
+
+	// Sets entity magnet status
+	// 0 = in cooldown
+	// 1 = ready to steal, not close to target
+	// 2 = ready to steal, close to target
+	// 3 = tethered, and stealing from target
+	void magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed); 
+
+	// Updates the victims that can be stolen from (TODO: SHOULD BE PRIVATE)
+	void checkVictims(Entity* stealer, std::vector<Entity*>& victims, float currentTime);
+	// Make victims list ( TODO: SHOULD BE PRIVATE)
+	void makeVictimsList(int stealer_id, std::vector<Entity*>& victims);
 
 	void cleanupPhysics();
 
@@ -71,7 +85,7 @@ public:
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer3;
 	PxVehicleDrive4WRawInputData mVehicleInputDataPlayer4;
 	
-	// For Tweaking
+	// Start of tweaking variables
 	void updateCar();
 
 	float chassis_mass;
@@ -93,6 +107,8 @@ public:
 	float peak_torque;
 	float max_omega;
 	float max_brake_torque;
+	
+	// End of tweaking variables
 
 	bool p1CameraHit;
 	glm::vec3 p1CameraHitPos;
