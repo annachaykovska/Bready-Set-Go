@@ -8,7 +8,7 @@ class GameLoopManager {
 public:
 	GameLoopManager();
 	void resetGameLoopValues();
-	void updateGameStageFromMenu();
+	void updateGameStageFromMenu(int numPlayers);
 	void updateGameStageFromPause();
 	void setEndStage();
 	void gameActorsReset(PhysicsSystem* physics, IngredientTracker* ingredientTracker, Inventory* p1Inv, Inventory* p2Inv, Inventory* p3Inv, Inventory* p4Inv);

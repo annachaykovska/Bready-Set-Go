@@ -338,7 +338,7 @@ int main()
 
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
-			gameLoop.updateGameStageFromMenu();
+			gameLoop.updateGameStageFromMenu(controllers.getNumberConnectedControllers());
 			if (gameLoop.gameStage >= 4)
 				audio.turnOffAllAudio();
 			// The game audio is played by the update function, no need to play it here

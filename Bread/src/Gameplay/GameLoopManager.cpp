@@ -15,13 +15,13 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 , isGameEnded(false)
 , mainMenuTimeoutStart(-1)
 , returnToMainMenuTimeoutStart(-1)
-, mainMenuTimeoutLength(1)
-, returnToMainMenuTimeoutLength(1)
+, mainMenuTimeoutLength(0.5)
+, returnToMainMenuTimeoutLength(0.5)
 , endScreenGenerated(-1)
 , isPaused(false)
 , showPauseMenu(false)
 , pauseMenuSelection(1)
-, showPauseMenuTimeoutLength(1)
+, showPauseMenuTimeoutLength(0.5)
 , showPauseMenuTimeoutStart(-1)
 , isPauseMenuItemSelected(false)
 {}
@@ -39,7 +39,7 @@ void GameLoopManager::resetGameLoopValues() {
 	return;
 }
 
-void GameLoopManager::updateGameStageFromMenu() {
+void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
 	if (gameStage == 1) {
 		if (menuSelectionNumber == 1) { // start game selected
 			gameStage = 2;
@@ -55,8 +55,9 @@ void GameLoopManager::updateGameStageFromMenu() {
 			gameStage = 4;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
+			g_scene.numPlayers = 1;
 		}
-		else if (menuSelectionNumber == 2) { // exit
+		else if (menuSelectionNumber == 2) { // multiplayer
 			gameStage = 3;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
@@ -68,6 +69,7 @@ void GameLoopManager::updateGameStageFromMenu() {
 			gameStage = 4;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
+			g_scene.numPlayers = numPlayers;
 		}
 	}
 	return;
