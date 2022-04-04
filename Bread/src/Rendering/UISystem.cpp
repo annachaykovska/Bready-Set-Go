@@ -171,12 +171,12 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage) {
     }
     else if (gameStage == 2) {
         if (itemSelected == 1) { // single player
-            renderImage(imageShader, singlePlayerButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
-            renderImage(imageShader, multiPlayerButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, multiPlayerButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, singlePlayerButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
         }
         else if (itemSelected == 2) { // multiplayer
-            renderImage(imageShader, singlePlayerButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
-            renderImage(imageShader, multiPlayerButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, multiPlayerButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, singlePlayerButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
         }
 
     }

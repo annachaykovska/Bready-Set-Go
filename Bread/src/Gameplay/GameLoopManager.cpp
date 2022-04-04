@@ -40,13 +40,21 @@ void GameLoopManager::resetGameLoopValues() {
 }
 
 void GameLoopManager::updateGameStageFromMenu() {
-	if (menuSelectionNumber == 1) { // start game selected
-		gameStage = 4;
-		isMenuItemSelected = false;
-		mainMenuTimeoutStart = glfwGetTime();
+	if (gameStage == 1) {
+		if (menuSelectionNumber == 1) { // start game selected
+			gameStage = 2;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+		}
+		else if (menuSelectionNumber == 2) { // exit
+			isGameExitSelected = true;
+		}
 	}
-	else if (menuSelectionNumber == 2) { // exit
-		isGameExitSelected = true;
+	else if (gameStage == 2) {
+
+	}
+	else if (gameStage == 3) {
+
 	}
 	return;
 }
