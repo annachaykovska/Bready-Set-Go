@@ -278,9 +278,9 @@ int main()
 
 		if (gameLoop.gameStage == 1) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4  controller
 			
 			// RENDER
 			ui.updateMainMenu(gameLoop.menuSelectionNumber);

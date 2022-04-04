@@ -199,7 +199,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	// Flip car
 	float currentTime = glfwGetTime();
 	if (B_button_pressed) {
-		if (b_held) {
+		if (*b_held) {
 			if (currentTime - *b_buttonTimeStart > 2) {
 				*b_held = false;
 				physics->respawnPlayerInPlace(controllerId + 1);
