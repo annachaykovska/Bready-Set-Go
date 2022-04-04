@@ -1466,13 +1466,13 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 			makeVictimsList(stealer_id, stealer->tethered_victims); // TODO: THIS MIGHT NOT HAVE TO BE A FUNCTION
 			checkVictims(stealer, stealer->tethered_victims, currentTime);
 			if (!stealer->tethered_victims.empty()) { // Check if stealer has victims
-				// TODO: start playing sucking noise
+				g_systems.audio->playSlurp(stealer->getAudioSource());
 				stealer->magnetStartTime = currentTime;
 				stealer->tethered = true;
 				stealer->magnetStatus = 3;
 			}
 			else {
-				// TODO: play sucking failed noise
+				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
 				stealer->lastMagnetUse = currentTime;
 				stealer->magnetStatus = 0;
 			}
@@ -1589,7 +1589,7 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 								break;
 							}
 						}
-						//TODO: play a done sound
+						g_systems.audio->endSlurp(stealer->getAudioSource(), true);
 
 						// Update stealer/victim variables
 						stealer->lastGracePeriodStart = currentTime;
@@ -1602,11 +1602,14 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 					}
 				}
 				else { // Tethered list is empty
+				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+					stealer->tethered = false;
 					stealer->lastMagnetUse = currentTime;
 					stealer->magnetStatus = 0;
 				}
 			}
 			else {
+				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
 				stealer->tethered = false;
 				stealer->tethered_victims.clear();
 				stealer->lastMagnetUse = currentTime;

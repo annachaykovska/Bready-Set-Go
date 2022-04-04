@@ -179,17 +179,15 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	bool START_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0); // RESET
 	bool BACK_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0); // pause
 
-	if (Y_button_pressed && !y_held) { // y just pressed
-		//physics->magnet(1);
-		physics->magnetCheckStealing(1, Y_button_pressed, !(*y_held));
+	if (Y_button_pressed && !*y_held) { // y just pressed
+		physics->magnetCheckStealing(controllerId+1, Y_button_pressed, !*y_held);
 		*y_held = true;
 	}
 	else if (Y_button_pressed) { // y held
-		//physics->magnet(1);
-		physics->magnetCheckStealing(1, Y_button_pressed, !(*y_held));
+		physics->magnetCheckStealing(controllerId+1, Y_button_pressed, !*y_held);
 	}
 	else { // y not pressed
-		physics->magnetCheckStealing(1, Y_button_pressed, !(*y_held));
+		physics->magnetCheckStealing(controllerId+1, Y_button_pressed, !*y_held);
 		*y_held = false;
 	}
 

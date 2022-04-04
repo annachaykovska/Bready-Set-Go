@@ -17,7 +17,6 @@ public:
 	physx::PxTransform originalSpawn;
 	
 	Entity(std::string name);
-	Entity();
 	bool attachComponent(Component* newComponent, std::string);
 	//bool attachComponent(Component* newComponent, std::string&);
 	Component* getComponent(std::string);

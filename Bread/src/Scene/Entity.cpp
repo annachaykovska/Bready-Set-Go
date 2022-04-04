@@ -28,29 +28,8 @@ Entity::Entity(std::string name)
 	this->lastGracePeriodStart = 0.f;
 	this->tethered = false;
 	this->magnetStartTime = 0.f;
-	this->magnetTimeToSteal = 0.1f;
+	this->magnetTimeToSteal = 0.5f;
 
-}
-
-Entity::Entity(){
-	this->name = "default";
-	this->originalSpawn;
-	this->removeFlag = false;
-	this->orientation = glm::vec3(1.0f);
-	this->verifyPlayerCollision = false;
-	this->otherPlayerInCollision = "";
-	this->collisionCooldownStart = 0;
-
-	//Magnet variables
-	int magnetStatus = 0;
-	this->magnetDistanceSquared = 200.f;
-	this->magnetCooldown = 4.0f;
-	this->lastMagnetUse = 0.f;
-	this->gracePeriod = 6.0f;
-	this->lastGracePeriodStart = 0.f;
-	this->tethered = false;
-	this->magnetStartTime = 0.f;
-	this->magnetTimeToSteal = 0.1f;
 }
 
 bool Entity::attachComponent(Component* newComponent, std::string name)

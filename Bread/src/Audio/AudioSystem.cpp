@@ -306,12 +306,13 @@ void AudioSystem::stopMusic(AudioSource* source) {
 }
 
 void AudioSystem::playSlurp(AudioSource* source) {
-	source->gain = 0.01f; // Volume control
+	source->gain = 1.f; // Volume control
 	source->loop = true;
 	source->play("slurp.wav"); // Comment this out to turn off the music on load
 }
 
 void AudioSystem::endSlurp(AudioSource* source, bool success) {
+	source->gain = 1.f; // Volume control
 	source->stop();
 	source->loop = false;
 	if (success) {
