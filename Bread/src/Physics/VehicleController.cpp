@@ -96,8 +96,8 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
 
 	float newTime = glfwGetTime();
-	if (newTime - gameLoop->returnToMainMenuTimeoutStart > gameLoop->returnToMainMenuTimeoutLength) {
-		gameLoop->returnToMainMenuTimeoutStart = -1;
+	if (newTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
 		if (A_button_pressed) {
 			gameLoop->isMenuItemSelected = true; 
 		}

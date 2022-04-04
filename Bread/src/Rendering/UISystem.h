@@ -96,10 +96,16 @@ private:
 	ImageTexture startGameButtonPressed;
 	ImageTexture exitButtonNormal;
 	ImageTexture exitButtonPressed;
+
 	ImageTexture singlePlayerButtonNormal;
 	ImageTexture singlePlayerButtonPressed;
 	ImageTexture multiPlayerButtonNormal;
 	ImageTexture multiPlayerButtonPressed;
+
+	ImageTexture playerConnected1;
+	ImageTexture playerConnected2;
+	ImageTexture playerConnected3;
+	ImageTexture playerConnected4;
 
 	// Pause Menu
 	ImageTexture pauseMenu;

@@ -49,6 +49,10 @@ UISystem::UISystem()
     , singlePlayerButtonPressed("resources/textures/button_single_player_selected.png", GL_NEAREST)
     , multiPlayerButtonNormal("resources/textures/button_multi_player.png", GL_NEAREST)
     , multiPlayerButtonPressed("resources/textures/button_multi_player_selected.png", GL_NEAREST)
+    , playerConnected1("resources/textures/player_connected_1.png", GL_NEAREST)
+    , playerConnected2("resources/textures/player_connected_2.png", GL_NEAREST)
+    , playerConnected3("resources/textures/player_connected_3.png", GL_NEAREST)
+    , playerConnected4("resources/textures/player_connected_4.png", GL_NEAREST)
     , speedometer_theta(MIN_SPEED_THETA)
     , powerReady(true)
     , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
@@ -181,7 +185,8 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage) {
 
     }
     else if (gameStage == 3) {
-        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, playerConnected1, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
 
     // Background

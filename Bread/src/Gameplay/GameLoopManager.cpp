@@ -51,10 +51,24 @@ void GameLoopManager::updateGameStageFromMenu() {
 		}
 	}
 	else if (gameStage == 2) {
+		if (menuSelectionNumber == 1) { // start game selected
+			gameStage = 4;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+		}
+		else if (menuSelectionNumber == 2) { // exit
+			gameStage = 3;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+		}
 
 	}
 	else if (gameStage == 3) {
-
+		if (menuSelectionNumber == 1) { // start game selected
+			gameStage = 4;
+			isMenuItemSelected = false;
+			mainMenuTimeoutStart = glfwGetTime();
+		}
 	}
 	return;
 }
