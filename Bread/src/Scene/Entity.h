@@ -17,7 +17,6 @@ public:
 	physx::PxTransform originalSpawn;
 	
 	Entity(std::string name);
-	Entity();
 	bool attachComponent(Component* newComponent, std::string);
 	//bool attachComponent(Component* newComponent, std::string&);
 	Component* getComponent(std::string);
@@ -38,13 +37,20 @@ public:
 	float collisionCooldownStart;
 
 	// Grab ability variables
-	float magnetDistanceSquared;
-
+	int magnetStatus;
+	float magnetDistanceSquared; // Max distance that can be stolen from (squared for faster calculations)
 	float magnetCooldown;
-	float lastMagnetUse; // Time at which the magnet ability was used last
+	float lastMagnetUse;
 
-	float stolenFromGracePeriod;
-	float lastStolenFrom;
+	// Time period when player cannot be stolen from
+	float gracePeriod;
+	float lastGracePeriodStart;
+
+	// For the tethered vacuum
+	bool tethered;
+	std::vector<Entity*> tethered_victims;
+	float magnetTimeToSteal;
+	float magnetStartTime;
 
 private:
 

@@ -65,6 +65,10 @@ private:
 	bool powerReady;
 	ImageTexture needle;
 	ImageTexture vacuum;
+	ImageTexture vacuum_red;
+	ImageTexture vacuum_yellow;
+	ImageTexture vacuum_blue;
+	ImageTexture vacuum_green;
 	ImageTexture miniMap;
 	ImageTexture inventory;
 
