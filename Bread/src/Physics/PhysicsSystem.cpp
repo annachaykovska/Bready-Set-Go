@@ -1452,8 +1452,6 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 		return; // Id passed in does not correspond to a car
 	}
 
-	std::cout << stealer->magnetStatus << std::endl;
-
 	// Check if in Cooldown
 	float currentTime = glfwGetTime();
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) { // in Cooldown
