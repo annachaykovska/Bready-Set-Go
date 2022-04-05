@@ -103,7 +103,7 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 			gameLoop->isMenuItemSelected = true; 
 		}
 		if (B_button_pressed) {
-			if (gameLoop->gameStage != 1) {
+			if (gameLoop->gameStage != GameLoopMode::MENU_START) {
 				gameLoop->gameStage--;
 				gameLoop->menuSelectionNumber = 1;
 				gameLoop->mainMenuTimeoutStart = newTime;

@@ -247,7 +247,7 @@ int main()
 	double accumulator = 0.0;
 
 	// Change to 1 for submission
-	gameLoop.gameStage = 1;
+	gameLoop.gameStage = GameLoopMode::MENU_START; // Change to MAIN_GAME_PLAY to skip menus
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -266,7 +266,7 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
+			if (gameLoop.gameStage == GameLoopMode::MAIN_GAME_PLAY || gameLoop.gameStage == GameLoopMode::END_GAME) {
 				if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
 					g_systems.physics->update(dt, gameLoop.gameStage);
 				}
@@ -278,7 +278,7 @@ int main()
 		// WINDOW
 		window.clear();
 
-		if (gameLoop.gameStage == 1 || gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+		if (gameLoop.gameStage == GameLoopMode::MENU_START || gameLoop.gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION || gameLoop.gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
 			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
 			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
 			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
@@ -288,7 +288,7 @@ int main()
 			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
-		else if (gameLoop.gameStage == 4 || gameLoop.gameStage == 5) {
+		else if (gameLoop.gameStage == GameLoopMode::MAIN_GAME_PLAY || gameLoop.gameStage == GameLoopMode::END_GAME) {
 			// TODO: Move out of main and make less dependent
 			pizza.updateRecipeProgress(p1Inv);
 			omelette.updateRecipeProgress(p2Inv);
@@ -325,9 +325,12 @@ int main()
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
-				//p2Brain.update();
-				p3Brain.update();
-				p4Brain.update();
+				if (g_scene.numPlayers <= 3)
+					p4Brain.update();
+				if (g_scene.numPlayers <= 2)
+					p3Brain.update();
+				if (g_scene.numPlayers <= 1)
+					p2Brain.update();
 			}
 
 			// AUDIO
@@ -341,7 +344,7 @@ int main()
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu(controllers.getNumberConnectedControllers());
-			if (gameLoop.gameStage >= 4)
+			if (gameLoop.gameStage >= GameLoopMode::MAIN_GAME_PLAY)
 				audio.turnOffAllAudio();
 			// The game audio is played by the update function, no need to play it here
 			gameLoop.isPaused = false;

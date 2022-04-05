@@ -7,7 +7,7 @@
 extern Scene g_scene;
 
 
-GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the menu
+GameLoopManager::GameLoopManager() : gameStage(GameLoopMode::MENU_START) 
 , menuSelectionNumber(1)
 , isMenuItemSelected(false)
 , isBackToMenuSelected(false)
@@ -28,7 +28,7 @@ GameLoopManager::GameLoopManager() : gameStage(1) // set this to 2 to skip the m
 
 
 void GameLoopManager::resetGameLoopValues() {
-	gameStage = 1;
+	gameStage = GameLoopMode::MENU_START;
 	isBackToMenuSelected = false;
 	isGameEnded = false;
 	returnToMainMenuTimeoutStart = glfwGetTime();
@@ -40,9 +40,9 @@ void GameLoopManager::resetGameLoopValues() {
 }
 
 void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
-	if (gameStage == 1) {
+	if (gameStage == GameLoopMode::MENU_START) {
 		if (menuSelectionNumber == 1) { // start game selected
-			gameStage = 2;
+			gameStage = GameLoopMode::MENU_SINGLE_MULTI_SELECTION;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
 		}
@@ -50,23 +50,23 @@ void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
 			isGameExitSelected = true;
 		}
 	}
-	else if (gameStage == 2) {
+	else if (gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION) {
 		if (menuSelectionNumber == 1) { // start game selected
-			gameStage = 4;
+			gameStage = GameLoopMode::MAIN_GAME_PLAY;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
 			g_scene.numPlayers = 1;
 		}
 		else if (menuSelectionNumber == 2) { // multiplayer
-			gameStage = 3;
+			gameStage = GameLoopMode::MENU_MULTI_CONNECT;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
 		}
 
 	}
-	else if (gameStage == 3) {
+	else if (gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
 		if (menuSelectionNumber == 1) { // start game selected
-			gameStage = 4;
+			gameStage = GameLoopMode::MAIN_GAME_PLAY;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
 			g_scene.numPlayers = numPlayers;
@@ -83,7 +83,7 @@ void GameLoopManager::updateGameStageFromPause() {
 		isPaused = false;
 	}
 	else if (pauseMenuSelection == 2) { // exit
-		gameStage = 1;
+		gameStage = GameLoopMode::MENU_START;
 		isBackToMenuSelected = true;
 		isPauseMenuItemSelected = false;
 		showPauseMenuTimeoutStart = glfwGetTime();
@@ -93,7 +93,7 @@ void GameLoopManager::updateGameStageFromPause() {
 
 
 void GameLoopManager::setEndStage() {
-	gameStage = 5;
+	gameStage = GameLoopMode::END_GAME;
 	if (endScreenGenerated == -1) {
 		// Add some random generation to final message 
 		srand((unsigned)time(0));

@@ -2,6 +2,7 @@
 #include "../Inventory.h"
 #include "../Scene/Entity.h"
 #include "../Gameplay/Recipe.h"
+#include "../Gameplay/GameLoopManager.h"
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -168,7 +169,7 @@ UISystem::~UISystem() {
 
 void UISystem::updateMainMenu(int itemSelected, int gameStage, int numControllers) {
     // Buttons
-    if (gameStage == 1) {
+    if (gameStage == GameLoopMode::MENU_START) {
         if (itemSelected == 1) { // start game
             renderImage(imageShader, exitButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
             renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
@@ -178,7 +179,7 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage, int numController
             renderImage(imageShader, startGameButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
         }
     }
-    else if (gameStage == 2) {
+    else if (gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION) {
         if (itemSelected == 1) { // single player
             renderImage(imageShader, multiPlayerButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
             renderImage(imageShader, singlePlayerButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
@@ -189,7 +190,7 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage, int numController
         }
 
     }
-    else if (gameStage == 3) {
+    else if (gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
         if (numControllers == 0) {
             renderImage(imageShader, playerConnected0, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
         }

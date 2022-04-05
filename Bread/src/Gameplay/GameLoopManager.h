@@ -19,7 +19,6 @@ public:
 	const float showPauseMenuTimeoutLength;
 
 	// State of the game
-	// 1 = main menu, 2 = single/multi screen, 3 = select # multi, 4 = play, 5 = game ended (no collision updates from here)
 	int gameStage;
 
 	// Main menu things
@@ -45,4 +44,13 @@ public:
 
 private:
 
+};
+
+
+enum GameLoopMode {
+	MENU_START = 1,
+	MENU_SINGLE_MULTI_SELECTION = 2,
+	MENU_MULTI_CONNECT = 3,
+	MAIN_GAME_PLAY = 4, 
+	END_GAME = 5
 };
