@@ -287,6 +287,7 @@ int main()
 			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
 			
 			// RENDER
+			renderer.update();
 			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
