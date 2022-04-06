@@ -36,6 +36,8 @@ void GameLoopManager::resetGameLoopValues() {
 	pauseMenuSelection = 1;
 	showPauseMenu = false;
 	isPauseMenuItemSelected = false;
+
+	g_scene.numPlayers = 1;
 	return;
 }
 
@@ -61,8 +63,8 @@ void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
 			gameStage = GameLoopMode::MENU_MULTI_CONNECT;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
+			menuSelectionNumber = 1;
 		}
-
 	}
 	else if (gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
 		if (menuSelectionNumber == 1) { // start game selected
