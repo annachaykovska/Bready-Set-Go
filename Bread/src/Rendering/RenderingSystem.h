@@ -47,6 +47,8 @@ public:
 	glm::vec3 lightDir;
 	int shadowHiRes;
 	int shadowLoRes;
+	unsigned int shadowWidth;
+	unsigned int shadowHeight;
 
 	int shadowDebugMode;
 

@@ -200,6 +200,7 @@ int main()
 
 	// Set up game loop manager
 	GameLoopManager gameLoop = GameLoopManager();
+	g_systems.loop = &gameLoop;
 
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics, &ui, &gameLoop);
@@ -271,6 +272,7 @@ int main()
 					g_systems.physics->update(dt, gameLoop.gameStage);
 				}
 			}
+
 			accumulator -= dt;
 			t += dt;
 		}

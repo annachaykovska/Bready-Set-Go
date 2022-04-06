@@ -149,6 +149,16 @@ void RenderingSystem::initShadows()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// High resolution shadows ---------------------------------------------------------------------
+	
+	this->shadowWidth = g_systems.width / g_scene.numPlayers;
+	this->shadowHeight = g_systems.height / g_scene.numPlayers;
+
+	if (g_scene.numPlayers == 3)
+	{
+		g_systems.width / 4;
+		g_systems.height / 4;
+	}
+
 	// Configure depth map FBO
 	glGenFramebuffers(1, &this->p1ShadowsFBO);
 
@@ -156,7 +166,7 @@ void RenderingSystem::initShadows()
 	glGenTextures(1, &this->p1ShadowsTex);
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -179,7 +189,7 @@ void RenderingSystem::initShadows()
 	glGenTextures(1, &this->p2ShadowsTex);
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->p2ShadowsTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -201,7 +211,7 @@ void RenderingSystem::initShadows()
 	glGenTextures(1, &this->p3ShadowsTex);
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->p3ShadowsTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -223,7 +233,7 @@ void RenderingSystem::initShadows()
 	glGenTextures(1, &this->p4ShadowsTex);
 	glActiveTexture(GL_TEXTURE25);
 	glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, this->shadowHiRes / 4, this->shadowHiRes / 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -546,9 +556,16 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	float screenWidth = g_systems.width;
 	float screenHeight = g_systems.height;
 
-	this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
-	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
-}
+	if (g_scene.numPlayers != 2)
+	{
+		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
+	}
+	else
+	{
+		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / (screenHeight / 2), 0.1f, 1000.0f);
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
+	}
 
 void RenderingSystem::createLoResShadowMap()
 {
@@ -614,14 +631,14 @@ void RenderingSystem::createHiResShadowMap(const std::string name)
 	{
 		this->p4LightSpaceMatrix = lightSpaceMatrix;
 		glBindFramebuffer(GL_FRAMEBUFFER, this->p4ShadowsFBO);
-	}	
+	}
 
 	// Switch to depth map shader and update it's light space matrix uniform
 	depthShader.use();
 	depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 	// Resize the viewport for hi-res shadows
-	glViewport(0, 0, this->shadowHiRes / 4, this->shadowHiRes / 4);
+	glViewport(0, 0, this->shadowWidth, this->shadowHeight);
 
 	// Draw to a FBO (texture)
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -682,7 +699,7 @@ void RenderingSystem::renderScene(const std::string name)
 
 		if (g_scene.numPlayers == 2)
 			glViewport(0, 0, g_systems.width, g_systems.height / 2);
-		else 
+		else
 			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}	
 	else if (name == "player3")
