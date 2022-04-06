@@ -3,6 +3,7 @@
 #include "SystemManager.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
+#include "./Gameplay/GameLoopManager.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;

@@ -566,6 +566,7 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / (screenHeight / 2), 0.1f, 1000.0f);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
 	}
+}
 
 void RenderingSystem::createLoResShadowMap()
 {
