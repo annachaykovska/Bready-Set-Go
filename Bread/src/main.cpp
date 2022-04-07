@@ -49,7 +49,7 @@ int main()
 	Profiler profiler(window);
 
 	// TODO change this at runtime in the main menu
-	g_scene.numPlayers = 4;
+	g_scene.numPlayers = 1;
 
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
@@ -247,8 +247,8 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
-	//gameLoop.gameStage = GameLoopMode::MENU_START;
-	gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY; // Skips menus
+	gameLoop.gameStage = GameLoopMode::MENU_START;
+	//gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY; // Skips menus
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
