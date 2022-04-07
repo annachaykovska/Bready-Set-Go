@@ -9,6 +9,8 @@
 #include "../Scene/Entity.h"
 #include <stbi/stb_image.h>
 #include "../Timer.h"
+#include "UISystem.h"
+#include "../Gameplay/GameLoopManager.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -830,12 +832,12 @@ void RenderingSystem::update()
 	}
 
 	// Step 3. Render the scene from each player's perspective
-	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
 	{
-		std::string temp = "player";
-		temp += std::to_string(i + 1);
-
-		renderScene(temp);
+		std::string playerNum = "player" + std::to_string(i);
+		renderScene(playerNum);
+		
+		g_systems.ui->updatePlayer(i, false);
 	}
 }
 

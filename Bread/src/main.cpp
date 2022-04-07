@@ -49,7 +49,7 @@ int main()
 	Profiler profiler(window);
 
 	// TODO change this at runtime in the main menu
-	g_scene.numPlayers = 1;
+	g_scene.numPlayers = 4;
 
 	//-----------------------------------------------------------------------------------
 	// ENTITY-COMPONENT STUFF 
@@ -248,7 +248,8 @@ int main()
 	double accumulator = 0.0;
 
 	// Change to 1 for submission
-	gameLoop.gameStage = GameLoopMode::MENU_START; // Change to MAIN_GAME_PLAY to skip menus
+	//gameLoop.gameStage = GameLoopMode::MENU_START; // Change to MAIN_GAME_PLAY to skip menus
+	gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY;
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -311,12 +312,6 @@ int main()
 			
 			// RENDER
 			renderer.update();
-
-			if (!g_systems.renderDebug)
-			{
-				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame(gameLoop.endScreenGenerated, gameLoop.pauseMenuSelection, gameLoop.showPauseMenu);
-			}
 
 			// Update the ImGUI profiler
 			profiler.newFrame();
