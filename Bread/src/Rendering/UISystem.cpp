@@ -383,9 +383,9 @@ void UISystem::updateRecipeList()
 }
 
 // Helper function that renders the passed ImageTexture at the passed Transform
-void UISystem::drawIndicator(Transform trans, ImageTexture& image)
+void UISystem::drawIndicator(int playerNum, Transform trans, ImageTexture& image)
 {
-    glm::vec3 IngLocation = offscreenBubbleLocation(trans.position);
+    glm::vec3 IngLocation = offscreenBubbleLocation(playerNum, trans.position);
     renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
 }
 
@@ -402,13 +402,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player1")->getInventory();
 
         if (!inventory->cheese)
-            drawIndicator(tracker->getCheeseLocation(), cheeseOffscreen);
+            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen);
         if (!inventory->tomato)
-            drawIndicator(tracker->getTomatoLocation(), tomatoOffscreen);
+            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen);
         if (!inventory->dough)
-            drawIndicator(tracker->getDoughLocation(), doughOffscreen);
+            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen);
         if (!inventory->sausage)
-            drawIndicator(tracker->getSausageLocation(), sausageOffscreen);
+            drawIndicator(playerNum, tracker->getSausageLocation(), sausageOffscreen);
         break;
 
     case 2: // egg, cheese, peas, lettuce
@@ -416,13 +416,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player2")->getInventory();
 
         if (!inventory->egg)
-            drawIndicator(tracker->getEggLocation(), egg);
+            drawIndicator(playerNum, tracker->getEggLocation(), egg);
         if (!inventory->cheese)
-            drawIndicator(tracker->getCheeseLocation(), cheeseOffscreen);
+            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen); // This is giving wrong transform
         if (!inventory->peas)
-            drawIndicator(tracker->getPeasLocation(), peas);
+            drawIndicator(playerNum, tracker->getPeasLocation(), peas);
         if (!inventory->lettuce)
-            drawIndicator(tracker->getLettuceLocation(), lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce);
         break;
 
     case 3: // chicken, dough, rice, lettuce
@@ -430,13 +430,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player3")->getInventory();
 
         if (!inventory->chicken)
-            drawIndicator(tracker->getChickenLocation(), chicken);
+            drawIndicator(playerNum, tracker->getChickenLocation(), chicken);
         if (!inventory->dough)
-            drawIndicator(tracker->getDoughLocation(), doughOffscreen);
+            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen);
         if (!inventory->rice)
-            drawIndicator(tracker->getRiceLocation(), rice);
+            drawIndicator(playerNum, tracker->getRiceLocation(), rice);
         if (!inventory->lettuce)
-            drawIndicator(tracker->getLettuceLocation(), lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce);
         break;
 
     case 4: // parsnip, carrot, tomato, lettuce
@@ -444,13 +444,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player4")->getInventory();
 
         if (!inventory->parsnip)
-            drawIndicator(tracker->getParsnipLocation(), parsnip);
+            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnip);
         if (!inventory->carrot)
-            drawIndicator(tracker->getCarrotLocation(), carrot);
+            drawIndicator(playerNum, tracker->getCarrotLocation(), carrot);
         if (!inventory->tomato)
-            drawIndicator(tracker->getTomatoLocation(), tomatoOffscreen);
+            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen);
         if (!inventory->lettuce)
-            drawIndicator(tracker->getLettuceLocation(), lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce);
         break;
 
     default:
@@ -734,14 +734,15 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
+glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos)
 {
     glm::vec4 location = glm::vec4(entityPos, 1);
 
     glm::vec3 cam = g_scene.camera.centerBeam;
     glm::vec3 toEntity = entityPos - g_scene.camera.position;
 
-    glm::mat4 viewMatrix = g_scene.camera.getViewMatrix(g_scene.getEntity("player1")->getTransform());
+    std::string player = "player" + std::to_string(playerNum);
+    glm::mat4 viewMatrix = g_scene.camera.getViewMatrix(g_scene.getEntity(player)->getTransform());
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
 
     location = projectionMatrix * viewMatrix * location;

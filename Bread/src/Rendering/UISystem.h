@@ -50,7 +50,7 @@ private:
 	void updateVacuum(int playerNum);
 	void updateRecipeList();
 	void updateMiniMap();
-	void drawIndicator(Transform trans, ImageTexture& image);
+	void drawIndicator(int playerNum, Transform trans, ImageTexture& image);
 	void updateOffscreenIndicators(int playerNum);
 	void drawInventoryIcon(unsigned int haveItem, ImageTexture& image, unsigned int invPos);
 	void updateInventory(int playerNum);
@@ -58,7 +58,7 @@ private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
-	glm::vec3 offscreenBubbleLocation(glm::vec3 entityPos);
+	glm::vec3 offscreenBubbleLocation(int playerNum, glm::vec3 entityPos);
 	glm::vec2 miniMapPlayerPosition(Transform& transform);
 
 	float scX(float xVal);
