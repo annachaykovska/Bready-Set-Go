@@ -33,9 +33,17 @@ UISystem::UISystem()
     , sausage("resources/textures/sausage.png", GL_NEAREST)
     , dough("resources/textures/dough.png", GL_NEAREST)
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
+    , cheeseOffscreenUp("resources/textures/cheeseOffscreenUp.png", GL_NEAREST)
+    , cheeseOffscreenDown("resources/textures/cheeseOffscreenDown.png", GL_NEAREST)
     , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
+    , tomatoOffscreenUp("resources/textures/tomatoOffscreenUp.png", GL_NEAREST)
+    , tomatoOffscreenDown("resources/textures/tomatoOffscreenDown.png", GL_NEAREST)
     , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
+    , doughOffscreenUp("resources/textures/doughOffscreenUp.png", GL_NEAREST)
+    , doughOffscreenDown("resources/textures/doughOffscreenDown.png", GL_NEAREST)
     , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
+    , sausageOffscreenUp("resources/textures/sausageOffscreenUp.png", GL_NEAREST)
+    , sausageOffscreenDown("resources/textures/sausageOffscreenDown.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -334,26 +342,74 @@ void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pa
 
     if (!p1Inv->cheese)
     {
-        IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
-        renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        int cheeseY;
+        IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position, cheeseY);
+        if (cheeseY == 0)
+        {
+            renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else if (cheeseY == 1)
+        {
+            renderImage(imageShader, cheeseOffscreenUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, cheeseOffscreenDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
     }
 
     if (!p1Inv->tomato)
     {
-        IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
-        renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        int tomatoY;
+        IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position, tomatoY);
+        if (tomatoY == 0)
+        {
+            renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else if (tomatoY == 1)
+        {
+            renderImage(imageShader, tomatoOffscreenUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, tomatoOffscreenDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
     }
 
     if (!p1Inv->dough)
     {
-        IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
-        renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        int doughY;
+        IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position, doughY);
+        if (doughY == 0)
+        {
+            renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else if (doughY == 1)
+        {
+            renderImage(imageShader, doughOffscreenUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, doughOffscreenDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
     }
 
     if (!p1Inv->sausage)
     {
-        IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
-        renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        int sausageY;
+        IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position, sausageY);
+        if (sausageY == 0)
+        {
+            renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else if (sausageY == 1)
+        {
+            renderImage(imageShader, sausageOffscreenUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, sausageOffscreenDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        }
     }
 
     // Drawing Inventory
@@ -537,8 +593,11 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
+glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos, int& vertical)
 {
+    vertical = 0;
+    bool verticalOffscreen = false;
+    
     glm::vec4 location = glm::vec4(entityPos, 1);
 
     glm::vec3 cam = g_scene.camera.centerBeam;
@@ -555,9 +614,10 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
 
     location.x = (location.x + 1) * g_systems.width * 0.5;
     location.y = (location.y + 1) * g_systems.height * 0.5 + scY(0.1);
-
-    if (location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
+    
+    if(location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
     {
+        vertical = 0;
         // When location.z is not in the interval between [-1, 1] it is no longer in the camera frustrum.
         // This where you will need to put your code for the object offscreen beside and behind states. 
 
@@ -590,7 +650,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
         // If the entity is between 90 deg and the viewrange of the player
         else
         {
-            float offset = ((((g_systems.height / 2.f) - 0) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
+            float offset = (((((g_systems.height - scY(0.0375)) / 2.f) - scY(0.0375)) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
             if (upVector.y < 0)
             {
                 location.x = g_systems.width - scX(0.0375);
@@ -603,6 +663,20 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
             }
         }
         location.z = scX(0.04);
+    }
+    else if (location.y > g_systems.height)
+    {
+        vertical = 1;
+        location.y = g_systems.height - scX(0.0375);
+        location.z = scX(0.04);
+        verticalOffscreen = true;
+    }
+    else if (location.y < 0)
+    {
+        vertical = -1;
+        location.y = scY(0.0375);
+        location.z = scX(0.04);
+        verticalOffscreen = true;
     }
     else
     {
