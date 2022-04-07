@@ -116,6 +116,8 @@ private:
 	ImageTexture pauseMenu;
 	ImageTexture continueButton;
 	ImageTexture continueButtonPressed;
+	ImageTexture controlsMenu;
+	ImageTexture semiTransparent;
 
 	// End Game
 	ImageTexture gameOverPlayer1_1;

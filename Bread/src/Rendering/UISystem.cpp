@@ -75,6 +75,8 @@ UISystem::UISystem()
     , pauseMenu("resources/textures/pause_screen.png", GL_NEAREST)
     , continueButton("resources/textures/button_continue.png", GL_NEAREST)
     , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
+    , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
+    , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -242,14 +244,16 @@ void UISystem::updateEndGame(int endScreenValue) {
 
 void UISystem::showPauseMenu(int itemSelected) {
     if (itemSelected == 1) {
-        renderImage(imageShader, continueButtonPressed, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, backToMainMenuButton, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, continueButtonPressed, scX(0.73f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButton, scX(0.73f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
     else if (itemSelected == 2) {
-        renderImage(imageShader, continueButton, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, continueButton, scX(0.73f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.73f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
-    renderImage(imageShader, pauseMenu, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    renderImage(imageShader, pauseMenu, scX(0.73f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    renderImage(imageShader, controlsMenu, scX(0.23f), scY(0.53f), scX(0.8f), scY(0.8f), 0, 1.f);
+    renderImage(imageShader, semiTransparent, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
 }
 
 
