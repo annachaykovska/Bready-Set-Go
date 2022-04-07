@@ -823,12 +823,11 @@ void RenderingSystem::update()
 	createLoResShadowMap();
 
 	// Step 2. Create the hi-res shadow maps for the players
-	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
 	{
-		std::string temp = "player";
-		temp += std::to_string(i + 1);
+		std::string playerNum = "player" + std::to_string(i);
 
-		createHiResShadowMap(temp);
+		createHiResShadowMap(playerNum);
 	}
 
 	// Step 3. Render the scene from each player's perspective
@@ -837,7 +836,15 @@ void RenderingSystem::update()
 		std::string playerNum = "player" + std::to_string(i);
 		renderScene(playerNum);
 		
-		g_systems.ui->updatePlayer(i, false);
+		if (!g_systems.loop->isPaused)
+			g_systems.ui->updatePlayer(i);
+	}
+
+	if (g_systems.loop->isPaused)
+	{
+		glViewport(0, 0, g_systems.width, g_systems.height);
+		g_systems.ui->showPauseMenu(g_systems.loop->pauseMenuSelection);
+		return;
 	}
 }
 

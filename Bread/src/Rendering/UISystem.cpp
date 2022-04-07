@@ -3,6 +3,7 @@
 #include "../Scene/Entity.h"
 #include "../Gameplay/Recipe.h"
 #include "../Gameplay/GameLoopManager.h"
+#include "RenderingSystem.h"
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -32,6 +33,13 @@ UISystem::UISystem()
     , cheese("resources/textures/cheese.png", GL_NEAREST)
     , sausage("resources/textures/sausage.png", GL_NEAREST)
     , dough("resources/textures/dough.png", GL_NEAREST)
+    , egg("resources/textures/egg.png", GL_NEAREST)
+    , peas("resources/textures/peas.png", GL_NEAREST)
+    , lettuce("resources/textures/lettuce.png", GL_NEAREST)
+    , chicken("resources/textures/chicken.png", GL_NEAREST)
+    , rice("resources/textures/rice.png", GL_NEAREST)
+    , parsnip("resources/textures/parsnip.png", GL_NEAREST)
+    , carrot("resources/textures/carrot.png", GL_NEAREST)
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
     , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
     , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
@@ -389,7 +397,7 @@ void UISystem::updateOffscreenIndicators(int playerNum)
 
     switch (playerNum)
     {
-    case 1:
+    case 1: // cheese, tomato, dough, sausage
 
         inventory = g_scene.getEntity("player1")->getInventory();
 
@@ -398,51 +406,51 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         if (!inventory->tomato)
             drawIndicator(tracker->getTomatoLocation(), tomatoOffscreen);
         if (!inventory->dough)
-            drawIndicator(tracker->getTomatoLocation(), tomatoOffscreen);
+            drawIndicator(tracker->getDoughLocation(), doughOffscreen);
         if (!inventory->sausage)
             drawIndicator(tracker->getSausageLocation(), sausageOffscreen);
         break;
 
-    case 2:
+    case 2: // egg, cheese, peas, lettuce
 
         inventory = g_scene.getEntity("player2")->getInventory();
 
         if (!inventory->egg)
-            drawIndicator(tracker->getEggLocation(), cheeseOffscreen);
+            drawIndicator(tracker->getEggLocation(), egg);
         if (!inventory->cheese)
-            drawIndicator(tracker->getCheeseLocation(), tomatoOffscreen);
+            drawIndicator(tracker->getCheeseLocation(), cheeseOffscreen);
         if (!inventory->peas)
-            drawIndicator(tracker->getPeasLocation(), tomatoOffscreen);
+            drawIndicator(tracker->getPeasLocation(), peas);
         if (!inventory->lettuce)
-            drawIndicator(tracker->getLettuceLocation(), sausageOffscreen);
+            drawIndicator(tracker->getLettuceLocation(), lettuce);
         break;
 
-    case 3:
+    case 3: // chicken, dough, rice, lettuce
 
         inventory = g_scene.getEntity("player3")->getInventory();
 
         if (!inventory->chicken)
-            drawIndicator(tracker->getChickenLocation(), cheeseOffscreen);
+            drawIndicator(tracker->getChickenLocation(), chicken);
         if (!inventory->dough)
-            drawIndicator(tracker->getDoughLocation(), tomatoOffscreen);
+            drawIndicator(tracker->getDoughLocation(), doughOffscreen);
         if (!inventory->rice)
-            drawIndicator(tracker->getRiceLocation(), tomatoOffscreen);
+            drawIndicator(tracker->getRiceLocation(), rice);
         if (!inventory->lettuce)
-            drawIndicator(tracker->getLettuceLocation(), sausageOffscreen);
+            drawIndicator(tracker->getLettuceLocation(), lettuce);
         break;
 
-    case 4:
+    case 4: // parsnip, carrot, tomato, lettuce
 
         inventory = g_scene.getEntity("player4")->getInventory();
 
         if (!inventory->parsnip)
-            drawIndicator(tracker->getParsnipLocation(), cheeseOffscreen);
+            drawIndicator(tracker->getParsnipLocation(), parsnip);
         if (!inventory->carrot)
-            drawIndicator(tracker->getCarrotLocation(), tomatoOffscreen);
+            drawIndicator(tracker->getCarrotLocation(), carrot);
         if (!inventory->tomato)
             drawIndicator(tracker->getTomatoLocation(), tomatoOffscreen);
         if (!inventory->lettuce)
-            drawIndicator(tracker->getLettuceLocation(), sausageOffscreen);
+            drawIndicator(tracker->getLettuceLocation(), lettuce);
         break;
 
     default:
@@ -502,10 +510,10 @@ void UISystem::updateInventory(int playerNum)
 
         playerInv = g_scene.getEntity("player2")->getInventory();
 
-        drawInventoryIcon(playerInv->egg, cheese, 0);
+        drawInventoryIcon(playerInv->egg, egg, 0);
         drawInventoryIcon(playerInv->cheese, cheese, 1);
-        drawInventoryIcon(playerInv->peas, cheese, 2);
-        drawInventoryIcon(playerInv->lettuce, cheese, 3);
+        drawInventoryIcon(playerInv->peas, peas, 2);
+        drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->egg && playerInv->cheese && playerInv->peas && playerInv->lettuce) ? opaque : faded;
         renderImage(imageShader, cheese, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
@@ -516,10 +524,10 @@ void UISystem::updateInventory(int playerNum)
 
         playerInv = g_scene.getEntity("player3")->getInventory();
 
-        drawInventoryIcon(playerInv->chicken, dough, 0);
+        drawInventoryIcon(playerInv->chicken, chicken, 0);
         drawInventoryIcon(playerInv->dough, dough, 1);
-        drawInventoryIcon(playerInv->rice, dough, 2);
-        drawInventoryIcon(playerInv->lettuce, dough, 3);
+        drawInventoryIcon(playerInv->rice, rice, 2);
+        drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->chicken && playerInv->dough && playerInv->rice && playerInv->lettuce) ? opaque : faded;
         renderImage(imageShader, dough, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
@@ -530,10 +538,10 @@ void UISystem::updateInventory(int playerNum)
 
         playerInv = g_scene.getEntity("player4")->getInventory();
 
-        drawInventoryIcon(playerInv->parsnip, tomato, 0);
-        drawInventoryIcon(playerInv->carrot, tomato, 1);
+        drawInventoryIcon(playerInv->parsnip, parsnip, 0);
+        drawInventoryIcon(playerInv->carrot, carrot, 1);
         drawInventoryIcon(playerInv->tomato, tomato, 2);
-        drawInventoryIcon(playerInv->lettuce, tomato, 3);
+        drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->parsnip && playerInv->carrot && playerInv->tomato && playerInv->lettuce) ? opaque : faded;
         renderImage(imageShader, tomato, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
@@ -549,11 +557,8 @@ void UISystem::updateInventory(int playerNum)
     renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 }
 
-void UISystem::updatePlayer(unsigned int playerNum, bool pause)
+void UISystem::updatePlayer(unsigned int playerNum)
 {
-    if (pause)
-        showPauseMenu(g_systems.loop->pauseMenuSelection);
-
     if (checkForWin() != 0)
         updateEndGame(g_systems.loop->endScreenGenerated);
     

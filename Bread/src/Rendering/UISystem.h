@@ -37,7 +37,7 @@ public:
 	UISystem();
 	~UISystem();
 	
-	void updatePlayer(unsigned int playerNum, bool pause);
+	void updatePlayer(unsigned int playerNum);
 	void updateMainMenu(int itemSelected, int gameStage, int numCntrollers);
 	void updateEndGame(int endScreenValue);
 	void showPauseMenu(int itemSelected);
@@ -88,6 +88,13 @@ private:
 	ImageTexture cheese;
 	ImageTexture sausage;
 	ImageTexture dough;
+	ImageTexture egg;
+	ImageTexture peas;
+	ImageTexture lettuce;
+	ImageTexture chicken;
+	ImageTexture rice;
+	ImageTexture parsnip;
+	ImageTexture carrot;
 
 	ImageTexture cheeseOffscreen;
 	ImageTexture tomatoOffscreen;
