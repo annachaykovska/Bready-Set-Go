@@ -41,6 +41,7 @@ public:
 	float magnetDistanceSquared; // Max distance that can be stolen from (squared for faster calculations)
 	float magnetCooldown;
 	float lastMagnetUse;
+	float unflipTimer;
 
 	// Time period when player cannot be stolen from
 	float gracePeriod;
