@@ -35,7 +35,6 @@ public:
 	float map_sx;
 
 	UISystem();
-	~UISystem();
 	
 	void updatePlayer(unsigned int playerNum);
 	void updateMainMenu(int itemSelected, int gameStage, int numCntrollers);
@@ -50,7 +49,7 @@ private:
 	void updateVacuum(int playerNum);
 	void updateRecipeList();
 	void updateMiniMap();
-	void drawIndicator(int playerNum, Transform trans, ImageTexture& image);
+	void drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown);
 	void updateOffscreenIndicators(int playerNum);
 	void drawInventoryIcon(unsigned int haveItem, ImageTexture& image, unsigned int invPos);
 	void updateInventory(int playerNum);
@@ -58,7 +57,7 @@ private:
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
-	glm::vec3 offscreenBubbleLocation(int playerNum, glm::vec3 entityPos);
+	glm::vec3 offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical);
 	glm::vec2 miniMapPlayerPosition(Transform& transform);
 
 	float scX(float xVal);
@@ -97,9 +96,24 @@ private:
 	ImageTexture carrot;
 
 	ImageTexture cheeseOffscreen;
+	ImageTexture cheeseOffscreenUp;
+	ImageTexture cheeseOffscreenDown;
+
 	ImageTexture tomatoOffscreen;
+	ImageTexture tomatoOffscreenUp;
+	ImageTexture tomatoOffscreenDown;
+
 	ImageTexture doughOffscreen;
+	ImageTexture doughOffscreenUp;
+	ImageTexture doughOffscreenDown;
+
 	ImageTexture sausageOffscreen;
+	ImageTexture sausageOffscreenUp;
+	ImageTexture sausageOffscreenDown;
+
+	ImageTexture unflip3;
+	ImageTexture unflip2;
+	ImageTexture unflip1;
 
 	ImageTexture pizza;
 
@@ -135,6 +149,8 @@ private:
 	ImageTexture pauseMenu;
 	ImageTexture continueButton;
 	ImageTexture continueButtonPressed;
+	ImageTexture controlsMenu;
+	ImageTexture semiTransparent;
 
 	// End Game
 	ImageTexture gameOverPlayer1_1;

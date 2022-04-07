@@ -41,9 +41,20 @@ UISystem::UISystem()
     , parsnip("resources/textures/parsnip.png", GL_NEAREST)
     , carrot("resources/textures/carrot.png", GL_NEAREST)
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
+    , cheeseOffscreenUp("resources/textures/cheeseOffscreenUp.png", GL_NEAREST)
+    , cheeseOffscreenDown("resources/textures/cheeseOffscreenDown.png", GL_NEAREST)
     , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
+    , tomatoOffscreenUp("resources/textures/tomatoOffscreenUp.png", GL_NEAREST)
+    , tomatoOffscreenDown("resources/textures/tomatoOffscreenDown.png", GL_NEAREST)
     , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
+    , doughOffscreenUp("resources/textures/doughOffscreenUp.png", GL_NEAREST)
+    , doughOffscreenDown("resources/textures/doughOffscreenDown.png", GL_NEAREST)
     , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
+    , sausageOffscreenUp("resources/textures/sausageOffscreenUp.png", GL_NEAREST)
+    , sausageOffscreenDown("resources/textures/sausageOffscreenDown.png", GL_NEAREST)
+    , unflip3("resources/textures/unflip3.png", GL_NEAREST)
+    , unflip2("resources/textures/unflip2.png", GL_NEAREST)
+    , unflip1("resources/textures/unflip1.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -87,6 +98,8 @@ UISystem::UISystem()
     , pauseMenu("resources/textures/pause_screen.png", GL_NEAREST)
     , continueButton("resources/textures/button_continue.png", GL_NEAREST)
     , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
+    , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
+    , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -175,10 +188,6 @@ Characters.insert(std::pair<char, Character>(c, character));
     glBindVertexArray(0);
 }
 
-UISystem::~UISystem() {
-
-}
-
 void UISystem::updateMainMenu(int itemSelected, int gameStage, int numControllers) {
     // Buttons
     if (gameStage == GameLoopMode::MENU_START) {
@@ -254,15 +263,17 @@ void UISystem::updateEndGame(int endScreenValue) {
 
 void UISystem::showPauseMenu(int itemSelected) {
     if (itemSelected == 1) {
-        renderImage(imageShader, continueButtonPressed, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, backToMainMenuButton, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, continueButtonPressed, scX(0.73f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButton, scX(0.73f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
     else if (itemSelected == 2) {
-        renderImage(imageShader, continueButton, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, continueButton, scX(0.73f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.73f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
 
-    renderImage(imageShader, pauseMenu, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    renderImage(imageShader, pauseMenu, scX(0.73f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    renderImage(imageShader, controlsMenu, scX(0.23f), scY(0.53f), scX(0.8f), scY(0.8f), 0, 1.f);
+    renderImage(imageShader, semiTransparent, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
 }
 
 // Draws the speedometer for the passed player HUD
@@ -383,10 +394,18 @@ void UISystem::updateRecipeList()
 }
 
 // Helper function that renders the passed ImageTexture at the passed Transform
-void UISystem::drawIndicator(int playerNum, Transform trans, ImageTexture& image)
+void UISystem::drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown)
 {
-    glm::vec3 IngLocation = offscreenBubbleLocation(playerNum, trans.position);
-    renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    int indicatorY;
+
+    glm::vec3 IngLocation = offscreenBubbleLocation(playerNum, trans.position, indicatorY);
+
+    if (indicatorY == 0)
+        renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    else if (indicatorY == 1)
+        renderImage(imageShader, imageUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    else
+        renderImage(imageShader, imageDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
 }
 
 // TODO need to update image references for players 2-3 when we have the new icons
@@ -402,13 +421,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player1")->getInventory();
 
         if (!inventory->cheese)
-            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen);
+            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen, cheeseOffscreenUp, cheeseOffscreenDown);
         if (!inventory->tomato)
-            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen);
+            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen, tomatoOffscreenUp, tomatoOffscreenDown);
         if (!inventory->dough)
-            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen);
+            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen, doughOffscreenUp, doughOffscreenDown);
         if (!inventory->sausage)
-            drawIndicator(playerNum, tracker->getSausageLocation(), sausageOffscreen);
+            drawIndicator(playerNum, tracker->getSausageLocation(), sausageOffscreen, sausageOffscreenUp, sausageOffscreenDown);
         break;
 
     case 2: // egg, cheese, peas, lettuce
@@ -416,13 +435,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player2")->getInventory();
 
         if (!inventory->egg)
-            drawIndicator(playerNum, tracker->getEggLocation(), egg);
+            drawIndicator(playerNum, tracker->getEggLocation(), egg, egg, egg);
         if (!inventory->cheese)
-            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen); // This is giving wrong transform
+            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen, cheeseOffscreenUp, cheeseOffscreenDown); 
         if (!inventory->peas)
-            drawIndicator(playerNum, tracker->getPeasLocation(), peas);
+            drawIndicator(playerNum, tracker->getPeasLocation(), peas, peas, peas);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
         break;
 
     case 3: // chicken, dough, rice, lettuce
@@ -430,13 +449,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player3")->getInventory();
 
         if (!inventory->chicken)
-            drawIndicator(playerNum, tracker->getChickenLocation(), chicken);
+            drawIndicator(playerNum, tracker->getChickenLocation(), chicken, chicken, chicken);
         if (!inventory->dough)
-            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen);
+            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen, doughOffscreenUp, doughOffscreenDown);
         if (!inventory->rice)
-            drawIndicator(playerNum, tracker->getRiceLocation(), rice);
+            drawIndicator(playerNum, tracker->getRiceLocation(), rice, rice, rice);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
         break;
 
     case 4: // parsnip, carrot, tomato, lettuce
@@ -444,13 +463,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player4")->getInventory();
 
         if (!inventory->parsnip)
-            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnip);
+            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnip, parsnip, parsnip);
         if (!inventory->carrot)
-            drawIndicator(playerNum, tracker->getCarrotLocation(), carrot);
+            drawIndicator(playerNum, tracker->getCarrotLocation(), carrot, carrot, carrot);
         if (!inventory->tomato)
-            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen);
+            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen, tomatoOffscreenUp, tomatoOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
         break;
 
     default:
@@ -734,8 +753,11 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos)
+glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical)
 {
+    vertical = 0;
+    bool verticalOffscreen = false;
+    
     glm::vec4 location = glm::vec4(entityPos, 1);
 
     glm::vec3 cam = g_scene.camera.centerBeam;
@@ -753,9 +775,10 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos)
 
     location.x = (location.x + 1) * g_systems.width * 0.5;
     location.y = (location.y + 1) * g_systems.height * 0.5 + scY(0.1);
-
-    if (location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
+    
+    if(location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
     {
+        vertical = 0;
         // When location.z is not in the interval between [-1, 1] it is no longer in the camera frustrum.
         // This where you will need to put your code for the object offscreen beside and behind states. 
 
@@ -788,7 +811,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos)
         // If the entity is between 90 deg and the viewrange of the player
         else
         {
-            float offset = ((((g_systems.height / 2.f) - 0) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
+            float offset = (((((g_systems.height - scY(0.0375)) / 2.f) - scY(0.0375)) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
             if (upVector.y < 0)
             {
                 location.x = g_systems.width - scX(0.0375);
@@ -801,6 +824,20 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos)
             }
         }
         location.z = scX(0.04);
+    }
+    else if (location.y > g_systems.height)
+    {
+        vertical = 1;
+        location.y = g_systems.height - scX(0.0375);
+        location.z = scX(0.04);
+        verticalOffscreen = true;
+    }
+    else if (location.y < 0)
+    {
+        vertical = -1;
+        location.y = scY(0.0375);
+        location.z = scX(0.04);
+        verticalOffscreen = true;
     }
     else
     {

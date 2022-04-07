@@ -29,6 +29,7 @@ Entity::Entity(std::string name)
 	this->tethered = false;
 	this->magnetStartTime = 0.f;
 	this->magnetTimeToSteal = 0.5f;
+	this->unflipTimer = 0.f;
 
 }
 

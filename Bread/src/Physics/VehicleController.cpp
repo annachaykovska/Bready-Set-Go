@@ -9,6 +9,10 @@ XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem,
 	this->physics = physicsSystem;
 	this->ui = uiSystem;
 	this->gameLoop = gameLoopManager;
+	this->useFlip1 = true;
+	this->useFlip2 = true;
+	this->useFlip3 = true;
+	this->useFlip4 = true;
 	this->y_held1 = false;
 	this->y_held2 = false;
 	this->y_held3 = false;
@@ -128,35 +132,44 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
 	physx::PxVehicleDrive4W* vehiclePhysics;
+	auto player = g_scene.getEntity("player1");
 	bool* y_held;
 	bool* b_held;
+	bool* useFlip;
 	float* b_buttonTimeStart;
 	if (controllerId == 1) {
 		input = &physics->mVehicleInputDataPlayer2;
 		vehiclePhysics = physics->mVehiclePlayer2;
 		y_held = &y_held2;
 		b_held = &b_held2;
+		useFlip = &useFlip2;
 		b_buttonTimeStart = &b_buttonTimeStart2;
+		player = g_scene.getEntity("player2");
 	}
 	else if (controllerId == 2) {
 		input = &physics->mVehicleInputDataPlayer3;
 		vehiclePhysics = physics->mVehiclePlayer3;
 		y_held = &y_held3;
 		b_held = &b_held3;
+		useFlip = &useFlip3;
 		b_buttonTimeStart = &b_buttonTimeStart3;
+		player = g_scene.getEntity("player3");
 	}
 	else if (controllerId == 3) {
 		input = &physics->mVehicleInputDataPlayer4;
 		vehiclePhysics = physics->mVehiclePlayer4;
 		y_held = &y_held4;
 		b_held = &b_held4;
+		useFlip = &useFlip4;
 		b_buttonTimeStart = &b_buttonTimeStart4;
+		player = g_scene.getEntity("player4");
 	}
 	else {
 		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
 		vehiclePhysics = physics->mVehiclePlayer1;
 		y_held = &y_held1;
 		b_held = &b_held1;
+		useFlip = &useFlip1;
 		b_buttonTimeStart = &b_buttonTimeStart1;
 	}
 	XINPUT_STATE state = getControllerState(controllerId);
@@ -211,20 +224,26 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	// Flip car
 	float currentTime = glfwGetTime();
 	if (B_button_pressed) {
-		if (*b_held) {
+		if (*b_held && *useFlip) {
+			player->unflipTimer = currentTime - *b_buttonTimeStart;
 			if (currentTime - *b_buttonTimeStart > 2) {
+				*useFlip = false;
 				*b_held = false;
+				player->unflipTimer = 0;
 				physics->respawnPlayerInPlace(controllerId + 1);
 				*b_buttonTimeStart = -1;
-				printf("RESPAWN\n");
+				//printf("RESPAWN\n");
 			}
 		}
 		else {
+			player->unflipTimer = 0;
 			*b_held = true;
 			*b_buttonTimeStart = currentTime;
 		}
 	}
-	if (!B_button_pressed) {
+	else {
+		*useFlip = true;
+		player->unflipTimer = 0;
 		*b_held = false;
 	}
 
@@ -239,7 +258,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	// Pause menu
 	if (currentTime - gameLoop->showPauseMenuTimeoutStart > gameLoop->showPauseMenuTimeoutLength) {
 		gameLoop->showPauseMenuTimeoutStart = -1;
-		if (BACK_button_pressed) {
+		if (START_button_pressed) {
 			gameLoop->showPauseMenuTimeoutStart = currentTime;
 			gameLoop->showPauseMenu = !gameLoop->showPauseMenu;
 			if (gameLoop->showPauseMenu) {
@@ -253,7 +272,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 
 	// Respawn player
-	if (START_button_pressed)
+	if (BACK_button_pressed)
 	{
 		physics->respawnPlayer(controllerId + 1);
 	}
@@ -411,6 +430,6 @@ int XboxController::getNumberConnectedControllers() {
 			numControllers++;
 		}
 	}
-	printf("NUM CONTROLLER: %d\n", numControllers);
+	//printf("NUM CONTROLLER: %d\n", numControllers);
 	return numControllers;
 }
