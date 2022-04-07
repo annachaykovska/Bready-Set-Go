@@ -1767,7 +1767,7 @@ void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
 		placeTransform.q.x = 0;
 		placeTransform.q.z = 0;
 		placeTransform.q.normalize();
-		mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(startTransformPlayer2);
+		mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(placeTransform);
 		mVehiclePlayer2->setToRestState();
 		break;
 	case (3):
@@ -1776,7 +1776,7 @@ void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
 		placeTransform.q.x = 0;
 		placeTransform.q.z = 0;
 		placeTransform.q.normalize();
-		mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(startTransformPlayer3);
+		mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(placeTransform);
 		mVehiclePlayer3->setToRestState();
 		break;
 	case (4):
@@ -1785,7 +1785,7 @@ void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
 		placeTransform.q.x = 0;
 		placeTransform.q.z = 0;
 		placeTransform.q.normalize();
-		mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(startTransformPlayer4);
+		mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(placeTransform);
 		mVehiclePlayer4->setToRestState();
 		break;
 	default:
