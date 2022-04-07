@@ -247,8 +247,8 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
-	// Change to 1 for submission
-	gameLoop.gameStage = GameLoopMode::MENU_START; // Change to MAIN_GAME_PLAY to skip menus
+	gameLoop.gameStage = GameLoopMode::MENU_START;
+	//gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY; // Skips menus
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -287,7 +287,6 @@ int main()
 			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
 			
 			// RENDER
-			renderer.update();
 			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
@@ -311,12 +310,6 @@ int main()
 			
 			// RENDER
 			renderer.update();
-
-			if (!g_systems.renderDebug)
-			{
-				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame(gameLoop.endScreenGenerated, gameLoop.pauseMenuSelection, gameLoop.showPauseMenu);
-			}
 
 			// Update the ImGUI profiler
 			profiler.newFrame();

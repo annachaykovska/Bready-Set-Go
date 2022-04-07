@@ -9,6 +9,8 @@
 #include "../Scene/Entity.h"
 #include <stbi/stb_image.h>
 #include "../Timer.h"
+#include "UISystem.h"
+#include "../Gameplay/GameLoopManager.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -150,13 +152,13 @@ void RenderingSystem::initShadows()
 
 	// High resolution shadows ---------------------------------------------------------------------
 	
-	this->shadowWidth = g_systems.width / g_scene.numPlayers;
-	this->shadowHeight = g_systems.height / g_scene.numPlayers;
+	this->shadowWidth = this->shadowHiRes / g_scene.numPlayers;
+	this->shadowHeight = this->shadowHiRes / g_scene.numPlayers;
 
 	if (g_scene.numPlayers == 3)
 	{
-		g_systems.width / 4;
-		g_systems.height / 4;
+		this->shadowWidth = g_systems.width / 4;
+		this->shadowHeight = g_systems.height / 4;
 	}
 
 	// Configure depth map FBO
@@ -563,7 +565,7 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	}
 	else
 	{
-		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / (screenHeight / 2), 0.1f, 1000.0f);
+		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), (screenWidth * 3/4) / (screenHeight / 2), 0.1f, 1000.0f);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
 	}
 }
@@ -689,7 +691,7 @@ void RenderingSystem::renderScene(const std::string name)
 		if (g_scene.numPlayers == 1)
 			glViewport(0, 0, g_systems.width, g_systems.height);
 		else if (g_scene.numPlayers == 2)
-			glViewport(0, g_systems.height / 2, g_systems.width, g_systems.height / 2);
+			glViewport(g_systems.width / 8, g_systems.height / 2, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}
@@ -699,7 +701,7 @@ void RenderingSystem::renderScene(const std::string name)
 		lightSpaceMatrix = this->p2LightSpaceMatrix;
 
 		if (g_scene.numPlayers == 2)
-			glViewport(0, 0, g_systems.width, g_systems.height / 2);
+			glViewport(g_systems.width / 8, 0, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}	
@@ -821,21 +823,28 @@ void RenderingSystem::update()
 	createLoResShadowMap();
 
 	// Step 2. Create the hi-res shadow maps for the players
-	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
 	{
-		std::string temp = "player";
-		temp += std::to_string(i + 1);
+		std::string playerNum = "player" + std::to_string(i);
 
-		createHiResShadowMap(temp);
+		createHiResShadowMap(playerNum);
 	}
 
 	// Step 3. Render the scene from each player's perspective
-	for (unsigned int i = 0; i < g_scene.numPlayers; i++)
+	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
 	{
-		std::string temp = "player";
-		temp += std::to_string(i + 1);
+		std::string playerNum = "player" + std::to_string(i);
+		renderScene(playerNum);
+		
+		if (!g_systems.loop->isPaused)
+			g_systems.ui->updatePlayer(i);
+	}
 
-		renderScene(temp);
+	if (g_systems.loop->isPaused)
+	{
+		glViewport(0, 0, g_systems.width, g_systems.height);
+		g_systems.ui->showPauseMenu(g_systems.loop->pauseMenuSelection);
+		return;
 	}
 }
 

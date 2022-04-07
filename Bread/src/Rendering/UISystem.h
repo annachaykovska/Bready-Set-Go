@@ -35,23 +35,29 @@ public:
 	float map_sx;
 
 	UISystem();
-	~UISystem();
-
-	void updateGame(int endScreenValue, int pauseMenuItemSelected, bool pause = false);
+	
+	void updatePlayer(unsigned int playerNum);
 	void updateMainMenu(int itemSelected, int gameStage, int numCntrollers);
 	void updateEndGame(int endScreenValue);
 	void showPauseMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
 	int checkForWin();
-	void updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform);
 
 private:
 
+	void updateSpeedometer(int playerNum);
+	void updateVacuum(int playerNum);
+	void updateRecipeList();
+	void updateMiniMap();
+	void drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown);
+	void updateOffscreenIndicators(int playerNum);
+	void drawInventoryIcon(unsigned int haveItem, ImageTexture& image, unsigned int invPos);
+	void updateInventory(int playerNum);
 
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
 
-	glm::vec3 offscreenBubbleLocation(glm::vec3 entityPos, int& vertical);
+	glm::vec3 offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical);
 	glm::vec2 miniMapPlayerPosition(Transform& transform);
 
 	float scX(float xVal);
@@ -62,6 +68,11 @@ private:
 
 	ImageTexture speedometer;
 	float speedometer_theta;
+	float p1SpeedometerTheta;
+	float p2SpeedometerTheta;
+	float p3SpeedometerTheta;
+	float p4SpeedometerTheta;
+
 	bool powerReady;
 	ImageTexture needle;
 	ImageTexture vacuum;
@@ -76,6 +87,13 @@ private:
 	ImageTexture cheese;
 	ImageTexture sausage;
 	ImageTexture dough;
+	ImageTexture egg;
+	ImageTexture peas;
+	ImageTexture lettuce;
+	ImageTexture chicken;
+	ImageTexture rice;
+	ImageTexture parsnip;
+	ImageTexture carrot;
 
 	ImageTexture cheeseOffscreen;
 	ImageTexture cheeseOffscreenUp;

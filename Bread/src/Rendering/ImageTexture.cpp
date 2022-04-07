@@ -48,7 +48,6 @@ ImageTexture::ImageTexture(std::string path, GLint interpolation)
 		unbind();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);	//Return to default alignment
 		stbi_image_free(data);
-
 	}
 	else {
 		throw std::runtime_error("Failed to read texture data from file!");
