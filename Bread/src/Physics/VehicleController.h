@@ -11,6 +11,7 @@
 #include "PhysicsSystem.h"
 #include "../Rendering/UISystem.h"
 #include "../Gameplay/GameLoopManager.h"
+#include "../Scene/Entity.h"
 
 #pragma comment(lib, "Xinput.lib") 
 #pragma comment(lib, "Xinput9_1_0.lib")
@@ -34,6 +35,10 @@ private:
 	UISystem* ui;
 	GameLoopManager* gameLoop;
 	bool forwards;
+	bool useFlip1;
+	bool useFlip2;
+	bool useFlip3;
+	bool useFlip4;
 	bool y_held1;
 	bool y_held2;
 	bool y_held3;

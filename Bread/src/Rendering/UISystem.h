@@ -93,6 +93,10 @@ private:
 	ImageTexture sausageOffscreenUp;
 	ImageTexture sausageOffscreenDown;
 
+	ImageTexture unflip3;
+	ImageTexture unflip2;
+	ImageTexture unflip1;
+
 	ImageTexture pizza;
 
 	ImageTexture p1Icon;

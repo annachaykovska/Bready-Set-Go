@@ -44,6 +44,9 @@ UISystem::UISystem()
     , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
     , sausageOffscreenUp("resources/textures/sausageOffscreenUp.png", GL_NEAREST)
     , sausageOffscreenDown("resources/textures/sausageOffscreenDown.png", GL_NEAREST)
+    , unflip3("resources/textures/unflip3.png", GL_NEAREST)
+    , unflip2("resources/textures/unflip2.png", GL_NEAREST)
+    , unflip1("resources/textures/unflip1.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -412,6 +415,21 @@ void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pa
         }
     }
 
+    if (player1->unflipTimer > 0)
+    {
+        if (player1->unflipTimer > 2 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else if (player1->unflipTimer > 1 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, unflip3, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+    }
     // Drawing Inventory
     float alpha;
     float faded = 0.15f;
