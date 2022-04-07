@@ -563,7 +563,7 @@ void RenderingSystem::setupCameras(Transform* player1Transform)
 	}
 	else
 	{
-		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / (screenHeight / 2), 0.1f, 1000.0f);
+		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), (screenWidth * 3/4) / (screenHeight / 2), 0.1f, 1000.0f);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
 	}
 }
@@ -689,7 +689,7 @@ void RenderingSystem::renderScene(const std::string name)
 		if (g_scene.numPlayers == 1)
 			glViewport(0, 0, g_systems.width, g_systems.height);
 		else if (g_scene.numPlayers == 2)
-			glViewport(0, g_systems.height / 2, g_systems.width, g_systems.height / 2);
+			glViewport(g_systems.width / 8, g_systems.height / 2, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}
@@ -699,7 +699,7 @@ void RenderingSystem::renderScene(const std::string name)
 		lightSpaceMatrix = this->p2LightSpaceMatrix;
 
 		if (g_scene.numPlayers == 2)
-			glViewport(0, 0, g_systems.width, g_systems.height / 2);
+			glViewport(g_systems.width / 8, 0, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
 	}	
