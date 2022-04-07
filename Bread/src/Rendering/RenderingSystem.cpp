@@ -150,13 +150,13 @@ void RenderingSystem::initShadows()
 
 	// High resolution shadows ---------------------------------------------------------------------
 	
-	this->shadowWidth = g_systems.width / g_scene.numPlayers;
-	this->shadowHeight = g_systems.height / g_scene.numPlayers;
+	this->shadowWidth = this->shadowHiRes / g_scene.numPlayers;
+	this->shadowHeight = this->shadowHiRes / g_scene.numPlayers;
 
 	if (g_scene.numPlayers == 3)
 	{
-		g_systems.width / 4;
-		g_systems.height / 4;
+		this->shadowWidth = g_systems.width / 4;
+		this->shadowHeight = g_systems.height / 4;
 	}
 
 	// Configure depth map FBO
