@@ -247,14 +247,6 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		*b_held = false;
 	}
 
-	// Accept exit conditions back to the menu
-	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
-		gameLoop->mainMenuTimeoutStart = -1;
-		if (A_button_pressed && gameCompleted) {
-			gameLoop->isBackToMenuSelected = true;
-		}
-	}
-
 	// Pause menu
 	if (currentTime - gameLoop->showPauseMenuTimeoutStart > gameLoop->showPauseMenuTimeoutLength) {
 		gameLoop->showPauseMenuTimeoutStart = -1;
@@ -264,11 +256,26 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 			if (gameLoop->showPauseMenu) {
 				gameLoop->isPaused = true;
 			}
+			else {
+				gameLoop->isPauseMenuItemSelected = true;
+				gameLoop->pauseMenuSelection = 1; // Pretend continue was pressed
+			}
 		}
 	}
 
 	if (A_button_pressed && gameLoop->showPauseMenu) {
+		gameLoop->showPauseMenuTimeoutStart = currentTime;
 		gameLoop->isPauseMenuItemSelected = true;
+	}
+
+	// Accept exit conditions back to the menu
+	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
+		// Last check is to prevent the pause menu from going back immediately
+		if (A_button_pressed && gameCompleted && currentTime - gameLoop->showPauseMenuTimeoutStart > gameLoop->showPauseMenuTimeoutLength) {
+			gameLoop->showPauseMenuTimeoutStart = -1;
+			gameLoop->isBackToMenuSelected = true;
+		}
 	}
 
 	// Respawn player
