@@ -163,6 +163,7 @@ void Profiler::player4Transform()
 
 void Profiler::cameraTransform()
 {
+	/*
 	Camera* camera = &(g_scene.camera);
 
 	float xBuf[50];
@@ -178,6 +179,7 @@ void Profiler::cameraTransform()
 		ImGui::InputFloat("cameraYaw", &(camera->yaw), step, stepFast, "%.3f");
 		ImGui::InputFloat("cameraPitch", &(camera->pitch), step, stepFast, "%.3f");
 	}
+	*/
 }
 
 void Profiler::testTransform()

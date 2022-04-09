@@ -984,6 +984,33 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 	}
 }
 
+float PhysicsSystem::getPlayerSidewaysSpeed(int playerNumber)
+{
+	float result;
+
+	switch (playerNumber)
+	{
+	case (1):
+		result = (float)mVehiclePlayer1->computeSidewaysSpeed();
+		return result;
+		break;
+	case (2):
+		result = (float)mVehiclePlayer2->computeSidewaysSpeed();
+		return result;
+		break;
+	case (3):
+		result = (float)mVehiclePlayer3->computeSidewaysSpeed();
+		return result;
+		break;
+	case (4):
+		result = (float)mVehiclePlayer4->computeSidewaysSpeed();
+		return result;
+		break;
+	default:
+		break;
+	}
+}
+
 bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
 	switch (playerNumber)
 	{

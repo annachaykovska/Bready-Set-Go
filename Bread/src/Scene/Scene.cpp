@@ -1,6 +1,24 @@
 #include "Scene.h"
 #include "Entity.h"
 
+Scene::Scene()
+{
+	this->entities.reserve(20);
+	this->p1Camera = new Camera();
+	this->p2Camera = new Camera();
+	this->p3Camera = new Camera();
+	this->p4Camera = new Camera();
+}
+
+Scene::~Scene()
+{
+	delete p1Camera;
+	delete p2Camera;
+	delete p3Camera;
+	delete p4Camera;
+}
+
+
 /// <summary>
 /// Creates all the Entities in the Scene.
 /// </summary>
@@ -86,9 +104,4 @@ Entity* Scene::createEntity(std::string name)
 		return &result->second;
 	else
 		return nullptr;
-}
-
-void Scene::init(PhysicsSystem* physics)
-{
-	camera.initPhysics(physics);
 }

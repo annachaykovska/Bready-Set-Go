@@ -81,11 +81,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
-	// Camera
-	Transform transform = Transform();
-	transform.position = glm::vec3(1.0f);
-	setupCameras(&transform); // Setup the camera
-
 	// Initialize shadow maps
 	this->initShadows();
 
@@ -542,32 +537,19 @@ void RenderingSystem::init4PlayerQuad()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-void RenderingSystem::setupCameras(Transform* player1Transform)
+void RenderingSystem::updateCamera(Camera* camera, int playerNum)
 {
-	// Get view matrix from Camera and update the Shader
-	this->viewMatrix = g_scene.camera.getViewMatrix(player1Transform);
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
+	// Get new view matrix from Camera and update the regular Shader
+	camera->setViewMatrix(playerNum);
+	glUniformMatrix4fv(this->viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 
-	// Tell shader about camera position
-	unsigned int viewPosLoc = glGetUniformLocation(getShaderId(), "viewPos");
-	glm::vec3 cameraPos = g_scene.camera.position;
-	glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
+	// Update regular Shader with the Camera's new position
+	unsigned int viewPosLoc = glGetUniformLocation(this->shader.getId(), "viewPos");
+	glUniform3f(viewPosLoc, camera->position.x, camera->position.y, camera->position.z);
 
-	// Projection matrix will be handled by the Camera class in the future
-	this->projMatrix = glm::mat4(1.0f);
-	float screenWidth = g_systems.width;
-	float screenHeight = g_systems.height;
-
-	if (g_scene.numPlayers != 2)
-	{
-		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
-	}
-	else
-	{
-		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), (screenWidth * 3/4) / (screenHeight / 2), 0.1f, 1000.0f);
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
-	}
+	// Update Shader with Camera's new projection matrix
+	camera->setProjMatrix();
+	glUniformMatrix4fv(this->projLoc, 1, GL_FALSE, glm::value_ptr(camera->projMatrix));
 }
 
 void RenderingSystem::createLoResShadowMap()
@@ -730,8 +712,16 @@ void RenderingSystem::renderScene(const std::string name)
 	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
 
 	// Update camera (MVP matrices)
-	setupCameras(g_scene.getEntity(name)->getTransform());
+	if (name == "player1")
+		updateCamera(g_scene.p1Camera, 1);
+	else if (name == "player2")
+		updateCamera(g_scene.p2Camera, 2);
+	else if (name == "player3")
+		updateCamera(g_scene.p3Camera, 3);
+	else if (name == "player4")
+		updateCamera(g_scene.p4Camera, 4);
 
+	/*
 	// Check if there is a wall between the player and the camera
 	if (g_systems.physics->p1CameraHit && name == "player1")
 	{
@@ -757,6 +747,7 @@ void RenderingSystem::renderScene(const std::string name)
 		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
 	}
+	*/
 
 	// Bind rough shadow map texture
 	glActiveTexture(GL_TEXTURE24);

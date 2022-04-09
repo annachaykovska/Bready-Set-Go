@@ -12,6 +12,8 @@
 using namespace physx;
 using namespace snippetvehicle;
 
+class Entity;
+
 class PhysicsSystem
 {
 public:
@@ -37,12 +39,12 @@ public:
 	float getTurnDirectionalInfluence();
 
 	float getPlayerSpeed(int playerNumber);
+	float getPlayerSidewaysSpeed(int playerNumber);
 	bool getIsVehicleInAir(int playerNumber);
 	void resetOutOfBoundsObjects();
 	void respawnPlayer(int playerNumber);
 	void respawnPlayerInPlace(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
-
 
 	// Functions for magnet ability
 	void magnet(int stealer_id);

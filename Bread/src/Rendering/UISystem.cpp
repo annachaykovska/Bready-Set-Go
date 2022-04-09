@@ -784,9 +784,29 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
 
         glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
 
-        float viewRange = g_scene.camera.perspective / 2.f;
+        float perspective = 0.0f;
+
+        switch (playerNum)
+        {
+        case 1:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 2:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 3:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 4:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        default:
+            break; // Uh-oh, something has gone wrong
+        }
+
+        float viewRange = perspective / 2.0f;
         //float viewRange = 80 / 2.f;
-        viewRange *= (PI / 180.f);
+        viewRange *= (PI / 180.0f);
 
         float yawTheta = acos(dot(cam, yaw) / (length(yaw) * length(cam)));
         glm::vec3 upVector = cross(cam, yaw);
