@@ -298,7 +298,7 @@ int main()
 			salad.updateRecipeProgress(p4Inv);
 
 			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
-			int winner = ui.checkForWin();
+			int winner = gameLoop.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();
 			}
@@ -333,7 +333,7 @@ int main()
 			audio.update(dt);
 		}
 
-		if (ui.checkForWin() != 0) {
+		if (gameLoop.checkForWin() != 0) {
 			gameLoop.isGameEnded = true;
 		}
 

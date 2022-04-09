@@ -41,7 +41,6 @@ public:
 	void updateEndGame(int endScreenValue);
 	void showPauseMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
-	int checkForWin();
 
 private:
 
