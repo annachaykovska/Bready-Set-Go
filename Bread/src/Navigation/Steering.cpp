@@ -11,13 +11,12 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics, int id)
 	, physics_(physics)
 	, id_(id)
 	, finalApproach_(false)
+	, currentTime_(0)
 	, stuckTimer_(0)
 	, stuck_(false)
-	, locked_(false)
 	, pause_(false)
 	, procedureTimer_(0)
 	, positionDelta_(glm::vec3(0, 0, 0))
-	, deltaTimer_(0)
 {
 	switch (id_)
 	{
@@ -49,22 +48,22 @@ void Steering::evasiveAction()
 {
 	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
 	input_->setAnalogAccel(0.3f);
-	if (procedureTimer_ > 200)
+	if (currentTime_ - procedureTimer_ > 2)
 	{
 		stuck_ = false;
-		procedureTimer_ = 0;
+		stuckTimer_ = glfwGetTime();
+		procedureTimer_ = glfwGetTime();
 	}
-	procedureTimer_++;
 }
 
 void Steering::brakeAction()
 {
-	if (procedureTimer_ <= 30)
+	if (currentTime_ - procedureTimer_ <= 0.5)
 	{
 		input_->setAnalogAccel(0.f);
 		input_->setAnalogBrake(1.f);
 	}
-	else if (procedureTimer_ > 30 && procedureTimer_ < 100)
+	else if (currentTime_ - procedureTimer_ > 0.5 && currentTime_ - procedureTimer_ < 1)
 	{
 		vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
 		input_->setAnalogBrake(0.f);
@@ -74,48 +73,41 @@ void Steering::brakeAction()
 	else
 	{
 		pause_ = false;
-		procedureTimer_ = 0;
+		procedureTimer_ = glfwGetTime();
 		input_->setAnalogBrake(0.f);
 	}
-	procedureTimer_++;
 }
 
 void Steering::pause()
 {
 	pause_ = true;
+	procedureTimer_ = glfwGetTime();
 }
 
 bool Steering::locked()
 {
-	bool temp = locked_;
-	locked_ = false;
-	return temp;
+	return false;
 }
 
 void Steering::updateSteering(position target)
 {
-	deltaTimer_++;
-	if (deltaTimer_ > 800)
-	{
-		if (length(entity_.getTransform()->position - positionDelta_) < 1.f)
-		{
-			locked_ = true;
-		}
-		positionDelta_ = entity_.getTransform()->position;
-		deltaTimer_ = 0;
-	}
+	currentTime_ = glfwGetTime();
 
 	if (pause_)
 	{
+		std::cout << "Braking" << std::endl;
 		brakeAction();
 		return;
 	}
 
 	if (stuck_)
 	{
+		std::cout << "Unstucking" << std::endl;
 		evasiveAction();
 		return;
 	}
+
+	std::cout << "Steering" << std::endl;
 	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 	glm::vec3 vectorA = target - entity_.getTransform()->position;
 	float distance = length(vectorA);
@@ -131,19 +123,16 @@ void Steering::updateSteering(position target)
 	float theta = acos(dot(vectorB, vectorA) / (length(vectorA) * length(vectorB)));
 	glm::vec3 upVector = cross(vectorB, vectorA);
 
-	if (vehicle_->computeForwardSpeed() < 5)
+	if (vehicle_->computeForwardSpeed() > 5)
 	{
-		stuckTimer_++;
-	}
-	else
-	{
-		stuckTimer_ = 0;
+		stuckTimer_ = glfwGetTime();
 	}
 
-	if (stuckTimer_ > 400)
+	if (currentTime_ - stuckTimer_ > 2)
 	{
-		stuckTimer_ = 0;
+		stuckTimer_ = glfwGetTime();
 		stuck_ = true;
+		procedureTimer_ = glfwGetTime();
 	}
 
 	int max = 25;

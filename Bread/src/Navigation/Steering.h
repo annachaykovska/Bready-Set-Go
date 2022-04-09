@@ -14,7 +14,6 @@ public:
 
 	void park();
 	void updateSteering(position target);
-	void setFinalApproach(bool status);
 	void evasiveAction();
 	void brakeAction();
 	void pause();
@@ -28,12 +27,11 @@ private:
 	int id_;
 	bool finalApproach_;
 
+	float currentTime_;
 	int stuckTimer_;
 	bool stuck_;
-	bool locked_;
 	bool pause_;
 
-	int deltaTimer_;
 	position positionDelta_;
 
 	int procedureTimer_;

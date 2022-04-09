@@ -44,6 +44,6 @@ private:
 	position currentTarget_;
 	NavMode currentMode_;
 
-	int magnetCooldown_;
-	int searchWatchdog_;
+	float magnetCooldown_;
+	float searchWatchdog_;
 };

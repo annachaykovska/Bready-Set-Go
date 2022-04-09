@@ -32,13 +32,10 @@ void NavigationSystem::pause()
 
 void NavigationSystem::update()
 {
-	if (magnetCooldown_ > 0)
-	{
-		magnetCooldown_--;
-	}
+	float currentTime = glfwGetTime();
 	if (length(currentTarget_ - vehicle_.getTransform()->position) < 20)
 	{
-		if (magnetCooldown_ < 1)
+		if (currentTime - magnetCooldown_ > 3)
 		{
 			physics_.magnet(id_);
 		}
@@ -66,11 +63,11 @@ void NavigationSystem::update()
 		}
 		break;
 	case search:
-		searchWatchdog_++;
-		if (searchWatchdog_ > 500)
+		float currentTime = glfwGetTime();
+		if (currentTime - searchWatchdog_ > 5)
 		{
 			steering_.pause();
-			searchWatchdog_ = 0;
+			searchWatchdog_ = glfwGetTime();
 		}
 		steering_.updateSteering(currentTarget_);
 		break;
@@ -87,7 +84,7 @@ void NavigationSystem::setMode(NavMode mode)
 {
 	if (mode == search)
 	{
-		searchWatchdog_ = 0;
+		searchWatchdog_ = glfwGetTime();
 	}
 	currentMode_ = mode;
 }
@@ -108,7 +105,7 @@ bool NavigationSystem::hasPath()
 
 void NavigationSystem::coolDownMagnet()
 {
-	magnetCooldown_ = 400;
+	magnetCooldown_ = glfwGetTime();
 }
 
 bool NavigationSystem::lostPath()
