@@ -38,6 +38,7 @@ public:
 	void ingredientSuck(AudioSource* source);
 	void powerReady(AudioSource* source);
 	void turnOffAllAudio();
+	void playMenuAudio(std::string clipName);
 
 	void update(const float dt);
 
@@ -45,6 +46,8 @@ private:
 
 	std::unordered_map<std::string, AudioClip> audioClips;
 	std::vector<AudioSource> audioSources;
+
+	AudioSource* menuAudio;
 
 	ALCdevice* device;
 	ALCcontext* context;
