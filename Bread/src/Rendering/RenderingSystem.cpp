@@ -663,6 +663,7 @@ void RenderingSystem::renderScene(const std::string name)
 
 	glm::mat4 lightSpaceMatrix, modelMatrix;
 	glm::vec3 pos;
+	Camera* camera = nullptr;
 
 	glActiveTexture(GL_TEXTURE25);
 
@@ -677,6 +678,16 @@ void RenderingSystem::renderScene(const std::string name)
 			glViewport(g_systems.width / 8, g_systems.height / 2, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p1Camera;
+		updateCamera(camera, 1);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p1CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p1CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}
 	else if (name == "player2")
 	{
@@ -687,6 +698,16 @@ void RenderingSystem::renderScene(const std::string name)
 			glViewport(g_systems.width / 8, 0, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p2Camera;
+		updateCamera(camera, 2);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p2CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p2CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}	
 	else if (name == "player3")
 	{
@@ -698,65 +719,41 @@ void RenderingSystem::renderScene(const std::string name)
 			glViewport(g_systems.width / 4, 0, g_systems.width / 2, g_systems.height / 2);
 		else
 			glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p3Camera;
+		updateCamera(camera, 3);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p3CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p3CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}	
 	else if (name == "player4")
 	{
 		glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
 		lightSpaceMatrix = this->p4LightSpaceMatrix;
 		glViewport(g_systems.width / 2, 0, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p4Camera;
+		updateCamera(camera, 4);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p4CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p4CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}
+	else
+		return; // Uh-oh, something has gone wrong
 
 	// Update uniforms
 	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	this->shader.setMat4("roughLightSpaceMatrix", this->loResLightSpaceMatrix);
 	this->shader.setVec3("playerPos", g_scene.getEntity(name)->getTransform()->position);
 	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
-
-	Camera* camera = nullptr;
-	// Update camera (MVP matrices)
-	if (name == "player1")
-	{
-		camera = g_scene.p1Camera;
-		updateCamera(camera, 1);
-	}
-	else if (name == "player2")
-	{
-		camera = g_scene.p2Camera;
-		updateCamera(camera, 2);
-	}
-	else if (name == "player3")
-	{
-		camera = g_scene.p3Camera;
-		updateCamera(camera, 3);
-	}
-	else if (name == "player4")
-	{
-		camera = g_scene.p4Camera;
-		updateCamera(camera, 4);
-	}
-	else
-		return; // Uh-oh, something has gone wrong
-
-	// Check if there is a wall between the player and the camera and get the position if there is
-	if (g_systems.physics->p1CameraHit && name == "player1")
-	{
-		camera->recalculateViewMatrix(g_systems.physics->p1CameraHitPos);
-	}
-	else if (g_systems.physics->p2CameraHit && name == "player2")
-	{
-		camera->recalculateViewMatrix(g_systems.physics->p2CameraHitPos);
-	}
-	else if (g_systems.physics->p3CameraHit && name == "player3")
-	{
-		camera->recalculateViewMatrix(g_systems.physics->p3CameraHitPos);
-	}
-	else if (g_systems.physics->p4CameraHit && name == "player4")
-	{
-		camera->recalculateViewMatrix(g_systems.physics->p4CameraHitPos);
-	}
-
-	// Update the camera's position to be the wall instead of behind the wall
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 
 	// Bind rough shadow map texture
 	glActiveTexture(GL_TEXTURE24);
@@ -766,7 +763,6 @@ void RenderingSystem::renderScene(const std::string name)
 	glBindTexture(GL_TEXTURE, 0);
 
 	// Bind high res shadow map texture
-	
 	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
