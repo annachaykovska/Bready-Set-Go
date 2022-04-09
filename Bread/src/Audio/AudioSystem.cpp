@@ -313,12 +313,17 @@ void AudioSystem::playSlurp(AudioSource* source) {
 	source->play("slurp.wav"); // Comment this out to turn off the music on load
 }
 
-void AudioSystem::endSlurp(AudioSource* source, bool success) {
+void AudioSystem::endSlurp(AudioSource* source, bool playBanner, bool success) {
 	source->gain = 1.f; // Volume control
 	source->stop();
 	source->loop = false;
 	if (success) {
-		source->play("ding.wav");
+		if (playBanner) {
+			source->play("banner_popup.wav");
+		}
+		else {
+			source->play("ding.wav");
+		}
 	}
 	else {
 		source->play("fart.wav");

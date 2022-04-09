@@ -321,12 +321,12 @@ int main()
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
-				/*if (g_scene.numPlayers <= 3)
+				if (g_scene.numPlayers <= 3)
 					p4Brain.update();
 				if (g_scene.numPlayers <= 2)
 					p3Brain.update();
 				if (g_scene.numPlayers <= 1)
-					p2Brain.update();*/
+					p2Brain.update();
 			}
 
 			// AUDIO
