@@ -712,15 +712,30 @@ void RenderingSystem::renderScene(const std::string name)
 	this->shader.setVec3("playerPos", g_scene.getEntity(name)->getTransform()->position);
 	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
 
+	Camera* camera = nullptr;
 	// Update camera (MVP matrices)
 	if (name == "player1")
-		updateCamera(g_scene.p1Camera, 1);
+	{
+		camera = g_scene.p1Camera;
+		updateCamera(camera, 1);
+	}
 	else if (name == "player2")
-		updateCamera(g_scene.p2Camera, 2);
+	{
+		camera = g_scene.p2Camera;
+		updateCamera(camera, 2);
+	}
 	else if (name == "player3")
-		updateCamera(g_scene.p3Camera, 3);
+	{
+		camera = g_scene.p3Camera;
+		updateCamera(camera, 3);
+	}
 	else if (name == "player4")
-		updateCamera(g_scene.p4Camera, 4);
+	{
+		camera = g_scene.p4Camera;
+		updateCamera(camera, 4);
+	}
+	else
+		return; // Uh-oh, something has gone wrong
 
 	/*
 	// Check if there is a wall between the player and the camera
@@ -763,11 +778,13 @@ void RenderingSystem::renderScene(const std::string name)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
 
+	/*
 	// Set shadow bias uniforms
 	shader.setFloat("maxBias", this->maxBias);
 	shader.setFloat("minBias", this->minBias);
 	shader.setFloat("maxRoughBias", this->maxRoughBias);
 	shader.setFloat("minRoughBias", this->minRoughBias);
+	*/
 
 	if (DEBUG_NAVMESH)
 	{
@@ -806,7 +823,7 @@ void RenderingSystem::renderScene(const std::string name)
 	glActiveTexture(GL_TEXTURE0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Reset to default FBO
 
-	drawSkybox();
+	drawSkybox(camera);
 }
 
 void RenderingSystem::update()
@@ -930,12 +947,12 @@ void RenderingSystem::renderTexturedQuad()
 	glBindVertexArray(0);
 }
 
-void RenderingSystem::drawSkybox()
+void RenderingSystem::drawSkybox(Camera* camera)
 {
 	glDepthFunc(GL_LEQUAL);
 	this->skyboxShader.use();
-	this->skyboxShader.setMat4("view", glm::mat4(glm::mat3(this->viewMatrix)));
-	this->skyboxShader.setMat4("projection", this->projMatrix);
+	this->skyboxShader.setMat4("view", glm::mat4(glm::mat3(camera->viewMatrix)));
+	this->skyboxShader.setMat4("projection", camera->projMatrix);
 	this->skyboxShader.setInt("skybox", 23);
 
 	glBindVertexArray(this->skyboxVAO);

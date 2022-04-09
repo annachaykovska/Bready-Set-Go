@@ -132,7 +132,7 @@ private:
 
 	void renderScene(const std::string name);
 
-	void drawSkybox();
+	void drawSkybox(Camera* camera);
 
 	void renderTexturedQuad();
 	void renderOnePlayerQuad();

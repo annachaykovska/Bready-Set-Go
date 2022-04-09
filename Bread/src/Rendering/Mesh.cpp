@@ -162,10 +162,6 @@ void Mesh::draw(Shader &shader)
 	unsigned int quadraticLoc = glGetUniformLocation(shader.getId(), "light.quadratic");
 	glUniform1f(quadraticLoc, 0.032f);
 
-	// Camera uniform
-	//unsigned int viewPosLoc = glGetUniformLocation(shader.getId(), "viewPos");
-	//glUniform3f(viewPosLoc, g_scene.camera.position.x, g_scene.camera.position.y, g_scene.camera.position.z);
-
 	glBindVertexArray(VAO);
 
 	if (wireframe)
