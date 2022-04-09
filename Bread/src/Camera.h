@@ -16,40 +16,23 @@ class Camera
 public:
 
 	glm::vec3 position;
-	glm::vec3 centerBeam;
 
 	glm::mat4 viewMatrix;
 	glm::mat4 projMatrix;
 
+	float viewDirectionalInfluence;
+	float turnDirectionalInfluence;
+
 	Camera();
-	glm::mat4 getViewMatrix(Transform* playerTransform);
 
-	void updateCameraPosition(const glm::vec3 pos);
-	glm::mat4 recalculateViewMatrix();
-
-	void setProjMatrix();
-	void setViewMatrix(int playerNum);
-
-	float getPerspective();
+	void update(const int playerNum);
 
 private:
 
-	glm::vec3 front;
-	glm::vec3 up;
-	glm::vec3 right;
-	glm::vec3 worldUp;
-	glm::vec3 lookAhead;
+	const glm::vec3 worldUp = glm::vec3(0, 1.0f, 0);
 
 	float perspective;
-	float yaw;
-	float pitch;
-
-	float lastOffset;
 	float lastSpeed;
-
-	float slowDownCounter;
-	int counter;
-
 	float cameraPositionOffset;
 	float forcedDirection;
 	float recordedForcedDirection;
@@ -57,23 +40,6 @@ private:
 	float oldCameraRotationOffset;
 	float oldFOV;
 
-	float predictedCameraDelta;
-
-	float movementSpeed;
-	float mouseSensitivity;
-	float zoom;
-
-	// Camera Tweaks
-	bool in_whiplash;
-	int total_whip_lash_frames;
-	int whiplash_frame;
-
-	//Tweakable
-	float max_fov;
-
-	// values for the fov sigmoid function
-	float a;
-	float b;
-	float c;
-	float d;
+	void setProjMatrix();
+	void setViewMatrix(const int playerNum);
 };

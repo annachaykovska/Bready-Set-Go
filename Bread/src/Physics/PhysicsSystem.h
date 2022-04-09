@@ -33,11 +33,6 @@ public:
 	void updateFoodTransforms(bool setAllVisible = false);
 	void setAnalogInputs(bool input);
 
-	void setViewDirectionalInfluence(float value);
-	float getViewDirectionalInfluence();
-	void setTurnDirectionalInfluence(float value);
-	float getTurnDirectionalInfluence();
-
 	float getPlayerSpeed(int playerNumber);
 	float getPlayerSidewaysSpeed(int playerNumber);
 	bool getIsVehicleInAir(int playerNumber);
@@ -158,12 +153,8 @@ private:
 	bool mIsVehicleInAirPlayer4 = true;
 	bool useAnalogInputs = false;
 
-	float viewDirectionalInfluence;
-	float turnDirectionalInfluence;
-
 	bool mImpulseAppliedPlayer1 = false;
 	bool mImpulseAppliedPlayer2 = false;
 	bool mImpulseAppliedPlayer3 = false;
 	bool mImpulseAppliedPlayer4 = false;
-}; 
-
+};

@@ -163,8 +163,8 @@ void Mesh::draw(Shader &shader)
 	glUniform1f(quadraticLoc, 0.032f);
 
 	// Camera uniform
-	unsigned int viewPosLoc = glGetUniformLocation(shader.getId(), "viewPos");
-	glUniform3f(viewPosLoc, g_scene.camera.position.x, g_scene.camera.position.y, g_scene.camera.position.z);
+	//unsigned int viewPosLoc = glGetUniformLocation(shader.getId(), "viewPos");
+	//glUniform3f(viewPosLoc, g_scene.camera.position.x, g_scene.camera.position.y, g_scene.camera.position.z);
 
 	glBindVertexArray(VAO);
 

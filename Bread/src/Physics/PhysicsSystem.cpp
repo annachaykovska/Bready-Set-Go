@@ -516,9 +516,6 @@ void PhysicsSystem::initialize()
 	mVehiclePlayer4->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	//mVehicleInputData.setAnalogBrake(1.0f);
 
-	viewDirectionalInfluence = 0.f;
-	turnDirectionalInfluence = 0.f;
-
 	updateCar(); // TODO THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
@@ -567,26 +564,6 @@ void PhysicsSystem::initVehicleSDK()
 
 void PhysicsSystem::setAnalogInputs(bool input) {
 	this->useAnalogInputs = input;
-}
-
-void PhysicsSystem::setViewDirectionalInfluence(float value)
-{
-	viewDirectionalInfluence = value;
-}
-
-float PhysicsSystem::getViewDirectionalInfluence()
-{
-	return viewDirectionalInfluence;
-}
-
-void PhysicsSystem::setTurnDirectionalInfluence(float value)
-{
-	turnDirectionalInfluence = value;
-}
-
-float PhysicsSystem::getTurnDirectionalInfluence()
-{
-	return turnDirectionalInfluence;
 }
 
 void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage) {
@@ -787,6 +764,7 @@ void PhysicsSystem::update(const float dt, int gameStage)
 // Check if camera is behind a wall and save the position of the wall if it is
 void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
 {
+	/*
 	// Get this player's current position
 	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
 	trans.p.y += 2.0f;
@@ -835,6 +813,7 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 		this->p3CameraHit = false;
 		this->p4CameraHit = false;
 	}
+	*/
 }
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)

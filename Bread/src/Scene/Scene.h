@@ -13,7 +13,6 @@ public:
 	Scene();
 	~Scene();
 
-	Camera camera;
 	Camera* p1Camera;
 	Camera* p2Camera;
 	Camera* p3Camera;
@@ -29,5 +28,4 @@ private:
 
 	Entity* createEntity(std::string name);
 	std::unordered_map<std::string, Entity> entities;
-
 };

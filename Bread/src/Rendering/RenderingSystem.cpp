@@ -539,8 +539,10 @@ void RenderingSystem::init4PlayerQuad()
 
 void RenderingSystem::updateCamera(Camera* camera, int playerNum)
 {
+	// Update the camera for the new frame
+	camera->update(playerNum);
+
 	// Get new view matrix from Camera and update the regular Shader
-	camera->setViewMatrix(playerNum);
 	glUniformMatrix4fv(this->viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 
 	// Update regular Shader with the Camera's new position
@@ -548,7 +550,6 @@ void RenderingSystem::updateCamera(Camera* camera, int playerNum)
 	glUniform3f(viewPosLoc, camera->position.x, camera->position.y, camera->position.z);
 
 	// Update Shader with Camera's new projection matrix
-	camera->setProjMatrix();
 	glUniformMatrix4fv(this->projLoc, 1, GL_FALSE, glm::value_ptr(camera->projMatrix));
 }
 

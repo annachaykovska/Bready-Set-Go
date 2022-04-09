@@ -755,6 +755,7 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
 
 glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical)
 {
+    /*
     vertical = 0;
     bool verticalOffscreen = false;
     
@@ -870,6 +871,9 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     }
 
     return glm::vec3(location.x, location.y, location.z);
+    */
+
+    return glm::vec3(1.0f);
 }
 
 float UISystem::scX(float xVal)

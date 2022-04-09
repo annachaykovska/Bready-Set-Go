@@ -18,7 +18,6 @@ Scene::~Scene()
 	delete p4Camera;
 }
 
-
 /// <summary>
 /// Creates all the Entities in the Scene.
 /// </summary>

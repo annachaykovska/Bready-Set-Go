@@ -76,23 +76,6 @@ void Profiler::fps()
 	ImGui::Text("framesPerSecond = %lf", framesPerSecond);
 }
 
-void Profiler::player1Inventory()
-{
-	Entity* player1 = g_scene.getEntity("player1");
-	Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
-
-	ImGui::Text("Current Recipe:");
-	ImGui::Text("Tomato: %d/1", p1Inv->tomato);
-	ImGui::Text("Cheese: %d/1", p1Inv->cheese);
-	ImGui::Text("Sausage: %d/1", p1Inv->sausage);
-	ImGui::Text("Dough: %d/1", p1Inv->dough);
-
-	if (p1Inv->tomato == 1 && p1Inv->cheese == 1 && p1Inv->sausage == 1 && p1Inv->dough == 1)
-		ImGui::Text("Recipe complete!");
-	else
-		ImGui::Text("Complete the recipe!");
-}
-
 void Profiler::player1Transform()
 {
 	Entity* player1 = g_scene.getEntity("player1");
@@ -103,10 +86,6 @@ void Profiler::player1Transform()
 		ImGui::InputFloat("p1.pos.x", &(player1Transform->position.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p1.pos.y", &(player1Transform->position.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p1.pos.z", &(player1Transform->position.z), 1.f, 10.f, "%.3f");
-
-		//ImGui::SliderFloat("xrot", &(player1Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("yrot", &(player1Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("zrot", &(player1Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
 	}
 }
 
@@ -120,10 +99,6 @@ void Profiler::player2Transform()
 		ImGui::InputFloat("p2.pos.x", &(player2Transform->position.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p2.pos.y", &(player2Transform->position.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p2.pos.z", &(player2Transform->position.z), 1.f, 10.f, "%.3f");
-
-		//ImGui::SliderFloat("xrot2", &(player2Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("yrot2", &(player2Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("zrot2", &(player2Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
 	}
 }
 
@@ -137,10 +112,6 @@ void Profiler::player3Transform()
 		ImGui::InputFloat("p3.pos.x", &(player3Transform->position.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p3.pos.y", &(player3Transform->position.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p3.pos.z", &(player3Transform->position.z), 1.f, 10.f, "%.3f");
-
-		//ImGui::SliderFloat("xrot2", &(player2Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("yrot2", &(player2Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("zrot2", &(player2Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
 	}
 }
 
@@ -154,32 +125,7 @@ void Profiler::player4Transform()
 		ImGui::InputFloat("p4.pos.x", &(player4Transform->position.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p4.pos.y", &(player4Transform->position.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("p4.pos.z", &(player4Transform->position.z), 1.f, 10.f, "%.3f");
-
-		//ImGui::SliderFloat("xrot2", &(player2Transform->rotation.x), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("yrot2", &(player2Transform->rotation.y), -180.0f, 180.0f, "%.3f", 1.0f);
-		//ImGui::SliderFloat("zrot2", &(player2Transform->rotation.z), -180.0f, 180.0f, "%.3f", 1.0f);
 	}
-}
-
-void Profiler::cameraTransform()
-{
-	/*
-	Camera* camera = &(g_scene.camera);
-
-	float xBuf[50];
-	float step = 1.f;
-	float stepFast = 10.f;
-
-	if (ImGui::CollapsingHeader("Camera"))
-	{
-		ImGui::InputFloat("cameraXPos", &(camera->position.x), step, stepFast, "%.3f");
-		ImGui::InputFloat("cameraYPos", &(camera->position.y), step, stepFast, "%.3f");
-		ImGui::InputFloat("cameraZPos", &(camera->position.z), step, stepFast, "%.3f");
-
-		ImGui::InputFloat("cameraYaw", &(camera->yaw), step, stepFast, "%.3f");
-		ImGui::InputFloat("cameraPitch", &(camera->pitch), step, stepFast, "%.3f");
-	}
-	*/
 }
 
 void Profiler::testTransform()
@@ -232,13 +178,6 @@ void Profiler::shadows()
 		ImGui::InputFloat("lightPos.x", &(lightPos.x), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.y", &(lightPos.y), 1.f, 10.f, "%.3f");
 		ImGui::InputFloat("lightPos.z", &(lightPos.z), 1.f, 10.f, "%.3f");
-		
-		//float& maxBias = g_systems.render->maxBias;
-		//ImGui::InputFloat("maxBias", &(maxBias), 0.0001f, 0.01f,  "%.5f");
-		//ImGui::InputFloat("maxBias", &(g_systems.render->maxBias), 0.0001f, 0.01f, "%.5f");
-		//ImGui::InputFloat("minBias", &(g_systems.render->minBias), 0.0001f, 0.01f, "%.5f");
-		//ImGui::InputFloat("maxRoughBias", &(g_systems.render->maxRoughBias), 0.0001f, 0.01f, "%.5f");
-		//ImGui::InputFloat("minRoughBias", &(g_systems.render->minRoughBias), 0.0001f, 0.01f, "%.5f");
 	}
 }
 
@@ -299,29 +238,15 @@ void Profiler::physicsValues() {
 	}
 }
 
-void Profiler::cameraValues() {
-	auto camera = g_scene.camera;
-	if (ImGui::CollapsingHeader("Camera Values")) {
-		//FIXME: THESE DOESNT CHANGE THE VALUES
-		//ImGui::InputFloat("a", &(camera.a), 10.f, 100.f, "%.3f");
-		//ImGui::InputFloat("b", &(camera.b), 10.f, 100.f, "%.3f");
-		//ImGui::InputFloat("c", &(camera.c), 10.f, 100.f, "%.3f");
-		//ImGui::InputFloat("d", &(camera.d), 10.f, 100.f, "%.3f");
-	}
-}
-
 void Profiler::update()
 {
 	begin();
 	fps();
-	//player1Inventory();
-	//cameraValues(); //doesn't really work rn I DONT KNOW WHY
 	physicsValues();
 	player1Transform();
 	player2Transform();
 	player3Transform();
 	player4Transform();
-	cameraTransform();	
 	testTransform();
 	shadows();
 	meshScale();
