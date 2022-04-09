@@ -12,12 +12,7 @@ class Steering
 public:
 	Steering(Entity& entity, PhysicsSystem& physics, int id);
 
-	void park();
 	void updateSteering(position target);
-	void evasiveAction();
-	void brakeAction();
-	void pause();
-	bool locked();
 
 private:
 	Entity& entity_;

@@ -39,101 +39,19 @@ Steering::Steering(Entity& entity, PhysicsSystem& physics, int id)
 	}
 }
 
-void Steering::park()
-{
-	vehicle_->mWheelsDynData.setToRestState();
-}
-
-void Steering::evasiveAction()
-{
-	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-	input_->setAnalogAccel(0.3f);
-	if (currentTime_ - procedureTimer_ > 2)
-	{
-		stuck_ = false;
-		stuckTimer_ = glfwGetTime();
-		procedureTimer_ = glfwGetTime();
-	}
-}
-
-void Steering::brakeAction()
-{
-	if (currentTime_ - procedureTimer_ <= 0.5)
-	{
-		input_->setAnalogAccel(0.f);
-		input_->setAnalogBrake(1.f);
-	}
-	else if (currentTime_ - procedureTimer_ > 0.5 && currentTime_ - procedureTimer_ < 1)
-	{
-		vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eREVERSE);
-		input_->setAnalogBrake(0.f);
-		input_->setAnalogAccel(0.3f);
-		input_->setAnalogSteer(1.0f);
-	}
-	else
-	{
-		pause_ = false;
-		procedureTimer_ = glfwGetTime();
-		input_->setAnalogBrake(0.f);
-	}
-}
-
-void Steering::pause()
-{
-	pause_ = true;
-	procedureTimer_ = glfwGetTime();
-}
-
-bool Steering::locked()
-{
-	return false;
-}
-
 void Steering::updateSteering(position target)
 {
 	currentTime_ = glfwGetTime();
 
-	if (pause_)
-	{
-		std::cout << "Braking" << std::endl;
-		brakeAction();
-		return;
-	}
 
-	if (stuck_)
-	{
-		std::cout << "Unstucking" << std::endl;
-		evasiveAction();
-		return;
-	}
-
-	std::cout << "Steering" << std::endl;
 	vehicle_->mDriveDynData.forceGearChange(snippetvehicle::PxVehicleGearsData::eFIRST);
 	glm::vec3 vectorA = target - entity_.getTransform()->position;
-	float distance = length(vectorA);
 
-	distance /= 20;
-	if (distance > 1)
-	{
-		distance = 1;
-	}
 	vectorA /= length(vectorA);
 	glm::vec3 vectorB = entity_.getTransform()->heading;
 	
 	float theta = acos(dot(vectorB, vectorA) / (length(vectorA) * length(vectorB)));
 	glm::vec3 upVector = cross(vectorB, vectorA);
-
-	if (vehicle_->computeForwardSpeed() > 5)
-	{
-		stuckTimer_ = glfwGetTime();
-	}
-
-	if (currentTime_ - stuckTimer_ > 2)
-	{
-		stuckTimer_ = glfwGetTime();
-		stuck_ = true;
-		procedureTimer_ = glfwGetTime();
-	}
 
 	int max = 25;
 	if (vehicle_->computeForwardSpeed() < max)

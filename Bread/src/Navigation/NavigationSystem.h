@@ -4,6 +4,7 @@
 #include "NavMesh.h"
 #include "PathFinder.h"
 #include "Steering.h"
+#include "BehaviorHandler.h"
 #include "../Scene/Component.h"
 #include "../Scene/Entity.h"
 #include "../Physics/PhysicsSystem.h"
@@ -35,6 +36,7 @@ private:
 
 	WaypointUpdater waypointUpdater_;
 	PathFinder pathFinder_;
+	BehaviorHandler behaviorHandler_;
 
 	int id_;
 	bool resetFlag_;

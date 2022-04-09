@@ -18,15 +18,6 @@ AIBrain::AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSys
 void AIBrain::update()
 {
 	findClosestTarget();
-	if (distance_ < 30)
-	{
-		panicCounter_++;
-		if (panicCounter_ > 3000)
-		{
-			navigation.pause();
-			panicCounter_ = 0;
-		}
-	}
 	bool movingTarget = false;
 	position targetPosition = glm::vec3(5.f, 0.f, -50.f);;
 
@@ -134,7 +125,6 @@ void AIBrain::update()
 	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget)
 	{
 		navigation.setMode(NavMode::nav);
-		panicCounter_ = 0;
 		oldInventoryCount = getInventoryCount();
 		currentTarget = findClosestTarget();
 

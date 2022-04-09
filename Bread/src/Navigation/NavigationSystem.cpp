@@ -7,6 +7,7 @@ NavigationSystem::NavigationSystem(Entity& vehicle, PhysicsSystem& physics, NavM
 	, pathFinder_(navmesh_)
 	, id_(id)
 	, steering_(vehicle_, physics_, id_)
+	, behaviorHandler_(vehicle_.getTransform())
 	, waypointUpdater_(vehicle_, navmesh_)
 	, resetFlag_(false)
 	, currentMode_(nav)
@@ -20,19 +21,21 @@ void NavigationSystem::planPath(position target)
 	if (vehicle_.getTransform()->position != glm::vec3(0.f, 0.f, 0.f))
 	{
 		waypointUpdater_.setWaypoints(pathFinder_.findPath(vehicle_.getTransform()->position, target));
-
 		currentTarget_ = target;
 	}
-}
-
-void NavigationSystem::pause()
-{
-	steering_.park();
 }
 
 void NavigationSystem::update()
 {
 	float currentTime = glfwGetTime();
+	if (currentTime - magnetCooldown_ > 3)
+	{
+		std::cout << "Magnet Ready" << std::endl;
+	}
+	else
+	{
+		std::cout << "Waiting" << std::endl;
+	}
 	if (length(currentTarget_ - vehicle_.getTransform()->position) < 20)
 	{
 		if (currentTime - magnetCooldown_ > 3)
@@ -46,15 +49,7 @@ void NavigationSystem::update()
 		lostPath_ = waypointUpdater_.offPath();
 		if (waypointUpdater_.currentWaypoint() != nullptr)
 		{
-			if (steering_.locked())
-			{
-				std::cout << "Respawning tipped player" << std::endl;
-				physics_.respawnPlayer(id_);
-			}
-			else
-			{
-				steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
-			}
+			steering_.updateSteering(waypointUpdater_.currentWaypoint()->meshStep_->position_);
 		}
 		waypointUpdater_.updateWaypoints();
 		if (waypointUpdater_.pathComplete())
@@ -63,12 +58,6 @@ void NavigationSystem::update()
 		}
 		break;
 	case search:
-		float currentTime = glfwGetTime();
-		if (currentTime - searchWatchdog_ > 5)
-		{
-			steering_.pause();
-			searchWatchdog_ = glfwGetTime();
-		}
 		steering_.updateSteering(currentTarget_);
 		break;
 	}
@@ -82,10 +71,6 @@ void NavigationSystem::update()
 
 void NavigationSystem::setMode(NavMode mode)
 {
-	if (mode == search)
-	{
-		searchWatchdog_ = glfwGetTime();
-	}
 	currentMode_ = mode;
 }
 
