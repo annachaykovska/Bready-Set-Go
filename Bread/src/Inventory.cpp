@@ -23,6 +23,7 @@ void Inventory::clearAllIngredients()
 	this->peas = 0;
 	//this->soupbase = 0;
 	//this->pumpkin = 0;
+	this->allIngredientsCollected = false;
 }
 
 // Removes a random ingredient from this player's inventory
@@ -178,4 +179,40 @@ void Inventory::clearRandomIngredient()
 			break;
 		}
 	}
+}
+
+bool Inventory::checkRecipeComplete(Entity* player) {
+	if (player->name == "player1") {
+		if (this->tomato && this->cheese && this->dough && this->sausage) {
+			this->allIngredientsCollected = true;
+		}
+		else {
+			this->allIngredientsCollected = false;
+		}
+	}
+	if (player->name == "player2") {
+		if (this->egg && this->cheese && this->peas && this->lettuce) {
+			this->allIngredientsCollected = true;
+		}
+		else {
+			this->allIngredientsCollected = false;
+		}
+	}
+	if (player->name == "player3") {
+		if (this->chicken && this->dough && this->rice && this->lettuce) {
+			this->allIngredientsCollected = true;
+		}
+		else {
+			this->allIngredientsCollected = false;
+		}
+	}
+	if (player->name == "player4") {
+		if (this->parsnip && this->carrot && this->tomato && this->lettuce) {
+			this->allIngredientsCollected = true;
+		}
+		else {
+			this->allIngredientsCollected = false;
+		}
+	}
+	return allIngredientsCollected;
 }

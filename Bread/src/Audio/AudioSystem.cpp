@@ -48,6 +48,7 @@ AudioSystem::AudioSystem()
 	load("fart.wav");
 	load("suck.wav");
 	load("power.wav");
+	load("banner_popup.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 

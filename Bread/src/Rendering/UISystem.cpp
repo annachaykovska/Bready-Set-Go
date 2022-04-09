@@ -582,16 +582,16 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
     switch (playerNum)
     {
     case 1:
-        drawBanner = g_scene.getEntity("player1")->allIngredientsCollected;
+        drawBanner = g_scene.getEntity("player1")->getInventory()->allIngredientsCollected;
         break;
     case 2:
-        drawBanner = g_scene.getEntity("player2")->allIngredientsCollected;
+        drawBanner = g_scene.getEntity("player2")->getInventory()->allIngredientsCollected;
         break;
     case 3:
-        drawBanner = g_scene.getEntity("player3")->allIngredientsCollected;
+        drawBanner = g_scene.getEntity("player3")->getInventory()->allIngredientsCollected;
         break;
     case 4:
-        drawBanner = g_scene.getEntity("player4")->allIngredientsCollected;
+        drawBanner = g_scene.getEntity("player4")->getInventory()->allIngredientsCollected;
         break;
     default:
         break;

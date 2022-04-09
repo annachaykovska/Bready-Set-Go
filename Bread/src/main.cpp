@@ -321,12 +321,12 @@ int main()
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
-				if (g_scene.numPlayers <= 3)
+				/*if (g_scene.numPlayers <= 3)
 					p4Brain.update();
 				if (g_scene.numPlayers <= 2)
 					p3Brain.update();
 				if (g_scene.numPlayers <= 1)
-					p2Brain.update();
+					p2Brain.update();*/
 			}
 
 			// AUDIO
@@ -354,6 +354,10 @@ int main()
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 
+			player1->bannerSoundPlayed = false;
+			player2->bannerSoundPlayed = false;
+			player3->bannerSoundPlayed = false;
+			player4->bannerSoundPlayed = false;
 			audio.turnOffAllAudio();
 			audio.playMainMenuMusic(countertopAudioSource);
 
