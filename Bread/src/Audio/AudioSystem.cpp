@@ -56,13 +56,20 @@ AudioSystem::AudioSystem()
 	AudioSource* countertopAudioSource = createAudioSource();
 	AudioSource* p1AudioSource = createAudioSource();
 	AudioSource* bgMusic = createAudioSource();
+	AudioSource* menuAudio = createAudioSource();
 	AudioSource* p1Engine = createAudioSource();
+	AudioSource* p1Vacuum = createAudioSource();
 	AudioSource* p2AudioSource = createAudioSource();
 	AudioSource* p2Engine = createAudioSource();
+	AudioSource* p2Vacuum = createAudioSource();
 	AudioSource* p3AudioSource = createAudioSource();
 	AudioSource* p3Engine = createAudioSource();
+	AudioSource* p3Vacuum = createAudioSource();
 	AudioSource* p4AudioSource = createAudioSource();
 	AudioSource* p4Engine = createAudioSource();
+	AudioSource* p4Vacuum = createAudioSource();
+
+	this->menuAudio = menuAudio;
 
 	// Attach AudioSource Components to Entities
 	Entity* countertop = g_scene.getEntity("countertop");
@@ -70,16 +77,21 @@ AudioSystem::AudioSystem()
 	Entity* player1 = g_scene.getEntity("player1");
 	player1->attachComponent(p1AudioSource, "audio");
 	player1->attachComponent(bgMusic, "bg");
+	player1->attachComponent(menuAudio, "menuAudio");
 	player1->attachComponent(p1Engine, "engineAudio");
+	player1->attachComponent(p1Vacuum, "vacuumAudio");
 	Entity* player2 = g_scene.getEntity("player2");
 	player2->attachComponent(p2AudioSource, "audio");
 	player2->attachComponent(p2Engine, "engineAudio");
+	player2->attachComponent(p2Vacuum, "vacuumAudio");
 	Entity* player3 = g_scene.getEntity("player3");
 	player3->attachComponent(p3AudioSource, "audio");
 	player3->attachComponent(p3Engine, "engineAudio");
+	player3->attachComponent(p3Vacuum, "vacuumAudio");
 	Entity* player4 = g_scene.getEntity("player4");
 	player4->attachComponent(p4AudioSource, "audio");
 	player4->attachComponent(p4Engine, "engineAudio");
+	player4->attachComponent(p4Vacuum, "vacuumAudio");
 
 	bgMusic->loop = true;
 	bgMusic->gain = 0.05f;
@@ -87,19 +99,11 @@ AudioSystem::AudioSystem()
 
 	p1Engine->loop = true;
 	p1Engine->gain = 0.7f;
-	p1Engine->pitch = 1.0f;
+	p1Vacuum->gain = 0.5f;
 
 	p2Engine->loop = true;
-	p2Engine->gain = 1.0f;
-	p2Engine->pitch = 1.0f;
-
 	p3Engine->loop = true;
-	p3Engine->gain = 1.0f;
-	p3Engine->pitch = 1.0f;
-
 	p4Engine->loop = true;
-	p4Engine->gain = 1.0f;
-	p4Engine->pitch = 1.0f;
 
 	this->accumulator = 0.0f;
 }
@@ -243,11 +247,13 @@ AudioSource* AudioSystem::createAudioSource()
 		return nullptr;
 }
 
+// Updates audio sources each frame as necessary (i.e. as players move)
 void AudioSystem::update(const float dt)
 {
 	AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
 	bgMusic->play("bg.wav");
 
+	// Update listener position to player1's new position
 	Transform* trans = g_scene.getEntity("player1")->getTransform();
 	glm::vec3 pos = trans->position;
 	alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
@@ -257,6 +263,7 @@ void AudioSystem::update(const float dt)
 	glm::vec3 velocity = heading * g_scene.getEntity("player1")->speed;
 	alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
+	// Update each player's engine audio location
 	AudioSource* p1Engine = (AudioSource*)g_scene.getEntity("player1")->getComponent("engineAudio");
 	p1Engine->update();
 	AudioSource* p2Engine = (AudioSource*)g_scene.getEntity("player2")->getComponent("engineAudio");
@@ -266,6 +273,7 @@ void AudioSystem::update(const float dt)
 	AudioSource* p4Engine = (AudioSource*)g_scene.getEntity("player4")->getComponent("engineAudio");
 	p4Engine->update();
 
+	// Change pitch of engine noises wrt player speed
 	if (accumulator > 0.25f)
 	{
 		p1Engine->pitch = glm::abs(g_systems.physics->getPlayerSpeed(1) / 60.0f) + 1.0f;
@@ -293,13 +301,13 @@ void AudioSystem::update(const float dt)
 void AudioSystem::playGameMusic(AudioSource* source) {
 	source->gain = 0.01f; // Volume control
 	source->loop = true;
-	source->play("bg.wav"); // Comment this out to turn off the music on load
+	source->play("bg.wav"); 
 }
 
 void AudioSystem::playMainMenuMusic(AudioSource* source) {
 	source->gain = 0.08f; // Volume control
 	source->loop = true;
-	source->play("le_festin.wav"); // Comment this out to turn off the music on load
+	source->play("le_festin.wav");
 }
 
 void AudioSystem::stopMusic(AudioSource* source) {
@@ -349,4 +357,10 @@ void AudioSystem::turnOffAllAudio() {
 	for (int i = 0; i < audioSources.size(); i++) {
 		audioSources[i].stop();
 	}
+}
+
+void AudioSystem::playMenuAudio(std::string clipName)
+{
+	this->menuAudio->stop();
+	this->menuAudio->play(clipName);
 }

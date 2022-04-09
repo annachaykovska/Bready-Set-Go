@@ -180,14 +180,8 @@ int main()
 	AudioSource* p3Audio = player3->getAudioSource();
 	AudioSource* p4Audio = player4->getAudioSource();
 	p2Audio->gain = 1.0f;
-	//p2Audio->loop = true;
-	//p2Audio->play("idle.wav");
 	p3Audio->gain = 1.0f;
-	//p3Audio->loop = true;
-	//p3Audio->play("idle.wav");
 	p4Audio->gain = 1.0f;
-	//p4Audio->loop = true;
-	//p4Audio->play("idle.wav");
 
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
