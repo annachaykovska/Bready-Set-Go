@@ -151,33 +151,53 @@ int GameLoopManager::checkForWin()
 	Entity* player1 = g_scene.getEntity("player1");
 	Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
 	bool isPlayerInBase = checkForPlayerInBase(player1, player1Base);
-	if (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage && isPlayerInBase)
+	if (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage)
 	{
-		winnerId = 1;
+		player1->allIngredientsCollected = true;
+		if (isPlayerInBase)
+			winnerId = 1;
+	}
+	else {
+		player1->allIngredientsCollected = false;
 	}
 
 	Entity* player2 = g_scene.getEntity("player2");
 	Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
 	isPlayerInBase = checkForPlayerInBase(player2, player2Base);
-	if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce && isPlayerInBase)
+	if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce)
 	{
-		winnerId = 2;
+		player2->allIngredientsCollected = true;
+		if (isPlayerInBase)
+			winnerId = 2;
+	}
+	else {
+		player2->allIngredientsCollected = false;
 	}
 
 	Entity* player3 = g_scene.getEntity("player3");
 	Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
 	isPlayerInBase = checkForPlayerInBase(player3, player3Base);
-	if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce && isPlayerInBase)
+	if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce)
 	{
-		winnerId = 3;
+		player3->allIngredientsCollected = true;
+		if (isPlayerInBase)
+			winnerId = 3;
+	}
+	else {
+		player3->allIngredientsCollected = false;
 	}
 
 	Entity* player4 = g_scene.getEntity("player4");
 	Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
 	isPlayerInBase = checkForPlayerInBase(player4, player4Base);
-	if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce && isPlayerInBase)
+	if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce)
 	{
-		winnerId = 4;
+		player4->allIngredientsCollected = true;
+		if (isPlayerInBase)
+			winnerId = 4;
+	}
+	else {
+		player4->allIngredientsCollected = false;
 	}
 
 	return winnerId;
@@ -188,7 +208,6 @@ bool GameLoopManager::checkForPlayerInBase(Entity* player, PlayerBase base) {
 	if (currentLocation.x >= base.minX && currentLocation.x <= base.maxX &&
 		currentLocation.y >= base.minY && currentLocation.y <= base.maxY &&
 		currentLocation.z >= base.minZ && currentLocation.z <= base.maxZ) {
-		printf("%f YES\n", glfwGetTime());
 		return true;
 	}
 

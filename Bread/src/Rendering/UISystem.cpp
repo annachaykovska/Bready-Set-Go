@@ -100,6 +100,7 @@ UISystem::UISystem()
     , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
     , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
     , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
+    , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -576,6 +577,30 @@ void UISystem::updateInventory(int playerNum)
     renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 }
 
+void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
+    bool drawBanner = false;
+    switch (playerNum)
+    {
+    case 1:
+        drawBanner = g_scene.getEntity("player1")->allIngredientsCollected;
+        break;
+    case 2:
+        drawBanner = g_scene.getEntity("player2")->allIngredientsCollected;
+        break;
+    case 3:
+        drawBanner = g_scene.getEntity("player3")->allIngredientsCollected;
+        break;
+    case 4:
+        drawBanner = g_scene.getEntity("player4")->allIngredientsCollected;
+        break;
+    default:
+        break;
+    }
+    if (drawBanner && g_systems.loop->checkForWin() == 0) {
+        renderImage(imageShader, backToBaseBanner, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+    }
+}
+
 void UISystem::updatePlayer(unsigned int playerNum)
 {
     if (g_systems.loop->checkForWin() != 0)
@@ -587,6 +612,7 @@ void UISystem::updatePlayer(unsigned int playerNum)
     updateMiniMap();
     updateOffscreenIndicators(playerNum);
     updateInventory(playerNum);
+    updateReturnToBaseBanner(playerNum);
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)

@@ -15,6 +15,7 @@ public:
 	std::string name;
 	physx::PxVehicleDrive4W* vehicle;
 	physx::PxTransform originalSpawn;
+	bool allIngredientsCollected;
 	
 	Entity(std::string name);
 	bool attachComponent(Component* newComponent, std::string);
