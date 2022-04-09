@@ -150,22 +150,23 @@ UISystem::UISystem()
             GL_UNSIGNED_BYTE,
             face->glyph->bitmap.buffer
         );
-// set texture options
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// now store character for later use
-Character character = {
-    texture,
-    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-    face->glyph->advance.x
-};
-//test print
 
+        // set texture options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-Characters.insert(std::pair<char, Character>(c, character));
+        // now store character for later use
+        Character character = 
+        { 
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x 
+        };
+
+        Characters.insert(std::pair<char, Character>(c, character));
     }
 
     //Cleaning up the freetype variables
@@ -755,18 +756,38 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
 
 glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical)
 {
-    /*
+    // Get the player's camera
+    Camera* camera = nullptr;
+    switch (playerNum)
+    {
+    case 1:
+        camera = g_scene.p1Camera;
+        break;
+    case 2:
+        camera = g_scene.p1Camera;
+        break;
+    case 3:
+        camera = g_scene.p1Camera;
+        break;
+    case 4:
+        camera = g_scene.p1Camera;
+        break;
+    default:
+        return glm::vec3(0); // Uh-oh, something has gone wrong
+        break;
+    }
+
     vertical = 0;
     bool verticalOffscreen = false;
     
     glm::vec4 location = glm::vec4(entityPos, 1);
 
-    glm::vec3 cam = g_scene.camera.centerBeam;
-    glm::vec3 toEntity = entityPos - g_scene.camera.position;
+    glm::vec3 cam =camera->centerBeam;
+    glm::vec3 toEntity = entityPos - camera->position;
 
     std::string player = "player" + std::to_string(playerNum);
-    glm::mat4 viewMatrix = g_scene.camera.getViewMatrix(g_scene.getEntity(player)->getTransform());
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
+    glm::mat4 viewMatrix = camera->viewMatrix;
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera->getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
 
     location = projectionMatrix * viewMatrix * location;
 
@@ -871,9 +892,6 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     }
 
     return glm::vec3(location.x, location.y, location.z);
-    */
-
-    return glm::vec3(1.0f);
 }
 
 float UISystem::scX(float xVal)

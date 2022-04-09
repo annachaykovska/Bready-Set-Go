@@ -5,17 +5,12 @@
 
 class Transform;
 
-const float YAW = -90.0f;
-const float PITCH = -30.0f;
-const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
-const float ZOOM = 35.0f;
-
 class Camera
 {
 public:
 
 	glm::vec3 position;
+	glm::vec3 centerBeam;
 
 	glm::mat4 viewMatrix;
 	glm::mat4 projMatrix;
@@ -26,6 +21,7 @@ public:
 	Camera();
 
 	void update(const int playerNum);
+	float getPerspective();
 
 private:
 

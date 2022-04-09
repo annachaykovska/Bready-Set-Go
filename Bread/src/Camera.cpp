@@ -35,12 +35,18 @@ Camera::Camera()
 	, recordedForcedDirection(forcedDirection)
 	, oldCameraRotationOffset(0.0f)
 	, oldFOV(40.0f)
+	, centerBeam(glm::vec3(1.0f))
 {}
 
 void Camera::update(const int playerNum)
 {
 	setProjMatrix();
 	setViewMatrix(playerNum);
+}
+
+float Camera::getPerspective()
+{
+	return this->perspective;
 }
 
 void Camera::setProjMatrix()
@@ -243,12 +249,14 @@ void Camera::setViewMatrix(const int playerNum)
 	float xChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.x;
 	float zChange = (CAMERA_DISTANCE + cameraPositionOffset) * positionFromVehicle.z;
 
-	position.x = playerTransform->position.x + xChange;
-	position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
-	position.z = playerTransform->position.z + zChange;
+	this->position.x = playerTransform->position.x + xChange;
+	this->position.y = playerTransform->position.y + CAMERA_GROUND_HEIGHT;
+	this->position.z = playerTransform->position.z + zChange;
 
 	glm::vec3 positionUp = glm::vec3(0.0f, 4.0f, 0.0f);
-	glm::vec3 lookAhead = position + ((playerTransform->position + positionUp) - position) * 1.2f;
+	glm::vec3 lookAhead = this->position + ((playerTransform->position + positionUp) - this->position) * 1.2f;
+
+	this->centerBeam = lookAhead - this->position;
 	
-	this->viewMatrix = glm::lookAt(position, lookAhead, worldUp);
+	this->viewMatrix = glm::lookAt(this->position, lookAhead, worldUp);
 }
