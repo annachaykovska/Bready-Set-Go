@@ -100,6 +100,7 @@ UISystem::UISystem()
     , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
     , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
     , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
+    , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -235,7 +236,7 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage, int numController
 }
 
 void UISystem::updateEndGame(int endScreenValue) {
-    int winner = checkForWin();
+    int winner = g_systems.loop->checkForWin();
     std::string winText = "Player " + std::to_string(winner) + " Wins!";
     //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
@@ -576,9 +577,33 @@ void UISystem::updateInventory(int playerNum)
     renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 }
 
+void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
+    bool drawBanner = false;
+    switch (playerNum)
+    {
+    case 1:
+        drawBanner = g_scene.getEntity("player1")->getInventory()->allIngredientsCollected;
+        break;
+    case 2:
+        drawBanner = g_scene.getEntity("player2")->getInventory()->allIngredientsCollected;
+        break;
+    case 3:
+        drawBanner = g_scene.getEntity("player3")->getInventory()->allIngredientsCollected;
+        break;
+    case 4:
+        drawBanner = g_scene.getEntity("player4")->getInventory()->allIngredientsCollected;
+        break;
+    default:
+        break;
+    }
+    if (drawBanner && g_systems.loop->checkForWin() == 0) {
+        renderImage(imageShader, backToBaseBanner, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+    }
+}
+
 void UISystem::updatePlayer(unsigned int playerNum)
 {
-    if (checkForWin() != 0)
+    if (g_systems.loop->checkForWin() != 0)
         updateEndGame(g_systems.loop->endScreenGenerated);
     
     updateVacuum(playerNum);
@@ -587,48 +612,12 @@ void UISystem::updatePlayer(unsigned int playerNum)
     updateMiniMap();
     updateOffscreenIndicators(playerNum);
     updateInventory(playerNum);
+    updateReturnToBaseBanner(playerNum);
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
 {
     tracker = offscreenTracker;
-}
-
-int UISystem::checkForWin()
-{
-    Entity* player1 = g_scene.getEntity("player1");
-    Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
-
-    if (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage)
-    {
-        return 1;
-    }
-
-    Entity* player2 = g_scene.getEntity("player2");
-    Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
-
-    if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce)
-    {
-        return 2;
-    }
-
-    Entity* player3 = g_scene.getEntity("player3");
-    Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
-
-    if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce)
-    {
-        return 3;
-    }
-
-    Entity* player4 = g_scene.getEntity("player4");
-    Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
-
-    if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce)
-    {
-        return 4;
-    }
-
-    return 0;
 }
 
 void UISystem::updateMiniMap()

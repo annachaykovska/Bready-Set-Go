@@ -1280,6 +1280,7 @@ void PhysicsSystem::magnet(int stealer_id)
 	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
 	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
 	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
+	bool playBanner = false;
 	for (int i = 0; i < victims.size();) {
 		//TODO: right now only the location is checked
 		// See the victims that are in range
@@ -1398,7 +1399,11 @@ void PhysicsSystem::magnet(int stealer_id)
 				victims[i]->lastGracePeriodStart = currentTime;
 				if (stealer_id == 1)
 				{
-					g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+					/*if (!stealer->bannerSoundPlayed && stealer_inventory->allIngredientsCollected) {
+						playBanner = true;
+						stealer->bannerSoundPlayed = true;
+					}*/
+					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
 				}
 				if (victims[i] == g_scene.getEntity("player1")) // TODO: This needs to change for multiplayer
 				{
@@ -1414,13 +1419,18 @@ void PhysicsSystem::magnet(int stealer_id)
 	stealer->lastMagnetUse = currentTime;
 	if (stealer_id == 1)
 	{
-		g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+		/*if (!stealer->bannerSoundPlayed && stealer_inventory->allIngredientsCollected) {
+			playBanner = true;
+			stealer->bannerSoundPlayed = true;
+		}*/
+		g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 	}
 }
 
 void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
 	// setting up the stealer entity (see if this can be passed in instead)
 	Entity* stealer;
+	bool playBanner = false;
 	switch (stealer_id) {
 	case 1:
 		stealer = g_scene.getEntity("player1");
@@ -1458,7 +1468,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				stealer->magnetStatus = 3;
 			}
 			else {
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+				/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+					playBanner = true;
+					stealer->bannerSoundPlayed = true;
+				}*/
+				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 				stealer->lastMagnetUse = currentTime;
 				stealer->magnetStatus = 0;
 			}
@@ -1575,7 +1589,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 								break;
 							}
 						}
-						g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+						/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+							playBanner = true;
+							stealer->bannerSoundPlayed = true;
+						}*/
+						g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
 
 						// Update stealer/victim variables
 						stealer->lastGracePeriodStart = currentTime;
@@ -1592,7 +1610,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 					}
 				}
 				else { // Tethered list is empty
-					g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+					/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+						playBanner = true;
+						stealer->bannerSoundPlayed = true;
+					}*/
+					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 					stealer->tethered = false;
 					stealer->lastMagnetUse = currentTime;
 					stealer->magnetStatus = 0;
@@ -1600,7 +1622,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				}
 			}
 			else {
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+				/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+					playBanner = true;
+					stealer->bannerSoundPlayed = true;
+				}*/
+				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 				stealer->tethered = false;
 				stealer->tethered_victims.clear();
 				stealer->lastMagnetUse = currentTime;

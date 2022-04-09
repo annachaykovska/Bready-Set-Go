@@ -41,7 +41,6 @@ public:
 	void updateEndGame(int endScreenValue);
 	void showPauseMenu(int itemSelected);
 	void initIngredientTracking(IngredientTracker* tracker);
-	int checkForWin();
 
 private:
 
@@ -53,6 +52,7 @@ private:
 	void updateOffscreenIndicators(int playerNum);
 	void drawInventoryIcon(unsigned int haveItem, ImageTexture& image, unsigned int invPos);
 	void updateInventory(int playerNum);
+	void updateReturnToBaseBanner(unsigned int playerNum);
 
 	void renderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
 	void renderImage(Shader& s, ImageTexture& image, float x, float y, float scaleX, float scaleY, float theta, float alpha);
@@ -162,6 +162,7 @@ private:
 	ImageTexture gameOverPlayer4;
 	ImageTexture backToMainMenuButton;
 	ImageTexture backToMainMenuButtonPressed;
+	ImageTexture backToBaseBanner;
 
 	//Constants needed to render
 	std::map<char, Character> Characters;
