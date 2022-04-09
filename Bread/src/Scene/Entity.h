@@ -25,7 +25,7 @@ public:
 	Model* getModel();
 	Inventory* getInventory();
 	AudioSource* getAudioSource();
-	std::vector<std::string> getOtherPlayers();
+	std::vector<std::string> getOtherPlayers(); 
 	void checkIngredientCollision(Entity* otherEntity);
 	void checkPlayerCollision(Entity* otherEntity);
 
