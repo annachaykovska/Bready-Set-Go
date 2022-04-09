@@ -764,18 +764,27 @@ void PhysicsSystem::update(const float dt, int gameStage)
 // Check if camera is behind a wall and save the position of the wall if it is
 void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
 {
-	/*
+	Camera* camera = nullptr;
+
+	if (name == "player1")
+		camera = g_scene.p1Camera;
+	else if (name == "player2")
+		camera = g_scene.p2Camera;
+	else if (name == "player3")
+		camera = g_scene.p3Camera;
+	else if (name == "player4")
+		camera = g_scene.p4Camera;
+	else
+		return; // Uh-oh, something has gone wrong
+
 	// Get this player's current position
 	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
 	trans.p.y += 2.0f;
 
-	// Update the position of this player's camera
-	g_scene.camera.getViewMatrix(g_scene.getEntity(name)->getTransform());
-
 	// Shoot a ray from just above the player to their camera to detect walls
 	glm::vec3 playerPos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
-	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - playerPos);
-	float distance = glm::distance(g_scene.camera.position, playerPos);
+	glm::vec3 unitDir = glm::normalize(camera->position - playerPos);
+	float distance = glm::distance(camera->position, playerPos);
 	physx::PxVec3 unitDirPx = physx::PxVec3(unitDir.x, unitDir.y, unitDir.z);
 	physx::PxRaycastBuffer hit;
 	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
@@ -804,8 +813,10 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
 			this->p3CameraHit = true;
 		}
+		else
+			return; // Uh-oh, something has gone wrong
 	}
-	// If there was not wall, do nothing
+	// If there was no wall, do nothing
 	else
 	{
 		this->p1CameraHit = false;
@@ -813,7 +824,6 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 		this->p3CameraHit = false;
 		this->p4CameraHit = false;
 	}
-	*/
 }
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)

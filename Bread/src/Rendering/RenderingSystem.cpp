@@ -737,33 +737,26 @@ void RenderingSystem::renderScene(const std::string name)
 	else
 		return; // Uh-oh, something has gone wrong
 
-	/*
-	// Check if there is a wall between the player and the camera
+	// Check if there is a wall between the player and the camera and get the position if there is
 	if (g_systems.physics->p1CameraHit && name == "player1")
 	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p1CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
+		camera->recalculateViewMatrix(g_systems.physics->p1CameraHitPos);
 	}
 	else if (g_systems.physics->p2CameraHit && name == "player2")
 	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p2CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
+		camera->recalculateViewMatrix(g_systems.physics->p2CameraHitPos);
 	}
 	else if (g_systems.physics->p3CameraHit && name == "player3")
 	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p3CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
+		camera->recalculateViewMatrix(g_systems.physics->p3CameraHitPos);
 	}
 	else if (g_systems.physics->p4CameraHit && name == "player4")
 	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p4CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
+		camera->recalculateViewMatrix(g_systems.physics->p4CameraHitPos);
 	}
-	*/
+
+	// Update the camera's position to be the wall instead of behind the wall
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 
 	// Bind rough shadow map texture
 	glActiveTexture(GL_TEXTURE24);
@@ -777,14 +770,6 @@ void RenderingSystem::renderScene(const std::string name)
 	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
-
-	/*
-	// Set shadow bias uniforms
-	shader.setFloat("maxBias", this->maxBias);
-	shader.setFloat("minBias", this->minBias);
-	shader.setFloat("maxRoughBias", this->maxRoughBias);
-	shader.setFloat("minRoughBias", this->minRoughBias);
-	*/
 
 	if (DEBUG_NAVMESH)
 	{

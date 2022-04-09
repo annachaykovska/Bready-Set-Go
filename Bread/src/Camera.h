@@ -21,11 +21,14 @@ public:
 	Camera();
 
 	void update(const int playerNum);
+	void recalculateViewMatrix(const glm::vec3 newPos);
 	float getPerspective();
 
 private:
 
 	const glm::vec3 worldUp = glm::vec3(0, 1.0f, 0);
+
+	glm::vec3 lookAhead;
 
 	float perspective;
 	float lastSpeed;

@@ -36,12 +36,18 @@ Camera::Camera()
 	, oldCameraRotationOffset(0.0f)
 	, oldFOV(40.0f)
 	, centerBeam(glm::vec3(1.0f))
+	, lookAhead(glm::vec3(1.0f))
 {}
 
 void Camera::update(const int playerNum)
 {
 	setProjMatrix();
 	setViewMatrix(playerNum);
+}
+
+void Camera::recalculateViewMatrix(const glm::vec3 newPos)
+{
+	this->viewMatrix = glm::lookAt(newPos, this->lookAhead, worldUp);
 }
 
 float Camera::getPerspective()
@@ -254,9 +260,9 @@ void Camera::setViewMatrix(const int playerNum)
 	this->position.z = playerTransform->position.z + zChange;
 
 	glm::vec3 positionUp = glm::vec3(0.0f, 4.0f, 0.0f);
-	glm::vec3 lookAhead = this->position + ((playerTransform->position + positionUp) - this->position) * 1.2f;
+	this->lookAhead = this->position + ((playerTransform->position + positionUp) - this->position) * 1.2f;
 
-	this->centerBeam = lookAhead - this->position;
+	this->centerBeam = this->lookAhead - this->position;
 	
-	this->viewMatrix = glm::lookAt(this->position, lookAhead, worldUp);
+	this->viewMatrix = glm::lookAt(this->position, this->lookAhead, worldUp);
 }
