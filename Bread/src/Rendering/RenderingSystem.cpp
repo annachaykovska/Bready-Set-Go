@@ -11,6 +11,7 @@
 #include "../Timer.h"
 #include "UISystem.h"
 #include "../Gameplay/GameLoopManager.h"
+#include "../Profiler.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -58,11 +59,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// Shadow map viewport sizes
 	this->shadowHiRes = 4096;
 	this->shadowLoRes = 2048;
-
-	this->maxBias = 0.001f;
-	this->minBias = 0.00005f;
-	this->maxRoughBias = 0.005f;
-	this->minRoughBias = 0.0005f;
 
 	// Populate the models
 	this->models.reserve(g_scene.entityCount());
@@ -152,14 +148,16 @@ void RenderingSystem::initShadows()
 
 	// High resolution shadows ---------------------------------------------------------------------
 	
-	this->shadowWidth = this->shadowHiRes / g_scene.numPlayers;
-	this->shadowHeight = this->shadowHiRes / g_scene.numPlayers;
+	this->shadowWidth = this->shadowHiRes;// / g_scene.numPlayers;
+	this->shadowHeight = this->shadowHiRes;// / g_scene.numPlayers;
 
+	/*
 	if (g_scene.numPlayers == 3)
 	{
 		this->shadowWidth = g_systems.width / 4;
 		this->shadowHeight = g_systems.height / 4;
 	}
+	*/
 
 	// Configure depth map FBO
 	glGenFramebuffers(1, &this->p1ShadowsFBO);
@@ -771,12 +769,6 @@ void RenderingSystem::renderScene(const std::string name)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
 
-	// Set shadow bias uniforms
-	shader.setFloat("maxBias", this->maxBias);
-	shader.setFloat("minBias", this->minBias);
-	shader.setFloat("maxRoughBias", this->maxRoughBias);
-	shader.setFloat("minRoughBias", this->minRoughBias);
-
 	if (DEBUG_NAVMESH)
 	{
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Transform().getModelMatrix()));
@@ -830,21 +822,28 @@ void RenderingSystem::update()
 		createHiResShadowMap(playerNum);
 	}
 
-	// Step 3. Render the scene from each player's perspective
-	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
+	if (this->shadowDebugMode < 1)
 	{
-		std::string playerNum = "player" + std::to_string(i);
-		renderScene(playerNum);
-		
-		if (!g_systems.loop->isPaused)
-			g_systems.ui->updatePlayer(i);
-	}
+		// Step 3. Render the scene from each player's perspective
+		for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
+		{
+			std::string playerNum = "player" + std::to_string(i);
+			renderScene(playerNum);
 
-	if (g_systems.loop->isPaused)
+			if (!g_systems.loop->isPaused)
+				g_systems.ui->updatePlayer(i);
+		}
+
+		if (g_systems.loop->isPaused)
+		{
+			glViewport(0, 0, g_systems.width, g_systems.height);
+			g_systems.ui->showPauseMenu(g_systems.loop->pauseMenuSelection);
+			return;
+		}
+	}
+	else if (this->shadowDebugMode >= 1)
 	{
-		glViewport(0, 0, g_systems.width, g_systems.height);
-		g_systems.ui->showPauseMenu(g_systems.loop->pauseMenuSelection);
-		return;
+		this->renderDebugShadowMap();
 	}
 }
 
@@ -911,8 +910,9 @@ void RenderingSystem::renderDebugShadowMap()
 	if (this->shadowDebugMode == 1)
 		glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
 	if (this->shadowDebugMode == 2)
-		glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	//glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
+		glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
+
+	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
 	renderTexturedQuad();
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
