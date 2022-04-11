@@ -820,66 +820,69 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
 {
+
+	glm::quat q = glm::quat(glm::vec3(0.0f, glfwGetTime(), 0.0f));
+	PxTransform trans = PxTransform(PxQuat(q.w, q.x, q.y, q.z));
+
 	// Cheese
+	this->cheese->setGlobalPose(this->cheese->getGlobalPose().transform(trans));
 	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("cheese")->removeFlag = false;
 
 	// Sausage
+	this->sausage->setGlobalPose(this->sausage->getGlobalPose().transform(trans));
 	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("sausage")->removeFlag = false;
 
 	// Tomato
+	this->tomato->setGlobalPose(this->tomato->getGlobalPose().transform(trans));
 	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("tomato")->removeFlag = false;
 
 	// Dough
+	this->dough->setGlobalPose(this->dough->getGlobalPose().transform(trans));
 	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("dough")->removeFlag = false;
 
 	// Carrot
+	this->carrot->setGlobalPose(this->carrot->getGlobalPose().transform(trans));
 	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("carrot")->removeFlag = false;
 
 	// Lettuce
+	this->lettuce->setGlobalPose(this->lettuce->getGlobalPose().transform(trans));
 	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("lettuce")->removeFlag = false;
 
 	// Parsnip
+	this->parsnip->setGlobalPose(this->parsnip->getGlobalPose().transform(trans));
 	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("parsnip")->removeFlag = false;
 
 	// Rice
+	this->rice->setGlobalPose(this->rice->getGlobalPose().transform(trans));
 	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("rice")->removeFlag = false;
 
 	// Egg
+	this->egg->setGlobalPose(this->egg->getGlobalPose().transform(trans));
 	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("egg")->removeFlag = false;
 
 	// Chicken
+	this->chicken->setGlobalPose(this->chicken->getGlobalPose().transform(trans));
 	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("chicken")->removeFlag = false;
 
 	// Peas
+	this->peas->setGlobalPose(this->peas->getGlobalPose().transform(trans));
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
+
+	// Check if visibility needs to be reset
 	if (setAllVisible)
+	{
+		g_scene.getEntity("cheese")->removeFlag = false;
+		g_scene.getEntity("sausage")->removeFlag = false;
+		g_scene.getEntity("tomato")->removeFlag = false;
+		g_scene.getEntity("dough")->removeFlag = false;
+		g_scene.getEntity("carrot")->removeFlag = false;
+		g_scene.getEntity("lettuce")->removeFlag = false;
+		g_scene.getEntity("parsnip")->removeFlag = false;
+		g_scene.getEntity("rice")->removeFlag = false;
+		g_scene.getEntity("egg")->removeFlag = false;
+		g_scene.getEntity("chicken")->removeFlag = false;
 		g_scene.getEntity("peas")->removeFlag = false;
-
-	//// Soupbase
-	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
-
-	//// Pumpkin
-	//g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
+	}
 }
 
 void PhysicsSystem::cleanupPhysics()

@@ -814,9 +814,10 @@ void RenderingSystem::update()
 	// Animate ingredients
 	for (unsigned int i = 6; i <= 16; i++)
 	{
-		models[i].owner->getTransform()->rotation = glm::vec3(0.0f, glfwGetTime() * 50.0f, 0.0f);
-		models[i].owner->getTransform()->position += glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f);
-		models[i].owner->getTransform()->update();
+		//models[i].owner->getTransform()->rotation = glm::vec3(0.0f, glfwGetTime() * 50.0f, 0.0f);
+		//models[i].owner->getTransform()->position += glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f);
+		//models[i].owner->getTransform()->update();
+		models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
 	}
 
 	// Step 1. Create the lo-res shadow map for the whole level
