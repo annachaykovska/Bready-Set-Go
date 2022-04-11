@@ -48,7 +48,7 @@ int main()
 	// ImGui profiler for debugging
 	Profiler profiler(window);
 
-	// TODO change this at runtime in the main menu
+	// Change this at runtime in the main menu
 	g_scene.numPlayers = 1;
 
 	//-----------------------------------------------------------------------------------
@@ -149,21 +149,6 @@ int main()
 	fan->getTransform()->position = glm::vec3(0.0f, 150.0f, -50.0f);
 	fan->getTransform()->scale = glm::vec3(15.0f);
 	fan->getTransform()->update();
-
-	// Set rendered ingredient scales
-	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
-	sausage->getTransform()->scale = glm::vec3(30, 30, 30);
-	tomato->getTransform()->scale = glm::vec3(30, 30, 30);
-	dough->getTransform()->scale = glm::vec3(30, 30, 30);
-	carrot->getTransform()->scale = glm::vec3(30, 30, 30);
-	lettuce->getTransform()->scale = glm::vec3(30, 30, 30);
-	parsnip->getTransform()->scale = glm::vec3(30, 30, 30);
-	rice->getTransform()->scale = glm::vec3(30, 30, 30);
-	egg->getTransform()->scale = glm::vec3(30, 30, 30);
-	chicken->getTransform()->scale = glm::vec3(30, 30, 30);
-	peas->getTransform()->scale = glm::vec3(30, 30, 30);
-	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
