@@ -31,8 +31,6 @@ public:
 	unsigned int getShaderId();
 	Shader& getShader();
 
-	void setupCameras(Transform* playerTransform);
-
 	Model* getKitchenModel();
 
 	Orthogonal roughOrt;
@@ -120,6 +118,8 @@ private:
 	unsigned int fourPlayerTex;
 	unsigned int fourPlayerRBO;
 
+	void updateCamera(Camera* camera, int playerNum);
+
 	void initShadows();
 	void initSkybox();
 	void loadModels();
@@ -132,7 +132,7 @@ private:
 
 	void renderScene(const std::string name);
 
-	void drawSkybox();
+	void drawSkybox(Camera* camera);
 
 	void renderTexturedQuad();
 	void renderOnePlayerQuad();

@@ -10,13 +10,17 @@ class Scene
 {
 public:
 
-	Camera camera;
+	Scene();
+	~Scene();
+
+	Camera* p1Camera;
+	Camera* p2Camera;
+	Camera* p3Camera;
+	Camera* p4Camera;
 
 	void createEntities();
 	Entity* getEntity(std::string name);
 	int entityCount();
-
-	void init(PhysicsSystem* physics);
 
 	int numPlayers;
 	
@@ -24,5 +28,4 @@ private:
 
 	Entity* createEntity(std::string name);
 	std::unordered_map<std::string, Entity> entities;
-
 };
