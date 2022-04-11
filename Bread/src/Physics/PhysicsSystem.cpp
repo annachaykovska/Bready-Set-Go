@@ -140,11 +140,7 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, float x, float y, float z, std::string name)
 {
-	physx::PxReal scalar = this->mPhysics->getTolerancesScale().length;
-
-	std::cout << scalar << std::endl;
-
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(x, y, z), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(x / 2.0f, y / 2.0f, z / 2.0f), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
