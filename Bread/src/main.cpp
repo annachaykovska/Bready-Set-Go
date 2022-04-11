@@ -152,7 +152,7 @@ int main()
 
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
-	testTransform->scale = glm::vec3(1, 1, 1);
+	testTransform->scale = glm::vec3(0.01f, 0.01f, 0.01f);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
