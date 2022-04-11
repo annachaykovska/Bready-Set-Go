@@ -12,6 +12,8 @@
 using namespace physx;
 using namespace snippetvehicle;
 
+class Entity;
+
 class PhysicsSystem
 {
 public:
@@ -31,18 +33,13 @@ public:
 	void updateFoodTransforms(bool setAllVisible = false);
 	void setAnalogInputs(bool input);
 
-	void setViewDirectionalInfluence(float value);
-	float getViewDirectionalInfluence();
-	void setTurnDirectionalInfluence(float value);
-	float getTurnDirectionalInfluence();
-
 	float getPlayerSpeed(int playerNumber);
+	float getPlayerSidewaysSpeed(int playerNumber);
 	bool getIsVehicleInAir(int playerNumber);
 	void resetOutOfBoundsObjects();
 	void respawnPlayer(int playerNumber);
 	void respawnPlayerInPlace(int playerNumber);
 	void playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W* firstVehicle, Entity* secondActor, PxVehicleDrive4W* secondVehicle);
-
 
 	// Functions for magnet ability
 	void magnet(int stealer_id);
@@ -156,12 +153,8 @@ private:
 	bool mIsVehicleInAirPlayer4 = true;
 	bool useAnalogInputs = false;
 
-	float viewDirectionalInfluence;
-	float turnDirectionalInfluence;
-
 	bool mImpulseAppliedPlayer1 = false;
 	bool mImpulseAppliedPlayer2 = false;
 	bool mImpulseAppliedPlayer3 = false;
 	bool mImpulseAppliedPlayer4 = false;
-}; 
-
+};
