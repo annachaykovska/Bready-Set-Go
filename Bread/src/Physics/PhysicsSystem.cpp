@@ -140,12 +140,15 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 
 PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, float x, float y, float z, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(x / 3.0f, y / 3.0f, z / 3.0f), *mMaterial);
+	physx::PxReal scalar = this->mPhysics->getTolerancesScale().length;
+
+	std::cout << scalar << std::endl;
+
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(x, y, z), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	//PxTransform localTm(PxVec3(10, 2, 10)); // TODO what is this?
-	PxRigidDynamic* body = mPhysics->createRigidDynamic(t);//.transform(localTm));
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t);
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
@@ -343,7 +346,7 @@ void PhysicsSystem::randomizeIngredientLocations()
 	// CHEESE
 	loc = LOCATIONS[spawnLocations[0]];
 	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->cheese = createFoodBlock(cheeseTransform, 5.89f, 3.56f, 5.49f, "cheese");
+	this->cheese = createFoodBlock(cheeseTransform, 5.894f, 3.580f, 5.491f, "cheese");
 	g_scene.getEntity("cheese")->originalSpawn = cheeseTransform;
 
 	// SAUSAGE
