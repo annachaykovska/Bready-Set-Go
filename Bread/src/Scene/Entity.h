@@ -15,6 +15,7 @@ public:
 	std::string name;
 	physx::PxVehicleDrive4W* vehicle;
 	physx::PxTransform originalSpawn;
+	bool bannerSoundPlayed;
 	
 	Entity(std::string name);
 	bool attachComponent(Component* newComponent, std::string);
@@ -24,7 +25,7 @@ public:
 	Model* getModel();
 	Inventory* getInventory();
 	AudioSource* getAudioSource();
-	std::vector<std::string> getOtherPlayers();
+	std::vector<std::string> getOtherPlayers(); 
 	void checkIngredientCollision(Entity* otherEntity);
 	void checkPlayerCollision(Entity* otherEntity);
 

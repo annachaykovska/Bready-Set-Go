@@ -2,7 +2,8 @@
 
 class Window;
 
-class Profiler {
+class Profiler 
+{
 public:
 
 	Profiler(Window& window);
@@ -11,18 +12,15 @@ public:
 	void begin();
 	void end();
 	void fps();
-	void player1Inventory();
 	void player1Transform();
 	void player2Transform();
 	void player3Transform();
 	void player4Transform();
-	void cameraTransform();
 	void testTransform();
 	void meshScale();
 	void update();
 	void shadows();
 	void physicsValues();
-	void cameraValues();
 
 private:
 

@@ -516,9 +516,6 @@ void PhysicsSystem::initialize()
 	mVehiclePlayer4->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	//mVehicleInputData.setAnalogBrake(1.0f);
 
-	viewDirectionalInfluence = 0.f;
-	turnDirectionalInfluence = 0.f;
-
 	updateCar(); // TODO THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
@@ -567,26 +564,6 @@ void PhysicsSystem::initVehicleSDK()
 
 void PhysicsSystem::setAnalogInputs(bool input) {
 	this->useAnalogInputs = input;
-}
-
-void PhysicsSystem::setViewDirectionalInfluence(float value)
-{
-	viewDirectionalInfluence = value;
-}
-
-float PhysicsSystem::getViewDirectionalInfluence()
-{
-	return viewDirectionalInfluence;
-}
-
-void PhysicsSystem::setTurnDirectionalInfluence(float value)
-{
-	turnDirectionalInfluence = value;
-}
-
-float PhysicsSystem::getTurnDirectionalInfluence()
-{
-	return turnDirectionalInfluence;
 }
 
 void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage) {
@@ -787,17 +764,27 @@ void PhysicsSystem::update(const float dt, int gameStage)
 // Check if camera is behind a wall and save the position of the wall if it is
 void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
 {
+	Camera* camera = nullptr;
+
+	if (name == "player1")
+		camera = g_scene.p1Camera;
+	else if (name == "player2")
+		camera = g_scene.p2Camera;
+	else if (name == "player3")
+		camera = g_scene.p3Camera;
+	else if (name == "player4")
+		camera = g_scene.p4Camera;
+	else
+		return; // Uh-oh, something has gone wrong
+
 	// Get this player's current position
 	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
 	trans.p.y += 2.0f;
 
-	// Update the position of this player's camera
-	g_scene.camera.getViewMatrix(g_scene.getEntity(name)->getTransform());
-
 	// Shoot a ray from just above the player to their camera to detect walls
 	glm::vec3 playerPos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
-	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - playerPos);
-	float distance = glm::distance(g_scene.camera.position, playerPos);
+	glm::vec3 unitDir = glm::normalize(camera->position - playerPos);
+	float distance = glm::distance(camera->position, playerPos);
 	physx::PxVec3 unitDirPx = physx::PxVec3(unitDir.x, unitDir.y, unitDir.z);
 	physx::PxRaycastBuffer hit;
 	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
@@ -826,8 +813,10 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
 			this->p3CameraHit = true;
 		}
+		else
+			return; // Uh-oh, something has gone wrong
 	}
-	// If there was not wall, do nothing
+	// If there was no wall, do nothing
 	else
 	{
 		this->p1CameraHit = false;
@@ -977,6 +966,33 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 		break;
 	case (4):
 		result = (float)mVehiclePlayer4->computeForwardSpeed();
+		return result;
+		break;
+	default:
+		break;
+	}
+}
+
+float PhysicsSystem::getPlayerSidewaysSpeed(int playerNumber)
+{
+	float result;
+
+	switch (playerNumber)
+	{
+	case (1):
+		result = (float)mVehiclePlayer1->computeSidewaysSpeed();
+		return result;
+		break;
+	case (2):
+		result = (float)mVehiclePlayer2->computeSidewaysSpeed();
+		return result;
+		break;
+	case (3):
+		result = (float)mVehiclePlayer3->computeSidewaysSpeed();
+		return result;
+		break;
+	case (4):
+		result = (float)mVehiclePlayer4->computeSidewaysSpeed();
 		return result;
 		break;
 	default:
@@ -1280,6 +1296,7 @@ void PhysicsSystem::magnet(int stealer_id)
 	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
 	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
 	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
+	bool playBanner = false;
 	for (int i = 0; i < victims.size();) {
 		//TODO: right now only the location is checked
 		// See the victims that are in range
@@ -1398,7 +1415,11 @@ void PhysicsSystem::magnet(int stealer_id)
 				victims[i]->lastGracePeriodStart = currentTime;
 				if (stealer_id == 1)
 				{
-					g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+					/*if (!stealer->bannerSoundPlayed && stealer_inventory->allIngredientsCollected) {
+						playBanner = true;
+						stealer->bannerSoundPlayed = true;
+					}*/
+					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
 				}
 				if (victims[i] == g_scene.getEntity("player1")) // TODO: This needs to change for multiplayer
 				{
@@ -1414,13 +1435,18 @@ void PhysicsSystem::magnet(int stealer_id)
 	stealer->lastMagnetUse = currentTime;
 	if (stealer_id == 1)
 	{
-		g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+		/*if (!stealer->bannerSoundPlayed && stealer_inventory->allIngredientsCollected) {
+			playBanner = true;
+			stealer->bannerSoundPlayed = true;
+		}*/
+		g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 	}
 }
 
 void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
 	// setting up the stealer entity (see if this can be passed in instead)
 	Entity* stealer;
+	bool playBanner = false;
 	switch (stealer_id) {
 	case 1:
 		stealer = g_scene.getEntity("player1");
@@ -1458,7 +1484,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				stealer->magnetStatus = 3;
 			}
 			else {
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+				/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+					playBanner = true;
+					stealer->bannerSoundPlayed = true;
+				}*/
+				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 				stealer->lastMagnetUse = currentTime;
 				stealer->magnetStatus = 0;
 			}
@@ -1575,7 +1605,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 								break;
 							}
 						}
-						g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+						/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+							playBanner = true;
+							stealer->bannerSoundPlayed = true;
+						}*/
+						g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
 
 						// Update stealer/victim variables
 						stealer->lastGracePeriodStart = currentTime;
@@ -1592,7 +1626,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 					}
 				}
 				else { // Tethered list is empty
-					g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+					/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+						playBanner = true;
+						stealer->bannerSoundPlayed = true;
+					}*/
+					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 					stealer->tethered = false;
 					stealer->lastMagnetUse = currentTime;
 					stealer->magnetStatus = 0;
@@ -1600,7 +1638,11 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				}
 			}
 			else {
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+				/*if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+					playBanner = true;
+					stealer->bannerSoundPlayed = true;
+				}*/
+				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 				stealer->tethered = false;
 				stealer->tethered_victims.clear();
 				stealer->lastMagnetUse = currentTime;

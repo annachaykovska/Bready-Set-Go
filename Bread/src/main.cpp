@@ -104,8 +104,6 @@ int main()
 	UISystem ui;
 	g_systems.ui = &ui;
 
-	g_scene.init(&physics);
-
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE TRANSFORMS
 	//-----------------------------------------------------------------------------------
@@ -292,7 +290,7 @@ int main()
 			salad.updateRecipeProgress(p4Inv);
 
 			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
-			int winner = ui.checkForWin();
+			int winner = gameLoop.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();
 			}
@@ -327,7 +325,7 @@ int main()
 			audio.update(dt);
 		}
 
-		if (ui.checkForWin() != 0) {
+		if (gameLoop.checkForWin() != 0) {
 			gameLoop.isGameEnded = true;
 		}
 
@@ -348,6 +346,10 @@ int main()
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 
+			player1->bannerSoundPlayed = false;
+			player2->bannerSoundPlayed = false;
+			player3->bannerSoundPlayed = false;
+			player4->bannerSoundPlayed = false;
 			audio.turnOffAllAudio();
 			audio.playMainMenuMusic(countertopAudioSource);
 

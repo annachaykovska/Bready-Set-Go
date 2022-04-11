@@ -137,6 +137,8 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	bool* b_held;
 	bool* useFlip;
 	float* b_buttonTimeStart;
+	Camera* camera;
+
 	if (controllerId == 1) {
 		input = &physics->mVehicleInputDataPlayer2;
 		vehiclePhysics = physics->mVehiclePlayer2;
@@ -145,6 +147,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		useFlip = &useFlip2;
 		b_buttonTimeStart = &b_buttonTimeStart2;
 		player = g_scene.getEntity("player2");
+		camera = g_scene.p2Camera;
 	}
 	else if (controllerId == 2) {
 		input = &physics->mVehicleInputDataPlayer3;
@@ -154,6 +157,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		useFlip = &useFlip3;
 		b_buttonTimeStart = &b_buttonTimeStart3;
 		player = g_scene.getEntity("player3");
+		camera = g_scene.p3Camera;
 	}
 	else if (controllerId == 3) {
 		input = &physics->mVehicleInputDataPlayer4;
@@ -163,6 +167,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		useFlip = &useFlip4;
 		b_buttonTimeStart = &b_buttonTimeStart4;
 		player = g_scene.getEntity("player4");
+		camera = g_scene.p4Camera;
 	}
 	else {
 		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
@@ -171,7 +176,9 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		b_held = &b_held1;
 		useFlip = &useFlip1;
 		b_buttonTimeStart = &b_buttonTimeStart1;
+		camera = g_scene.p1Camera;
 	}
+
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
@@ -287,11 +294,11 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	float analogVal;
 	float analogVal2;
 	if (thumbRightX <= 0) { // left
-		physics->setViewDirectionalInfluence(thumbRightDeadZone);
+		camera->viewDirectionalInfluence = thumbRightDeadZone;
 	}
 	if (thumbRightX > 0) { // right
 		analogVal = -1.0 * thumbRightDeadZone;
-		physics->setViewDirectionalInfluence(analogVal);
+		camera->viewDirectionalInfluence = analogVal;
 	}
 
 	// TRIGGER PRESSED
@@ -390,7 +397,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 				thumbLeftDeadZone = 1;
 			}
 			input->setAnalogSteer(thumbLeftDeadZone);
-			physics->setTurnDirectionalInfluence(thumbLeftDeadZone);
+			camera->turnDirectionalInfluence = thumbLeftDeadZone;
 
 		}
 		if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
@@ -404,13 +411,15 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 			{
 				thumbLeftDeadZone = 0;
 			}
+
 			if (thumbLeftDeadZone > 1)
 			{
 				thumbLeftDeadZone = 1;
 			}
+
 			analogVal = -1.0 * thumbLeftDeadZone;
 			input->setAnalogSteer(analogVal);
-			physics->setTurnDirectionalInfluence(analogVal);
+			camera->turnDirectionalInfluence = analogVal;
 		}
 	}
 

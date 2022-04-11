@@ -81,11 +81,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
 
-	// Camera
-	Transform transform = Transform();
-	transform.position = glm::vec3(1.0f);
-	setupCameras(&transform); // Setup the camera
-
 	// Initialize shadow maps
 	this->initShadows();
 
@@ -542,32 +537,20 @@ void RenderingSystem::init4PlayerQuad()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-void RenderingSystem::setupCameras(Transform* player1Transform)
+void RenderingSystem::updateCamera(Camera* camera, int playerNum)
 {
-	// Get view matrix from Camera and update the Shader
-	this->viewMatrix = g_scene.camera.getViewMatrix(player1Transform);
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
+	// Update the camera for the new frame
+	camera->update(playerNum);
 
-	// Tell shader about camera position
-	unsigned int viewPosLoc = glGetUniformLocation(getShaderId(), "viewPos");
-	glm::vec3 cameraPos = g_scene.camera.position;
-	glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
+	// Get new view matrix from Camera and update the regular Shader
+	glUniformMatrix4fv(this->viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 
-	// Projection matrix will be handled by the Camera class in the future
-	this->projMatrix = glm::mat4(1.0f);
-	float screenWidth = g_systems.width;
-	float screenHeight = g_systems.height;
+	// Update regular Shader with the Camera's new position
+	unsigned int viewPosLoc = glGetUniformLocation(this->shader.getId(), "viewPos");
+	glUniform3f(viewPosLoc, camera->position.x, camera->position.y, camera->position.z);
 
-	if (g_scene.numPlayers != 2)
-	{
-		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), screenWidth / screenHeight, 0.1f, 1000.0f);
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
-	}
-	else
-	{
-		this->projMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), (screenWidth * 3/4) / (screenHeight / 2), 0.1f, 1000.0f);
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(this->projMatrix));
-	}
+	// Update Shader with Camera's new projection matrix
+	glUniformMatrix4fv(this->projLoc, 1, GL_FALSE, glm::value_ptr(camera->projMatrix));
 }
 
 void RenderingSystem::createLoResShadowMap()
@@ -680,6 +663,7 @@ void RenderingSystem::renderScene(const std::string name)
 
 	glm::mat4 lightSpaceMatrix, modelMatrix;
 	glm::vec3 pos;
+	Camera* camera = nullptr;
 
 	glActiveTexture(GL_TEXTURE25);
 
@@ -694,6 +678,16 @@ void RenderingSystem::renderScene(const std::string name)
 			glViewport(g_systems.width / 8, g_systems.height / 2, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(0, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p1Camera;
+		updateCamera(camera, 1);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p1CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p1CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}
 	else if (name == "player2")
 	{
@@ -704,6 +698,16 @@ void RenderingSystem::renderScene(const std::string name)
 			glViewport(g_systems.width / 8, 0, g_systems.width * (6.0f / 8.0f), g_systems.height / 2);
 		else
 			glViewport(g_systems.width / 2, g_systems.height / 2, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p2Camera;
+		updateCamera(camera, 2);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p2CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p2CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}	
 	else if (name == "player3")
 	{
@@ -715,48 +719,41 @@ void RenderingSystem::renderScene(const std::string name)
 			glViewport(g_systems.width / 4, 0, g_systems.width / 2, g_systems.height / 2);
 		else
 			glViewport(0, 0, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p3Camera;
+		updateCamera(camera, 3);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p3CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p3CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}	
 	else if (name == "player4")
 	{
 		glBindTexture(GL_TEXTURE_2D, this->p4ShadowsTex);
 		lightSpaceMatrix = this->p4LightSpaceMatrix;
 		glViewport(g_systems.width / 2, 0, g_systems.width / 2, g_systems.height / 2);
+
+		camera = g_scene.p4Camera;
+		updateCamera(camera, 4);
+
+		// Check if there is a wall between the player and the camera and get the position if there is
+		if (g_systems.physics->p4CameraHit)
+		{
+			camera->recalculateViewMatrix(g_systems.physics->p4CameraHitPos);
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		}
 	}
+	else
+		return; // Uh-oh, something has gone wrong
 
 	// Update uniforms
 	this->shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	this->shader.setMat4("roughLightSpaceMatrix", this->loResLightSpaceMatrix);
 	this->shader.setVec3("playerPos", g_scene.getEntity(name)->getTransform()->position);
 	this->shader.setMat4("playerModelMatrix", g_scene.getEntity(name)->getTransform()->getModelMatrix());
-
-	// Update camera (MVP matrices)
-	setupCameras(g_scene.getEntity(name)->getTransform());
-
-	// Check if there is a wall between the player and the camera
-	if (g_systems.physics->p1CameraHit && name == "player1")
-	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p1CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
-	}
-	else if (g_systems.physics->p2CameraHit && name == "player2")
-	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p2CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
-	}
-	else if (g_systems.physics->p3CameraHit && name == "player3")
-	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p3CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
-	}
-	else if (g_systems.physics->p4CameraHit && name == "player4")
-	{
-		g_scene.camera.updateCameraPosition(g_systems.physics->p4CameraHitPos);
-		this->viewMatrix = g_scene.camera.recalculateViewMatrix();
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->viewMatrix));
-	}
 
 	// Bind rough shadow map texture
 	glActiveTexture(GL_TEXTURE24);
@@ -766,16 +763,9 @@ void RenderingSystem::renderScene(const std::string name)
 	glBindTexture(GL_TEXTURE, 0);
 
 	// Bind high res shadow map texture
-	
 	glUniform1i(glGetUniformLocation(this->shader.getId(), "shadowMap"), 25);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE, 0);
-
-	// Set shadow bias uniforms
-	shader.setFloat("maxBias", this->maxBias);
-	shader.setFloat("minBias", this->minBias);
-	shader.setFloat("maxRoughBias", this->maxRoughBias);
-	shader.setFloat("minRoughBias", this->minRoughBias);
 
 	if (DEBUG_NAVMESH)
 	{
@@ -814,7 +804,7 @@ void RenderingSystem::renderScene(const std::string name)
 	glActiveTexture(GL_TEXTURE0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Reset to default FBO
 
-	drawSkybox();
+	drawSkybox(camera);
 }
 
 void RenderingSystem::update()
@@ -938,12 +928,12 @@ void RenderingSystem::renderTexturedQuad()
 	glBindVertexArray(0);
 }
 
-void RenderingSystem::drawSkybox()
+void RenderingSystem::drawSkybox(Camera* camera)
 {
 	glDepthFunc(GL_LEQUAL);
 	this->skyboxShader.use();
-	this->skyboxShader.setMat4("view", glm::mat4(glm::mat3(this->viewMatrix)));
-	this->skyboxShader.setMat4("projection", this->projMatrix);
+	this->skyboxShader.setMat4("view", glm::mat4(glm::mat3(camera->viewMatrix)));
+	this->skyboxShader.setMat4("projection", camera->projMatrix);
 	this->skyboxShader.setInt("skybox", 23);
 
 	glBindVertexArray(this->skyboxVAO);
