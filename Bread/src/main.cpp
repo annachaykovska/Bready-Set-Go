@@ -297,6 +297,7 @@ int main()
 			window.swapBuffer();
 
 			// AI + Navigation
+			/*
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
@@ -306,7 +307,7 @@ int main()
 					p3Brain.update();
 				if (g_scene.numPlayers <= 1)
 					p2Brain.update();
-			}
+			}*/
 
 			// AUDIO
 			audio.update(dt);
