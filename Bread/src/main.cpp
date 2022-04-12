@@ -273,10 +273,10 @@ int main()
 		window.clear();
 
 		if (gameLoop.gameStage == GameLoopMode::MENU_START || gameLoop.gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION || gameLoop.gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
-			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
-			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
+			controllers.setButtonStateFromControllerMainMenu(0, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(1, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerMainMenu(2, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerMainMenu(3, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 4 controller
 			
 			// RENDER
 			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
@@ -295,10 +295,10 @@ int main()
 				gameLoop.setEndStage();
 			}
 
-			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerDriving(1, winner); // Getting the input from player 2 controller
-			controllers.setButtonStateFromControllerDriving(2, winner); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerDriving(3, winner); // Getting the input from player 4 controller
+			controllers.setButtonStateFromControllerDriving(0, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerDriving(1, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerDriving(2, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerDriving(3, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 4 controller
 			
 			// RENDER
 			renderer.update();
