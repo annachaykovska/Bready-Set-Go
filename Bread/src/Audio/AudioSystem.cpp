@@ -49,14 +49,16 @@ AudioSystem::AudioSystem()
 	load("suck.wav");
 	load("power.wav");
 	load("banner_popup.wav");
+	load("knife.wav");
+	load("chop.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
 	// Create AudioSource Components
+	AudioSource* menuAudio = createAudioSource(); // keep this first
 	AudioSource* countertopAudioSource = createAudioSource();
 	AudioSource* p1AudioSource = createAudioSource();
 	AudioSource* bgMusic = createAudioSource();
-	AudioSource* menuAudio = createAudioSource();
 	AudioSource* p1Engine = createAudioSource();
 	AudioSource* p1Vacuum = createAudioSource();
 	AudioSource* p2AudioSource = createAudioSource();
@@ -354,7 +356,8 @@ void AudioSystem::powerReady(AudioSource* source)
 }
 
 void AudioSystem::turnOffAllAudio() {
-	for (int i = 0; i < audioSources.size(); i++) {
+	// Starts from 1 to avoid the menu noises
+	for (int i = 1; i < audioSources.size(); i++) {
 		audioSources[i].stop();
 	}
 }
