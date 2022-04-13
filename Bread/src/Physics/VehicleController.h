@@ -23,8 +23,8 @@ class XboxController {
 public:
 	XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem, GameLoopManager* gameLoopManager);
 	void checkControllers();
-	void setButtonStateFromControllerDriving(int controllerId, bool gameEnded);
-	void setButtonStateFromControllerMainMenu(int controllerId);
+	void setButtonStateFromControllerDriving(int controllerId, bool gameEnded, AudioSource* menuSource);
+	void setButtonStateFromControllerMainMenu(int controllerId, AudioSource* menuSource);
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
 	int getNumberConnectedControllers();
