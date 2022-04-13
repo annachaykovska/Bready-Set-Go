@@ -1024,25 +1024,25 @@ void PhysicsSystem::resetOutOfBoundsObjects()
 	{
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player1")->getInventory()->clearRandomIngredient();
-		g_scene.getEntity("player1")->getAudioSource()->play("potfill.wav");
+		g_scene.getEntity("player1")->getAudioSource()->play("drum.wav");
 	}
 	if (this->mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player2")->getInventory()->clearRandomIngredient();
-		g_scene.getEntity("player2")->getAudioSource()->play("potfill.wav");
+		g_scene.getEntity("player2")->getAudioSource()->play("drum.wav");
 	}
 	if (this->mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player3")->getInventory()->clearRandomIngredient();
-		g_scene.getEntity("player3")->getAudioSource()->play("potfill.wav");
+		g_scene.getEntity("player3")->getAudioSource()->play("drum.wav");
 	}
 	if (this->mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player4")->getInventory()->clearRandomIngredient();
-		g_scene.getEntity("player4")->getAudioSource()->play("potfill.wav");
+		g_scene.getEntity("player4")->getAudioSource()->play("drum.wav");
 	}
 
 	// Ingredients

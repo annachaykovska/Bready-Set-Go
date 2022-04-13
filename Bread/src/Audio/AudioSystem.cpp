@@ -55,7 +55,7 @@ AudioSystem::AudioSystem()
 	load("carioca.wav");
 	load("menu.wav");
 	load("wrong.wav");
-	load("potfill.wav");
+	load("drum.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
