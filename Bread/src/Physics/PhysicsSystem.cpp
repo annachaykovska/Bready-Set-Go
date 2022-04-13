@@ -1016,7 +1016,8 @@ bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
 	return false;
 }
 
-void PhysicsSystem::resetOutOfBoundsObjects() {
+void PhysicsSystem::resetOutOfBoundsObjects() 
+{
 	// Players
 	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
