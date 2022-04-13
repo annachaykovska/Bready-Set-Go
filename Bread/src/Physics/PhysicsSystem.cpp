@@ -138,14 +138,13 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
-PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, float x, float y, float z, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(x / 2.0f, y / 2.0f, z / 2.0f), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(10, 2, 10));
-	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t);
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
@@ -156,6 +155,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	void* vp = static_cast<void*>(new std::string(name));
 	body->userData = vp;
 
+	// Add the collider to the scene
 	mScene->addActor(*body);
 	shape->release();
 
@@ -327,91 +327,83 @@ void PhysicsSystem::initializeActors() {
 
 void PhysicsSystem::randomizeIngredientLocations()
 {
-	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
-	// Note: Physx actor name must match Entity name
-
+	// Randomize starting location
 	std::random_device r;
 	std::seed_seq seed{ r(), r(), r(), r(), r(), r(), r(), r() };
 	std::mt19937 eng(seed);
 
 	std::shuffle(std::begin(spawnLocations), std::end(spawnLocations), eng);
 
-	float halfExtent = 1.0f;
 	glm::vec3 loc;
+
+	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	// Note: Physx actor name must match Entity name
 
 	// CHEESE
 	loc = LOCATIONS[spawnLocations[0]];
 	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
+	this->cheese = createFoodBlock(cheeseTransform, 5.894f, 3.580f, 5.491f, "cheese");
 	g_scene.getEntity("cheese")->originalSpawn = cheeseTransform;
 
 	// SAUSAGE
 	loc = LOCATIONS[spawnLocations[1]];
 	PxTransform sausageTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
+	this->sausage = createFoodBlock(sausageTransform, 6.72f, 1.53f, 1.25f, "sausage");
 	g_scene.getEntity("sausage")->originalSpawn = sausageTransform;
 
 	// TOMATO
 	loc = LOCATIONS[spawnLocations[2]];
 	PxTransform tomatoTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
+	this->tomato = createFoodBlock(tomatoTransform, 6.11f, 5.49f, 6.11f, "tomato");
 	g_scene.getEntity("tomato")->originalSpawn = tomatoTransform;
 
 	// DOUGH
 	loc = LOCATIONS[spawnLocations[3]];
 	PxTransform doughTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
+	this->dough = createFoodBlock(doughTransform, 5.69f, 2.66f, 5.69f, "dough");
 	g_scene.getEntity("dough")->originalSpawn = doughTransform;
 
 	// CARROT
 	loc = LOCATIONS[spawnLocations[4]];
 	PxTransform carrotTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->carrot = createFoodBlock(carrotTransform, halfExtent, "carrot");
+	this->carrot = createFoodBlock(carrotTransform, 9.32f, 2.76f, 2.32f, "carrot");
 	g_scene.getEntity("carrot")->originalSpawn = carrotTransform;
 
 	// LETTUCE
 	loc = LOCATIONS[spawnLocations[5]];
 	PxTransform lettuceTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->lettuce = createFoodBlock(lettuceTransform, halfExtent, "lettuce");
+	this->lettuce = createFoodBlock(lettuceTransform, 6.45f, 4.65f, 6.18f, "lettuce");
 	g_scene.getEntity("lettuce")->originalSpawn = lettuceTransform;
 
 	// PARSNIP
 	loc = LOCATIONS[spawnLocations[6]];
 	PxTransform parsnipTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->parsnip = createFoodBlock(parsnipTransform, halfExtent, "parsnip");
+	this->parsnip = createFoodBlock(parsnipTransform, 6.06f, 7.08f, 6.06f, "parsnip");
 	g_scene.getEntity("parsnip")->originalSpawn = parsnipTransform;
 
 	// RICE
 	loc = LOCATIONS[spawnLocations[7]];
 	PxTransform riceTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->rice = createFoodBlock(riceTransform, halfExtent, "rice");
+	this->rice = createFoodBlock(riceTransform, 6.65f, 4.48f, 6.61f, "rice");
 	g_scene.getEntity("rice")->originalSpawn = riceTransform;
 
 	// EGG
 	loc = LOCATIONS[spawnLocations[8]];
 	PxTransform eggTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->egg = createFoodBlock(eggTransform, halfExtent, "egg");
+	this->egg = createFoodBlock(eggTransform, 5.14f, 0.683f, 5.14f, "egg");
 	g_scene.getEntity("egg")->originalSpawn = eggTransform;
 
 	// CHICKEN
 	loc = LOCATIONS[spawnLocations[9]];
 	PxTransform chickenTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->chicken = createFoodBlock(chickenTransform, halfExtent, "chicken");
+	this->chicken = createFoodBlock(chickenTransform, 7.83f, 2.58f, 4.49f, "chicken");
 	g_scene.getEntity("chicken")->originalSpawn = chickenTransform;
 
 	// PEAS
 	loc = LOCATIONS[spawnLocations[10]];
 	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
+	this->peas = createFoodBlock(peasTransform, 7.13f, 2.18f, 2.41f, "peas");
 	g_scene.getEntity("peas")->originalSpawn = peasTransform;
-
-	//// SOUPBASE
-	//PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
-	//this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
-
-	//// PUMPKIN
-	//PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
-	//this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
 // Constructor
@@ -828,66 +820,69 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
 {
+
+	glm::quat q = glm::quat(glm::vec3(0.0f, glfwGetTime(), 0.0f));
+	PxTransform trans = PxTransform(PxQuat(q.w, q.x, q.y, q.z));
+
 	// Cheese
+	this->cheese->setGlobalPose(this->cheese->getGlobalPose().transform(trans));
 	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("cheese")->removeFlag = false;
 
 	// Sausage
+	this->sausage->setGlobalPose(this->sausage->getGlobalPose().transform(trans));
 	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("sausage")->removeFlag = false;
 
 	// Tomato
+	this->tomato->setGlobalPose(this->tomato->getGlobalPose().transform(trans));
 	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("tomato")->removeFlag = false;
 
 	// Dough
+	this->dough->setGlobalPose(this->dough->getGlobalPose().transform(trans));
 	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("dough")->removeFlag = false;
 
 	// Carrot
+	this->carrot->setGlobalPose(this->carrot->getGlobalPose().transform(trans));
 	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("carrot")->removeFlag = false;
 
 	// Lettuce
+	this->lettuce->setGlobalPose(this->lettuce->getGlobalPose().transform(trans));
 	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("lettuce")->removeFlag = false;
 
 	// Parsnip
+	this->parsnip->setGlobalPose(this->parsnip->getGlobalPose().transform(trans));
 	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("parsnip")->removeFlag = false;
 
 	// Rice
+	this->rice->setGlobalPose(this->rice->getGlobalPose().transform(trans));
 	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("rice")->removeFlag = false;
 
 	// Egg
+	this->egg->setGlobalPose(this->egg->getGlobalPose().transform(trans));
 	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("egg")->removeFlag = false;
 
 	// Chicken
+	this->chicken->setGlobalPose(this->chicken->getGlobalPose().transform(trans));
 	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("chicken")->removeFlag = false;
 
 	// Peas
+	this->peas->setGlobalPose(this->peas->getGlobalPose().transform(trans));
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
+
+	// Check if visibility needs to be reset
 	if (setAllVisible)
+	{
+		g_scene.getEntity("cheese")->removeFlag = false;
+		g_scene.getEntity("sausage")->removeFlag = false;
+		g_scene.getEntity("tomato")->removeFlag = false;
+		g_scene.getEntity("dough")->removeFlag = false;
+		g_scene.getEntity("carrot")->removeFlag = false;
+		g_scene.getEntity("lettuce")->removeFlag = false;
+		g_scene.getEntity("parsnip")->removeFlag = false;
+		g_scene.getEntity("rice")->removeFlag = false;
+		g_scene.getEntity("egg")->removeFlag = false;
+		g_scene.getEntity("chicken")->removeFlag = false;
 		g_scene.getEntity("peas")->removeFlag = false;
-
-	//// Soupbase
-	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
-
-	//// Pumpkin
-	//g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
+	}
 }
 
 void PhysicsSystem::cleanupPhysics()
@@ -1021,7 +1016,8 @@ bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
 	return false;
 }
 
-void PhysicsSystem::resetOutOfBoundsObjects() {
+void PhysicsSystem::resetOutOfBoundsObjects() 
+{
 	// Players
 	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
