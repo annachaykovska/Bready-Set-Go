@@ -226,6 +226,17 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		*y_held = false;
 	}
 
+	// Update the vibration 
+	if (player->magnetStatus == 2) {
+		vibrateController(controllerId, true, 1);
+	}
+	else if (player->magnetStatus == 3)
+		vibrateController(controllerId, true, 2);
+	else {
+		vibrateController(controllerId, false, 0);
+	}
+
+	// Handbrake
 	if (X_button_pressed)
 	{
 		input->setAnalogHandbrake(1.0f);
@@ -463,4 +474,24 @@ int XboxController::getNumberConnectedControllers() {
 	}
 	//printf("NUM CONTROLLER: %d\n", numControllers);
 	return numControllers;
+}
+
+void XboxController::vibrateController(int controllerId, bool vibrate, int pattern) {
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	if (vibrate) {
+		if (pattern == 1) {
+			vibration.wLeftMotorSpeed = 4000; // use any value between 0-65535 here
+			//vibration.wRightMotorSpeed = 5000; // use any value between 0-65535 here
+		}
+		else if (pattern == 2) {
+			vibration.wLeftMotorSpeed = 65535; // use any value between 0-65535 here
+			vibration.wRightMotorSpeed = 65535; // use any value between 0-65535 here
+		}
+	} 
+	else {
+		vibration.wLeftMotorSpeed = 0; // use any value between 0-65535 here
+		vibration.wRightMotorSpeed = 0; // use any value between 0-65535 here
+	}
+	XInputSetState(controllerId, &vibration);
 }
