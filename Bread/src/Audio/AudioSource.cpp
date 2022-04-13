@@ -7,7 +7,6 @@ extern SystemManager g_systems;
 
 // TODO add audio streaming
 // TODO add .ogg file format compatibility
-// TODO add update method that updates audio source positions and velocities
 // TODO add audio event queuing system?
 
 AudioSource::AudioSource()

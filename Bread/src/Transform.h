@@ -24,4 +24,5 @@ public:
 
 	void update();
 	void update(physx::PxTransform transform);
+	void translate(glm::vec3 translation);
 };
