@@ -2,11 +2,13 @@
 
 extern Scene g_scene;
 
-AIBrain::AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSystem& navigation)
+AIBrain::AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSystem& navigation, position start)
 	: inventory(inventory)
 	, tracker(tracker)
 	, navigation(navigation)
+	, start(start)
 	, oldInventoryCount(0)
+	, returnToBase(false)
 	, panicCounter_(0)
 	, distance_(0)
 	, trackedTargetDelta(position(0.f, 0.f, 0.f))
@@ -28,12 +30,14 @@ void AIBrain::update()
 		}
 	}
 	bool movingTarget = false;
-	position targetPosition = glm::vec3(5.f, 0.f, -50.f);;
+	position targetPosition = start;
+	bool winStatus = returnToBase;
 
 	switch (currentTarget)
 	{
 	case Ingredient::Cheese:
 		targetPosition = tracker.getCheeseLocation().position;
+		returnToBase = false;
 		//std::cout << "Cheese" << std::endl;
 		if (length(tracker.getCheeseLocation().position - trackedTargetDelta) > 5)
 		{
@@ -42,6 +46,7 @@ void AIBrain::update()
 		break;
 	case Ingredient::Dough:
 		targetPosition = tracker.getDoughLocation().position;
+		returnToBase = false;
 		//std::cout << "Dough" << std::endl;
 		if (length(tracker.getDoughLocation().position - trackedTargetDelta) > 5)
 		{
@@ -50,6 +55,7 @@ void AIBrain::update()
 		break;
 	case Ingredient::Sausage:
 		targetPosition = tracker.getSausageLocation().position;
+		returnToBase = false;
 		//std::cout << "Sausage" << std::endl;
 		if (length(tracker.getSausageLocation().position - trackedTargetDelta) > 5)
 		{
@@ -58,6 +64,7 @@ void AIBrain::update()
 		break;
 	case Ingredient::Tomato:
 		targetPosition = tracker.getTomatoLocation().position;
+		returnToBase = false;
 		//std::cout << "Tomato" << std::endl;
 		if (length(tracker.getTomatoLocation().position - trackedTargetDelta) > 5)
 		{
@@ -67,6 +74,7 @@ void AIBrain::update()
 	case Ingredient::Carrot:
 		//std::cout << "Carrot" << std::endl;
 		targetPosition = tracker.getCarrotLocation().position;
+		returnToBase = false;
 		if (length(tracker.getCarrotLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
@@ -75,6 +83,7 @@ void AIBrain::update()
 	case Ingredient::Lettuce:
 		//std::cout << "Lettuce" << std::endl;
 		targetPosition = tracker.getLettuceLocation().position;
+		returnToBase = false;
 		if (length(tracker.getLettuceLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
@@ -83,6 +92,7 @@ void AIBrain::update()
 	case Ingredient::Parsnip:
 		//std::cout << "Parsnip" << std::endl;
 		targetPosition = tracker.getParsnipLocation().position;
+		returnToBase = false;
 		if (length(tracker.getParsnipLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
@@ -91,6 +101,7 @@ void AIBrain::update()
 	case Ingredient::Rice:
 		//std::cout << "Rice" << std::endl;
 		targetPosition = tracker.getRiceLocation().position;
+		returnToBase = false;
 		if (length(tracker.getRiceLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
@@ -99,6 +110,7 @@ void AIBrain::update()
 	case Ingredient::Egg:
 		//std::cout << "Egg" << std::endl;
 		targetPosition = tracker.getEggLocation().position;
+		returnToBase = false;
 		if (length(tracker.getEggLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
@@ -107,6 +119,7 @@ void AIBrain::update()
 	case Ingredient::Chicken:
 		//std::cout << "Chicken" << std::endl;
 		targetPosition = tracker.getChickenLocation().position;
+		returnToBase = false;
 		if (length(tracker.getChickenLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
@@ -115,14 +128,15 @@ void AIBrain::update()
 	case Ingredient::Peas:
 		//std::cout << "Peas" << std::endl;
 		targetPosition = tracker.getPeasLocation().position;
+		returnToBase = false;
 		if (length(tracker.getPeasLocation().position - trackedTargetDelta) > 5)
 		{
 			movingTarget = true;
 		}
 		break;
 	case Ingredient::NONE:
-		//std::cout << "None" << std::endl;
-		targetPosition = glm::vec3(5.f, 0.f, -50.f);
+		returnToBase = true;
+		targetPosition = start;
 		break;
 	}
 
@@ -131,8 +145,9 @@ void AIBrain::update()
 		navigation.coolDownMagnet();
 	}
 
-	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget)
+	if (!navigation.hasPath() || oldInventoryCount != getInventoryCount() || navigation.queryReset() || navigation.lostPath() || movingTarget || returnToBase != winStatus)
 	{
+		//std::cout << "Path planned with target: " << targetPosition.x << " " << targetPosition.y << std::endl;
 		navigation.setMode(NavMode::nav);
 		panicCounter_ = 0;
 		oldInventoryCount = getInventoryCount();

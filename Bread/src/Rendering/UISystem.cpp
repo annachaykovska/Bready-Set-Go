@@ -578,6 +578,41 @@ void UISystem::updateInventory(int playerNum)
     renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 }
 
+void UISystem::updateUnflip(int playerNum)
+{
+    Entity* player = nullptr;
+    switch (playerNum)
+    {
+    case 1:
+        player = g_scene.getEntity("player1");
+        break;
+    case 2:
+        player = g_scene.getEntity("player2");
+        break;
+    case 3:
+        player = g_scene.getEntity("player3");
+        break;
+    case 4:
+        player = g_scene.getEntity("player4");
+        break;
+    }
+    if (player->unflipTimer > 0)
+    {
+        if (player->unflipTimer > 2 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else if (player->unflipTimer > 1 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, unflip3, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+    }
+}
+
 void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
     bool drawBanner = false;
     switch (playerNum)
@@ -613,6 +648,7 @@ void UISystem::updatePlayer(unsigned int playerNum)
     updateMiniMap();
     updateOffscreenIndicators(playerNum);
     updateInventory(playerNum);
+    updateUnflip(playerNum);
     updateReturnToBaseBanner(playerNum);
 }
 

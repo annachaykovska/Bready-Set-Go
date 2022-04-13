@@ -51,6 +51,7 @@ private:
 	void drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown);
 	void updateOffscreenIndicators(int playerNum);
 	void drawInventoryIcon(unsigned int haveItem, ImageTexture& image, unsigned int invPos);
+	void updateUnflip(int playerNum);
 	void updateInventory(int playerNum);
 	void updateReturnToBaseBanner(unsigned int playerNum);
 

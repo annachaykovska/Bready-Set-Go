@@ -158,7 +158,7 @@ int GameLoopManager::checkForWin()
 	Entity* player2 = g_scene.getEntity("player2");
 	Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
 	isPlayerInBase = checkForPlayerInBase(player2, player2Base);
-	if (p2Inv->checkRecipeComplete(player1) && isPlayerInBase) {
+	if (p2Inv->checkRecipeComplete(player2) && isPlayerInBase) {
 		winnerId = 2;
 	}
 
@@ -166,14 +166,14 @@ int GameLoopManager::checkForWin()
 	Entity* player3 = g_scene.getEntity("player3");
 	Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
 	isPlayerInBase = checkForPlayerInBase(player3, player3Base);
-	if (p3Inv->checkRecipeComplete(player1) && isPlayerInBase) {
+	if (p3Inv->checkRecipeComplete(player3) && isPlayerInBase) {
 		winnerId = 3;
 	}
 
 	Entity* player4 = g_scene.getEntity("player4");
 	Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
 	isPlayerInBase = checkForPlayerInBase(player4, player4Base);
-	if (p4Inv->checkRecipeComplete(player1) && isPlayerInBase) {
+	if (p4Inv->checkRecipeComplete(player4) && isPlayerInBase) {
 		winnerId = 4;
 	}
 
