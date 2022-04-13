@@ -34,7 +34,7 @@ Entity::Entity(std::string name)
 	this->magnetTimeToSteal = 0.5f;
 	this->unflipTimer = 0.f;
 
-	this->ingredientCollectDistanceSquared = 400.f;
+	this->ingredientCollectDistanceSquared = 100.f;
 
 }
 
