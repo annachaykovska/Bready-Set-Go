@@ -187,6 +187,7 @@ bool Inventory::checkRecipeComplete(Entity* player) {
 			this->allIngredientsCollected = true;
 		}
 		else {
+			player->bannerSoundPlayed = false;
 			this->allIngredientsCollected = false;
 		}
 	}
@@ -195,6 +196,7 @@ bool Inventory::checkRecipeComplete(Entity* player) {
 			this->allIngredientsCollected = true;
 		}
 		else {
+			player->bannerSoundPlayed = false;
 			this->allIngredientsCollected = false;
 		}
 	}
@@ -203,6 +205,7 @@ bool Inventory::checkRecipeComplete(Entity* player) {
 			this->allIngredientsCollected = true;
 		}
 		else {
+			player->bannerSoundPlayed = false;
 			this->allIngredientsCollected = false;
 		}
 	}
@@ -211,6 +214,7 @@ bool Inventory::checkRecipeComplete(Entity* player) {
 			this->allIngredientsCollected = true;
 		}
 		else {
+			player->bannerSoundPlayed = false;
 			this->allIngredientsCollected = false;
 		}
 	}

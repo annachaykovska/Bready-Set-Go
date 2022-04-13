@@ -28,6 +28,7 @@ public:
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
 	int getNumberConnectedControllers();
+	void vibrateController(int controllerId, bool vibrate);
 
 	PhysicsSystem* physics;
 
