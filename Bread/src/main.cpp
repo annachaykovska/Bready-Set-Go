@@ -194,13 +194,16 @@ int main()
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
-	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
+	glm::vec3 p2Start = glm::vec3(11, 3, 60);
+	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem, p2Start);
 
 	NavigationSystem p3NavSystem(*player3, physics, navMesh, 3);
-	AIBrain p3Brain(p3Inv, ingredientTracker, p3NavSystem);
+	glm::vec3 p3Start = glm::vec3(-31, 3, 60);
+	AIBrain p3Brain(p3Inv, ingredientTracker, p3NavSystem, p3Start);
 
 	NavigationSystem p4NavSystem(*player4, physics, navMesh, 4);
-	AIBrain p4Brain(p4Inv, ingredientTracker, p4NavSystem);
+	glm::vec3 p4Start = glm::vec3(-11.5, 3, 60);
+	AIBrain p4Brain(p4Inv, ingredientTracker, p4NavSystem, p4Start);
 	
 	player1->attachComponent(&p1Inv, "inventory");
 	player1->attachComponent(&pizza, "recipe");
@@ -307,10 +310,14 @@ int main()
 			}
 
 			// AUDIO
-			audio.update(dt);
+			audio.update(dt, gameLoop.gameStage);
 		}
 
 		if (gameLoop.checkForWin() != 0) {
+			if (!gameLoop.isGameEnded) {
+				AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
+				bgMusic->stop();
+			}
 			gameLoop.isGameEnded = true;
 		}
 

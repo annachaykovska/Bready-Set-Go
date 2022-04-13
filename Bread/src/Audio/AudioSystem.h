@@ -40,7 +40,7 @@ public:
 	void turnOffAllAudio();
 	void playMenuAudio(std::string clipName);
 
-	void update(const float dt);
+	void update(const float dt, int gameStage);
 
 private:
 
