@@ -58,6 +58,8 @@ public:
 
 	void cleanupPhysics();
 
+	void checkIngredientCollisions();
+
 	PxVehicleDrive4W* mVehiclePlayer1;
 	PxVehicleDrive4W* mVehiclePlayer2;
 	PxVehicleDrive4W* mVehiclePlayer3;
@@ -116,7 +118,12 @@ public:
 	bool p4CameraHit;
 	glm::vec3 p4CameraHitPos;
 
+	std::vector<PxVehicleDrive4W*> getVehicles();
+	void checkIngredientCollisoins();
+
 private:
+
+	std::vector<PxVehicleDrive4W*> vehicles;
 
 	void raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name);
 
