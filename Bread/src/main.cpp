@@ -322,10 +322,14 @@ int main()
 			}
 
 			// AUDIO
-			audio.update(dt);
+			audio.update(dt, gameLoop.gameStage);
 		}
 
 		if (gameLoop.checkForWin() != 0) {
+			if (!gameLoop.isGameEnded) {
+				AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
+				bgMusic->stop();
+			}
 			gameLoop.isGameEnded = true;
 		}
 
