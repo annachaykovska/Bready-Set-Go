@@ -3,15 +3,35 @@
 #include "../Physics/PhysicsSystem.h"
 #include "../Navigation/IngredientTracker.h"
 
+struct PlayerBase {
+	float minX = 0;
+	float maxX = 0;
+	float minY = 0;
+	float maxY = 0;
+	float minZ = 0;
+	float maxZ = 0;
+
+	PlayerBase(float newMinX, float newMaxX, float newMinY, float newMaxY, float newMinZ, float newMaxZ) :
+		minX(newMinX),
+		maxX(newMaxX),
+		minY(newMinY),
+		maxY(newMaxY),
+		minZ(newMinZ),
+		maxZ(newMaxZ)
+	{}
+};
+
 
 class GameLoopManager {
 public:
 	GameLoopManager();
 	void resetGameLoopValues();
-	void updateGameStageFromMenu();
+	void updateGameStageFromMenu(int numPlayers);
 	void updateGameStageFromPause();
 	void setEndStage();
 	void gameActorsReset(PhysicsSystem* physics, IngredientTracker* ingredientTracker, Inventory* p1Inv, Inventory* p2Inv, Inventory* p3Inv, Inventory* p4Inv);
+	int checkForWin();
+	bool checkForPlayerInBase(Entity* player, PlayerBase base);
 
 	// Constants
 	const float mainMenuTimeoutLength;
@@ -19,8 +39,8 @@ public:
 	const float showPauseMenuTimeoutLength;
 
 	// State of the game
-	// 1 = main menu, 2 = play, 3 = game ended (no collision updates from here)
 	int gameStage;
+	int winnerId;
 
 	// Main menu things
 	int menuSelectionNumber;
@@ -45,4 +65,13 @@ public:
 
 private:
 
+};
+
+
+enum GameLoopMode {
+	MENU_START = 1,
+	MENU_SINGLE_MULTI_SELECTION = 2,
+	MENU_MULTI_CONNECT = 3,
+	MAIN_GAME_PLAY = 4, 
+	END_GAME = 5
 };

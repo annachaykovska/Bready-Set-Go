@@ -2,6 +2,8 @@
 #include "../Inventory.h"
 #include "../Scene/Entity.h"
 #include "../Gameplay/Recipe.h"
+#include "../Gameplay/GameLoopManager.h"
+#include "RenderingSystem.h"
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -31,10 +33,28 @@ UISystem::UISystem()
     , cheese("resources/textures/cheese.png", GL_NEAREST)
     , sausage("resources/textures/sausage.png", GL_NEAREST)
     , dough("resources/textures/dough.png", GL_NEAREST)
+    , egg("resources/textures/egg.png", GL_NEAREST)
+    , peas("resources/textures/peas.png", GL_NEAREST)
+    , lettuce("resources/textures/lettuce.png", GL_NEAREST)
+    , chicken("resources/textures/chicken.png", GL_NEAREST)
+    , rice("resources/textures/rice.png", GL_NEAREST)
+    , parsnip("resources/textures/parsnip.png", GL_NEAREST)
+    , carrot("resources/textures/carrot.png", GL_NEAREST)
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
+    , cheeseOffscreenUp("resources/textures/cheeseOffscreenUp.png", GL_NEAREST)
+    , cheeseOffscreenDown("resources/textures/cheeseOffscreenDown.png", GL_NEAREST)
     , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
+    , tomatoOffscreenUp("resources/textures/tomatoOffscreenUp.png", GL_NEAREST)
+    , tomatoOffscreenDown("resources/textures/tomatoOffscreenDown.png", GL_NEAREST)
     , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
+    , doughOffscreenUp("resources/textures/doughOffscreenUp.png", GL_NEAREST)
+    , doughOffscreenDown("resources/textures/doughOffscreenDown.png", GL_NEAREST)
     , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
+    , sausageOffscreenUp("resources/textures/sausageOffscreenUp.png", GL_NEAREST)
+    , sausageOffscreenDown("resources/textures/sausageOffscreenDown.png", GL_NEAREST)
+    , unflip3("resources/textures/unflip3.png", GL_NEAREST)
+    , unflip2("resources/textures/unflip2.png", GL_NEAREST)
+    , unflip1("resources/textures/unflip1.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
@@ -49,7 +69,20 @@ UISystem::UISystem()
     , startGameButtonPressed("resources/textures/button_start_game_selected_2.png", GL_NEAREST)
     , exitButtonNormal("resources/textures/button_exit_2.png", GL_NEAREST)
     , exitButtonPressed("resources/textures/button_exit_selected_2.png", GL_NEAREST)
+    , singlePlayerButtonNormal("resources/textures/button_single_player.png", GL_NEAREST)
+    , singlePlayerButtonPressed("resources/textures/button_single_player_selected.png", GL_NEAREST)
+    , multiPlayerButtonNormal("resources/textures/button_multi_player.png", GL_NEAREST)
+    , multiPlayerButtonPressed("resources/textures/button_multi_player_selected.png", GL_NEAREST)
+    , playerConnected0("resources/textures/player_connected_0.png", GL_NEAREST)
+    , playerConnected1("resources/textures/player_connected_1.png", GL_NEAREST)
+    , playerConnected2("resources/textures/player_connected_2.png", GL_NEAREST)
+    , playerConnected3("resources/textures/player_connected_3.png", GL_NEAREST)
+    , playerConnected4("resources/textures/player_connected_4.png", GL_NEAREST)
     , speedometer_theta(MIN_SPEED_THETA)
+    , p1SpeedometerTheta(MIN_SPEED_THETA)
+    , p2SpeedometerTheta(MIN_SPEED_THETA)
+    , p3SpeedometerTheta(MIN_SPEED_THETA)
+    , p4SpeedometerTheta(MIN_SPEED_THETA)
     , powerReady(true)
     , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
     , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
@@ -64,7 +97,10 @@ UISystem::UISystem()
     , map_sx(0.190)
     , pauseMenu("resources/textures/pause_screen.png", GL_NEAREST)
     , continueButton("resources/textures/button_continue.png", GL_NEAREST)
-    , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST)
+    , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
+    , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
+    , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
+    , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -115,22 +151,23 @@ UISystem::UISystem()
             GL_UNSIGNED_BYTE,
             face->glyph->bitmap.buffer
         );
-// set texture options
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// now store character for later use
-Character character = {
-    texture,
-    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-    face->glyph->advance.x
-};
-//test print
 
+        // set texture options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-Characters.insert(std::pair<char, Character>(c, character));
+        // now store character for later use
+        Character character = 
+        { 
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x 
+        };
+
+        Characters.insert(std::pair<char, Character>(c, character));
     }
 
     //Cleaning up the freetype variables
@@ -153,19 +190,46 @@ Characters.insert(std::pair<char, Character>(c, character));
     glBindVertexArray(0);
 }
 
-UISystem::~UISystem() {
-
-}
-
-void UISystem::updateMainMenu(int itemSelected) {
+void UISystem::updateMainMenu(int itemSelected, int gameStage, int numControllers) {
     // Buttons
-    if (itemSelected == 1) { // start game
-        renderImage(imageShader, exitButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+    if (gameStage == GameLoopMode::MENU_START) {
+        if (itemSelected == 1) { // start game
+            renderImage(imageShader, exitButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
+        else if (itemSelected == 2) { // exit
+            renderImage(imageShader, exitButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, startGameButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
     }
-    else if (itemSelected == 2) { // exit
-        renderImage(imageShader, exitButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, startGameButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+    else if (gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION) {
+        if (itemSelected == 1) { // single player
+            renderImage(imageShader, multiPlayerButtonNormal, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, singlePlayerButtonPressed, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
+        else if (itemSelected == 2) { // multiplayer
+            renderImage(imageShader, multiPlayerButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
+            renderImage(imageShader, singlePlayerButtonNormal, scX(0.79f), scY(0.60f), scX(0.2f), scY(0.1f), 0, 1.f);
+        }
+
+    }
+    else if (gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
+        if (numControllers == 0) {
+            renderImage(imageShader, playerConnected0, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 1) {
+            renderImage(imageShader, playerConnected1, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 2) {
+            renderImage(imageShader, playerConnected2, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 3) {
+            renderImage(imageShader, playerConnected3, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        if (numControllers == 4) {
+            renderImage(imageShader, playerConnected4, scX(0.79f), scY(0.60f), scX(0.3f), scY(0.2f), 0, 1.f);
+        }
+        renderImage(imageShader, startGameButtonPressed, scX(0.79f), scY(0.47f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
 
     // Background
@@ -173,7 +237,7 @@ void UISystem::updateMainMenu(int itemSelected) {
 }
 
 void UISystem::updateEndGame(int endScreenValue) {
-    int winner = checkForWin();
+    int winner = g_systems.loop->checkForWin();
     std::string winText = "Player " + std::to_string(winner) + " Wins!";
     //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
@@ -201,117 +265,223 @@ void UISystem::updateEndGame(int endScreenValue) {
 
 void UISystem::showPauseMenu(int itemSelected) {
     if (itemSelected == 1) {
-        renderImage(imageShader, continueButtonPressed, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, backToMainMenuButton, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, continueButtonPressed, scX(0.73f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButton, scX(0.73f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
     else if (itemSelected == 2) {
-        renderImage(imageShader, continueButton, scX(0.5f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
-        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, continueButton, scX(0.73f), scY(0.52f), scX(0.2f), scY(0.1f), 0, 1.f);
+        renderImage(imageShader, backToMainMenuButtonPressed, scX(0.73f), scY(0.39f), scX(0.2f), scY(0.1f), 0, 1.f);
     }
-    renderImage(imageShader, pauseMenu, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+
+    renderImage(imageShader, pauseMenu, scX(0.73f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    renderImage(imageShader, controlsMenu, scX(0.23f), scY(0.53f), scX(0.8f), scY(0.8f), 0, 1.f);
+    renderImage(imageShader, semiTransparent, scX(0.5f), scY(0.5f), scX(1.0f), scY(1.0f), 0, 1.f);
 }
 
-
-void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pause) {
-    if (pause) {
-        showPauseMenu(pauseMenuItemSelected);
-    }
-
-    if (checkForWin() != 0)
-    {
-        updateEndGame(endScreenValue);
-    }
-    float height, width;
-
-    // Player 1 UI (eventually abstract to a draw player UI method)
+// Draws the speedometer for the passed player HUD
+void UISystem::updateSpeedometer(int playerNum)
+{
     // Drawing speedometer
-    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(1)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
-    speedometer_theta += std::min(std::max((speedometer_goal_theta - speedometer_theta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
-    renderImage(imageShader, needle, scX(0.875), scY(0.19), scX(0.225), scY(0.3), speedometer_theta, 1.f);
+    float speedometer_goal_theta = lerp(std::min(std::max(abs(g_systems.physics->getPlayerSpeed(playerNum)) / 40.f, 0.f), 1.f), MIN_SPEED_THETA, MAX_SPEED_THETA);
+    float speedometer_theta = 0.0f;
 
-    auto p1_ent = g_scene.getEntity("player1");
-    if ((glfwGetTime() - p1_ent->lastMagnetUse) / p1_ent->magnetCooldown > 0.99f && powerReady == false)
+    switch (playerNum)
     {
-        g_systems.audio->powerReady(p1_ent->getAudioSource());
+    case 1:
+        p1SpeedometerTheta += std::min(std::max((speedometer_goal_theta - p1SpeedometerTheta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
+        speedometer_theta = p1SpeedometerTheta;
+        break;
+    case 2:
+        p2SpeedometerTheta += std::min(std::max((speedometer_goal_theta - p2SpeedometerTheta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
+        speedometer_theta = p2SpeedometerTheta;
+        break;
+    case 3:
+        p3SpeedometerTheta += std::min(std::max((speedometer_goal_theta - p3SpeedometerTheta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
+        speedometer_theta = p3SpeedometerTheta;
+        break;
+    case 4:
+        p4SpeedometerTheta += std::min(std::max((speedometer_goal_theta - p4SpeedometerTheta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
+        speedometer_theta = p4SpeedometerTheta;
+        break;
+    default:
+        return; // Uh-oh, something has gone wrong
+        break;
+    }
+
+    //speedometer_theta += std::min(std::max((speedometer_goal_theta - speedometer_theta), -MAX_NEEDLE_DELTA), MAX_NEEDLE_DELTA);
+
+    renderImage(imageShader, needle, scX(0.875), scY(0.19), scX(0.225), scY(0.3), speedometer_theta, 1.f);
+    renderImage(imageShader, speedometer, scX(0.875), scY(0.19), scX(0.225), scY(0.3), 0.f, 1.f);
+}
+
+// Draws the vacuum item for the passed player HUD
+void UISystem::updateVacuum(int playerNum)
+{
+    Entity* player = nullptr;
+
+    // Get reference to correct player Entity
+    switch (playerNum)
+    {
+    case 1:
+        player = g_scene.getEntity("player1");
+        break;
+    case 2:
+        player = g_scene.getEntity("player2");
+        break;
+    case 3:
+        player = g_scene.getEntity("player3");
+        break;
+    case 4:
+        player = g_scene.getEntity("player4");
+        break;
+    default:
+        return; // Uh-oh, something has gone wrong
+        break;
+    }
+
+    // Play sound effect if vacuum power has reset
+    if ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown > 0.99f && powerReady == false)
+    {
+        g_systems.audio->powerReady(player->getAudioSource());
         powerReady = true;
     }
-    else if ((glfwGetTime() - p1_ent->lastMagnetUse) / p1_ent->magnetCooldown < 0.99f && powerReady == true)
+    else if ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown < 0.99f && powerReady == true)
     {
         powerReady = false;
     }
-    // TODO: Needs to be refactored when multiplayer is implemented
+
+    // Update vacuum icon on HUD
     ImageTexture* vac_status;
     double vac_alpha = 1.0;
-    if (p1_ent->magnetStatus == 0) {
+    
+    if (player->magnetStatus == 1)      // Charged, out of range
+    {
+        vac_status = &vacuum_yellow;
+    }
+    else if (player->magnetStatus == 0) // Uncharged
+    {
         vac_status = &vacuum_red;
-        vac_alpha = ((glfwGetTime() - p1_ent->lastMagnetUse) / p1_ent->magnetCooldown) * 0.75;
-    } else if (p1_ent->magnetStatus == 1) vac_status = &vacuum_yellow;
-    else if (p1_ent->magnetStatus == 2) vac_status = &vacuum_green;
-    else vac_status = &vacuum_blue;
-    
+        vac_alpha = ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown) * 0.75;
+    }
+    else if (player->magnetStatus == 2) // Charged, in range
+    {
+        vac_status = &vacuum_green;
+    }
+    else                                // Actively stealing
+    {
+        vac_status = &vacuum_blue;
+    }
+
     renderImage(imageShader, *vac_status, scX(0.875), scY(0.2), scX(0.1), scY(0.1), 0.f, vac_alpha);
+}
 
-    renderImage(imageShader, speedometer, scX(0.875), scY(0.19), scX(0.225), scY(0.3), 0.f, 1.f);
-
-    
-
+// Draws the recipe state for each player to the UI
+void UISystem::updateRecipeList()
+{
     Recipe* p1Recipe = (Recipe*)g_scene.getEntity("player1")->getComponent("recipe");
     Recipe* p2Recipe = (Recipe*)g_scene.getEntity("player2")->getComponent("recipe");
     Recipe* p3Recipe = (Recipe*)g_scene.getEntity("player3")->getComponent("recipe");
     Recipe* p4Recipe = (Recipe*)g_scene.getEntity("player4")->getComponent("recipe");
 
-    if (p1Recipe != nullptr)
+    // Recipe States
+    renderText(textShader, "Recipe Progress", scX(0.8), scY(0.9), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "P1 ", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 0, 0));
+    renderText(textShader, "P2 ", scX(0.8), scY(0.8), 1.f, glm::vec3(0, 0, 1));
+    renderText(textShader, "P3 ", scX(0.8), scY(0.75), 1.f, glm::vec3(0, 1, 0));
+    renderText(textShader, "P4", scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 0));
+    renderText(textShader, "(Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.83), scY(0.85), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "(Omelette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "(Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.83), scY(0.75), 1.f, glm::vec3(1, 1, 1));
+    renderText(textShader, "(Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.83), scY(0.7), 1.f, glm::vec3(1, 1, 1));
+}
+
+// Helper function that renders the passed ImageTexture at the passed Transform
+void UISystem::drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown)
+{
+    int indicatorY;
+
+    glm::vec3 IngLocation = offscreenBubbleLocation(playerNum, trans.position, indicatorY);
+
+    if (indicatorY == 0)
+        renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    else if (indicatorY == 1)
+        renderImage(imageShader, imageUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+    else
+        renderImage(imageShader, imageDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+}
+
+// TODO need to update image references for players 2-3 when we have the new icons
+// Draws the offscreen indicators for missing ingredients to the UI
+void UISystem::updateOffscreenIndicators(int playerNum)
+{
+    Inventory* inventory = nullptr;
+
+    switch (playerNum)
     {
-        // Recipe States
-        renderText(textShader, "Recipe Progress", scX(0.8), scY(0.9), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "P1 ", scX(0.8), scY(0.85), 1.f, glm::vec3(1, 0, 0));
-        renderText(textShader, "P2 ", scX(0.8), scY(0.8), 1.f, glm::vec3(0, 0, 1));
-        renderText(textShader, "P3 ", scX(0.8), scY(0.75), 1.f, glm::vec3(0, 1, 0));
-        renderText(textShader, "P4" , scX(0.8), scY(0.7), 1.f, glm::vec3(1, 1, 0));
-        renderText(textShader, "(Pizza): " + std::to_string(p1Recipe->progress) + "/4", scX(0.83), scY(0.85), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "(Omelette): " + std::to_string(p2Recipe->progress) + "/4", scX(0.83), scY(0.8), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "(Wrap): " + std::to_string(p3Recipe->progress) + "/4", scX(0.83), scY(0.75), 1.f, glm::vec3(1, 1, 1));
-        renderText(textShader, "(Salad): " + std::to_string(p4Recipe->progress) + "/4", scX(0.83), scY(0.7), 1.f, glm::vec3(1, 1, 1));
+    case 1: // cheese, tomato, dough, sausage
+
+        inventory = g_scene.getEntity("player1")->getInventory();
+
+        if (!inventory->cheese)
+            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen, cheeseOffscreenUp, cheeseOffscreenDown);
+        if (!inventory->tomato)
+            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen, tomatoOffscreenUp, tomatoOffscreenDown);
+        if (!inventory->dough)
+            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen, doughOffscreenUp, doughOffscreenDown);
+        if (!inventory->sausage)
+            drawIndicator(playerNum, tracker->getSausageLocation(), sausageOffscreen, sausageOffscreenUp, sausageOffscreenDown);
+        break;
+
+    case 2: // egg, cheese, peas, lettuce
+
+        inventory = g_scene.getEntity("player2")->getInventory();
+
+        if (!inventory->egg)
+            drawIndicator(playerNum, tracker->getEggLocation(), egg, egg, egg);
+        if (!inventory->cheese)
+            drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen, cheeseOffscreenUp, cheeseOffscreenDown); 
+        if (!inventory->peas)
+            drawIndicator(playerNum, tracker->getPeasLocation(), peas, peas, peas);
+        if (!inventory->lettuce)
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+        break;
+
+    case 3: // chicken, dough, rice, lettuce
+
+        inventory = g_scene.getEntity("player3")->getInventory();
+
+        if (!inventory->chicken)
+            drawIndicator(playerNum, tracker->getChickenLocation(), chicken, chicken, chicken);
+        if (!inventory->dough)
+            drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen, doughOffscreenUp, doughOffscreenDown);
+        if (!inventory->rice)
+            drawIndicator(playerNum, tracker->getRiceLocation(), rice, rice, rice);
+        if (!inventory->lettuce)
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+        break;
+
+    case 4: // parsnip, carrot, tomato, lettuce
+
+        inventory = g_scene.getEntity("player4")->getInventory();
+
+        if (!inventory->parsnip)
+            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnip, parsnip, parsnip);
+        if (!inventory->carrot)
+            drawIndicator(playerNum, tracker->getCarrotLocation(), carrot, carrot, carrot);
+        if (!inventory->tomato)
+            drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen, tomatoOffscreenUp, tomatoOffscreenDown);
+        if (!inventory->lettuce)
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+        break;
+
+    default:
+        return; // Uh-oh, something has gone wrong
+        break;
     }
+}
 
-    // Drawing minimap
-    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 20.f, 20.f, 0, 1.f);
-    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 20.f, 20.f, 0, 1.f);
-    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
-    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
-
-    renderImage(imageShader, miniMap, scX(map_x), scY(0.8), scX(map_sx), scY(0.325), 0, 1.f);
-
-    glm::vec3 IngLocation;
-
-    Entity* player1 = g_scene.getEntity("player1");
-    Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
-
-    if (!p1Inv->cheese)
-    {
-        IngLocation = offscreenBubbleLocation(tracker->getCheeseLocation().position);
-        renderImage(imageShader, cheeseOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-    }
-
-    if (!p1Inv->tomato)
-    {
-        IngLocation = offscreenBubbleLocation(tracker->getTomatoLocation().position);
-        renderImage(imageShader, tomatoOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-    }
-
-    if (!p1Inv->dough)
-    {
-        IngLocation = offscreenBubbleLocation(tracker->getDoughLocation().position);
-        renderImage(imageShader, doughOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-    }
-
-    if (!p1Inv->sausage)
-    {
-        IngLocation = offscreenBubbleLocation(tracker->getSausageLocation().position);
-        renderImage(imageShader, sausageOffscreen, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
-    }
-
-    // Drawing Inventory
+void UISystem::drawInventoryIcon(unsigned int haveItem, ImageTexture& image, unsigned int invPos)
+{
     float alpha;
     float faded = 0.15f;
     float opaque = 1.f;
@@ -323,23 +493,127 @@ void UISystem::updateGame(int endScreenValue, int pauseMenuItemSelected, bool pa
     float invBlockOffset = scY(0.097);
     float recipeYOffset = scY(0.53);
 
-    alpha = (p1Inv->tomato) ? opaque : faded;
-    renderImage(imageShader, tomato, invXOffset, invYOffset - (0 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
+    alpha = (haveItem) ? opaque : faded;
+    renderImage(imageShader, image, invXOffset, invYOffset - (invPos * invBlockOffset), invScaleX, invScaleY, 0, alpha);
+}
 
-    alpha = (p1Inv->cheese) ? opaque : faded;
-    renderImage(imageShader, cheese, invXOffset, invYOffset - (1 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
+// TODO need to update image references for players 2-3 when we have the new icons
+// Draws the player's inventory to the HUD
+void UISystem::updateInventory(int playerNum)
+{
+    Inventory* playerInv = nullptr;
+
+    float alpha;
+    float faded = 0.15f;
+    float opaque = 1.f;
+
+    float invXOffset = scX(0.12);
+    float recipeYOffset = scY(0.53);
+
+    // Draw inventory icons for this player
+    switch (playerNum)
+    {
+    case 1: // tomato, cheese, dough, sausage, pizza
+
+        playerInv = g_scene.getEntity("player1")->getInventory();
+
+        drawInventoryIcon(playerInv->tomato, tomato, 0);
+        drawInventoryIcon(playerInv->cheese, cheese, 1);
+        drawInventoryIcon(playerInv->dough, dough, 2);
+        drawInventoryIcon(playerInv->sausage, sausage, 3);
+
+        alpha = (playerInv->tomato && playerInv->cheese && playerInv->dough && playerInv->sausage) ? opaque : faded;
+        renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+
+        break;
+
+    case 2: // egg, cheese, peas, lettuce, ????
+
+        playerInv = g_scene.getEntity("player2")->getInventory();
+
+        drawInventoryIcon(playerInv->egg, egg, 0);
+        drawInventoryIcon(playerInv->cheese, cheese, 1);
+        drawInventoryIcon(playerInv->peas, peas, 2);
+        drawInventoryIcon(playerInv->lettuce, lettuce, 3);
+
+        alpha = (playerInv->egg && playerInv->cheese && playerInv->peas && playerInv->lettuce) ? opaque : faded;
+        renderImage(imageShader, cheese, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+
+        break;
+
+    case 3: // chicken, dough, rice, lettuce, ????
+
+        playerInv = g_scene.getEntity("player3")->getInventory();
+
+        drawInventoryIcon(playerInv->chicken, chicken, 0);
+        drawInventoryIcon(playerInv->dough, dough, 1);
+        drawInventoryIcon(playerInv->rice, rice, 2);
+        drawInventoryIcon(playerInv->lettuce, lettuce, 3);
+
+        alpha = (playerInv->chicken && playerInv->dough && playerInv->rice && playerInv->lettuce) ? opaque : faded;
+        renderImage(imageShader, dough, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+
+        break;
+
+    case 4: // parsnip, carrot, tomato, lettuce, salad
+
+        playerInv = g_scene.getEntity("player4")->getInventory();
+
+        drawInventoryIcon(playerInv->parsnip, parsnip, 0);
+        drawInventoryIcon(playerInv->carrot, carrot, 1);
+        drawInventoryIcon(playerInv->tomato, tomato, 2);
+        drawInventoryIcon(playerInv->lettuce, lettuce, 3);
+
+        alpha = (playerInv->parsnip && playerInv->carrot && playerInv->tomato && playerInv->lettuce) ? opaque : faded;
+        renderImage(imageShader, tomato, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+
+        break;
+
+    default:
+        return; // Uh-oh, something has gone wrong
+        break;
+    }
+
+    // Draw inventory frame
+    renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
+}
+
+void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
+    bool drawBanner = false;
+    switch (playerNum)
+    {
+    case 1:
+        drawBanner = g_scene.getEntity("player1")->getInventory()->allIngredientsCollected;
+        break;
+    case 2:
+        drawBanner = g_scene.getEntity("player2")->getInventory()->allIngredientsCollected;
+        break;
+    case 3:
+        drawBanner = g_scene.getEntity("player3")->getInventory()->allIngredientsCollected;
+        break;
+    case 4:
+        drawBanner = g_scene.getEntity("player4")->getInventory()->allIngredientsCollected;
+        break;
+    default:
+        break;
+    }
+    if (drawBanner && g_systems.loop->checkForWin() == 0) {
+        renderImage(imageShader, backToBaseBanner, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+    }
+}
+
+void UISystem::updatePlayer(unsigned int playerNum)
+{
+    if (g_systems.loop->checkForWin() != 0)
+        updateEndGame(g_systems.loop->endScreenGenerated);
     
-    alpha = (p1Inv->dough) ? opaque : faded;
-    renderImage(imageShader, dough, invXOffset, invYOffset - (2 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
-
-    alpha = (p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, sausage, invXOffset, invYOffset - (3 * invBlockOffset), invScaleX, invScaleY, 0, alpha);
-
-    alpha = (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage) ? opaque : faded;
-    renderImage(imageShader, pizza, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
-
-    renderImage(imageShader, inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
-
+    updateVacuum(playerNum);
+    updateSpeedometer(playerNum);
+    updateRecipeList();
+    updateMiniMap();
+    updateOffscreenIndicators(playerNum);
+    updateInventory(playerNum);
+    updateReturnToBaseBanner(playerNum);
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
@@ -347,49 +621,22 @@ void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
     tracker = offscreenTracker;
 }
 
-int UISystem::checkForWin()
+void UISystem::updateMiniMap()
 {
-    Entity* player1 = g_scene.getEntity("player1");
-    Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
+    // Get new locations for minimap icons
+    this->p1Location = miniMapPlayerPosition(*g_scene.getEntity("player1")->getTransform());
+    this->p2Location = miniMapPlayerPosition(*g_scene.getEntity("player2")->getTransform());
+    this->p3Location = miniMapPlayerPosition(*g_scene.getEntity("player3")->getTransform());
+    this->p4Location = miniMapPlayerPosition(*g_scene.getEntity("player4")->getTransform());
 
-    if (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage)
-    {
-        return 1;
-    }
+    // Draw minimap icons
+    renderImage(imageShader, p1Icon, p1Location.x, p1Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p2Icon, p2Location.x, p2Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p3Icon, p3Location.x, p3Location.y, 20.f, 20.f, 0, 1.f);
+    renderImage(imageShader, p4Icon, p4Location.x, p4Location.y, 20.f, 20.f, 0, 1.f);
 
-    Entity* player2 = g_scene.getEntity("player2");
-    Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
-
-    if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce)
-    {
-        return 2;
-    }
-
-    Entity* player3 = g_scene.getEntity("player3");
-    Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
-
-    if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce)
-    {
-        return 3;
-    }
-
-    Entity* player4 = g_scene.getEntity("player4");
-    Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
-
-    if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce)
-    {
-        return 4;
-    }
-
-    return 0;
-}
-
-void UISystem::updateMiniMap(Transform& p1Transform, Transform& p2Transform, Transform& p3Transform, Transform& p4Transform)
-{
-    p1Location = miniMapPlayerPosition(p1Transform);
-    p2Location = miniMapPlayerPosition(p2Transform);
-    p3Location = miniMapPlayerPosition(p3Transform);
-    p4Location = miniMapPlayerPosition(p4Transform);
+    // Draw minimap
+    renderImage(imageShader, miniMap, scX(map_x), scY(0.8), scX(map_sx), scY(0.325), 0, 1.f);
 }
 
 glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
@@ -397,13 +644,17 @@ glm::vec2 UISystem::miniMapPlayerPosition(Transform& transform)
     float x;
     float z;
     glm::vec2 location;
+
     //x = 0 + ((400.f - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
     //z = 0 + ((400.f - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
+
     x = 0 + ((scX(0.15625) - 0) / (270.f - (-270.f))) * (transform.position.x - (-270.f));
     z = 0 + ((scY(0.28) - 0) / (210.f - (-170.f))) * (transform.position.z - (-170.f));
+
     location = glm::vec2(x, z);
     location.y = scY(0.3) - location.y;
     location += glm::vec2(scX(0.04), scY(0.62));
+
     return location;
 }
 
@@ -492,15 +743,40 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
+glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical)
 {
+    // Get the player's camera
+    Camera* camera = nullptr;
+    switch (playerNum)
+    {
+    case 1:
+        camera = g_scene.p1Camera;
+        break;
+    case 2:
+        camera = g_scene.p1Camera;
+        break;
+    case 3:
+        camera = g_scene.p1Camera;
+        break;
+    case 4:
+        camera = g_scene.p1Camera;
+        break;
+    default:
+        return glm::vec3(0); // Uh-oh, something has gone wrong
+        break;
+    }
+
+    vertical = 0;
+    bool verticalOffscreen = false;
+    
     glm::vec4 location = glm::vec4(entityPos, 1);
 
-    glm::vec3 cam = g_scene.camera.centerBeam;
-    glm::vec3 toEntity = entityPos - g_scene.camera.position;
+    glm::vec3 cam =camera->centerBeam;
+    glm::vec3 toEntity = entityPos - camera->position;
 
-    glm::mat4 viewMatrix = g_scene.camera.getViewMatrix(g_scene.getEntity("player1")->getTransform());
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
+    std::string player = "player" + std::to_string(playerNum);
+    glm::mat4 viewMatrix = camera->viewMatrix;
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera->getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
 
     location = projectionMatrix * viewMatrix * location;
 
@@ -510,17 +786,38 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
 
     location.x = (location.x + 1) * g_systems.width * 0.5;
     location.y = (location.y + 1) * g_systems.height * 0.5 + scY(0.1);
-
-    if (location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
+    
+    if(location.z < -1 || location.z > 1 || location.x > g_systems.width || location.x < 0)
     {
+        vertical = 0;
         // When location.z is not in the interval between [-1, 1] it is no longer in the camera frustrum.
         // This where you will need to put your code for the object offscreen beside and behind states. 
 
         glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
 
-        float viewRange = g_scene.camera.perspective / 2.f;
+        float perspective = 0.0f;
+
+        switch (playerNum)
+        {
+        case 1:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 2:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 3:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 4:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        default:
+            break; // Uh-oh, something has gone wrong
+        }
+
+        float viewRange = perspective / 2.0f;
         //float viewRange = 80 / 2.f;
-        viewRange *= (PI / 180.f);
+        viewRange *= (PI / 180.0f);
 
         float yawTheta = acos(dot(cam, yaw) / (length(yaw) * length(cam)));
         glm::vec3 upVector = cross(cam, yaw);
@@ -545,7 +842,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
         // If the entity is between 90 deg and the viewrange of the player
         else
         {
-            float offset = ((((g_systems.height / 2.f) - 0) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
+            float offset = (((((g_systems.height - scY(0.0375)) / 2.f) - scY(0.0375)) / ((PI / 2.f) - viewRange)) * (yawTheta - viewRange));
             if (upVector.y < 0)
             {
                 location.x = g_systems.width - scX(0.0375);
@@ -558,6 +855,20 @@ glm::vec3 UISystem::offscreenBubbleLocation(glm::vec3 entityPos)
             }
         }
         location.z = scX(0.04);
+    }
+    else if (location.y > g_systems.height)
+    {
+        vertical = 1;
+        location.y = g_systems.height - scX(0.0375);
+        location.z = scX(0.04);
+        verticalOffscreen = true;
+    }
+    else if (location.y < 0)
+    {
+        vertical = -1;
+        location.y = scY(0.0375);
+        location.z = scX(0.04);
+        verticalOffscreen = true;
     }
     else
     {

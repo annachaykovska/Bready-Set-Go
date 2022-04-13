@@ -9,6 +9,10 @@ XboxController::XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem,
 	this->physics = physicsSystem;
 	this->ui = uiSystem;
 	this->gameLoop = gameLoopManager;
+	this->useFlip1 = true;
+	this->useFlip2 = true;
+	this->useFlip3 = true;
+	this->useFlip4 = true;
 	this->y_held1 = false;
 	this->y_held2 = false;
 	this->y_held3 = false;
@@ -83,7 +87,7 @@ float XboxController::getDeadZone(float x, float y, float deadzone) {
 	return normalizedMagnitude;
 }
 
-void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
+void XboxController::setButtonStateFromControllerMainMenu(int controllerId, AudioSource* menuSource) {
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
@@ -92,65 +96,96 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 
 	float thumbLeftDeadZone = getDeadZone(thumbLeftX, thumbLeftY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
 
-	// A button
+	// Other buttons
 	bool A_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0); // accept choice
+	bool B_button_pressed = ((state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0); // return
 
 	float newTime = glfwGetTime();
-	if (newTime - gameLoop->returnToMainMenuTimeoutStart > gameLoop->returnToMainMenuTimeoutLength) {
-		gameLoop->returnToMainMenuTimeoutStart = -1;
+	if (newTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
 		if (A_button_pressed) {
 			gameLoop->isMenuItemSelected = true; 
+			menuSource->stop();
+			menuSource->play("chop.wav");
+		}
+		if (B_button_pressed) {
+			if (gameLoop->gameStage != GameLoopMode::MENU_START) {
+				gameLoop->gameStage--;
+				gameLoop->menuSelectionNumber = 1;
+				gameLoop->mainMenuTimeoutStart = newTime;
+				menuSource->stop();
+				menuSource->play("chop.wav");
+			}
 		}
 	}
 
 	if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
 		if (gameLoop->menuSelectionNumber == 2) {
 			gameLoop->menuSelectionNumber = 1;
+			menuSource->stop();
+			menuSource->play("knife.wav");
 		}
-		
 	}
 	else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
 		if (gameLoop->menuSelectionNumber == 1) {
 			gameLoop->menuSelectionNumber = 2;
+			menuSource->stop();
+			menuSource->play("knife.wav");
 		}
-	}
+	}	
 }
 
-void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted) {
+void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted, AudioSource* menuSource) {
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
 	physx::PxVehicleDrive4W* vehiclePhysics;
+	auto player = g_scene.getEntity("player1");
 	bool* y_held;
 	bool* b_held;
+	bool* useFlip;
 	float* b_buttonTimeStart;
+	Camera* camera;
+
 	if (controllerId == 1) {
 		input = &physics->mVehicleInputDataPlayer2;
 		vehiclePhysics = physics->mVehiclePlayer2;
 		y_held = &y_held2;
 		b_held = &b_held2;
+		useFlip = &useFlip2;
 		b_buttonTimeStart = &b_buttonTimeStart2;
+		player = g_scene.getEntity("player2");
+		camera = g_scene.p2Camera;
 	}
 	else if (controllerId == 2) {
 		input = &physics->mVehicleInputDataPlayer3;
 		vehiclePhysics = physics->mVehiclePlayer3;
 		y_held = &y_held3;
 		b_held = &b_held3;
+		useFlip = &useFlip3;
 		b_buttonTimeStart = &b_buttonTimeStart3;
+		player = g_scene.getEntity("player3");
+		camera = g_scene.p3Camera;
 	}
 	else if (controllerId == 3) {
 		input = &physics->mVehicleInputDataPlayer4;
 		vehiclePhysics = physics->mVehiclePlayer4;
 		y_held = &y_held4;
 		b_held = &b_held4;
+		useFlip = &useFlip4;
 		b_buttonTimeStart = &b_buttonTimeStart4;
+		player = g_scene.getEntity("player4");
+		camera = g_scene.p4Camera;
 	}
 	else {
 		input = &physics->mVehicleInputDataPlayer1; // Defaults to player 1
 		vehiclePhysics = physics->mVehiclePlayer1;
 		y_held = &y_held1;
 		b_held = &b_held1;
+		useFlip = &useFlip1;
 		b_buttonTimeStart = &b_buttonTimeStart1;
+		camera = g_scene.p1Camera;
 	}
+
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
@@ -203,49 +238,66 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	// Flip car
 	float currentTime = glfwGetTime();
 	if (B_button_pressed) {
-		if (*b_held) {
+		if (*b_held && *useFlip) {
+			player->unflipTimer = currentTime - *b_buttonTimeStart;
 			if (currentTime - *b_buttonTimeStart > 2) {
+				*useFlip = false;
 				*b_held = false;
+				player->unflipTimer = 0;
 				physics->respawnPlayerInPlace(controllerId + 1);
 				*b_buttonTimeStart = -1;
-				printf("RESPAWN\n");
+				//printf("RESPAWN\n");
 			}
 		}
 		else {
+			player->unflipTimer = 0;
 			*b_held = true;
 			*b_buttonTimeStart = currentTime;
 		}
 	}
-	if (!B_button_pressed) {
+	else {
+		*useFlip = true;
+		player->unflipTimer = 0;
 		*b_held = false;
-	}
-
-	// Accept exit conditions back to the menu
-	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
-		gameLoop->mainMenuTimeoutStart = -1;
-		if (A_button_pressed && gameCompleted) {
-			gameLoop->isBackToMenuSelected = true;
-		}
 	}
 
 	// Pause menu
 	if (currentTime - gameLoop->showPauseMenuTimeoutStart > gameLoop->showPauseMenuTimeoutLength) {
 		gameLoop->showPauseMenuTimeoutStart = -1;
-		if (BACK_button_pressed) {
+		if (START_button_pressed) {
 			gameLoop->showPauseMenuTimeoutStart = currentTime;
 			gameLoop->showPauseMenu = !gameLoop->showPauseMenu;
+			menuSource->stop();
+			menuSource->play("chop.wav");
 			if (gameLoop->showPauseMenu) {
 				gameLoop->isPaused = true;
+			}
+			else {
+				gameLoop->isPauseMenuItemSelected = true;
+				gameLoop->pauseMenuSelection = 1; // Pretend continue was pressed
 			}
 		}
 	}
 
 	if (A_button_pressed && gameLoop->showPauseMenu) {
+		gameLoop->showPauseMenuTimeoutStart = currentTime;
 		gameLoop->isPauseMenuItemSelected = true;
+		menuSource->stop();
+		menuSource->play("chop.wav");
+	}
+
+	// Accept exit conditions back to the menu
+	if (currentTime - gameLoop->mainMenuTimeoutStart > gameLoop->mainMenuTimeoutLength) {
+		gameLoop->mainMenuTimeoutStart = -1;
+		// Last check is to prevent the pause menu from going back immediately
+		if (A_button_pressed && gameCompleted && currentTime - gameLoop->showPauseMenuTimeoutStart > gameLoop->showPauseMenuTimeoutLength) {
+			gameLoop->showPauseMenuTimeoutStart = -1;
+			gameLoop->isBackToMenuSelected = true;
+		}
 	}
 
 	// Respawn player
-	if (START_button_pressed)
+	if (BACK_button_pressed)
 	{
 		physics->respawnPlayer(controllerId + 1);
 	}
@@ -253,11 +305,11 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	float analogVal;
 	float analogVal2;
 	if (thumbRightX <= 0) { // left
-		physics->setViewDirectionalInfluence(thumbRightDeadZone);
+		camera->viewDirectionalInfluence = thumbRightDeadZone;
 	}
 	if (thumbRightX > 0) { // right
 		analogVal = -1.0 * thumbRightDeadZone;
-		physics->setViewDirectionalInfluence(analogVal);
+		camera->viewDirectionalInfluence = analogVal;
 	}
 
 	// TRIGGER PRESSED
@@ -330,12 +382,16 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
 			if (gameLoop->pauseMenuSelection == 2) {
 				gameLoop->pauseMenuSelection = 1;
+				menuSource->stop();
+				menuSource->play("knife.wav");
 			}
 
 		}
 		else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
 			if (gameLoop->pauseMenuSelection == 1) {
 				gameLoop->pauseMenuSelection = 2;
+				menuSource->stop();
+				menuSource->play("knife.wav");
 			}
 		}
 	}
@@ -356,7 +412,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 				thumbLeftDeadZone = 1;
 			}
 			input->setAnalogSteer(thumbLeftDeadZone);
-			physics->setTurnDirectionalInfluence(thumbLeftDeadZone);
+			camera->turnDirectionalInfluence = thumbLeftDeadZone;
 
 		}
 		if (thumbLeftX > 0 && thumbLeftDeadZone > 0.1) { // right
@@ -370,13 +426,15 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 			{
 				thumbLeftDeadZone = 0;
 			}
+
 			if (thumbLeftDeadZone > 1)
 			{
 				thumbLeftDeadZone = 1;
 			}
+
 			analogVal = -1.0 * thumbLeftDeadZone;
 			input->setAnalogSteer(analogVal);
-			physics->setTurnDirectionalInfluence(analogVal);
+			camera->turnDirectionalInfluence = analogVal;
 		}
 	}
 
@@ -391,3 +449,18 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 }
 
+int XboxController::getNumberConnectedControllers() {
+	int numControllers = 0;
+
+	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		XINPUT_STATE state;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+			numControllers++;
+		}
+	}
+	//printf("NUM CONTROLLER: %d\n", numControllers);
+	return numControllers;
+}

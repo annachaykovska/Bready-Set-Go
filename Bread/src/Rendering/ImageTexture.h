@@ -35,11 +35,4 @@ private:
 	TextureHandle textureID;
 	std::string path;
 	GLint interpolation;
-
-
-	// Although uint might make more sense here, went with int under the assumption
-	// that most students will want to work with ints, not uints, in main.cpp
-
-
-
 };

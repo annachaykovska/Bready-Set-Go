@@ -22,6 +22,7 @@ public:
 	unsigned int chicken;	// id == 9;
 	unsigned int peas;		// id == 10;
 
+	bool allIngredientsCollected = false;
 	Inventory()
 	{
 		clearAllIngredients();
@@ -29,4 +30,5 @@ public:
 
 	void clearAllIngredients();
 	void clearRandomIngredient();
+	bool checkRecipeComplete(Entity* player);
 };

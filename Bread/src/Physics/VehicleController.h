@@ -11,6 +11,7 @@
 #include "PhysicsSystem.h"
 #include "../Rendering/UISystem.h"
 #include "../Gameplay/GameLoopManager.h"
+#include "../Scene/Entity.h"
 
 #pragma comment(lib, "Xinput.lib") 
 #pragma comment(lib, "Xinput9_1_0.lib")
@@ -22,10 +23,11 @@ class XboxController {
 public:
 	XboxController(PhysicsSystem* physicsSystem, UISystem* uiSystem, GameLoopManager* gameLoopManager);
 	void checkControllers();
-	void setButtonStateFromControllerDriving(int controllerId, bool gameEnded);
-	void setButtonStateFromControllerMainMenu(int controllerId);
+	void setButtonStateFromControllerDriving(int controllerId, bool gameEnded, AudioSource* menuSource);
+	void setButtonStateFromControllerMainMenu(int controllerId, AudioSource* menuSource);
 	_XINPUT_STATE getControllerState(int controllerId);
 	float getDeadZone(float x, float y, float deadzone);
+	int getNumberConnectedControllers();
 
 	PhysicsSystem* physics;
 
@@ -33,6 +35,10 @@ private:
 	UISystem* ui;
 	GameLoopManager* gameLoop;
 	bool forwards;
+	bool useFlip1;
+	bool useFlip2;
+	bool useFlip3;
+	bool useFlip4;
 	bool y_held1;
 	bool y_held2;
 	bool y_held3;

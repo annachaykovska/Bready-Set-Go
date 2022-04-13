@@ -4,8 +4,10 @@
 #include "Entity.h"
 #include "Scene.h"
 #include "../Gameplay/Recipe.h"
+#include "../SystemManager.h"
 
 extern Scene g_scene;
+extern SystemManager g_systems;
 
 using namespace std;
 
@@ -13,6 +15,7 @@ Entity::Entity(std::string name)
 {
 	this->name = name;
 	this->originalSpawn;
+	this->bannerSoundPlayed = false;
 	this->removeFlag = false;
 	this->orientation = glm::vec3(1.0f);
 	this->verifyPlayerCollision = false;
@@ -29,6 +32,7 @@ Entity::Entity(std::string name)
 	this->tethered = false;
 	this->magnetStartTime = 0.f;
 	this->magnetTimeToSteal = 0.5f;
+	this->unflipTimer = 0.f;
 
 }
 
@@ -103,77 +107,154 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	if (otherEntity->name == "cheese" && playerInventory->cheese == 0 && recipe->checkRecipeForIngredient(Ingredient::Cheese))
 	{
 		playerInventory->cheese = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "dough" && playerInventory->dough == 0 && recipe->checkRecipeForIngredient(Ingredient::Dough))
 	{
 		playerInventory->dough = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "sausage" && playerInventory->sausage == 0 && recipe->checkRecipeForIngredient(Ingredient::Sausage))
 	{
 		playerInventory->sausage = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "tomato" && playerInventory->tomato == 0 && recipe->checkRecipeForIngredient(Ingredient::Tomato))
 	{
 		playerInventory->tomato = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "carrot" && playerInventory->carrot == 0 && recipe->checkRecipeForIngredient(Ingredient::Carrot))
 	{
 		playerInventory->carrot = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "lettuce" && playerInventory->lettuce == 0 && recipe->checkRecipeForIngredient(Ingredient::Lettuce))
 	{
 		playerInventory->lettuce = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "parsnip" && playerInventory->parsnip == 0 && recipe->checkRecipeForIngredient(Ingredient::Parsnip))
 	{
 		playerInventory->parsnip = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "rice" && playerInventory->rice == 0 && recipe->checkRecipeForIngredient(Ingredient::Rice))
 	{
 		playerInventory->rice = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "egg" && playerInventory->egg == 0 && recipe->checkRecipeForIngredient(Ingredient::Egg))
 	{
 		playerInventory->egg = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "chicken" && playerInventory->chicken == 0 && recipe->checkRecipeForIngredient(Ingredient::Chicken))
 	{
 		playerInventory->chicken = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}
 	if (otherEntity->name == "peas" && playerInventory->peas == 0 && recipe->checkRecipeForIngredient(Ingredient::Peas))
 	{
 		playerInventory->peas = 1;
-		this->getAudioSource()->play("pickup.wav");
+		playerInventory->checkRecipeComplete(this);
+		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
+			bannerSoundPlayed = true;
+			this->getAudioSource()->play("banner_popup.wav");
+		}
+		else {
+			this->getAudioSource()->play("pickup.wav");
+		}
 		//entity0->getModel()->visible = false;
 		otherEntity->removeFlag = true;
 	}

@@ -48,7 +48,7 @@ int main()
 	// ImGui profiler for debugging
 	Profiler profiler(window);
 
-	// TODO change this at runtime in the main menu
+	// Change this at runtime in the main menu
 	g_scene.numPlayers = 1;
 
 	//-----------------------------------------------------------------------------------
@@ -104,8 +104,6 @@ int main()
 	UISystem ui;
 	g_systems.ui = &ui;
 
-	g_scene.init(&physics);
-
 	//-----------------------------------------------------------------------------------
 	// INITIALIZE TRANSFORMS
 	//-----------------------------------------------------------------------------------
@@ -150,24 +148,9 @@ int main()
 	fan->getTransform()->scale = glm::vec3(15.0f);
 	fan->getTransform()->update();
 
-	// Set rendered ingredient scales
-	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
-	sausage->getTransform()->scale = glm::vec3(30, 30, 30);
-	tomato->getTransform()->scale = glm::vec3(30, 30, 30);
-	dough->getTransform()->scale = glm::vec3(30, 30, 30);
-	carrot->getTransform()->scale = glm::vec3(30, 30, 30);
-	lettuce->getTransform()->scale = glm::vec3(30, 30, 30);
-	parsnip->getTransform()->scale = glm::vec3(30, 30, 30);
-	rice->getTransform()->scale = glm::vec3(30, 30, 30);
-	egg->getTransform()->scale = glm::vec3(30, 30, 30);
-	chicken->getTransform()->scale = glm::vec3(30, 30, 30);
-	peas->getTransform()->scale = glm::vec3(30, 30, 30);
-	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
-
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
-	testTransform->scale = glm::vec3(1, 1, 1);
+	testTransform->scale = glm::vec3(0.01f, 0.01f, 0.01f);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
@@ -180,14 +163,8 @@ int main()
 	AudioSource* p3Audio = player3->getAudioSource();
 	AudioSource* p4Audio = player4->getAudioSource();
 	p2Audio->gain = 1.0f;
-	//p2Audio->loop = true;
-	//p2Audio->play("idle.wav");
 	p3Audio->gain = 1.0f;
-	//p3Audio->loop = true;
-	//p3Audio->play("idle.wav");
 	p4Audio->gain = 1.0f;
-	//p4Audio->loop = true;
-	//p4Audio->play("idle.wav");
 
 	// Set movement control callbacks
 	auto movementCallbacks = std::make_shared<MovementCallbacks>(&physics); 
@@ -200,6 +177,7 @@ int main()
 
 	// Set up game loop manager
 	GameLoopManager gameLoop = GameLoopManager();
+	g_systems.loop = &gameLoop;
 
 	// Set up controller inputs
 	XboxController controllers = XboxController(&physics, &ui, &gameLoop);
@@ -246,8 +224,8 @@ int main()
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
 
-	// Change to 1 for submission
-	gameLoop.gameStage = 1;
+	gameLoop.gameStage = GameLoopMode::MENU_START;
+	//gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY; // Skips menus
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -266,9 +244,12 @@ int main()
 		while (accumulator >= dt)
 		{
 			// SIMULATE
-			if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
-				g_systems.physics->update(dt, gameLoop.gameStage);
+			if (gameLoop.gameStage == GameLoopMode::MAIN_GAME_PLAY || gameLoop.gameStage == GameLoopMode::END_GAME) {
+				if (!gameLoop.isPaused || !gameLoop.showPauseMenu) {
+					g_systems.physics->update(dt, gameLoop.gameStage);
+				}
 			}
+
 			accumulator -= dt;
 			t += dt;
 		}
@@ -276,17 +257,17 @@ int main()
 		// WINDOW
 		window.clear();
 
-		if (gameLoop.gameStage == 1) {
-			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
-			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4  controller
+		if (gameLoop.gameStage == GameLoopMode::MENU_START || gameLoop.gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION || gameLoop.gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
+			controllers.setButtonStateFromControllerMainMenu(0, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(1, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerMainMenu(2, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerMainMenu(3, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 4 controller
 			
 			// RENDER
-			ui.updateMainMenu(gameLoop.menuSelectionNumber);
+			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
-		else if (gameLoop.gameStage == 2 || gameLoop.gameStage == 3) {
+		else if (gameLoop.gameStage == GameLoopMode::MAIN_GAME_PLAY || gameLoop.gameStage == GameLoopMode::END_GAME) {
 			// TODO: Move out of main and make less dependent
 			pizza.updateRecipeProgress(p1Inv);
 			omelette.updateRecipeProgress(p2Inv);
@@ -294,24 +275,18 @@ int main()
 			salad.updateRecipeProgress(p4Inv);
 
 			//std::cout << navMesh.currentMeshSegment(player1->getTransform()->position)->id_ << std::endl;
-			int winner = ui.checkForWin();
+			int winner = gameLoop.checkForWin();
 			if (winner != 0) {
 				gameLoop.setEndStage();
 			}
 
-			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerDriving(1, winner); // Getting the input from player 2 controller
-			controllers.setButtonStateFromControllerDriving(2, winner); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerDriving(3, winner); // Getting the input from player 4 controller
+			controllers.setButtonStateFromControllerDriving(0, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerDriving(1, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerDriving(2, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerDriving(3, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 4 controller
 			
 			// RENDER
 			renderer.update();
-
-			if (!g_systems.renderDebug)
-			{
-				ui.updateMiniMap(*player1->getTransform(), *player2->getTransform(), *player3->getTransform(), *player4->getTransform());
-				ui.updateGame(gameLoop.endScreenGenerated, gameLoop.pauseMenuSelection, gameLoop.showPauseMenu);
-			}
 
 			// Update the ImGUI profiler
 			profiler.newFrame();
@@ -323,23 +298,27 @@ int main()
 			ingredientTracker.update();
 			if (!gameLoop.isGameEnded)
 			{
-				//p2Brain.update();
-				p3Brain.update();
-				p4Brain.update();
+				if (g_scene.numPlayers <= 3)
+					p4Brain.update();
+				if (g_scene.numPlayers <= 2)
+					p3Brain.update();
+				if (g_scene.numPlayers <= 1)
+					p2Brain.update();
 			}
 
 			// AUDIO
 			audio.update(dt);
 		}
 
-		if (ui.checkForWin() != 0) {
+		if (gameLoop.checkForWin() != 0) {
 			gameLoop.isGameEnded = true;
 		}
 
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
-			gameLoop.updateGameStageFromMenu();
-			audio.turnOffAllAudio();
+			gameLoop.updateGameStageFromMenu(controllers.getNumberConnectedControllers());
+			if (gameLoop.gameStage >= GameLoopMode::MAIN_GAME_PLAY)
+				audio.turnOffAllAudio();
 			// The game audio is played by the update function, no need to play it here
 			gameLoop.isPaused = false;
 		}
@@ -352,6 +331,10 @@ int main()
 			gameLoop.resetGameLoopValues();
 			gameLoop.gameActorsReset(&physics, &ingredientTracker, &p1Inv, &p2Inv, &p3Inv, &p4Inv);
 
+			player1->bannerSoundPlayed = false;
+			player2->bannerSoundPlayed = false;
+			player3->bannerSoundPlayed = false;
+			player4->bannerSoundPlayed = false;
 			audio.turnOffAllAudio();
 			audio.playMainMenuMusic(countertopAudioSource);
 
