@@ -48,3 +48,9 @@ void Transform::update(physx::PxTransform transform)
 
 	this->model = translationMatrix * rotationMat * scaleMatrix;
 }
+
+void Transform::translate(glm::vec3 translation)
+{
+	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.f), translation);
+	this->model *= translationMatrix;
+}

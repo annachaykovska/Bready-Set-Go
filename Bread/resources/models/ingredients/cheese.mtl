@@ -1,7 +1,7 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'cheese.blend'
 # Material Count: 1
 
-newmtl PandaMat
+newmtl PandaMat.008
 Ns 35.999996
 Ka 1.000000 1.000000 1.000000
 Kd 1.000000 0.651000 0.000000

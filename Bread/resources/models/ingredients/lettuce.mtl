@@ -1,7 +1,7 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'lettuce.blend'
 # Material Count: 1
 
-newmtl PandaMat.001
+newmtl PandaMat.004
 Ns 35.999996
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
