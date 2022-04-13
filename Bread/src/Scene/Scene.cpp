@@ -30,6 +30,12 @@ void Scene::createEntities()
 	createEntity("player3");
 	createEntity("player4");
 
+	// Adding players to a list to keep track in one place
+	players.push_back(getEntity("player1"));
+	players.push_back(getEntity("player2"));
+	players.push_back(getEntity("player3"));
+	players.push_back(getEntity("player4"));
+
 	// Ingredients
 	createEntity("cheese");
 	createEntity("sausage");
@@ -42,8 +48,18 @@ void Scene::createEntities()
 	createEntity("egg");
 	createEntity("chicken");
 	createEntity("peas");
-	//createEntity("soupbase");
-	//createEntity("pumpkin");
+
+	// Adding ingredients to a list to keep track in one place
+	ingredients.push_back(getEntity("cheese"));
+	ingredients.push_back(getEntity("sausage"));
+	ingredients.push_back(getEntity("tomato"));
+	ingredients.push_back(getEntity("dough"));
+	ingredients.push_back(getEntity("carrot"));
+	ingredients.push_back(getEntity("lettuce"));
+	ingredients.push_back(getEntity("parsnip"));
+	ingredients.push_back(getEntity("rice"));
+	ingredients.push_back(getEntity("egg"));
+	ingredients.push_back(getEntity("chicken"));
 
 	// World
 	createEntity("countertop");
@@ -103,4 +119,11 @@ Entity* Scene::createEntity(std::string name)
 		return &result->second;
 	else
 		return nullptr;
+}
+
+std::vector<Entity*> Scene::getIngredients() {
+	return ingredients;
+}
+std::vector<Entity*> Scene::getPlayers() {
+	return players;
 }

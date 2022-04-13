@@ -21,6 +21,8 @@ public:
 	void createEntities();
 	Entity* getEntity(std::string name);
 	int entityCount();
+	std::vector<Entity*> getIngredients();
+	std::vector<Entity*> getPlayers();
 
 	int numPlayers;
 	
@@ -28,4 +30,7 @@ private:
 
 	Entity* createEntity(std::string name);
 	std::unordered_map<std::string, Entity> entities;
+
+	std::vector<Entity*> ingredients;
+	std::vector<Entity*> players;
 };

@@ -25,6 +25,10 @@ public:
 	Model* getModel();
 	Inventory* getInventory();
 	AudioSource* getAudioSource();
+
+
+	inline bool IngredientCanBeCollected(std::string name);
+	std::vector<Entity*> getCollectableIngredients();
 	std::vector<std::string> getOtherPlayers(); 
 	void checkIngredientCollision(Entity* otherEntity);
 	void checkPlayerCollision(Entity* otherEntity);
@@ -53,6 +57,9 @@ public:
 	std::vector<Entity*> tethered_victims;
 	float magnetTimeToSteal;
 	float magnetStartTime;
+
+	// For ingredient collection
+	float ingredientCollectDistanceSquared;
 
 private:
 

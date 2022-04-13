@@ -322,6 +322,12 @@ void PhysicsSystem::initializeActors() {
 	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
+	vehicles.clear(); // idk if this is needed
+	vehicles.push_back(mVehiclePlayer1);
+	vehicles.push_back(mVehiclePlayer2);
+	vehicles.push_back(mVehiclePlayer3);
+	vehicles.push_back(mVehiclePlayer4);
+
 	randomizeIngredientLocations();
 }
 
@@ -751,6 +757,8 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	if (g_scene.numPlayers > 1)
 		raycastCamera(this->mVehiclePlayer2, "player2");
 	raycastCamera(this->mVehiclePlayer1, "player1");
+
+	checkIngredientCollisoins();
 }
 
 // Check if camera is behind a wall and save the position of the wall if it is
@@ -1240,6 +1248,7 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	secondActor->otherPlayerInCollision = "";
 }
 
+// TODO: DELETE THIS FUNCTION
 void PhysicsSystem::magnet(int stealer_id)
 {
 	// Get the entity that is stealing, and the entities that can be stolen from
@@ -1838,5 +1847,25 @@ void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
 		break;
 	default:
 		break;
+	}
+}
+
+std::vector<PxVehicleDrive4W*> PhysicsSystem::getVehicles()
+{
+	return vehicles;
+}
+
+void PhysicsSystem::checkIngredientCollisoins(){
+	auto players = g_scene.getPlayers();
+	for (int i = 0; i < players.size(); i++) {
+		auto ingredients = players[i]->getCollectableIngredients();
+		for (auto ingredient : ingredients) {
+			//glm::vec3 distance2 = glm::length2(ingredient players[i]->getTransform()->position())
+			if (players[i]->ingredientCollectDistanceSquared >= 
+				glm::length2(ingredient->getTransform()->position-players[i]->getTransform()->position)) {
+				players[i]->checkIngredientCollision(ingredient);
+			}
+
+		}
 	}
 }
