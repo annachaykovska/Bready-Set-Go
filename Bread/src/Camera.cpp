@@ -19,9 +19,10 @@
 #define MAX_FOV_DELTA 2.0f
 #define ELASTIC_FORCE 2.0f
 #define EULER 2.71828f
-#define INFLUENCE_SCALING 2.f
+#define INFLUENCE_SCALING 2.6f
 #define OUTWARD_INFLUENCE_SCALING 1.5f
 #define INWARD_INFLUENCE_SCALING 2.f
+#define TESTING_DT 0.035f // Average delta time on David's computer which was used for tuning
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -40,6 +41,7 @@ Camera::Camera()
 	, oldFOV(40.0f)
 	, centerBeam(glm::vec3(1.0f))
 	, lookAhead(glm::vec3(1.0f))
+	, prevTime(glfwGetTime())
 {}
 
 void Camera::update(const int playerNum)
@@ -85,6 +87,13 @@ void Camera::setProjMatrix()
 
 void Camera::setViewMatrix(const int playerNum)
 {
+	// Getting delta time (TODO: should be passed in instead)
+	float timeNow = glfwGetTime();
+	float dt = timeNow - prevTime;
+	prevTime = timeNow;
+
+	//std::cout << dt << std::endl;
+
 	float cameraRotationOffset = 0.0f;
 
 	this->cameraPositionOffset = 0.0f;
@@ -137,7 +146,7 @@ void Camera::setViewMatrix(const int playerNum)
 				stepSize = (-(1 / (5 * (functionStep + 0.2))) + 1) * OUTWARD_INFLUENCE_SCALING;
 			}
 
-			stepSize *= INFLUENCE_SCALING; // scale step size
+			stepSize *= INFLUENCE_SCALING * (dt/TESTING_DT); // scale step size
 			if (forcedDirection + stepSize < stopDegrees)
 			{ // Move the forced direction
 				forcedDirection += stepSize;
@@ -149,7 +158,7 @@ void Camera::setViewMatrix(const int playerNum)
 			functionStep -= ELASTIC_FORCE;
 			stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
 
-			stepSize *= INFLUENCE_SCALING; // scale step size
+			stepSize *= INFLUENCE_SCALING * (dt / TESTING_DT); // scale step size
 			if (forcedDirection - stepSize > stopDegrees)
 			{
 				forcedDirection -= stepSize;
@@ -173,7 +182,7 @@ void Camera::setViewMatrix(const int playerNum)
 				stepSize = (-(1 / (5 * (functionStep + 0.2))) + 1)*OUTWARD_INFLUENCE_SCALING;
 			}
 
-			stepSize *= INFLUENCE_SCALING; // scale step size
+			stepSize *= INFLUENCE_SCALING * (dt/TESTING_DT); // scale step size
 			if (forcedDirection > -stopDegrees)
 			{ // Move the camera to the left
 				forcedDirection -= stepSize;
@@ -185,7 +194,7 @@ void Camera::setViewMatrix(const int playerNum)
 			functionStep -= ELASTIC_FORCE;
 			stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
 
-			stepSize *= INFLUENCE_SCALING; // scale step size
+			stepSize *= INFLUENCE_SCALING * (dt / TESTING_DT); // scale step size
 			if (forcedDirection + stepSize < stopDegrees)
 			{
 				forcedDirection += stepSize;
@@ -200,7 +209,7 @@ void Camera::setViewMatrix(const int playerNum)
 			float functionStep = (1.2f / abs(recordedForcedDirection)) * abs(forcedDirection);
 			float stepSize = (-(1 / (5 * (functionStep + 0.2))) + 1)*INWARD_INFLUENCE_SCALING;
 
-			stepSize *= INFLUENCE_SCALING; // scale step size
+			stepSize *= INFLUENCE_SCALING * (dt / TESTING_DT); // scale step size
 			if (forcedDirection > 0)
 			{ // Camera on the right
 				if (forcedDirection - stepSize < 0)
