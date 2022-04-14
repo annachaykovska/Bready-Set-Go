@@ -34,13 +34,13 @@ public:
 	void playMainMenuMusic(AudioSource* source);
 	void stopMusic(AudioSource* source);
 	void playSlurp(AudioSource* source);
-	void endSlurp(AudioSource* source, bool success);
+	void endSlurp(AudioSource* source, bool playBanner, bool success);
 	void ingredientSuck(AudioSource* source);
 	void powerReady(AudioSource* source);
 	void turnOffAllAudio();
 	void playMenuAudio(std::string clipName);
 
-	void update(const float dt);
+	void update(const float dt, int gameStage);
 
 private:
 

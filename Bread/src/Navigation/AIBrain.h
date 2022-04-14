@@ -7,7 +7,7 @@
 class AIBrain
 {
 public:
-	AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSystem& navigation);
+	AIBrain(Inventory& inventory, IngredientTracker& tracker, NavigationSystem& navigation, position start);
 
 	void pause();
 	void update();
@@ -20,6 +20,7 @@ private:
 	Ingredient currentTarget;
 
 	position trackedTargetDelta;
+	position start;
 
 	Inventory& inventory;
 	IngredientTracker& tracker;
@@ -28,6 +29,7 @@ private:
 	Recipe* currentRecipe;
 
 	int oldInventoryCount;
+	bool returnToBase;
 
 	int panicCounter_;
 	float distance_;

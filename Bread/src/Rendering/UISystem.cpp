@@ -100,6 +100,7 @@ UISystem::UISystem()
     , continueButtonPressed("resources/textures/button_continue_selected.png", GL_NEAREST) 
     , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
     , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
+    , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -150,22 +151,23 @@ UISystem::UISystem()
             GL_UNSIGNED_BYTE,
             face->glyph->bitmap.buffer
         );
-// set texture options
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// now store character for later use
-Character character = {
-    texture,
-    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-    face->glyph->advance.x
-};
-//test print
 
+        // set texture options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-Characters.insert(std::pair<char, Character>(c, character));
+        // now store character for later use
+        Character character = 
+        { 
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x 
+        };
+
+        Characters.insert(std::pair<char, Character>(c, character));
     }
 
     //Cleaning up the freetype variables
@@ -235,7 +237,7 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage, int numController
 }
 
 void UISystem::updateEndGame(int endScreenValue) {
-    int winner = checkForWin();
+    int winner = g_systems.loop->checkForWin();
     std::string winText = "Player " + std::to_string(winner) + " Wins!";
     //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
@@ -525,7 +527,7 @@ void UISystem::updateInventory(int playerNum)
 
         break;
 
-    case 2: // egg, cheese, peas, lettuce, ????
+    case 2: // egg, cheese, peas, lettuce, omelette
 
         playerInv = g_scene.getEntity("player2")->getInventory();
 
@@ -539,7 +541,7 @@ void UISystem::updateInventory(int playerNum)
 
         break;
 
-    case 3: // chicken, dough, rice, lettuce, ????
+    case 3: // chicken, dough, rice, lettuce, wrap
 
         playerInv = g_scene.getEntity("player3")->getInventory();
 
@@ -576,59 +578,80 @@ void UISystem::updateInventory(int playerNum)
     renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 }
 
+void UISystem::updateUnflip(int playerNum)
+{
+    Entity* player = nullptr;
+    switch (playerNum)
+    {
+    case 1:
+        player = g_scene.getEntity("player1");
+        break;
+    case 2:
+        player = g_scene.getEntity("player2");
+        break;
+    case 3:
+        player = g_scene.getEntity("player3");
+        break;
+    case 4:
+        player = g_scene.getEntity("player4");
+        break;
+    }
+    if (player->unflipTimer > 0)
+    {
+        if (player->unflipTimer > 2 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else if (player->unflipTimer > 1 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, unflip3, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+    }
+}
+
+void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
+    bool drawBanner = false;
+    switch (playerNum)
+    {
+    case 1:
+        drawBanner = g_scene.getEntity("player1")->getInventory()->allIngredientsCollected;
+        break;
+    case 2:
+        drawBanner = g_scene.getEntity("player2")->getInventory()->allIngredientsCollected;
+        break;
+    case 3:
+        drawBanner = g_scene.getEntity("player3")->getInventory()->allIngredientsCollected;
+        break;
+    case 4:
+        drawBanner = g_scene.getEntity("player4")->getInventory()->allIngredientsCollected;
+        break;
+    default:
+        break;
+    }
+    if (drawBanner && g_systems.loop->checkForWin() == 0) {
+        renderImage(imageShader, backToBaseBanner, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+    }
+}
+
 void UISystem::updatePlayer(unsigned int playerNum)
 {
-    if (checkForWin() != 0)
-        updateEndGame(g_systems.loop->endScreenGenerated);
-    
     updateVacuum(playerNum);
     updateSpeedometer(playerNum);
     updateRecipeList();
     updateMiniMap();
     updateOffscreenIndicators(playerNum);
     updateInventory(playerNum);
+    updateUnflip(playerNum);
+    updateReturnToBaseBanner(playerNum);
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
 {
     tracker = offscreenTracker;
-}
-
-int UISystem::checkForWin()
-{
-    Entity* player1 = g_scene.getEntity("player1");
-    Inventory* p1Inv = (Inventory*)player1->getComponent("inventory");
-
-    if (p1Inv->tomato && p1Inv->cheese && p1Inv->dough && p1Inv->sausage)
-    {
-        return 1;
-    }
-
-    Entity* player2 = g_scene.getEntity("player2");
-    Inventory* p2Inv = (Inventory*)player2->getComponent("inventory");
-
-    if (p2Inv->egg && p2Inv->cheese && p2Inv->peas && p2Inv->lettuce)
-    {
-        return 2;
-    }
-
-    Entity* player3 = g_scene.getEntity("player3");
-    Inventory* p3Inv = (Inventory*)player3->getComponent("inventory");
-
-    if (p3Inv->chicken && p3Inv->dough && p3Inv->rice && p3Inv->lettuce)
-    {
-        return 3;
-    }
-
-    Entity* player4 = g_scene.getEntity("player4");
-    Inventory* p4Inv = (Inventory*)player4->getComponent("inventory");
-
-    if (p4Inv->parsnip && p4Inv->carrot && p4Inv->tomato && p4Inv->lettuce)
-    {
-        return 4;
-    }
-
-    return 0;
 }
 
 void UISystem::updateMiniMap()
@@ -755,17 +778,38 @@ void UISystem::renderImage(Shader& s, ImageTexture& image, float x, float y, flo
 
 glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, int& vertical)
 {
+    // Get the player's camera
+    Camera* camera = nullptr;
+    switch (playerNum)
+    {
+    case 1:
+        camera = g_scene.p1Camera;
+        break;
+    case 2:
+        camera = g_scene.p2Camera;
+        break;
+    case 3:
+        camera = g_scene.p3Camera;
+        break;
+    case 4:
+        camera = g_scene.p4Camera;
+        break;
+    default:
+        return glm::vec3(0); // Uh-oh, something has gone wrong
+        break;
+    }
+
     vertical = 0;
     bool verticalOffscreen = false;
     
     glm::vec4 location = glm::vec4(entityPos, 1);
 
-    glm::vec3 cam = g_scene.camera.centerBeam;
-    glm::vec3 toEntity = entityPos - g_scene.camera.position;
+    glm::vec3 cam = camera->centerBeam;
+    glm::vec3 toEntity = entityPos - camera->position;
 
     std::string player = "player" + std::to_string(playerNum);
-    glm::mat4 viewMatrix = g_scene.camera.getViewMatrix(g_scene.getEntity(player)->getTransform());
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(g_scene.camera.getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
+    glm::mat4 viewMatrix = camera->viewMatrix;
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera->getPerspective()), float(g_systems.width) / g_systems.height, 0.1f, 500.0f);
 
     location = projectionMatrix * viewMatrix * location;
 
@@ -784,9 +828,29 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
 
         glm::vec3 yaw = glm::vec3(toEntity.x, 0, toEntity.z);
 
-        float viewRange = g_scene.camera.perspective / 2.f;
+        float perspective = 0.0f;
+
+        switch (playerNum)
+        {
+        case 1:
+            perspective = g_scene.p1Camera->getPerspective();
+            break;
+        case 2:
+            perspective = g_scene.p2Camera->getPerspective();
+            break;
+        case 3:
+            perspective = g_scene.p3Camera->getPerspective();
+            break;
+        case 4:
+            perspective = g_scene.p4Camera->getPerspective();
+            break;
+        default:
+            break; // Uh-oh, something has gone wrong
+        }
+
+        float viewRange = perspective / 2.0f;
         //float viewRange = 80 / 2.f;
-        viewRange *= (PI / 180.f);
+        viewRange *= (PI / 180.0f);
 
         float yawTheta = acos(dot(cam, yaw) / (length(yaw) * length(cam)));
         glm::vec3 upVector = cross(cam, yaw);

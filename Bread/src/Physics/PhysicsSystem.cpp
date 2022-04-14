@@ -138,14 +138,13 @@ VehicleDesc initVehicleDesc(PxMaterial* mMaterial)
 	return vehicleDesc;
 }
 
-PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name)
+PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, float x, float y, float z, std::string name)
 {
-	PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+	PxShape* shape = mPhysics->createShape(PxBoxGeometry(x / 2.0f, y / 2.0f, z / 2.0f), *mMaterial);
 	PxFilterData cheeseFilter(COLLISION_FLAG_FOOD, COLLISION_FLAG_FOOD_AGAINST, 0, 0);
 	shape->setSimulationFilterData(cheeseFilter);
 
-	PxTransform localTm(PxVec3(10, 2, 10));
-	PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+	PxRigidDynamic* body = mPhysics->createRigidDynamic(t);
 	body->attachShape(*shape);
 	PxRigidBodyExt::updateMassAndInertia(*body, 0.1f);
 
@@ -156,6 +155,7 @@ PxRigidDynamic* PhysicsSystem::createFoodBlock(const PxTransform& t, PxReal half
 	void* vp = static_cast<void*>(new std::string(name));
 	body->userData = vp;
 
+	// Add the collider to the scene
 	mScene->addActor(*body);
 	shape->release();
 
@@ -322,96 +322,94 @@ void PhysicsSystem::initializeActors() {
 	mScene->addActor(*mVehiclePlayer3->getRigidDynamicActor());
 	mScene->addActor(*mVehiclePlayer4->getRigidDynamicActor());
 
+	vehicles.clear(); // idk if this is needed
+	vehicles.push_back(mVehiclePlayer1);
+	vehicles.push_back(mVehiclePlayer2);
+	vehicles.push_back(mVehiclePlayer3);
+	vehicles.push_back(mVehiclePlayer4);
+
 	randomizeIngredientLocations();
 }
 
 void PhysicsSystem::randomizeIngredientLocations()
 {
-	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
-	// Note: Physx actor name must match Entity name
-
+	// Randomize starting location
 	std::random_device r;
 	std::seed_seq seed{ r(), r(), r(), r(), r(), r(), r(), r() };
 	std::mt19937 eng(seed);
 
 	std::shuffle(std::begin(spawnLocations), std::end(spawnLocations), eng);
 
-	float halfExtent = 1.0f;
 	glm::vec3 loc;
+
+	// FOOD ITEMS ---------------------------------------------------------------------------------------------------------------------
+	// Note: Physx actor name must match Entity name
 
 	// CHEESE
 	loc = LOCATIONS[spawnLocations[0]];
 	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->cheese = createFoodBlock(cheeseTransform, halfExtent, "cheese");
+	this->cheese = createFoodBlock(cheeseTransform, 5.894f, 3.580f, 5.491f, "cheese");
 	g_scene.getEntity("cheese")->originalSpawn = cheeseTransform;
 
 	// SAUSAGE
 	loc = LOCATIONS[spawnLocations[1]];
 	PxTransform sausageTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->sausage = createFoodBlock(sausageTransform, halfExtent, "sausage");
+	this->sausage = createFoodBlock(sausageTransform, 6.72f, 1.53f, 1.25f, "sausage");
 	g_scene.getEntity("sausage")->originalSpawn = sausageTransform;
 
 	// TOMATO
 	loc = LOCATIONS[spawnLocations[2]];
 	PxTransform tomatoTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->tomato = createFoodBlock(tomatoTransform, halfExtent, "tomato");
+	this->tomato = createFoodBlock(tomatoTransform, 6.11f, 5.49f, 6.11f, "tomato");
 	g_scene.getEntity("tomato")->originalSpawn = tomatoTransform;
 
 	// DOUGH
 	loc = LOCATIONS[spawnLocations[3]];
 	PxTransform doughTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->dough = createFoodBlock(doughTransform, halfExtent, "dough");
+	this->dough = createFoodBlock(doughTransform, 5.69f, 2.66f, 5.69f, "dough");
 	g_scene.getEntity("dough")->originalSpawn = doughTransform;
 
 	// CARROT
 	loc = LOCATIONS[spawnLocations[4]];
 	PxTransform carrotTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->carrot = createFoodBlock(carrotTransform, halfExtent, "carrot");
+	this->carrot = createFoodBlock(carrotTransform, 9.32f, 2.76f, 2.32f, "carrot");
 	g_scene.getEntity("carrot")->originalSpawn = carrotTransform;
 
 	// LETTUCE
 	loc = LOCATIONS[spawnLocations[5]];
 	PxTransform lettuceTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->lettuce = createFoodBlock(lettuceTransform, halfExtent, "lettuce");
+	this->lettuce = createFoodBlock(lettuceTransform, 6.45f, 4.65f, 6.18f, "lettuce");
 	g_scene.getEntity("lettuce")->originalSpawn = lettuceTransform;
 
 	// PARSNIP
 	loc = LOCATIONS[spawnLocations[6]];
 	PxTransform parsnipTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->parsnip = createFoodBlock(parsnipTransform, halfExtent, "parsnip");
+	this->parsnip = createFoodBlock(parsnipTransform, 6.06f, 7.08f, 6.06f, "parsnip");
 	g_scene.getEntity("parsnip")->originalSpawn = parsnipTransform;
 
 	// RICE
 	loc = LOCATIONS[spawnLocations[7]];
 	PxTransform riceTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->rice = createFoodBlock(riceTransform, halfExtent, "rice");
+	this->rice = createFoodBlock(riceTransform, 6.65f, 4.48f, 6.61f, "rice");
 	g_scene.getEntity("rice")->originalSpawn = riceTransform;
 
 	// EGG
 	loc = LOCATIONS[spawnLocations[8]];
 	PxTransform eggTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->egg = createFoodBlock(eggTransform, halfExtent, "egg");
+	this->egg = createFoodBlock(eggTransform, 5.14f, 0.683f, 5.14f, "egg");
 	g_scene.getEntity("egg")->originalSpawn = eggTransform;
 
 	// CHICKEN
 	loc = LOCATIONS[spawnLocations[9]];
 	PxTransform chickenTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->chicken = createFoodBlock(chickenTransform, halfExtent, "chicken");
+	this->chicken = createFoodBlock(chickenTransform, 7.83f, 2.58f, 4.49f, "chicken");
 	g_scene.getEntity("chicken")->originalSpawn = chickenTransform;
 
 	// PEAS
 	loc = LOCATIONS[spawnLocations[10]];
 	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
-	this->peas = createFoodBlock(peasTransform, halfExtent, "peas");
+	this->peas = createFoodBlock(peasTransform, 7.13f, 2.18f, 2.41f, "peas");
 	g_scene.getEntity("peas")->originalSpawn = peasTransform;
-
-	//// SOUPBASE
-	//PxTransform soupbaseTransform(PxVec3(-40, 3, 0));
-	//this->soupbase = createFoodBlock(soupbaseTransform, halfExtent, "soupbase");
-
-	//// PUMPKIN
-	//PxTransform pumpkinTransform(PxVec3(-45, 3, 0));
-	//this->pumpkin = createFoodBlock(pumpkinTransform, halfExtent, "pumpkin");
 }
 
 // Constructor
@@ -516,9 +514,6 @@ void PhysicsSystem::initialize()
 	mVehiclePlayer4->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	//mVehicleInputData.setAnalogBrake(1.0f);
 
-	viewDirectionalInfluence = 0.f;
-	turnDirectionalInfluence = 0.f;
-
 	updateCar(); // TODO THIS IS EXTREMELY SCUFFED LOOK FOR A BETTER WAY TO DO THIS
 }
 
@@ -567,26 +562,6 @@ void PhysicsSystem::initVehicleSDK()
 
 void PhysicsSystem::setAnalogInputs(bool input) {
 	this->useAnalogInputs = input;
-}
-
-void PhysicsSystem::setViewDirectionalInfluence(float value)
-{
-	viewDirectionalInfluence = value;
-}
-
-float PhysicsSystem::getViewDirectionalInfluence()
-{
-	return viewDirectionalInfluence;
-}
-
-void PhysicsSystem::setTurnDirectionalInfluence(float value)
-{
-	turnDirectionalInfluence = value;
-}
-
-float PhysicsSystem::getTurnDirectionalInfluence()
-{
-	return turnDirectionalInfluence;
 }
 
 void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir, PxVehicleDrive4WRawInputData& inputData, std::string entityName, const float timestep, int gameStage) {
@@ -782,22 +757,34 @@ void PhysicsSystem::update(const float dt, int gameStage)
 	if (g_scene.numPlayers > 1)
 		raycastCamera(this->mVehiclePlayer2, "player2");
 	raycastCamera(this->mVehiclePlayer1, "player1");
+
+	checkIngredientCollisoins();
 }
 
 // Check if camera is behind a wall and save the position of the wall if it is
 void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name)
 {
+	Camera* camera = nullptr;
+
+	if (name == "player1")
+		camera = g_scene.p1Camera;
+	else if (name == "player2")
+		camera = g_scene.p2Camera;
+	else if (name == "player3")
+		camera = g_scene.p3Camera;
+	else if (name == "player4")
+		camera = g_scene.p4Camera;
+	else
+		return; // Uh-oh, something has gone wrong
+
 	// Get this player's current position
 	physx::PxTransform trans = vehicle->getRigidDynamicActor()->getGlobalPose();
 	trans.p.y += 2.0f;
 
-	// Update the position of this player's camera
-	g_scene.camera.getViewMatrix(g_scene.getEntity(name)->getTransform());
-
 	// Shoot a ray from just above the player to their camera to detect walls
 	glm::vec3 playerPos = glm::vec3(trans.p.x, trans.p.y, trans.p.z);
-	glm::vec3 unitDir = glm::normalize(g_scene.camera.position - playerPos);
-	float distance = glm::distance(g_scene.camera.position, playerPos);
+	glm::vec3 unitDir = glm::normalize(camera->position - playerPos);
+	float distance = glm::distance(camera->position, playerPos);
 	physx::PxVec3 unitDirPx = physx::PxVec3(unitDir.x, unitDir.y, unitDir.z);
 	physx::PxRaycastBuffer hit;
 	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
@@ -826,8 +813,10 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 			this->p3CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
 			this->p3CameraHit = true;
 		}
+		else
+			return; // Uh-oh, something has gone wrong
 	}
-	// If there was not wall, do nothing
+	// If there was no wall, do nothing
 	else
 	{
 		this->p1CameraHit = false;
@@ -839,66 +828,69 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
 {
+
+	glm::quat q = glm::quat(glm::vec3(0.0f, glfwGetTime(), 0.0f));
+	PxTransform trans = PxTransform(PxQuat(q.w, q.x, q.y, q.z));
+
 	// Cheese
+	this->cheese->setGlobalPose(this->cheese->getGlobalPose().transform(trans));
 	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("cheese")->removeFlag = false;
 
 	// Sausage
+	this->sausage->setGlobalPose(this->sausage->getGlobalPose().transform(trans));
 	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("sausage")->removeFlag = false;
 
 	// Tomato
+	this->tomato->setGlobalPose(this->tomato->getGlobalPose().transform(trans));
 	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("tomato")->removeFlag = false;
 
 	// Dough
+	this->dough->setGlobalPose(this->dough->getGlobalPose().transform(trans));
 	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("dough")->removeFlag = false;
 
 	// Carrot
+	this->carrot->setGlobalPose(this->carrot->getGlobalPose().transform(trans));
 	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("carrot")->removeFlag = false;
 
 	// Lettuce
+	this->lettuce->setGlobalPose(this->lettuce->getGlobalPose().transform(trans));
 	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("lettuce")->removeFlag = false;
 
 	// Parsnip
+	this->parsnip->setGlobalPose(this->parsnip->getGlobalPose().transform(trans));
 	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("parsnip")->removeFlag = false;
 
 	// Rice
+	this->rice->setGlobalPose(this->rice->getGlobalPose().transform(trans));
 	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("rice")->removeFlag = false;
 
 	// Egg
+	this->egg->setGlobalPose(this->egg->getGlobalPose().transform(trans));
 	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("egg")->removeFlag = false;
 
 	// Chicken
+	this->chicken->setGlobalPose(this->chicken->getGlobalPose().transform(trans));
 	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
-	if (setAllVisible)
-		g_scene.getEntity("chicken")->removeFlag = false;
 
 	// Peas
+	this->peas->setGlobalPose(this->peas->getGlobalPose().transform(trans));
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
+
+	// Check if visibility needs to be reset
 	if (setAllVisible)
+	{
+		g_scene.getEntity("cheese")->removeFlag = false;
+		g_scene.getEntity("sausage")->removeFlag = false;
+		g_scene.getEntity("tomato")->removeFlag = false;
+		g_scene.getEntity("dough")->removeFlag = false;
+		g_scene.getEntity("carrot")->removeFlag = false;
+		g_scene.getEntity("lettuce")->removeFlag = false;
+		g_scene.getEntity("parsnip")->removeFlag = false;
+		g_scene.getEntity("rice")->removeFlag = false;
+		g_scene.getEntity("egg")->removeFlag = false;
+		g_scene.getEntity("chicken")->removeFlag = false;
 		g_scene.getEntity("peas")->removeFlag = false;
-
-	//// Soupbase
-	//g_scene.getEntity("soupbase")->getTransform()->update(this->soupbase->getGlobalPose());
-
-	//// Pumpkin
-	//g_scene.getEntity("pumpkin")->getTransform()->update(this->pumpkin->getGlobalPose());
+	}
 }
 
 void PhysicsSystem::cleanupPhysics()
@@ -984,6 +976,33 @@ float PhysicsSystem::getPlayerSpeed(int playerNumber)
 	}
 }
 
+float PhysicsSystem::getPlayerSidewaysSpeed(int playerNumber)
+{
+	float result;
+
+	switch (playerNumber)
+	{
+	case (1):
+		result = (float)mVehiclePlayer1->computeSidewaysSpeed();
+		return result;
+		break;
+	case (2):
+		result = (float)mVehiclePlayer2->computeSidewaysSpeed();
+		return result;
+		break;
+	case (3):
+		result = (float)mVehiclePlayer3->computeSidewaysSpeed();
+		return result;
+		break;
+	case (4):
+		result = (float)mVehiclePlayer4->computeSidewaysSpeed();
+		return result;
+		break;
+	default:
+		break;
+	}
+}
+
 bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
 	switch (playerNumber)
 	{
@@ -1005,28 +1024,33 @@ bool PhysicsSystem::getIsVehicleInAir(int playerNumber) {
 	return false;
 }
 
-void PhysicsSystem::resetOutOfBoundsObjects() {
+void PhysicsSystem::resetOutOfBoundsObjects() 
+{
 	// Players
 	PxTransform reset = PxTransform(PxVec3(0, 5.0, 0));
 	if (this->mVehiclePlayer1->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer1->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player1")->getInventory()->clearRandomIngredient();
+		g_scene.getEntity("player1")->getAudioSource()->play("drum.wav");
 	}
 	if (this->mVehiclePlayer2->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer2->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player2")->getInventory()->clearRandomIngredient();
+		g_scene.getEntity("player2")->getAudioSource()->play("drum.wav");
 	}
 	if (this->mVehiclePlayer3->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer3->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player3")->getInventory()->clearRandomIngredient();
+		g_scene.getEntity("player3")->getAudioSource()->play("drum.wav");
 	}
 	if (this->mVehiclePlayer4->getRigidDynamicActor()->getGlobalPose().p.y < -75.0f)
 	{
 		this->mVehiclePlayer4->getRigidDynamicActor()->setGlobalPose(reset);
 		g_scene.getEntity("player4")->getInventory()->clearRandomIngredient();
+		g_scene.getEntity("player4")->getAudioSource()->play("drum.wav");
 	}
 
 	// Ingredients
@@ -1224,6 +1248,7 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	secondActor->otherPlayerInCollision = "";
 }
 
+// TODO: DELETE THIS FUNCTION
 void PhysicsSystem::magnet(int stealer_id)
 {
 	// Get the entity that is stealing, and the entities that can be stolen from
@@ -1280,6 +1305,7 @@ void PhysicsSystem::magnet(int stealer_id)
 	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
 	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
 	auto stealer_inventory = (Inventory*)stealer->getComponent("inventory");
+	bool playBanner = false;
 	for (int i = 0; i < victims.size();) {
 		//TODO: right now only the location is checked
 		// See the victims that are in range
@@ -1398,7 +1424,12 @@ void PhysicsSystem::magnet(int stealer_id)
 				victims[i]->lastGracePeriodStart = currentTime;
 				if (stealer_id == 1)
 				{
-					g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+					stealer->getInventory()->checkRecipeComplete(stealer);
+					if (!stealer->bannerSoundPlayed && stealer_inventory->allIngredientsCollected) {
+						playBanner = true;
+						stealer->bannerSoundPlayed = true;
+					}
+					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
 				}
 				if (victims[i] == g_scene.getEntity("player1")) // TODO: This needs to change for multiplayer
 				{
@@ -1414,13 +1445,19 @@ void PhysicsSystem::magnet(int stealer_id)
 	stealer->lastMagnetUse = currentTime;
 	if (stealer_id == 1)
 	{
-		g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+		stealer->getInventory()->checkRecipeComplete(stealer);
+		if (!stealer->bannerSoundPlayed && stealer_inventory->allIngredientsCollected) {
+			playBanner = true;
+			stealer->bannerSoundPlayed = true;
+		}
+		g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 	}
 }
 
 void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
 	// setting up the stealer entity (see if this can be passed in instead)
 	Entity* stealer;
+	bool playBanner = false;
 	switch (stealer_id) {
 	case 1:
 		stealer = g_scene.getEntity("player1");
@@ -1458,7 +1495,12 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				stealer->magnetStatus = 3;
 			}
 			else {
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+				stealer->getInventory()->checkRecipeComplete(stealer);
+				if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+					playBanner = true;
+					stealer->bannerSoundPlayed = true;
+				}
+				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 				stealer->lastMagnetUse = currentTime;
 				stealer->magnetStatus = 0;
 			}
@@ -1575,7 +1617,12 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 								break;
 							}
 						}
-						g_systems.audio->endSlurp(stealer->getAudioSource(), true);
+						stealer->getInventory()->checkRecipeComplete(stealer);
+						if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+							playBanner = true;
+							stealer->bannerSoundPlayed = true;
+						}
+						g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
 
 						// Update stealer/victim variables
 						stealer->lastGracePeriodStart = currentTime;
@@ -1592,7 +1639,12 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 					}
 				}
 				else { // Tethered list is empty
-					g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+					stealer->getInventory()->checkRecipeComplete(stealer);
+					if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+						playBanner = true;
+						stealer->bannerSoundPlayed = true;
+					}
+					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 					stealer->tethered = false;
 					stealer->lastMagnetUse = currentTime;
 					stealer->magnetStatus = 0;
@@ -1600,7 +1652,12 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 				}
 			}
 			else {
-				g_systems.audio->endSlurp(stealer->getAudioSource(), false);
+				stealer->getInventory()->checkRecipeComplete(stealer);
+				if (!stealer->bannerSoundPlayed && stealer->getInventory()->allIngredientsCollected) {
+					playBanner = true;
+					stealer->bannerSoundPlayed = true;
+				}
+				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
 				stealer->tethered = false;
 				stealer->tethered_victims.clear();
 				stealer->lastMagnetUse = currentTime;
@@ -1790,5 +1847,25 @@ void PhysicsSystem::respawnPlayerInPlace(int playerNumber) {
 		break;
 	default:
 		break;
+	}
+}
+
+std::vector<PxVehicleDrive4W*> PhysicsSystem::getVehicles()
+{
+	return vehicles;
+}
+
+void PhysicsSystem::checkIngredientCollisoins(){
+	auto players = g_scene.getPlayers();
+	for (int i = 0; i < players.size(); i++) {
+		auto ingredients = players[i]->getCollectableIngredients();
+		for (auto ingredient : ingredients) {
+			//glm::vec3 distance2 = glm::length2(ingredient players[i]->getTransform()->position())
+			if (players[i]->ingredientCollectDistanceSquared >= 
+				glm::length2(ingredient->getTransform()->position-players[i]->getTransform()->position)) {
+				players[i]->checkIngredientCollision(ingredient);
+			}
+
+		}
 	}
 }

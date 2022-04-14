@@ -31,6 +31,8 @@
 #include "SnippetVehicleFilterShader.h"
 #include "PxPhysicsAPI.h"
 
+#include <iostream>
+
 namespace snippetvehicle
 {
 
@@ -46,10 +48,18 @@ PxFilterFlags VehicleFilterShader
 	PX_UNUSED(constantBlock);
 	PX_UNUSED(constantBlockSize);
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+	if ((filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_WHEEL) ||
+		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_WHEEL) ||
+		(filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_CHASSIS) ||
+		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_CHASSIS))
+	{
+		return PxFilterFlag::eSUPPRESS;
+	}
 
-
-	if ((0 == (filterData0.word0 & filterData1.word1)) && (0 == (filterData1.word0 & filterData0.word1)))
-		if (PxGetFilterObjectType(attributes0) == PxFilterObjectType::eRIGID_DYNAMIC && PxGetFilterObjectType(attributes0) == PxFilterObjectType::eRIGID_DYNAMIC)
+	if ((0 == (filterData0.word0 & filterData1.word1)) && (0 == (filterData1.word0 & filterData0.word1))) {
+		if (PxGetFilterObjectType(attributes0) == PxFilterObjectType::eRIGID_DYNAMIC 
+			&& PxGetFilterObjectType(attributes0) == PxFilterObjectType::eRIGID_DYNAMIC &&
+			filterData0.word0 != 0 && filterData1.word0 != 0) // Why does this work? no idea. But who cares!
 		{
 			pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 			pairFlags |= PxPairFlags(PxU16(filterData0.word2 | filterData1.word2));
@@ -58,15 +68,6 @@ PxFilterFlags VehicleFilterShader
 		else {
 			return PxFilterFlag::eSUPPRESS;
 		}
-		
-
-	
-	if ((filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_WHEEL) ||
-		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_WHEEL) ||
-		(filterData0.word0 == COLLISION_FLAG_FOOD && filterData1.word0 == COLLISION_FLAG_CHASSIS) ||
-		(filterData1.word0 == COLLISION_FLAG_FOOD && filterData0.word0 == COLLISION_FLAG_CHASSIS))
-	{
-		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 	}
 
 	pairFlags |= PxPairFlags(PxU16(filterData0.word2 | filterData1.word2));

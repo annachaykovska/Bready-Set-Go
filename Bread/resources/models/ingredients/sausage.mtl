@@ -1,9 +1,9 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'sausage.blend'
 # Material Count: 1
 
-newmtl PandaMat
+newmtl PandaMat.001
 Ns 35.999996
-Ka 1.000000 1.000000 1.000000 #97,23,23
+Ka 1.000000 1.000000 1.000000
 Kd 0.380392 0.090196 0.090196
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000

@@ -15,6 +15,7 @@ public:
 	std::string name;
 	physx::PxVehicleDrive4W* vehicle;
 	physx::PxTransform originalSpawn;
+	bool bannerSoundPlayed;
 	
 	Entity(std::string name);
 	bool attachComponent(Component* newComponent, std::string);
@@ -24,7 +25,11 @@ public:
 	Model* getModel();
 	Inventory* getInventory();
 	AudioSource* getAudioSource();
-	std::vector<std::string> getOtherPlayers();
+
+
+	inline bool IngredientCanBeCollected(std::string name);
+	std::vector<Entity*> getCollectableIngredients();
+	std::vector<std::string> getOtherPlayers(); 
 	void checkIngredientCollision(Entity* otherEntity);
 	void checkPlayerCollision(Entity* otherEntity);
 
@@ -52,6 +57,9 @@ public:
 	std::vector<Entity*> tethered_victims;
 	float magnetTimeToSteal;
 	float magnetStartTime;
+
+	// For ingredient collection
+	float ingredientCollectDistanceSquared;
 
 private:
 
