@@ -60,6 +60,7 @@ void Scene::createEntities()
 	ingredients.push_back(getEntity("rice"));
 	ingredients.push_back(getEntity("egg"));
 	ingredients.push_back(getEntity("chicken"));
+	ingredients.push_back(getEntity("peas"));
 
 	// World
 	createEntity("countertop");
