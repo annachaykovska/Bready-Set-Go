@@ -639,9 +639,6 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
 
 void UISystem::updatePlayer(unsigned int playerNum)
 {
-    if (g_systems.loop->checkForWin() != 0)
-        updateEndGame(g_systems.loop->endScreenGenerated);
-    
     updateVacuum(playerNum);
     updateSpeedometer(playerNum);
     updateRecipeList();

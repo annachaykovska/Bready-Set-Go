@@ -814,9 +814,6 @@ void RenderingSystem::update()
 	// Animate ingredients
 	for (unsigned int i = 6; i <= 16; i++)
 	{
-		//models[i].owner->getTransform()->rotation = glm::vec3(0.0f, glfwGetTime() * 50.0f, 0.0f);
-		//models[i].owner->getTransform()->position += glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f);
-		//models[i].owner->getTransform()->update();
 		models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
 	}
 
@@ -836,7 +833,7 @@ void RenderingSystem::update()
 	{
 		std::string playerNum = "player" + std::to_string(i);
 		renderScene(playerNum);
-		
+
 		if (!g_systems.loop->isPaused)
 			g_systems.ui->updatePlayer(i);
 	}
@@ -845,7 +842,11 @@ void RenderingSystem::update()
 	{
 		glViewport(0, 0, g_systems.width, g_systems.height);
 		g_systems.ui->showPauseMenu(g_systems.loop->pauseMenuSelection);
-		return;
+	}
+	else if (g_systems.loop->gameStage == GameLoopMode::END_GAME)
+	{
+		glViewport(0, 0, g_systems.width, g_systems.height);
+		g_systems.ui->updateEndGame(g_systems.loop->endScreenGenerated);
 	}
 }
 
