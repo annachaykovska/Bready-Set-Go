@@ -156,7 +156,10 @@ void Profiler::shadows()
 		ImGui::InputInt("DepthMap Render", &depthMap);
 
 		if (depthMap == 0)
+		{
 			g_systems.renderDebug = false;
+			g_systems.render->shadowDebugMode = 0;
+		}
 		if (depthMap == 1)
 		{
 			g_systems.renderDebug = true;

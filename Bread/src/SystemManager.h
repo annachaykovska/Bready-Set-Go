@@ -10,6 +10,7 @@ class PhysicsSystem;
 class RenderingSystem;
 class UISystem;
 class GameLoopManager;
+class Profiler;
 
 class SystemManager
 {
@@ -24,6 +25,10 @@ public:
 		renderDebug = false;
 		tracker = nullptr;
 		loop = nullptr;
+		profiler = nullptr;
+
+		width = 0;
+		height = 0;
 	}
 
 	SystemManager(SystemManager& rhs) = delete; // No copy constructor
@@ -35,6 +40,7 @@ public:
 	UISystem* ui;
 	IngredientTracker* tracker;
 	GameLoopManager* loop;
+	Profiler* profiler;
 
 	int height;
 	int width;

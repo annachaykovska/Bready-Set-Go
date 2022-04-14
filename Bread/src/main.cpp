@@ -47,6 +47,7 @@ int main()
 
 	// ImGui profiler for debugging
 	Profiler profiler(window);
+	g_systems.profiler = &profiler;
 
 	// Change this at runtime in the main menu
 	g_scene.numPlayers = 1;

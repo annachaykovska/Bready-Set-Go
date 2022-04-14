@@ -52,11 +52,6 @@ public:
 
 	unsigned int depthMapTex;
 
-	float maxBias;
-	float minBias;
-	float maxRoughBias;
-	float minRoughBias;
-
 	glm::mat4 projMatrix;
 	glm::mat4 viewMatrix;
 
