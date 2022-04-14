@@ -39,6 +39,8 @@ private:
 	float oldCameraRotationOffset;
 	float oldFOV;
 
+	float prevTime;
+
 	void setProjMatrix();
 	void setViewMatrix(const int playerNum);
 };
