@@ -17,8 +17,11 @@
 #define TOP_SPEED 40.0f
 #define MAX_ROTATION 2.0f
 #define MAX_FOV_DELTA 2.0f
-#define ELASTIC_FORCE 0.2f
+#define ELASTIC_FORCE 2.0f
 #define EULER 2.71828f
+#define INFLUENCE_SCALING 2.f
+#define OUTWARD_INFLUENCE_SCALING 1.5f
+#define INWARD_INFLUENCE_SCALING 2.f
 
 extern SystemManager g_systems;
 extern Scene g_scene;
@@ -119,22 +122,24 @@ void Camera::setViewMatrix(const int playerNum)
 	float stopDegrees = abs(this->viewDirectionalInfluence * 90.0);
 
 	if (this->viewDirectionalInfluence < 0)
-	{
+	{ // R stick held to the right
 		float stepSize = 0;
 		if (forcedDirection < stopDegrees)
-		{
+		{ // Camera can move
 			if (forcedDirection < 0)
-			{
-				stepSize = -(1 / (5 * 2.f)) + 1;
+			{ // Returning to center
+				stepSize = (-(1 / (5 * 2.f)) + 1) * INWARD_INFLUENCE_SCALING;
 			}
 			else
-			{
+			{ // Moving to the right
 				float functionStep = (ELASTIC_FORCE / stopDegrees) * abs(forcedDirection);
 				functionStep = ELASTIC_FORCE - functionStep;
-				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				stepSize = (-(1 / (5 * (functionStep + 0.2))) + 1) * OUTWARD_INFLUENCE_SCALING;
 			}
+
+			stepSize *= INFLUENCE_SCALING; // scale step size
 			if (forcedDirection + stepSize < stopDegrees)
-			{
+			{ // Move the forced direction
 				forcedDirection += stepSize;
 			}
 		}
@@ -143,6 +148,8 @@ void Camera::setViewMatrix(const int playerNum)
 			float functionStep = (ELASTIC_FORCE / stopDegrees) * abs(forcedDirection);
 			functionStep -= ELASTIC_FORCE;
 			stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+
+			stepSize *= INFLUENCE_SCALING; // scale step size
 			if (forcedDirection - stepSize > stopDegrees)
 			{
 				forcedDirection -= stepSize;
@@ -151,22 +158,24 @@ void Camera::setViewMatrix(const int playerNum)
 		recordedForcedDirection = forcedDirection;
 	}
 	else if (this->viewDirectionalInfluence > 0)
-	{
+	{ // R stick held to the left
 		float stepSize = 0;
 		if (abs(forcedDirection) < stopDegrees)
-		{
+		{ // Camera can be moved
 			if (forcedDirection > 0)
-			{
-				stepSize = -(1 / (5 * 2.f)) + 1;
+			{ // Returning to center
+				stepSize = (-(1 / (5 * 2.f)) + 1)*INWARD_INFLUENCE_SCALING;
 			}
 			else
-			{
+			{ // Moving to the left
 				float functionStep = (ELASTIC_FORCE / stopDegrees) * abs(forcedDirection);
 				functionStep = ELASTIC_FORCE - functionStep;
-				stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+				stepSize = (-(1 / (5 * (functionStep + 0.2))) + 1)*OUTWARD_INFLUENCE_SCALING;
 			}
+
+			stepSize *= INFLUENCE_SCALING; // scale step size
 			if (forcedDirection > -stopDegrees)
-			{
+			{ // Move the camera to the left
 				forcedDirection -= stepSize;
 			}
 		}
@@ -175,6 +184,8 @@ void Camera::setViewMatrix(const int playerNum)
 			float functionStep = (ELASTIC_FORCE / stopDegrees) * abs(forcedDirection);
 			functionStep -= ELASTIC_FORCE;
 			stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+
+			stepSize *= INFLUENCE_SCALING; // scale step size
 			if (forcedDirection + stepSize < stopDegrees)
 			{
 				forcedDirection += stepSize;
@@ -183,13 +194,15 @@ void Camera::setViewMatrix(const int playerNum)
 		recordedForcedDirection = forcedDirection;
 	}
 	else
-	{
+	{ // R stick in neutral position
 		if (abs(forcedDirection) > 0.001)
-		{
+		{ // Move camera back to center
 			float functionStep = (1.2f / abs(recordedForcedDirection)) * abs(forcedDirection);
-			float stepSize = -(1 / (5 * (functionStep + 0.2))) + 1;
+			float stepSize = (-(1 / (5 * (functionStep + 0.2))) + 1)*INWARD_INFLUENCE_SCALING;
+
+			stepSize *= INFLUENCE_SCALING; // scale step size
 			if (forcedDirection > 0)
-			{
+			{ // Camera on the right
 				if (forcedDirection - stepSize < 0)
 				{
 					forcedDirection = 0;
@@ -200,7 +213,7 @@ void Camera::setViewMatrix(const int playerNum)
 				}
 			}
 			else
-			{
+			{ // Camera on the left
 				if (forcedDirection + stepSize > 0)
 				{
 					forcedDirection = 0;
@@ -212,11 +225,10 @@ void Camera::setViewMatrix(const int playerNum)
 			}
 		}
 		else
-		{
+		{ // Keep camera in center
 			forcedDirection = 0;
 		}
 	}
-	
 	// Save this frame's values for next frame
 	this->lastSpeed = vehicleSpeed;
 	this->oldForcedDirection = this->forcedDirection;
