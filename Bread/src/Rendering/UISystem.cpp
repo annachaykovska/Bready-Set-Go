@@ -639,9 +639,6 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
 
 void UISystem::updatePlayer(unsigned int playerNum)
 {
-    if (g_systems.loop->checkForWin() != 0)
-        updateEndGame(g_systems.loop->endScreenGenerated);
-    
     updateVacuum(playerNum);
     updateSpeedometer(playerNum);
     updateRecipeList();
@@ -789,13 +786,13 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
         camera = g_scene.p1Camera;
         break;
     case 2:
-        camera = g_scene.p1Camera;
+        camera = g_scene.p2Camera;
         break;
     case 3:
-        camera = g_scene.p1Camera;
+        camera = g_scene.p3Camera;
         break;
     case 4:
-        camera = g_scene.p1Camera;
+        camera = g_scene.p4Camera;
         break;
     default:
         return glm::vec3(0); // Uh-oh, something has gone wrong
@@ -807,7 +804,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     
     glm::vec4 location = glm::vec4(entityPos, 1);
 
-    glm::vec3 cam =camera->centerBeam;
+    glm::vec3 cam = camera->centerBeam;
     glm::vec3 toEntity = entityPos - camera->position;
 
     std::string player = "player" + std::to_string(playerNum);
@@ -839,13 +836,13 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
             perspective = g_scene.p1Camera->getPerspective();
             break;
         case 2:
-            perspective = g_scene.p1Camera->getPerspective();
+            perspective = g_scene.p2Camera->getPerspective();
             break;
         case 3:
-            perspective = g_scene.p1Camera->getPerspective();
+            perspective = g_scene.p3Camera->getPerspective();
             break;
         case 4:
-            perspective = g_scene.p1Camera->getPerspective();
+            perspective = g_scene.p4Camera->getPerspective();
             break;
         default:
             break; // Uh-oh, something has gone wrong
