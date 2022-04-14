@@ -527,7 +527,7 @@ void UISystem::updateInventory(int playerNum)
 
         break;
 
-    case 2: // egg, cheese, peas, lettuce, ????
+    case 2: // egg, cheese, peas, lettuce, omelette
 
         playerInv = g_scene.getEntity("player2")->getInventory();
 
@@ -541,7 +541,7 @@ void UISystem::updateInventory(int playerNum)
 
         break;
 
-    case 3: // chicken, dough, rice, lettuce, ????
+    case 3: // chicken, dough, rice, lettuce, wrap
 
         playerInv = g_scene.getEntity("player3")->getInventory();
 
