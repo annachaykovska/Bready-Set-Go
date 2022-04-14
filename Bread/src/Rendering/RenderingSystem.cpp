@@ -459,7 +459,7 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Debug models
 	//-----------------------------------------------------------------------------------
-	std::string testPath = "resources/models/ball/ball.obj";
+	std::string testPath = "resources/models/kitchen/lego.obj";
 	this->models.emplace_back(Model(&testPath[0]));
 	g_scene.getEntity("test")->attachComponent(&(this->models[index++]), "model");
 }
@@ -797,6 +797,13 @@ void RenderingSystem::renderScene(const std::string name)
 		}
 		else // Use texture images for everything else
 		{
+			if (i == 17)
+			{
+				models[i].owner->getTransform()->position = glm::vec3(88.17f, -13.15f, 160.71f);
+				models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 200.50f, 0.0f);
+				models[i].owner->getTransform()->update();
+			}
+
 			glUniform1i(texLoc, 1);
 			models[i].draw(this->shader);
 		}
