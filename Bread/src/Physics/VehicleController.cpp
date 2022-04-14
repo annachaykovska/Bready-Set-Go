@@ -481,8 +481,8 @@ void XboxController::vibrateController(int controllerId, bool vibrate, int patte
 	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
 	if (vibrate) {
 		if (pattern == 1) {
-			vibration.wLeftMotorSpeed = 4000; // use any value between 0-65535 here
-			//vibration.wRightMotorSpeed = 5000; // use any value between 0-65535 here
+			vibration.wLeftMotorSpeed = 14000; // use any value between 0-65535 here
+			vibration.wRightMotorSpeed = 15000; // use any value between 0-65535 here
 		}
 		else if (pattern == 2) {
 			vibration.wLeftMotorSpeed = 65535; // use any value between 0-65535 here

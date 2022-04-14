@@ -11,6 +11,7 @@
 #include "../Timer.h"
 #include "UISystem.h"
 #include "../Gameplay/GameLoopManager.h"
+#include "../Profiler.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -58,11 +59,6 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	// Shadow map viewport sizes
 	this->shadowHiRes = 4096;
 	this->shadowLoRes = 2048;
-
-	this->maxBias = 0.001f;
-	this->minBias = 0.00005f;
-	this->maxRoughBias = 0.005f;
-	this->minRoughBias = 0.0005f;
 
 	// Populate the models
 	this->models.reserve(g_scene.entityCount());
@@ -147,14 +143,16 @@ void RenderingSystem::initShadows()
 
 	// High resolution shadows ---------------------------------------------------------------------
 	
-	this->shadowWidth = this->shadowHiRes / g_scene.numPlayers;
-	this->shadowHeight = this->shadowHiRes / g_scene.numPlayers;
+	this->shadowWidth = this->shadowHiRes;// / g_scene.numPlayers;
+	this->shadowHeight = this->shadowHiRes;// / g_scene.numPlayers;
 
+	/*
 	if (g_scene.numPlayers == 3)
 	{
 		this->shadowWidth = g_systems.width / 4;
 		this->shadowHeight = g_systems.height / 4;
 	}
+	*/
 
 	// Configure depth map FBO
 	glGenFramebuffers(1, &this->p1ShadowsFBO);
@@ -573,12 +571,14 @@ void RenderingSystem::createLoResShadowMap()
 
 void RenderingSystem::createHiResShadowMap(const std::string name)
 {
+	const float buffer = 70.0f;
+
 	glm::vec3 pos = g_scene.getEntity(name)->getTransform()->position;
 
-	glm::vec4 left = glm::vec4(pos.x + 50.0f, pos.y, pos.z, 1.0f);
-	glm::vec4 right = glm::vec4(pos.x - 50.0f, pos.y, pos.z, 1.0f);
-	glm::vec4 top = glm::vec4(pos.x, pos.y, pos.z + 50.0f, 1.0f);
-	glm::vec4 bottom = glm::vec4(pos.x, pos.y, pos.z + 50.0f, 1.0f);
+	glm::vec4 left = glm::vec4(pos.x + buffer, pos.y, pos.z, 1.0f);
+	glm::vec4 right = glm::vec4(pos.x - buffer, pos.y, pos.z, 1.0f);
+	glm::vec4 top = glm::vec4(pos.x, pos.y, pos.z + buffer, 1.0f);
+	glm::vec4 bottom = glm::vec4(pos.x, pos.y, pos.z + buffer, 1.0f);
 
 	left = this->lightViewMatrix * left;
 	right = this->lightViewMatrix * right;
@@ -586,10 +586,10 @@ void RenderingSystem::createHiResShadowMap(const std::string name)
 	bottom = this->lightViewMatrix * bottom;
 
 	Orthogonal ort;
-	ort.left = -(pos.x + 50.0f);
-	ort.right = -(pos.x - 50.0f);
-	ort.top = pos.z + 50.0f;
-	ort.bottom = pos.z - 50.0f;;
+	ort.left = -(pos.x + buffer);
+	ort.right = -(pos.x - buffer);
+	ort.top = pos.z + buffer;
+	ort.bottom = pos.z - buffer;
 	ort.nearPlane = 0.1f;
 	ort.farPlane = 1400.0f;
 
@@ -779,7 +779,6 @@ void RenderingSystem::renderScene(const std::string name)
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
 		// Spin the fan
 		if (models[i].owner->name == "fan")
@@ -788,6 +787,7 @@ void RenderingSystem::renderScene(const std::string name)
 			models[i].owner->getTransform()->update();
 		}
 
+		// Update model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
 		if (i < 3) // Use material info for first 3 player models
@@ -799,8 +799,10 @@ void RenderingSystem::renderScene(const std::string name)
 		{
 			if (i == 17)
 			{
-				models[i].owner->getTransform()->position = glm::vec3(88.17f, -13.15f, 160.71f);
-				models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 200.50f, 0.0f);
+				//models[i].owner->getTransform()->position = glm::vec3(88.17f, -13.15f, 160.71f);
+				//models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 200.50f, 0.0f);
+				models[i].owner->getTransform()->position = glm::vec3(0.0f, 10.0f, 0.0f);
+				models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 				models[i].owner->getTransform()->update();
 			}
 
@@ -821,7 +823,8 @@ void RenderingSystem::update()
 	// Animate ingredients
 	for (unsigned int i = 6; i <= 16; i++)
 	{
-		models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
+		if (g_systems.loop->gameStage == GameLoopMode::MAIN_GAME_PLAY)
+			models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
 	}
 
 	// Step 1. Create the lo-res shadow map for the whole level
@@ -831,20 +834,26 @@ void RenderingSystem::update()
 	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
 	{
 		std::string playerNum = "player" + std::to_string(i);
-
 		createHiResShadowMap(playerNum);
 	}
 
-	// Step 3. Render the scene from each player's perspective
-	for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
+	if (this->shadowDebugMode < 1)
 	{
-		std::string playerNum = "player" + std::to_string(i);
-		renderScene(playerNum);
+		// Step 3. Render the scene from each player's perspective
+		for (unsigned int i = 1; i <= g_scene.numPlayers; i++)
+		{
+			std::string playerNum = "player" + std::to_string(i);
+			renderScene(playerNum);
 
-		if (!g_systems.loop->isPaused)
-			g_systems.ui->updatePlayer(i);
+			if (!g_systems.loop->isPaused)
+				g_systems.ui->updatePlayer(i, g_systems.loop->gameStage);
+		}
 	}
-
+	else if (this->shadowDebugMode >= 1)
+	{
+		this->renderDebugShadowMap();
+	}
+	
 	if (g_systems.loop->isPaused)
 	{
 		glViewport(0, 0, g_systems.width, g_systems.height);
@@ -854,6 +863,10 @@ void RenderingSystem::update()
 	{
 		glViewport(0, 0, g_systems.width, g_systems.height);
 		g_systems.ui->updateEndGame(g_systems.loop->endScreenGenerated);
+	}
+	else if (g_systems.loop->gameStage == GameLoopMode::START_COUNTDOWN) {
+		glViewport(0, 0, g_systems.width, g_systems.height);
+		g_systems.ui->updateCountdown(g_systems.loop->countdownStage);
 	}
 }
 
@@ -920,8 +933,9 @@ void RenderingSystem::renderDebugShadowMap()
 	if (this->shadowDebugMode == 1)
 		glBindTexture(GL_TEXTURE_2D, this->roughDepthMapTex);
 	if (this->shadowDebugMode == 2)
-		glBindTexture(GL_TEXTURE_2D, this->depthMapTex);
-	//glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
+		glBindTexture(GL_TEXTURE_2D, this->p1ShadowsTex);
+
+	glUniform1i(glGetUniformLocation(this->debugShader.getId(), "shadowMap"), 25);
 	renderTexturedQuad();
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

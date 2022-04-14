@@ -1,0 +1,10 @@
+#pragma once
+
+enum GameLoopMode {
+	MENU_START = 1,
+	MENU_SINGLE_MULTI_SELECTION = 2,
+	MENU_MULTI_CONNECT = 3,
+	START_COUNTDOWN = 4,
+	MAIN_GAME_PLAY = 5,
+	END_GAME = 6
+};

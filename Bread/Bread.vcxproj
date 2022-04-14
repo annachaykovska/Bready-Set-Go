@@ -854,6 +854,7 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Gameplay\Breadmobile.h" />
     <ClInclude Include="src\Gameplay\GameLoopManager.h" />
+    <ClInclude Include="src\Gameplay\GameLoopMode.h" />
     <ClInclude Include="src\Gameplay\Recipe.h" />
     <ClInclude Include="src\Inventory.h" />
     <ClInclude Include="src\Navigation\AIBrain.h" />

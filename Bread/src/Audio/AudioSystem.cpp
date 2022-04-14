@@ -2,6 +2,7 @@
 #include "../Scene/Scene.h"
 #include "../Scene/Entity.h"
 #include "../SystemManager.h"
+#include "../Gameplay/GameLoopMode.h"
 
 extern Scene g_scene;
 extern SystemManager g_systems;
@@ -56,6 +57,8 @@ AudioSystem::AudioSystem()
 	load("menu.wav");
 	load("wrong.wav");
 	load("drum.wav");
+	load("countdown_count.wav");
+	load("countdown_go.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
@@ -258,7 +261,7 @@ AudioSource* AudioSystem::createAudioSource()
 void AudioSystem::update(const float dt, int gameStage)
 {
 	AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
-	if (gameStage != 5) {
+	if (gameStage != GameLoopMode::END_GAME) {
 		bgMusic->gain = 0.2;
 		bgMusic->play("carioca.wav");
 	}
