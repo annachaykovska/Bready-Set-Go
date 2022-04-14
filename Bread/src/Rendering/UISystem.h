@@ -36,7 +36,8 @@ public:
 
 	UISystem();
 	
-	void updatePlayer(unsigned int playerNum);
+	void updateCountdown(int countdownStage);
+	void updatePlayer(unsigned int playerNum, int gameStage);
 	void updateMainMenu(int itemSelected, int gameStage, int numCntrollers);
 	void updateEndGame(int endScreenValue);
 	void showPauseMenu(int itemSelected);
@@ -145,6 +146,11 @@ private:
 	ImageTexture playerConnected2;
 	ImageTexture playerConnected3;
 	ImageTexture playerConnected4;
+
+	// Countdown
+	ImageTexture countdown3;
+	ImageTexture countdown2;
+	ImageTexture countdown1;
 
 	// Pause Menu
 	ImageTexture pauseMenu;

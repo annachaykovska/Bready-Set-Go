@@ -842,11 +842,9 @@ void RenderingSystem::update()
 			std::string playerNum = "player" + std::to_string(i);
 			renderScene(playerNum);
 
-			// Step 4. Render each player's ui
 			if (!g_systems.loop->isPaused)
-				g_systems.ui->updatePlayer(i);
+				g_systems.ui->updatePlayer(i, g_systems.loop->gameStage);
 		}
-		
 	}
 	else if (this->shadowDebugMode >= 1)
 	{
@@ -862,6 +860,10 @@ void RenderingSystem::update()
 	{
 		glViewport(0, 0, g_systems.width, g_systems.height);
 		g_systems.ui->updateEndGame(g_systems.loop->endScreenGenerated);
+	}
+	else if (g_systems.loop->gameStage == GameLoopMode::START_COUNTDOWN) {
+		glViewport(0, 0, g_systems.width, g_systems.height);
+		g_systems.ui->updateCountdown(g_systems.loop->countdownStage);
 	}
 }
 

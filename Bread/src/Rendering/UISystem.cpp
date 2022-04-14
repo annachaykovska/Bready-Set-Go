@@ -101,6 +101,9 @@ UISystem::UISystem()
     , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
     , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
     , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
+    , countdown3("resources/textures/countdown_3.png", GL_NEAREST)
+    , countdown2("resources/textures/countdown_2.png", GL_NEAREST)
+    , countdown1("resources/textures/countdown_1.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -637,13 +640,27 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
     }
 }
 
-void UISystem::updatePlayer(unsigned int playerNum)
+
+void UISystem::updateCountdown(int countdownStage) {
+    if (countdownStage == 1) {
+        renderImage(imageShader, countdown3, scX(0.5f), scY(0.53f), scX(0.3f), scY(0.85f), 0, 1.f);
+    }
+    else if (countdownStage == 2) {
+        renderImage(imageShader, countdown2, scX(0.5f), scY(0.53f), scX(0.3f), scY(0.85f), 0, 1.f);
+    }
+    else if (countdownStage == 3) {
+        renderImage(imageShader, countdown1, scX(0.5f), scY(0.53f), scX(0.3f), scY(0.85f), 0, 1.f);
+    }
+}
+
+void UISystem::updatePlayer(unsigned int playerNum, int gameStage)
 {
     updateVacuum(playerNum);
     updateSpeedometer(playerNum);
     updateRecipeList();
     updateMiniMap();
-    updateOffscreenIndicators(playerNum);
+    if (gameStage != GameLoopMode::START_COUNTDOWN)
+        updateOffscreenIndicators(playerNum);
     updateInventory(playerNum);
     updateUnflip(playerNum);
     updateReturnToBaseBanner(playerNum);
