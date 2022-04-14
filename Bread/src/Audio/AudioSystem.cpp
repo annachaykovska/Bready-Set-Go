@@ -49,14 +49,21 @@ AudioSystem::AudioSystem()
 	load("suck.wav");
 	load("power.wav");
 	load("banner_popup.wav");
+	load("knife.wav");
+	load("chop.wav");
+	load("lose.wav");
+	load("carioca.wav");
+	load("menu.wav");
+	load("wrong.wav");
+	load("drum.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
 	// Create AudioSource Components
+	AudioSource* menuAudio = createAudioSource(); // keep this first
 	AudioSource* countertopAudioSource = createAudioSource();
 	AudioSource* p1AudioSource = createAudioSource();
 	AudioSource* bgMusic = createAudioSource();
-	AudioSource* menuAudio = createAudioSource();
 	AudioSource* p1Engine = createAudioSource();
 	AudioSource* p1Vacuum = createAudioSource();
 	AudioSource* p2AudioSource = createAudioSource();
@@ -248,10 +255,17 @@ AudioSource* AudioSystem::createAudioSource()
 }
 
 // Updates audio sources each frame as necessary (i.e. as players move)
-void AudioSystem::update(const float dt)
+void AudioSystem::update(const float dt, int gameStage)
 {
 	AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
-	bgMusic->play("bg.wav");
+	if (gameStage != 5) {
+		bgMusic->gain = 0.2;
+		bgMusic->play("carioca.wav");
+	}
+	else {
+		bgMusic->gain = 0.5;
+		bgMusic->play("le_festin.wav");
+	}
 
 	// Update listener position to player1's new position
 	Transform* trans = g_scene.getEntity("player1")->getTransform();
@@ -299,15 +313,15 @@ void AudioSystem::update(const float dt)
 }
 
 void AudioSystem::playGameMusic(AudioSource* source) {
-	source->gain = 0.01f; // Volume control
+	source->gain = 0.1f; // Volume control
 	source->loop = true;
-	source->play("bg.wav"); 
+	source->play("carioca.wav"); 
 }
 
 void AudioSystem::playMainMenuMusic(AudioSource* source) {
-	source->gain = 0.08f; // Volume control
+	source->gain = 0.6f; // Volume control
 	source->loop = true;
-	source->play("le_festin.wav");
+	source->play("menu.wav");
 }
 
 void AudioSystem::stopMusic(AudioSource* source) {
@@ -354,7 +368,8 @@ void AudioSystem::powerReady(AudioSource* source)
 }
 
 void AudioSystem::turnOffAllAudio() {
-	for (int i = 0; i < audioSources.size(); i++) {
+	// Starts from 1 to avoid the menu noises
+	for (int i = 1; i < audioSources.size(); i++) {
 		audioSources[i].stop();
 	}
 }

@@ -25,7 +25,7 @@ public:
 	void initializeActors();
 	void randomizeIngredientLocations();
 
-	PxRigidDynamic* createFoodBlock(const PxTransform& t, PxReal halfExtent, std::string name);
+	PxRigidDynamic* createFoodBlock(const PxTransform& t, float x, float y, float z, std::string name);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
 	PxRigidDynamic* createObstacle(const PxTransform& t, PxReal halfExtent, std::string name);
 	void update(const float timestep, int gameStage);
@@ -57,6 +57,8 @@ public:
 	void makeVictimsList(int stealer_id, std::vector<Entity*>& victims);
 
 	void cleanupPhysics();
+
+	void checkIngredientCollisions();
 
 	PxVehicleDrive4W* mVehiclePlayer1;
 	PxVehicleDrive4W* mVehiclePlayer2;
@@ -116,7 +118,12 @@ public:
 	bool p4CameraHit;
 	glm::vec3 p4CameraHitPos;
 
+	std::vector<PxVehicleDrive4W*> getVehicles();
+	void checkIngredientCollisoins();
+
 private:
+
+	std::vector<PxVehicleDrive4W*> vehicles;
 
 	void raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string name);
 

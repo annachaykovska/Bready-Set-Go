@@ -578,6 +578,41 @@ void UISystem::updateInventory(int playerNum)
     renderImage(imageShader, this->inventory, invXOffset, scY(0.33), scX(0.1), scY(0.53), 0, 1.f);
 }
 
+void UISystem::updateUnflip(int playerNum)
+{
+    Entity* player = nullptr;
+    switch (playerNum)
+    {
+    case 1:
+        player = g_scene.getEntity("player1");
+        break;
+    case 2:
+        player = g_scene.getEntity("player2");
+        break;
+    case 3:
+        player = g_scene.getEntity("player3");
+        break;
+    case 4:
+        player = g_scene.getEntity("player4");
+        break;
+    }
+    if (player->unflipTimer > 0)
+    {
+        if (player->unflipTimer > 2 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else if (player->unflipTimer > 1 * (2.f / 3.f))
+        {
+            renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+        else
+        {
+            renderImage(imageShader, unflip3, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
+        }
+    }
+}
+
 void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
     bool drawBanner = false;
     switch (playerNum)
@@ -604,15 +639,13 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
 
 void UISystem::updatePlayer(unsigned int playerNum)
 {
-    if (g_systems.loop->checkForWin() != 0)
-        updateEndGame(g_systems.loop->endScreenGenerated);
-    
     updateVacuum(playerNum);
     updateSpeedometer(playerNum);
     updateRecipeList();
     updateMiniMap();
     updateOffscreenIndicators(playerNum);
     updateInventory(playerNum);
+    updateUnflip(playerNum);
     updateReturnToBaseBanner(playerNum);
 }
 
@@ -753,13 +786,13 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
         camera = g_scene.p1Camera;
         break;
     case 2:
-        camera = g_scene.p1Camera;
+        camera = g_scene.p2Camera;
         break;
     case 3:
-        camera = g_scene.p1Camera;
+        camera = g_scene.p3Camera;
         break;
     case 4:
-        camera = g_scene.p1Camera;
+        camera = g_scene.p4Camera;
         break;
     default:
         return glm::vec3(0); // Uh-oh, something has gone wrong
@@ -771,7 +804,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     
     glm::vec4 location = glm::vec4(entityPos, 1);
 
-    glm::vec3 cam =camera->centerBeam;
+    glm::vec3 cam = camera->centerBeam;
     glm::vec3 toEntity = entityPos - camera->position;
 
     std::string player = "player" + std::to_string(playerNum);
@@ -803,13 +836,13 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
             perspective = g_scene.p1Camera->getPerspective();
             break;
         case 2:
-            perspective = g_scene.p1Camera->getPerspective();
+            perspective = g_scene.p2Camera->getPerspective();
             break;
         case 3:
-            perspective = g_scene.p1Camera->getPerspective();
+            perspective = g_scene.p3Camera->getPerspective();
             break;
         case 4:
-            perspective = g_scene.p1Camera->getPerspective();
+            perspective = g_scene.p4Camera->getPerspective();
             break;
         default:
             break; // Uh-oh, something has gone wrong

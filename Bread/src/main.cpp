@@ -48,7 +48,7 @@ int main()
 	// ImGui profiler for debugging
 	Profiler profiler(window);
 
-	// TODO change this at runtime in the main menu
+	// Change this at runtime in the main menu
 	g_scene.numPlayers = 1;
 
 	//-----------------------------------------------------------------------------------
@@ -148,24 +148,9 @@ int main()
 	fan->getTransform()->scale = glm::vec3(15.0f);
 	fan->getTransform()->update();
 
-	// Set rendered ingredient scales
-	cheese->getTransform()->scale = glm::vec3(30, 30, 30);
-	sausage->getTransform()->scale = glm::vec3(30, 30, 30);
-	tomato->getTransform()->scale = glm::vec3(30, 30, 30);
-	dough->getTransform()->scale = glm::vec3(30, 30, 30);
-	carrot->getTransform()->scale = glm::vec3(30, 30, 30);
-	lettuce->getTransform()->scale = glm::vec3(30, 30, 30);
-	parsnip->getTransform()->scale = glm::vec3(30, 30, 30);
-	rice->getTransform()->scale = glm::vec3(30, 30, 30);
-	egg->getTransform()->scale = glm::vec3(30, 30, 30);
-	chicken->getTransform()->scale = glm::vec3(30, 30, 30);
-	peas->getTransform()->scale = glm::vec3(30, 30, 30);
-	//soupbase->getTransform()->scale = glm::vec3(30, 30, 30);
-	//pumpkin->getTransform()->scale = glm::vec3(30, 30, 30);
-
 	Transform* testTransform = test->getTransform();
 	testTransform->position = glm::vec3(0, 3, 30);
-	testTransform->scale = glm::vec3(1, 1, 1);
+	testTransform->scale = glm::vec3(0.01f, 0.01f, 0.01f);
 	//-----------------------------------------------------------------------------------
 
 	// Get a reference to the countertop's AudioSource to play background music
@@ -209,13 +194,16 @@ int main()
 	Inventory p1Inv, p2Inv, p3Inv, p4Inv;
 
 	NavigationSystem p2NavSystem(*player2, physics, navMesh, 2);
-	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem);
+	glm::vec3 p2Start = glm::vec3(11, 3, 60);
+	AIBrain p2Brain(p2Inv, ingredientTracker, p2NavSystem, p2Start);
 
 	NavigationSystem p3NavSystem(*player3, physics, navMesh, 3);
-	AIBrain p3Brain(p3Inv, ingredientTracker, p3NavSystem);
+	glm::vec3 p3Start = glm::vec3(-31, 3, 60);
+	AIBrain p3Brain(p3Inv, ingredientTracker, p3NavSystem, p3Start);
 
 	NavigationSystem p4NavSystem(*player4, physics, navMesh, 4);
-	AIBrain p4Brain(p4Inv, ingredientTracker, p4NavSystem);
+	glm::vec3 p4Start = glm::vec3(-11.5, 3, 60);
+	AIBrain p4Brain(p4Inv, ingredientTracker, p4NavSystem, p4Start);
 	
 	player1->attachComponent(&p1Inv, "inventory");
 	player1->attachComponent(&pizza, "recipe");
@@ -273,10 +261,10 @@ int main()
 		window.clear();
 
 		if (gameLoop.gameStage == GameLoopMode::MENU_START || gameLoop.gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION || gameLoop.gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
-			controllers.setButtonStateFromControllerMainMenu(0); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerMainMenu(1); // Getting the input from player 2 controller
-			controllers.setButtonStateFromControllerMainMenu(2); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerMainMenu(3); // Getting the input from player 4 controller
+			controllers.setButtonStateFromControllerMainMenu(0, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerMainMenu(1, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerMainMenu(2, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerMainMenu(3, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 4 controller
 			
 			// RENDER
 			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
@@ -295,10 +283,10 @@ int main()
 				gameLoop.setEndStage();
 			}
 
-			controllers.setButtonStateFromControllerDriving(0, winner); // Getting the input from player 1 controller
-			controllers.setButtonStateFromControllerDriving(1, winner); // Getting the input from player 2 controller
-			controllers.setButtonStateFromControllerDriving(2, winner); // Getting the input from player 3 controller
-			controllers.setButtonStateFromControllerDriving(3, winner); // Getting the input from player 4 controller
+			controllers.setButtonStateFromControllerDriving(0, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 1 controller
+			controllers.setButtonStateFromControllerDriving(1, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 2 controller
+			controllers.setButtonStateFromControllerDriving(2, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 3 controller
+			controllers.setButtonStateFromControllerDriving(3, winner, (AudioSource*)player1->getComponent("menuAudio")); // Getting the input from player 4 controller
 			
 			// RENDER
 			renderer.update();
@@ -322,10 +310,14 @@ int main()
 			}
 
 			// AUDIO
-			audio.update(dt);
+			audio.update(dt, gameLoop.gameStage);
 		}
 
 		if (gameLoop.checkForWin() != 0) {
+			if (!gameLoop.isGameEnded) {
+				AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
+				bgMusic->stop();
+			}
 			gameLoop.isGameEnded = true;
 		}
 

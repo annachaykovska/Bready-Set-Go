@@ -87,7 +87,7 @@ float XboxController::getDeadZone(float x, float y, float deadzone) {
 	return normalizedMagnitude;
 }
 
-void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
+void XboxController::setButtonStateFromControllerMainMenu(int controllerId, AudioSource* menuSource) {
 	XINPUT_STATE state = getControllerState(controllerId);
 
 	// Left Thumb
@@ -105,12 +105,16 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 		gameLoop->mainMenuTimeoutStart = -1;
 		if (A_button_pressed) {
 			gameLoop->isMenuItemSelected = true; 
+			menuSource->stop();
+			menuSource->play("chop.wav");
 		}
 		if (B_button_pressed) {
 			if (gameLoop->gameStage != GameLoopMode::MENU_START) {
 				gameLoop->gameStage--;
 				gameLoop->menuSelectionNumber = 1;
 				gameLoop->mainMenuTimeoutStart = newTime;
+				menuSource->stop();
+				menuSource->play("chop.wav");
 			}
 		}
 	}
@@ -118,17 +122,20 @@ void XboxController::setButtonStateFromControllerMainMenu(int controllerId) {
 	if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
 		if (gameLoop->menuSelectionNumber == 2) {
 			gameLoop->menuSelectionNumber = 1;
+			menuSource->stop();
+			menuSource->play("knife.wav");
 		}
-		
 	}
 	else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
 		if (gameLoop->menuSelectionNumber == 1) {
 			gameLoop->menuSelectionNumber = 2;
+			menuSource->stop();
+			menuSource->play("knife.wav");
 		}
 	}	
 }
 
-void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted) {
+void XboxController::setButtonStateFromControllerDriving(int controllerId, bool gameCompleted, AudioSource* menuSource) {
 	// Get the correct input data for the controller
 	physx::PxVehicleDrive4WRawInputData* input;
 	physx::PxVehicleDrive4W* vehiclePhysics;
@@ -219,6 +226,17 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		*y_held = false;
 	}
 
+	// Update the vibration 
+	if (player->magnetStatus == 2) {
+		vibrateController(controllerId, true, 1);
+	}
+	else if (player->magnetStatus == 3)
+		vibrateController(controllerId, true, 2);
+	else {
+		vibrateController(controllerId, false, 0);
+	}
+
+	// Handbrake
 	if (X_button_pressed)
 	{
 		input->setAnalogHandbrake(1.0f);
@@ -260,6 +278,8 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		if (START_button_pressed) {
 			gameLoop->showPauseMenuTimeoutStart = currentTime;
 			gameLoop->showPauseMenu = !gameLoop->showPauseMenu;
+			menuSource->stop();
+			menuSource->play("chop.wav");
 			if (gameLoop->showPauseMenu) {
 				gameLoop->isPaused = true;
 			}
@@ -273,6 +293,8 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	if (A_button_pressed && gameLoop->showPauseMenu) {
 		gameLoop->showPauseMenuTimeoutStart = currentTime;
 		gameLoop->isPauseMenuItemSelected = true;
+		menuSource->stop();
+		menuSource->play("chop.wav");
 	}
 
 	// Accept exit conditions back to the menu
@@ -371,12 +393,16 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 		if (thumbLeftY > 0.0 && thumbLeftDeadZone > 0.1) {
 			if (gameLoop->pauseMenuSelection == 2) {
 				gameLoop->pauseMenuSelection = 1;
+				menuSource->stop();
+				menuSource->play("knife.wav");
 			}
 
 		}
 		else if (thumbLeftY < 0.0 && thumbLeftDeadZone > 0.1) {
 			if (gameLoop->pauseMenuSelection == 1) {
 				gameLoop->pauseMenuSelection = 2;
+				menuSource->stop();
+				menuSource->play("knife.wav");
 			}
 		}
 	}
@@ -448,4 +474,24 @@ int XboxController::getNumberConnectedControllers() {
 	}
 	//printf("NUM CONTROLLER: %d\n", numControllers);
 	return numControllers;
+}
+
+void XboxController::vibrateController(int controllerId, bool vibrate, int pattern) {
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	if (vibrate) {
+		if (pattern == 1) {
+			vibration.wLeftMotorSpeed = 4000; // use any value between 0-65535 here
+			//vibration.wRightMotorSpeed = 5000; // use any value between 0-65535 here
+		}
+		else if (pattern == 2) {
+			vibration.wLeftMotorSpeed = 65535; // use any value between 0-65535 here
+			vibration.wRightMotorSpeed = 65535; // use any value between 0-65535 here
+		}
+	} 
+	else {
+		vibration.wLeftMotorSpeed = 0; // use any value between 0-65535 here
+		vibration.wRightMotorSpeed = 0; // use any value between 0-65535 here
+	}
+	XInputSetState(controllerId, &vibration);
 }
