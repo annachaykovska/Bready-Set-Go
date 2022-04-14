@@ -842,7 +842,7 @@ void RenderingSystem::update()
 		renderScene(playerNum);
 
 		if (!g_systems.loop->isPaused)
-			g_systems.ui->updatePlayer(i);
+			g_systems.ui->updatePlayer(i, g_systems.loop->gameStage);
 	}
 
 	if (g_systems.loop->isPaused)
@@ -854,6 +854,10 @@ void RenderingSystem::update()
 	{
 		glViewport(0, 0, g_systems.width, g_systems.height);
 		g_systems.ui->updateEndGame(g_systems.loop->endScreenGenerated);
+	}
+	else if (g_systems.loop->gameStage == GameLoopMode::START_COUNTDOWN) {
+		glViewport(0, 0, g_systems.width, g_systems.height);
+		g_systems.ui->updateCountdown(g_systems.loop->countdownStage);
 	}
 }
 

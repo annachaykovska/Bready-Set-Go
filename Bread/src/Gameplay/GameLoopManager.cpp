@@ -38,6 +38,7 @@ GameLoopManager::GameLoopManager() : gameStage(GameLoopMode::MENU_START)
 , isPauseMenuItemSelected(false)
 , winnerId(0)
 , countdownStart(-1)
+, countdownStage(0)
 {}
 
 
@@ -52,6 +53,7 @@ void GameLoopManager::resetGameLoopValues() {
 	isPauseMenuItemSelected = false;
 	winnerId = 0;
 	countdownStart = -1;
+	countdownStage = 0;
 
 	g_scene.numPlayers = 1;
 	return;

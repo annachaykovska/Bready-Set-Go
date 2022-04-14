@@ -51,6 +51,7 @@ public:
 
 	// Mid game things
 	float countdownStart;
+	int countdownStage;
 	bool isPaused;
 	bool showPauseMenu;
 	int pauseMenuSelection;
