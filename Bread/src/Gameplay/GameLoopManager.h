@@ -23,7 +23,6 @@ struct PlayerBase {
 	{}
 };
 
-
 class GameLoopManager {
 public:
 	GameLoopManager();
@@ -66,7 +65,4 @@ public:
 	float mainMenuTimeoutStart; // after starting game in main
 	float returnToMainMenuTimeoutStart; // after returning to main
 	float showPauseMenuTimeoutStart; // pressing the pause button
-
-private:
-
 };

@@ -18,7 +18,6 @@ PlayerBase player2Base = PlayerBase(3, 20, 0, 5, 50, 70);
 PlayerBase player3Base = PlayerBase(-20, 0, 0, 5, 50, 70);
 PlayerBase player4Base = PlayerBase(-38, -25, 0, 5, 50, 70);
 
-
 GameLoopManager::GameLoopManager() : gameStage(GameLoopMode::MENU_START) 
 , menuSelectionNumber(1)
 , isMenuItemSelected(false)
@@ -40,7 +39,6 @@ GameLoopManager::GameLoopManager() : gameStage(GameLoopMode::MENU_START)
 , countdownStart(-1)
 , countdownStage(0)
 {}
-
 
 void GameLoopManager::resetGameLoopValues() {
 	gameStage = GameLoopMode::MENU_START;

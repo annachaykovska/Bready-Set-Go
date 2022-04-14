@@ -779,7 +779,6 @@ void RenderingSystem::renderScene(const std::string name)
 	for (int i = 0; i < models.size(); i++)
 	{
 		Transform* ownerTransform = models[i].owner->getTransform();
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
 		// Spin the fan
 		if (models[i].owner->name == "fan")
@@ -788,6 +787,7 @@ void RenderingSystem::renderScene(const std::string name)
 			models[i].owner->getTransform()->update();
 		}
 
+		// Update model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
 		if (i < 3) // Use material info for first 3 player models
@@ -799,8 +799,10 @@ void RenderingSystem::renderScene(const std::string name)
 		{
 			if (i == 17)
 			{
-				models[i].owner->getTransform()->position = glm::vec3(88.17f, -13.15f, 160.71f);
-				models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 200.50f, 0.0f);
+				//models[i].owner->getTransform()->position = glm::vec3(88.17f, -13.15f, 160.71f);
+				//models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 200.50f, 0.0f);
+				models[i].owner->getTransform()->position = glm::vec3(0.0f, 10.0f, 0.0f);
+				models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 				models[i].owner->getTransform()->update();
 			}
 
@@ -821,7 +823,8 @@ void RenderingSystem::update()
 	// Animate ingredients
 	for (unsigned int i = 6; i <= 16; i++)
 	{
-		models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
+		if (g_systems.loop->gameStage == GameLoopMode::MAIN_GAME_PLAY)
+			models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
 	}
 
 	// Step 1. Create the lo-res shadow map for the whole level
