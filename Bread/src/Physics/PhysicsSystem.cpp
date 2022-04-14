@@ -29,6 +29,7 @@
 
 #include "../Audio/AudioSource.h"
 #include "../Audio/AudioSystem.h"
+#include "../Gameplay/GameLoopMode.h"
 
 #define PI 3.14159f
 
@@ -584,7 +585,7 @@ void PhysicsSystem::updateVehicle(PxVehicleDrive4W* player, bool& isVehicleInAir
 	Entity* player2 = g_scene.getEntity("player2");
 	Entity* player3 = g_scene.getEntity("player3");
 	Entity* player4 = g_scene.getEntity("player4");
-	if (gameStage != 5) {
+	if (gameStage != GameLoopMode::END_GAME) {
 		if (player1->verifyPlayerCollision) {
 			if (player1->otherPlayerInCollision == "player2")
 				playerCollisionRaycast(player1, mVehiclePlayer1, g_scene.getEntity(player1->otherPlayerInCollision), mVehiclePlayer2);
@@ -834,46 +835,68 @@ void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
 
 	// Cheese
 	this->cheese->setGlobalPose(this->cheese->getGlobalPose().transform(trans));
+	this->cheese->setLinearVelocity(PxVec3(0, 0, 0));
+	this->cheese->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
 
 	// Sausage
 	this->sausage->setGlobalPose(this->sausage->getGlobalPose().transform(trans));
+	this->sausage->setLinearVelocity(PxVec3(0, 0, 0));
+	this->sausage->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
 
 	// Tomato
 	this->tomato->setGlobalPose(this->tomato->getGlobalPose().transform(trans));
+	this->tomato->setLinearVelocity(PxVec3(0, 0, 0));
+	this->tomato->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
 
 	// Dough
 	this->dough->setGlobalPose(this->dough->getGlobalPose().transform(trans));
+	this->dough->setLinearVelocity(PxVec3(0, 0, 0));
+	this->dough->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
 
 	// Carrot
 	this->carrot->setGlobalPose(this->carrot->getGlobalPose().transform(trans));
+	this->carrot->setLinearVelocity(PxVec3(0, 0, 0));
+	this->carrot->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
 
 	// Lettuce
 	this->lettuce->setGlobalPose(this->lettuce->getGlobalPose().transform(trans));
+	this->lettuce->setLinearVelocity(PxVec3(0, 0, 0));
+	this->lettuce->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
 
 	// Parsnip
 	this->parsnip->setGlobalPose(this->parsnip->getGlobalPose().transform(trans));
+	this->parsnip->setLinearVelocity(PxVec3(0, 0, 0));
+	this->parsnip->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
 
 	// Rice
 	this->rice->setGlobalPose(this->rice->getGlobalPose().transform(trans));
+	this->rice->setLinearVelocity(PxVec3(0, 0, 0));
+	this->rice->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
 
 	// Egg
 	this->egg->setGlobalPose(this->egg->getGlobalPose().transform(trans));
+	this->egg->setLinearVelocity(PxVec3(0, 0, 0));
+	this->egg->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
 
 	// Chicken
 	this->chicken->setGlobalPose(this->chicken->getGlobalPose().transform(trans));
+	this->chicken->setLinearVelocity(PxVec3(0, 0, 0));
+	this->chicken->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
 
 	// Peas
 	this->peas->setGlobalPose(this->peas->getGlobalPose().transform(trans));
+	this->peas->setLinearVelocity(PxVec3(0, 0, 0));
+	this->peas->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
 
 	// Check if visibility needs to be reset

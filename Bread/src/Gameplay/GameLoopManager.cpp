@@ -37,6 +37,8 @@ GameLoopManager::GameLoopManager() : gameStage(GameLoopMode::MENU_START)
 , showPauseMenuTimeoutStart(-1)
 , isPauseMenuItemSelected(false)
 , winnerId(0)
+, countdownStart(-1)
+, countdownStage(0)
 {}
 
 
@@ -50,6 +52,8 @@ void GameLoopManager::resetGameLoopValues() {
 	showPauseMenu = false;
 	isPauseMenuItemSelected = false;
 	winnerId = 0;
+	countdownStart = -1;
+	countdownStage = 0;
 
 	g_scene.numPlayers = 1;
 	return;
@@ -68,10 +72,11 @@ void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
 	}
 	else if (gameStage == GameLoopMode::MENU_SINGLE_MULTI_SELECTION) {
 		if (menuSelectionNumber == 1) { // start game selected
-			gameStage = GameLoopMode::MAIN_GAME_PLAY;
+			gameStage = GameLoopMode::START_COUNTDOWN;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
 			g_scene.numPlayers = 1;
+			countdownStart = glfwGetTime();
 		}
 		else if (menuSelectionNumber == 2) { // multiplayer
 			gameStage = GameLoopMode::MENU_MULTI_CONNECT;
@@ -82,10 +87,11 @@ void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
 	}
 	else if (gameStage == GameLoopMode::MENU_MULTI_CONNECT) {
 		if (menuSelectionNumber == 1) { // start game selected
-			gameStage = GameLoopMode::MAIN_GAME_PLAY;
+			gameStage = GameLoopMode::START_COUNTDOWN;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
 			g_scene.numPlayers = numPlayers;
+			countdownStart = glfwGetTime();
 		}
 	}
 	return;
