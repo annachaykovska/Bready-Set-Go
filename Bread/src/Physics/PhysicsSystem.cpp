@@ -789,10 +789,19 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 	physx::PxRaycastBuffer hit;
 	bool status = this->mScene->raycast(trans.p, unitDirPx, distance, hit);
 
+
 	// If there was a wall between the player and their camera, save the wall's position
 	// to use as the camera's new position for rendering
 	if (status)
 	{
+		std::vector<Entity*> ingredients = g_scene.getIngredients();
+		for (unsigned int i = 0; i < ingredients.size(); i++)
+		{
+			float temp = glm::distance(ingredients[i]->getTransform()->position, camera->position);
+			if (temp > 2.0f)
+				return;
+		}
+
 		if (name == "player1")
 		{
 			this->p1CameraHitPos = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
