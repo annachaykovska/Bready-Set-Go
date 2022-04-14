@@ -376,6 +376,10 @@ int main()
 
 			gameLoop.isPaused = true;
 			g_systems.physics->update(dt, gameLoop.gameStage);
+			controllers.vibrateController(0, false, 0);
+			controllers.vibrateController(1, false, 0);
+			controllers.vibrateController(2, false, 0);
+			controllers.vibrateController(3, false, 0);
 		}
 	}
 
