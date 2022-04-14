@@ -2,6 +2,8 @@
 #include "../Inventory.h"
 #include "../Physics/PhysicsSystem.h"
 #include "../Navigation/IngredientTracker.h"
+#include "GameLoopMode.h"
+
 
 struct PlayerBase {
 	float minX = 0;
@@ -48,6 +50,7 @@ public:
 	bool isBackToMenuSelected;
 
 	// Mid game things
+	float countdownStart;
 	bool isPaused;
 	bool showPauseMenu;
 	int pauseMenuSelection;
@@ -65,13 +68,4 @@ public:
 
 private:
 
-};
-
-
-enum GameLoopMode {
-	MENU_START = 1,
-	MENU_SINGLE_MULTI_SELECTION = 2,
-	MENU_MULTI_CONNECT = 3,
-	MAIN_GAME_PLAY = 4, 
-	END_GAME = 5
 };

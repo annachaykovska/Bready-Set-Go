@@ -226,9 +226,13 @@ int main()
 	const double dt = 1.0/120.0;
 	double currentTime = glfwGetTime();
 	double accumulator = 0.0;
+	int countdownStage = 0;
 
 	gameLoop.gameStage = GameLoopMode::MENU_START;
 	//gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY; // Skips menus
+
+	// Call it a single time
+	g_systems.physics->update(dt, gameLoop.gameStage);
 
 	// GAME LOOP
 	while (!window.shouldClose() && !gameLoop.isGameExitSelected)
@@ -270,7 +274,36 @@ int main()
 			ui.updateMainMenu(gameLoop.menuSelectionNumber, gameLoop.gameStage, controllers.getNumberConnectedControllers());
 			window.swapBuffer();
 		}
-		else if (gameLoop.gameStage == GameLoopMode::MAIN_GAME_PLAY || gameLoop.gameStage == GameLoopMode::END_GAME) {
+		else if (gameLoop.gameStage == GameLoopMode::START_COUNTDOWN || gameLoop.gameStage == GameLoopMode::MAIN_GAME_PLAY || gameLoop.gameStage == GameLoopMode::END_GAME) {
+			if (gameLoop.gameStage == GameLoopMode::START_COUNTDOWN) {
+				// 3
+				if (glfwGetTime() - gameLoop.countdownStart > 1 && countdownStage == 0) {
+					printf("1\n");
+					countertopAudioSource->loop = false;
+					countertopAudioSource->play("countdown_count.wav");
+					countdownStage = 1;
+				}
+				// 2
+				if (glfwGetTime() - gameLoop.countdownStart > 2 && countdownStage == 1) {
+					printf("2\n");
+					countertopAudioSource->play("countdown_count.wav");
+					countdownStage = 2;
+				}
+				// 1
+				if (glfwGetTime() - gameLoop.countdownStart > 3 && countdownStage == 2) {
+					printf("3\n");
+					countertopAudioSource->play("countdown_count.wav");
+					countdownStage = 3;
+				}
+				// START
+				if (glfwGetTime() - gameLoop.countdownStart > 4 && countdownStage == 3) {
+					printf("GO\n");
+					countertopAudioSource->play("countdown_go.wav");
+					countdownStage = 4;
+					gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY;
+				}
+			}
+			
 			// TODO: Move out of main and make less dependent
 			pizza.updateRecipeProgress(p1Inv);
 			omelette.updateRecipeProgress(p2Inv);
@@ -324,7 +357,7 @@ int main()
 		// UPDATE GAME STAGE
 		if (gameLoop.isMenuItemSelected) {
 			gameLoop.updateGameStageFromMenu(controllers.getNumberConnectedControllers());
-			if (gameLoop.gameStage >= GameLoopMode::MAIN_GAME_PLAY)
+			if (gameLoop.gameStage >= GameLoopMode::START_COUNTDOWN)
 				audio.turnOffAllAudio();
 			// The game audio is played by the update function, no need to play it here
 			gameLoop.isPaused = false;
@@ -346,6 +379,8 @@ int main()
 			audio.playMainMenuMusic(countertopAudioSource);
 
 			gameLoop.isPaused = true;
+			countdownStage = 0;
+			g_systems.physics->update(dt, gameLoop.gameStage);
 		}
 	}
 
