@@ -56,6 +56,9 @@ UISystem::UISystem()
     , unflip2("resources/textures/unflip2.png", GL_NEAREST)
     , unflip1("resources/textures/unflip1.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
+    , salad("resources/textures/salad.png", GL_NEAREST)
+    , omelette("resources/textures/salad.png", GL_NEAREST)
+    , wrap("resources/textures/salad.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
     , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
@@ -88,9 +91,13 @@ UISystem::UISystem()
     , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
     , gameOverPlayer1_3("resources/textures/game_over_screen_player_1_3.png", GL_NEAREST)
     , gameOverPlayer1_4("resources/textures/game_over_screen_player_1_4.png", GL_NEAREST)
+    , gameOverPlayer1_5("resources/textures/game_over_screen_player_1_5.png", GL_NEAREST)
     , gameOverPlayer2("resources/textures/game_over_screen_player_2.png", GL_NEAREST)
+    , gameOverPlayer2_2("resources/textures/game_over_screen_player_2_2.png", GL_NEAREST)
     , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
+    , gameOverPlayer3_2("resources/textures/game_over_screen_player_3_2.png", GL_NEAREST)
     , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
+    , gameOverPlayer4_2("resources/textures/game_over_screen_player_4_2.png", GL_NEAREST)
     , backToMainMenuButton("resources/textures/button_back_to_main_menu.png", GL_NEAREST)
     , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
     , map_x(0.126)
@@ -242,9 +249,8 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage, int numController
 void UISystem::updateEndGame(int endScreenValue) {
     int winner = g_systems.loop->checkForWin();
     std::string winText = "Player " + std::to_string(winner) + " Wins!";
-    //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
-    if (winner == 1) {
+    if (winner == 1 && g_scene.numPlayers == 1) {
         if (endScreenValue == 0) {
             renderImage(imageShader, gameOverPlayer1_1, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
         }
@@ -258,12 +264,20 @@ void UISystem::updateEndGame(int endScreenValue) {
             renderImage(imageShader, gameOverPlayer1_4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
         }
     }
-    else if (winner == 2)
+    else if (winner == 1 && g_scene.numPlayers > 1)
+        renderImage(imageShader, gameOverPlayer1_5, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 2 && g_scene.numPlayers >= 2)
+        renderImage(imageShader, gameOverPlayer2_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 2 && g_scene.numPlayers == 1)
         renderImage(imageShader, gameOverPlayer2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
-    else if (winner == 3)
+    else if (winner == 3 && g_scene.numPlayers <= 2)
         renderImage(imageShader, gameOverPlayer3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
-    else if (winner == 4)
+    else if (winner == 3 && g_scene.numPlayers >= 3)
+        renderImage(imageShader, gameOverPlayer3_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 4 && g_scene.numPlayers <= 3)
         renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 4 && g_scene.numPlayers == 4)
+        renderImage(imageShader, gameOverPlayer4_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
 }
 
 void UISystem::showPauseMenu(int itemSelected) {
@@ -540,7 +554,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->egg && playerInv->cheese && playerInv->peas && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, cheese, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, omelette, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -554,7 +568,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->chicken && playerInv->dough && playerInv->rice && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, dough, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, wrap, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -568,7 +582,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->parsnip && playerInv->carrot && playerInv->tomato && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, tomato, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, salad, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -601,11 +615,11 @@ void UISystem::updateUnflip(int playerNum)
     }
     if (player->unflipTimer > 0)
     {
-        if (player->unflipTimer > 2 * (2.f / 3.f))
+        if (player->unflipTimer > 1.5 * (2.f / 3.f))
         {
             renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
         }
-        else if (player->unflipTimer > 1 * (2.f / 3.f))
+        else if (player->unflipTimer > 0.75 * (2.f / 3.f))
         {
             renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
         }
@@ -655,15 +669,17 @@ void UISystem::updateCountdown(int countdownStage) {
 
 void UISystem::updatePlayer(unsigned int playerNum, int gameStage)
 {
-    updateVacuum(playerNum);
-    updateSpeedometer(playerNum);
-    updateRecipeList();
-    updateMiniMap();
-    if (gameStage != GameLoopMode::START_COUNTDOWN)
+    // Draw UI only when in game
+    if (gameStage == GameLoopMode::MAIN_GAME_PLAY) {
         updateOffscreenIndicators(playerNum);
-    updateInventory(playerNum);
-    updateUnflip(playerNum);
-    updateReturnToBaseBanner(playerNum);
+        updateVacuum(playerNum);
+        updateSpeedometer(playerNum);
+        updateRecipeList();
+        updateMiniMap();
+        updateInventory(playerNum);
+        updateUnflip(playerNum);
+        updateReturnToBaseBanner(playerNum);
+    }
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
@@ -929,7 +945,10 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     {
         location.z = scX(0.04);
     }
-
+    if (g_scene.numPlayers == 2) { // screen is stretched so return it scaled
+        location.x = location.x/2.f + g_systems.width/4.f;
+    }
+    //std::cout << location.x << std::endl;
     return glm::vec3(location.x, location.y, location.z);
 }
 
