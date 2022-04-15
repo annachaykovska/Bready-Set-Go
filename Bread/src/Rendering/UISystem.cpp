@@ -601,11 +601,11 @@ void UISystem::updateUnflip(int playerNum)
     }
     if (player->unflipTimer > 0)
     {
-        if (player->unflipTimer > 2 * (2.f / 3.f))
+        if (player->unflipTimer > 1.5 * (2.f / 3.f))
         {
             renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
         }
-        else if (player->unflipTimer > 1 * (2.f / 3.f))
+        else if (player->unflipTimer > 0.75 * (2.f / 3.f))
         {
             renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
         }
