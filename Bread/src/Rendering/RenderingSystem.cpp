@@ -305,12 +305,12 @@ void RenderingSystem::initSkybox()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeMap);
 
 	std::vector<std::string> faces;
-	faces.push_back("resources/textures/skybox/x.jpg");
-	faces.push_back("resources/textures/skybox/x.jpg");
-	faces.push_back("resources/textures/skybox/z.jpg");
-	faces.push_back("resources/textures/skybox/x.jpg");
-	faces.push_back("resources/textures/skybox/z.jpg");
-	faces.push_back("resources/textures/skybox/z.jpg");
+	faces.push_back("resources/textures/skybox/minx.jpeg");
+	faces.push_back("resources/textures/skybox/minx.jpeg");
+	faces.push_back("resources/textures/skybox/minx.jpeg");
+	faces.push_back("resources/textures/skybox/minx.jpeg");
+	faces.push_back("resources/textures/skybox/minz.jpeg");
+	faces.push_back("resources/textures/skybox/minz.jpeg");
 
 	int width, height, nrChannels;
 	unsigned char* data;
