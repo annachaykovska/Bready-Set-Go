@@ -128,7 +128,7 @@ void Camera::setViewMatrix(const int playerNum)
 	else if (this->perspective - this->oldFOV < -MAX_FOV_DELTA)
 		this->perspective = this->oldFOV - MAX_FOV_DELTA;
 
-	float stopDegrees = abs(this->viewDirectionalInfluence * 90.0);
+	float stopDegrees = abs(this->viewDirectionalInfluence * 120.0);
 
 	if (this->viewDirectionalInfluence < 0)
 	{ // R stick held to the right
