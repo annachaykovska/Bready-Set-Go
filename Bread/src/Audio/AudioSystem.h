@@ -36,7 +36,7 @@ public:
 	void playSlurp(AudioSource* source);
 	void endSlurp(AudioSource* source, bool playBanner, bool success);
 	void ingredientSuck(AudioSource* source);
-	void powerReady(AudioSource* source);
+	void vacuumReady(AudioSource* source);
 	void turnOffAllAudio();
 	void playMenuAudio(std::string clipName);
 

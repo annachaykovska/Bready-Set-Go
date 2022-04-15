@@ -75,7 +75,10 @@ private:
 	float p3SpeedometerTheta;
 	float p4SpeedometerTheta;
 
-	bool powerReady;
+	bool p1PowerReady;
+	bool p2PowerReady;
+	bool p3PowerReady;
+	bool p4PowerReady;
 	ImageTexture needle;
 	ImageTexture vacuum;
 	ImageTexture vacuum_red;

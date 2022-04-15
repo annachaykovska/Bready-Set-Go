@@ -86,7 +86,10 @@ UISystem::UISystem()
     , p2SpeedometerTheta(MIN_SPEED_THETA)
     , p3SpeedometerTheta(MIN_SPEED_THETA)
     , p4SpeedometerTheta(MIN_SPEED_THETA)
-    , powerReady(true)
+    , p1PowerReady(true)
+    , p2PowerReady(true)
+    , p3PowerReady(true)
+    , p4PowerReady(true)
     , gameOverPlayer1_1("resources/textures/game_over_screen_player_1.png", GL_NEAREST)
     , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
     , gameOverPlayer1_3("resources/textures/game_over_screen_player_1_3.png", GL_NEAREST)
@@ -335,36 +338,42 @@ void UISystem::updateSpeedometer(int playerNum)
 void UISystem::updateVacuum(int playerNum)
 {
     Entity* player = nullptr;
+    bool* powerReady;
 
     // Get reference to correct player Entity
     switch (playerNum)
     {
     case 1:
         player = g_scene.getEntity("player1");
+        powerReady = &p1PowerReady;
         break;
     case 2:
         player = g_scene.getEntity("player2");
+        powerReady = &p2PowerReady;
         break;
     case 3:
         player = g_scene.getEntity("player3");
+        powerReady = &p3PowerReady;
         break;
     case 4:
         player = g_scene.getEntity("player4");
+        powerReady = &p4PowerReady;
         break;
     default:
         return; // Uh-oh, something has gone wrong
         break;
     }
 
+    // TODO something is weird here
     // Play sound effect if vacuum power has reset
-    if ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown > 0.99f && powerReady == false)
+    if (glfwGetTime() - player->lastMagnetUse < player->magnetCooldown)
     {
-        g_systems.audio->powerReady((AudioSource*)player->getComponent("vacuumAudio"));
-        powerReady = true;
+        *powerReady = false;
     }
-    else if ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown < 0.99f && powerReady == true)
+    else if ((glfwGetTime() - player->lastMagnetUse) > player->magnetCooldown && *powerReady == false)
     {
-        powerReady = false;
+        g_systems.audio->vacuumReady((AudioSource*)player->getComponent("vacuumAudio"));
+        *powerReady = true;
     }
 
     // Update vacuum icon on HUD

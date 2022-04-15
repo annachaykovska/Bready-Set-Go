@@ -26,6 +26,7 @@ public:
 	bool stop();
 
 	void update();
+	void update(glm::vec3 pos);
 
 private:
 

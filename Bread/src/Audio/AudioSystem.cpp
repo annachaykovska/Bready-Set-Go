@@ -290,6 +290,25 @@ void AudioSystem::update(const float dt, int gameStage)
 	AudioSource* p4Engine = (AudioSource*)g_scene.getEntity("player4")->getComponent("engineAudio");
 	p4Engine->update();
 
+	if (g_scene.numPlayers > 3)
+	{
+		AudioSource* p4Vacuum = (AudioSource*)g_scene.getEntity("player4")->getComponent("vacuumAudio");
+		p4Vacuum->update(g_scene.getEntity("player1")->getTransform()->position);
+	}
+	if (g_scene.numPlayers > 2)
+	{
+		AudioSource* p3Vacuum = (AudioSource*)g_scene.getEntity("player3")->getComponent("vacuumAudio");
+		p3Vacuum->update(g_scene.getEntity("player1")->getTransform()->position);
+	}
+	if (g_scene.numPlayers > 1)
+	{
+		AudioSource* p2Vacuum = (AudioSource*)g_scene.getEntity("player2")->getComponent("vacuumAudio");
+		p2Vacuum->update(g_scene.getEntity("player1")->getTransform()->position);
+	}
+
+	AudioSource* p1Vacuum = (AudioSource*)g_scene.getEntity("player1")->getComponent("vacuumAudio");
+	p1Vacuum->update();
+
 	// Change pitch of engine noises wrt player speed
 	if (accumulator > 0.25f)
 	{
@@ -362,7 +381,7 @@ void AudioSystem::ingredientSuck(AudioSource* source)
 	source->play("suck.wav");
 }
 
-void AudioSystem::powerReady(AudioSource* source)
+void AudioSystem::vacuumReady(AudioSource* source)
 {
 	source->gain = .5f; // Volume control
 	source->stop();
