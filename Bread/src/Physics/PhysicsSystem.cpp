@@ -1527,10 +1527,9 @@ void PhysicsSystem::magnet(int stealer_id)
 					}
 					g_systems.audio->endSlurp(vacuumAudio, playBanner, true);
 				}
-				if (victims[i] == g_scene.getEntity("player1")) // TODO: This needs to change for multiplayer
-				{
-					g_systems.audio->ingredientSuck(vacuumAudio);
-				}
+
+				g_systems.audio->ingredientSuck(vacuumAudio);
+
 				return;
 			}
 		}
