@@ -336,6 +336,7 @@ void AudioSystem::stopMusic(AudioSource* source) {
 }
 
 void AudioSystem::playSlurp(AudioSource* source) {
+	source->stop();
 	source->gain = 1.f; // Volume control
 	//source->stop(); // NOTE: not sure if needed but i tried it to make it play consistently
 	source->loop = true;
