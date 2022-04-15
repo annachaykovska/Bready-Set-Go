@@ -164,9 +164,13 @@ private:
 	ImageTexture gameOverPlayer1_2;
 	ImageTexture gameOverPlayer1_3;
 	ImageTexture gameOverPlayer1_4;
+	ImageTexture gameOverPlayer1_5;
 	ImageTexture gameOverPlayer2;
+	ImageTexture gameOverPlayer2_2;
 	ImageTexture gameOverPlayer3;
+	ImageTexture gameOverPlayer3_2;
 	ImageTexture gameOverPlayer4;
+	ImageTexture gameOverPlayer4_2;
 	ImageTexture backToMainMenuButton;
 	ImageTexture backToMainMenuButtonPressed;
 	ImageTexture backToBaseBanner;
