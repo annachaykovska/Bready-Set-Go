@@ -449,16 +449,17 @@ void UISystem::updateRecipeList()
 // Helper function that renders the passed ImageTexture at the passed Transform
 void UISystem::drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown)
 {
+    #define SCALING 2.f
     int indicatorY;
 
     glm::vec3 IngLocation = offscreenBubbleLocation(playerNum, trans.position, indicatorY);
 
     if (indicatorY == 0)
-        renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z * SCALING, IngLocation.z * SCALING, 0, 1.f);
     else if (indicatorY == 1)
-        renderImage(imageShader, imageUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        renderImage(imageShader, imageUp, IngLocation.x, IngLocation.y, IngLocation.z * SCALING, IngLocation.z * SCALING, 0, 1.f);
     else
-        renderImage(imageShader, imageDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        renderImage(imageShader, imageDown, IngLocation.x, IngLocation.y, IngLocation.z * SCALING, IngLocation.z * SCALING, 0, 1.f);
 }
 
 // TODO need to update image references for players 2-3 when we have the new icons
