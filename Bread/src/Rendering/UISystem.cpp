@@ -655,15 +655,17 @@ void UISystem::updateCountdown(int countdownStage) {
 
 void UISystem::updatePlayer(unsigned int playerNum, int gameStage)
 {
-    updateVacuum(playerNum);
-    updateSpeedometer(playerNum);
-    updateRecipeList();
-    updateMiniMap();
-    if (gameStage != GameLoopMode::START_COUNTDOWN)
+    // Draw UI only when in game
+    if (gameStage == GameLoopMode::MAIN_GAME_PLAY) {
+        updateVacuum(playerNum);
+        updateSpeedometer(playerNum);
+        updateRecipeList();
+        updateMiniMap();
         updateOffscreenIndicators(playerNum);
-    updateInventory(playerNum);
-    updateUnflip(playerNum);
-    updateReturnToBaseBanner(playerNum);
+        updateInventory(playerNum);
+        updateUnflip(playerNum);
+        updateReturnToBaseBanner(playerNum);
+    }
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
