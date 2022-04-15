@@ -142,6 +142,10 @@ UISystem::UISystem()
     , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
     , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
     , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
+    , backToBaseBanner1("resources/textures/return_to_base_1.png", GL_NEAREST)
+    , backToBaseBanner2("resources/textures/return_to_base_2.png", GL_NEAREST)
+    , backToBaseBanner3("resources/textures/return_to_base_3.png", GL_NEAREST)
+    , backToBaseBanner4("resources/textures/return_to_base_4.png", GL_NEAREST)
     , countdown3("resources/textures/countdown_3.png", GL_NEAREST)
     , countdown2("resources/textures/countdown_2.png", GL_NEAREST)
     , countdown1("resources/textures/countdown_1.png", GL_NEAREST)
@@ -685,7 +689,14 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
         break;
     }
     if (drawBanner && g_systems.loop->checkForWin() == 0) {
-        renderImage(imageShader, backToBaseBanner, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 1)
+            renderImage(imageShader, backToBaseBanner1, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 2)
+            renderImage(imageShader, backToBaseBanner2, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 3)
+            renderImage(imageShader, backToBaseBanner3, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 4)
+            renderImage(imageShader, backToBaseBanner4, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
     }
 }
 

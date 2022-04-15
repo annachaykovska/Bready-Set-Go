@@ -279,22 +279,25 @@ int main()
 				// 3
 				if (glfwGetTime() - gameLoop.countdownStart > 1 && gameLoop.countdownStage == 0) {
 					countertopAudioSource->loop = false;
-					countertopAudioSource->play("countdown_count.wav");
+					countertopAudioSource->play("double_horn.wav");
 					gameLoop.countdownStage = 1;
 				}
 				// 2
 				if (glfwGetTime() - gameLoop.countdownStart > 2 && gameLoop.countdownStage == 1) {
-					countertopAudioSource->play("countdown_count.wav");
+					countertopAudioSource->stop();
+					countertopAudioSource->play("double_horn.wav");
 					gameLoop.countdownStage = 2;
 				}
 				// 1
 				if (glfwGetTime() - gameLoop.countdownStart > 3 && gameLoop.countdownStage == 2) {
-					countertopAudioSource->play("countdown_count.wav");
+					countertopAudioSource->stop();
+					countertopAudioSource->play("double_horn.wav");
 					gameLoop.countdownStage = 3;
 				}
 				// START
 				if (glfwGetTime() - gameLoop.countdownStart > 4 && gameLoop.countdownStage == 3) {
-					countertopAudioSource->play("countdown_go.wav");
+					countertopAudioSource->stop();
+					countertopAudioSource->play("chicken.wav");
 					gameLoop.countdownStage = 4;
 					gameLoop.gameStage = GameLoopMode::MAIN_GAME_PLAY;
 				}
