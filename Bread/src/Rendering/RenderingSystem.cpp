@@ -76,6 +76,7 @@ RenderingSystem::RenderingSystem() : shader("resources/shaders/vertex.txt", "res
 	this->texLoc = glGetUniformLocation(getShaderId(), "textured");
 	this->viewLoc = glGetUniformLocation(getShaderId(), "view");
 	this->projLoc = glGetUniformLocation(getShaderId(), "proj");
+	this->opacityLoc = glGetUniformLocation(getShaderId(), "reduceOpacity");
 
 	// Initialize shadow maps
 	this->initShadows();
@@ -389,57 +390,57 @@ void RenderingSystem::loadModels()
 	//-----------------------------------------------------------------------------------
 	// Ingredient models
 	//-----------------------------------------------------------------------------------
-	// Cheese
+	// Cheese 6
 	std::string cheesePath = "resources/models/ingredients/cheese.obj";
 	this->models.emplace_back(Model(&cheesePath[0]));
 	g_scene.getEntity("cheese")->attachComponent(&(this->models[index++]), "model");
 
-	// Sausage
+	// Sausage 7
 	std::string sausagePath = "resources/models/ingredients/sausage.obj";
 	this->models.emplace_back(Model(&sausagePath[0]));
 	g_scene.getEntity("sausage")->attachComponent(&(this->models[index++]), "model");
 
-	// Tomato
+	// Tomato 8
 	std::string tomatoPath = "resources/models/ingredients/tomato.obj";
 	this->models.emplace_back(Model(&tomatoPath[0]));
 	g_scene.getEntity("tomato")->attachComponent(&(this->models[index++]), "model");
 
-	// Dough
+	// Dough 9
 	std::string doughPath = "resources/models/ingredients/dough.obj";
 	this->models.emplace_back(Model(&doughPath[0]));
 	g_scene.getEntity("dough")->attachComponent(&(this->models[index++]), "model");
 
-	// Carrot
+	// Carrot 10
 	std::string carrotPath = "resources/models/ingredients/carrot.obj";
 	this->models.emplace_back(Model(&carrotPath[0]));
 	g_scene.getEntity("carrot")->attachComponent(&(this->models[index++]), "model");
 
-	// Lettuce
+	// Lettuce 11
 	std::string lettucePath = "resources/models/ingredients/lettuce.obj";
 	this->models.emplace_back(Model(&lettucePath[0]));
 	g_scene.getEntity("lettuce")->attachComponent(&(this->models[index++]), "model");
 
-	// Parsnip
+	// Parsnip 12
 	std::string parsnipPath = "resources/models/ingredients/parsnip.obj";
 	this->models.emplace_back(Model(&parsnipPath[0]));
 	g_scene.getEntity("parsnip")->attachComponent(&(this->models[index++]), "model");
 
-	// Rice
+	// Rice 13
 	std::string ricePath = "resources/models/ingredients/rice.obj";
 	this->models.emplace_back(Model(&ricePath[0]));
 	g_scene.getEntity("rice")->attachComponent(&(this->models[index++]), "model");
 
-	// Egg
+	// Egg 14
 	std::string eggPath = "resources/models/ingredients/egg.obj";
 	this->models.emplace_back(Model(&eggPath[0]));
 	g_scene.getEntity("egg")->attachComponent(&(this->models[index++]), "model");
 
-	// Chicken
+	// Chicken 15
 	std::string chickenPath = "resources/models/ingredients/chicken.obj";
 	this->models.emplace_back(Model(&chickenPath[0]));
 	g_scene.getEntity("chicken")->attachComponent(&(this->models[index++]), "model");
 
-	// Peas
+	// Peas 16
 	std::string peasPath = "resources/models/ingredients/peas.obj";
 	this->models.emplace_back(Model(&peasPath[0]));
 	g_scene.getEntity("peas")->attachComponent(&(this->models[index++]), "model");
@@ -790,6 +791,29 @@ void RenderingSystem::renderScene(const std::string name)
 		// Update model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 
+		glUniform1i(opacityLoc, 1);
+
+		if (name == "player1")
+		{
+			if (i > 9 && i != 17)
+				glUniform1i(opacityLoc, 0);
+		}
+		else if (name == "player2")
+		{
+			if (i > 6 && i != 11 && i != 14 && i < 16)
+				glUniform1i(opacityLoc, 0);
+		}
+		else if (name == "player3")
+		{
+			if (i > 6 && i != 9 && i != 11 && i != 13 && i != 15 && i != 17)
+				glUniform1i(opacityLoc, 0);
+		}
+		else if (name == "player4")
+		{
+			if (i > 6 && i != 8 && i < 10 && i > 13 && i != 17)
+				glUniform1i(opacityLoc, 0);
+		}
+
 		if (i < 3) // Use material info for first 3 player models
 		{
 			glUniform1i(texLoc, 0);
@@ -801,9 +825,10 @@ void RenderingSystem::renderScene(const std::string name)
 			{
 				//models[i].owner->getTransform()->position = glm::vec3(88.17f, -13.15f, 160.71f);
 				//models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 200.50f, 0.0f);
-				models[i].owner->getTransform()->position = glm::vec3(0.0f, 10.0f, 0.0f);
+				models[i].owner->getTransform()->position = glm::vec3(0.0f, 3.0f, 0.0f);
 				models[i].owner->getTransform()->rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 				models[i].owner->getTransform()->update();
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ownerTransform->getModelMatrix()));
 			}
 
 			glUniform1i(texLoc, 1);

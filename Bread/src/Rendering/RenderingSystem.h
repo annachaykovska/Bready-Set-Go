@@ -71,6 +71,7 @@ private:
 	unsigned int texLoc;
 	unsigned int viewLoc;
 	unsigned int projLoc;
+	unsigned int opacityLoc;
 	
 	Shader shader;
 	Shader lightShader;

@@ -55,6 +55,8 @@ in vec4 playerFragPos;
 in vec3 textureDir;
 uniform samplerCube cubeMap;
 
+uniform int reduceOpacity;
+
 float shadows(vec3 norm, vec3 lightDir)
 {
 	float shadow = 0.0;
@@ -196,6 +198,8 @@ void main()
 	else
 		fragColor = vec4(0.8 * phong, 1.0);
 
+	if (reduceOpacity == 0)
+		fragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 0.5);
 	/*
 	if (intensity > 0.66)
 		fragColor = vec4(phong, 1.0);
