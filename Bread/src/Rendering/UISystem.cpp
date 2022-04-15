@@ -149,6 +149,9 @@ UISystem::UISystem()
     , countdown3("resources/textures/countdown_3.png", GL_NEAREST)
     , countdown2("resources/textures/countdown_2.png", GL_NEAREST)
     , countdown1("resources/textures/countdown_1.png", GL_NEAREST)
+    , rat1("resources/textures/rat1.png", GL_NEAREST)
+    , rat2("resources/textures/rat2.png", GL_NEAREST)
+    , rat3("resources/textures/rat3.png", GL_NEAREST)
 {
     //Variables needed to initialize freetype characters
     FT_Library ft;
@@ -703,13 +706,13 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
 
 void UISystem::updateCountdown(int countdownStage) {
     if (countdownStage == 1) {
-        renderImage(imageShader, countdown3, scX(0.5f), scY(0.53f), scX(0.3f), scY(0.85f), 0, 1.f);
+        renderImage(imageShader, rat1, scX(0.5f), scY(0.53f), scX(0.5f), scY(0.75f), 0, 1.f);
     }
     else if (countdownStage == 2) {
-        renderImage(imageShader, countdown2, scX(0.5f), scY(0.53f), scX(0.3f), scY(0.85f), 0, 1.f);
+        renderImage(imageShader, rat2, scX(0.5f), scY(0.53f), scX(0.5f), scY(0.75f), 0, 1.f);
     }
     else if (countdownStage == 3) {
-        renderImage(imageShader, countdown1, scX(0.5f), scY(0.53f), scX(0.3f), scY(0.85f), 0, 1.f);
+        renderImage(imageShader, rat3, scX(0.5f), scY(0.53f), scX(0.5f), scY(0.75f), 0, 1.f);
     }
 }
 
