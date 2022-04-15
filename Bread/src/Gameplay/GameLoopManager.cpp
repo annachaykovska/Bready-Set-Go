@@ -88,7 +88,7 @@ void GameLoopManager::updateGameStageFromMenu(int numPlayers) {
 			gameStage = GameLoopMode::START_COUNTDOWN;
 			isMenuItemSelected = false;
 			mainMenuTimeoutStart = glfwGetTime();
-			g_scene.numPlayers = numPlayers;
+			g_scene.numPlayers = 2;
 			countdownStart = glfwGetTime();
 		}
 	}
