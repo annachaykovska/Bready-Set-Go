@@ -308,10 +308,10 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	}
 
 	// Respawn player
-	if (BACK_button_pressed)
+	/*if (BACK_button_pressed)
 	{
 		physics->respawnPlayer(controllerId + 1);
-	}
+	}*/
 
 	float analogVal;
 	float analogVal2;
