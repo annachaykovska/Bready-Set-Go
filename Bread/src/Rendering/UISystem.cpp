@@ -56,6 +56,9 @@ UISystem::UISystem()
     , unflip2("resources/textures/unflip2.png", GL_NEAREST)
     , unflip1("resources/textures/unflip1.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
+    , salad("resources/textures/salad.png", GL_NEAREST)
+    , omelette("resources/textures/salad.png", GL_NEAREST)
+    , wrap("resources/textures/salad.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
     , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
@@ -540,7 +543,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->egg && playerInv->cheese && playerInv->peas && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, cheese, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, omelette, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -554,7 +557,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->chicken && playerInv->dough && playerInv->rice && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, dough, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, wrap, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -568,7 +571,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->parsnip && playerInv->carrot && playerInv->tomato && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, tomato, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, salad, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 

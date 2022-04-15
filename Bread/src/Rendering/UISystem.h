@@ -118,6 +118,9 @@ private:
 	ImageTexture unflip1;
 
 	ImageTexture pizza;
+	ImageTexture salad;
+	ImageTexture wrap;
+	ImageTexture omelette;
 
 	ImageTexture p1Icon;
 	ImageTexture p2Icon;
