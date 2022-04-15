@@ -930,7 +930,7 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
         location.z = scX(0.04);
     }
     if (g_scene.numPlayers == 2) { // screen is stretched so return it scaled
-        location.x = location.x * 2.f  - g_systems.width/2.f;
+        location.x = location.x/2.f + g_systems.width/4.f;
     }
     //std::cout << location.x << std::endl;
     return glm::vec3(location.x, location.y, location.z);
