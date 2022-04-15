@@ -110,6 +110,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->cheese = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -124,6 +125,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->dough = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -138,6 +140,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->sausage = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -152,6 +155,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->tomato = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -166,6 +170,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->carrot = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -180,6 +185,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->lettuce = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -194,6 +200,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->parsnip = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -208,6 +215,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->rice = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -222,6 +230,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->egg = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -236,6 +245,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->chicken = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");
@@ -250,6 +260,7 @@ void Entity::checkIngredientCollision(Entity* otherEntity) {
 	{
 		playerInventory->peas = 1;
 		playerInventory->checkRecipeComplete(this);
+		this->getAudioSource()->stop();
 		if (playerInventory->allIngredientsCollected && !this->bannerSoundPlayed) {
 			bannerSoundPlayed = true;
 			this->getAudioSource()->play("banner_popup.wav");

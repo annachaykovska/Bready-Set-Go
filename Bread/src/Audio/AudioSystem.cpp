@@ -59,6 +59,8 @@ AudioSystem::AudioSystem()
 	load("drum.wav");
 	load("countdown_count.wav");
 	load("countdown_go.wav");
+	load("chicken.wav");
+	load("double_horn.wav");
 	//load("thumpdull.wav");
 	//load("thump2.wav");
 
@@ -262,8 +264,10 @@ void AudioSystem::update(const float dt, int gameStage)
 {
 	AudioSource* bgMusic = (AudioSource*)g_scene.getEntity("player1")->getComponent("bg");
 	if (gameStage != GameLoopMode::END_GAME) {
-		bgMusic->gain = 0.2;
-		bgMusic->play("carioca.wav");
+		if (gameStage != GameLoopMode::START_COUNTDOWN) {
+			bgMusic->gain = 0.2;
+			bgMusic->play("carioca.wav");
+		}
 	}
 	else {
 		bgMusic->gain = 0.5;
@@ -351,6 +355,7 @@ void AudioSystem::stopMusic(AudioSource* source) {
 }
 
 void AudioSystem::playSlurp(AudioSource* source) {
+	source->stop();
 	source->gain = 1.f; // Volume control
 	//source->stop(); // NOTE: not sure if needed but i tried it to make it play consistently
 	source->loop = true;
