@@ -129,7 +129,8 @@ void GameLoopManager::gameActorsReset(PhysicsSystem* physics, IngredientTracker*
 	physics->respawnPlayer(4);
 
 	// Reset all ingredient positions 
-	physics->randomizeIngredientLocations();
+	physics->reRandomizeIngredientLocations();
+	physics->resetIngredientDynamics();
 	physics->updateFoodTransforms(true);
 	ingredientTracker->updateCheeseTransformSource(g_scene.getEntity("cheese")->getTransform());
 	ingredientTracker->updateDoughTransformSource(g_scene.getEntity("dough")->getTransform());

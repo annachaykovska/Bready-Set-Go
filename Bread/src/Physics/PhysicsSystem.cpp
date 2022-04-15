@@ -332,6 +332,84 @@ void PhysicsSystem::initializeActors() {
 	randomizeIngredientLocations();
 }
 
+void PhysicsSystem::reRandomizeIngredientLocations()
+{
+	// Randomize starting location
+	std::random_device r;
+	std::seed_seq seed{ r(), r(), r(), r(), r(), r(), r(), r() };
+	std::mt19937 eng(seed);
+
+	std::shuffle(std::begin(spawnLocations), std::end(spawnLocations), eng);
+
+	glm::vec3 loc;
+
+	// CHEESE
+	loc = LOCATIONS[spawnLocations[0]];
+	PxTransform cheeseTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->cheese->setGlobalPose(cheeseTransform);
+	g_scene.getEntity("cheese")->originalSpawn = cheeseTransform;
+
+	// SAUSAGE
+	loc = LOCATIONS[spawnLocations[1]];
+	PxTransform sausageTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->sausage->setGlobalPose(sausageTransform);
+	g_scene.getEntity("sausage")->originalSpawn = sausageTransform;
+
+	// TOMATO
+	loc = LOCATIONS[spawnLocations[2]];
+	PxTransform tomatoTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->tomato->setGlobalPose(tomatoTransform);
+	g_scene.getEntity("tomato")->originalSpawn = tomatoTransform;
+
+	// DOUGH
+	loc = LOCATIONS[spawnLocations[3]];
+	PxTransform doughTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->dough->setGlobalPose(doughTransform);
+	g_scene.getEntity("dough")->originalSpawn = doughTransform;
+
+	// CARROT
+	loc = LOCATIONS[spawnLocations[4]];
+	PxTransform carrotTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->carrot->setGlobalPose(carrotTransform);
+	g_scene.getEntity("carrot")->originalSpawn = carrotTransform;
+
+	// LETTUCE
+	loc = LOCATIONS[spawnLocations[5]];
+	PxTransform lettuceTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->lettuce->setGlobalPose(lettuceTransform);
+	g_scene.getEntity("lettuce")->originalSpawn = lettuceTransform;
+
+	// PARSNIP
+	loc = LOCATIONS[spawnLocations[6]];
+	PxTransform parsnipTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->parsnip->setGlobalPose(parsnipTransform);
+	g_scene.getEntity("parsnip")->originalSpawn = parsnipTransform;
+
+	// RICE
+	loc = LOCATIONS[spawnLocations[7]];
+	PxTransform riceTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->rice->setGlobalPose(riceTransform);
+	g_scene.getEntity("rice")->originalSpawn = riceTransform;
+
+	// EGG
+	loc = LOCATIONS[spawnLocations[8]];
+	PxTransform eggTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->egg->setGlobalPose(eggTransform);
+	g_scene.getEntity("egg")->originalSpawn = eggTransform;
+
+	// CHICKEN
+	loc = LOCATIONS[spawnLocations[9]];
+	PxTransform chickenTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->chicken->setGlobalPose(chickenTransform);
+	g_scene.getEntity("chicken")->originalSpawn = chickenTransform;
+
+	// PEAS
+	loc = LOCATIONS[spawnLocations[10]];
+	PxTransform peasTransform(PxVec3(loc.x, loc.y, loc.z));
+	this->peas->setGlobalPose(peasTransform);
+	g_scene.getEntity("peas")->originalSpawn = peasTransform;
+}
+
 void PhysicsSystem::randomizeIngredientLocations()
 {
 	// Randomize starting location
@@ -836,76 +914,65 @@ void PhysicsSystem::raycastCamera(physx::PxVehicleDrive4W* vehicle, std::string 
 	}
 }
 
+void PhysicsSystem::resetIngredientDynamics()
+{
+	this->cheese->setAngularVelocity(PxVec3(0));
+	this->cheese->setLinearVelocity(PxVec3(0));
+	this->dough->setAngularVelocity(PxVec3(0));
+	this->dough->setLinearVelocity(PxVec3(0));
+	this->sausage->setAngularVelocity(PxVec3(0));
+	this->sausage->setLinearVelocity(PxVec3(0));
+	this->tomato->setAngularVelocity(PxVec3(0));
+	this->tomato->setLinearVelocity(PxVec3(0));
+	this->carrot->setAngularVelocity(PxVec3(0));
+	this->carrot->setLinearVelocity(PxVec3(0));
+	this->lettuce->setAngularVelocity(PxVec3(0));
+	this->lettuce->setLinearVelocity(PxVec3(0));
+	this->parsnip->setAngularVelocity(PxVec3(0));
+	this->parsnip->setLinearVelocity(PxVec3(0));
+	this->rice->setAngularVelocity(PxVec3(0));
+	this->rice->setLinearVelocity(PxVec3(0));
+	this->egg->setAngularVelocity(PxVec3(0));
+	this->egg->setLinearVelocity(PxVec3(0));
+	this->chicken->setAngularVelocity(PxVec3(0));
+	this->chicken->setLinearVelocity(PxVec3(0));
+	this->peas->setAngularVelocity(PxVec3(0));
+	this->peas->setLinearVelocity(PxVec3(0));
+}
+
 void PhysicsSystem::updateFoodTransforms(bool setAllVisible)
 {
-
-	glm::quat q = glm::quat(glm::vec3(0.0f, glfwGetTime(), 0.0f));
-	PxTransform trans = PxTransform(PxQuat(q.w, q.x, q.y, q.z));
-
 	// Cheese
-	this->cheese->setGlobalPose(this->cheese->getGlobalPose().transform(trans));
-	this->cheese->setLinearVelocity(PxVec3(0, 0, 0));
-	this->cheese->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("cheese")->getTransform()->update(this->cheese->getGlobalPose());
 
 	// Sausage
-	this->sausage->setGlobalPose(this->sausage->getGlobalPose().transform(trans));
-	this->sausage->setLinearVelocity(PxVec3(0, 0, 0));
-	this->sausage->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("sausage")->getTransform()->update(this->sausage->getGlobalPose());
 
 	// Tomato
-	this->tomato->setGlobalPose(this->tomato->getGlobalPose().transform(trans));
-	this->tomato->setLinearVelocity(PxVec3(0, 0, 0));
-	this->tomato->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("tomato")->getTransform()->update(this->tomato->getGlobalPose());
 
 	// Dough
-	this->dough->setGlobalPose(this->dough->getGlobalPose().transform(trans));
-	this->dough->setLinearVelocity(PxVec3(0, 0, 0));
-	this->dough->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("dough")->getTransform()->update(this->dough->getGlobalPose());
 
 	// Carrot
-	this->carrot->setGlobalPose(this->carrot->getGlobalPose().transform(trans));
-	this->carrot->setLinearVelocity(PxVec3(0, 0, 0));
-	this->carrot->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("carrot")->getTransform()->update(this->carrot->getGlobalPose());
 
 	// Lettuce
-	this->lettuce->setGlobalPose(this->lettuce->getGlobalPose().transform(trans));
-	this->lettuce->setLinearVelocity(PxVec3(0, 0, 0));
-	this->lettuce->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("lettuce")->getTransform()->update(this->lettuce->getGlobalPose());
 
 	// Parsnip
-	this->parsnip->setGlobalPose(this->parsnip->getGlobalPose().transform(trans));
-	this->parsnip->setLinearVelocity(PxVec3(0, 0, 0));
-	this->parsnip->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("parsnip")->getTransform()->update(this->parsnip->getGlobalPose());
 
 	// Rice
-	this->rice->setGlobalPose(this->rice->getGlobalPose().transform(trans));
-	this->rice->setLinearVelocity(PxVec3(0, 0, 0));
-	this->rice->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("rice")->getTransform()->update(this->rice->getGlobalPose());
 
 	// Egg
-	this->egg->setGlobalPose(this->egg->getGlobalPose().transform(trans));
-	this->egg->setLinearVelocity(PxVec3(0, 0, 0));
-	this->egg->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("egg")->getTransform()->update(this->egg->getGlobalPose());
 
 	// Chicken
-	this->chicken->setGlobalPose(this->chicken->getGlobalPose().transform(trans));
-	this->chicken->setLinearVelocity(PxVec3(0, 0, 0));
-	this->chicken->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("chicken")->getTransform()->update(this->chicken->getGlobalPose());
 
 	// Peas
-	this->peas->setGlobalPose(this->peas->getGlobalPose().transform(trans));
-	this->peas->setLinearVelocity(PxVec3(0, 0, 0));
-	this->peas->setAngularVelocity(PxVec3(0, 0, 0));
 	g_scene.getEntity("peas")->getTransform()->update(this->peas->getGlobalPose());
 
 	// Check if visibility needs to be reset
@@ -1189,7 +1256,6 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	firstCollisionNum += buf.nbTouches;
 	//printf("NUM COLLISION 1: %d\n", firstCollisionNum);
 
-
 	// SECOND ACTOR RAYCAST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	int secondCollisionNum = 0;
 	//printf("Second Actor: %s\n", secondActor->name.c_str());
@@ -1222,7 +1288,6 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 	secondCollisionNum += buf2.nbTouches;
 	//printf("NUM COLLISION 2: %d\n", secondCollisionNum);
 
-
 	// DECIDE COLLISION WINNER AND CHECK COOLDOWN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	float currentTime = glfwGetTime();
 	bool cooldownIncomplete = false;
@@ -1247,7 +1312,6 @@ void PhysicsSystem::playerCollisionRaycast(Entity* firstActor, PxVehicleDrive4W*
 		}
 	}
 	
-
 	// RESOLVE COLLISION INGREDIENT EXCHANGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	if (collisionWinner == 0) {
 		// No winners (headon collision)
@@ -1331,8 +1395,6 @@ void PhysicsSystem::magnet(int stealer_id)
 	// See if the stealer can steal (cooldown)
 	float currentTime = glfwGetTime();
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) return;
-
-
 
 	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
 	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");

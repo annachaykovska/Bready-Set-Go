@@ -29,6 +29,7 @@ UISystem::UISystem()
     , vacuum_yellow("resources/textures/vacuum_yellow.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
+
     , tomato("resources/textures/tomato.png", GL_NEAREST)
     , cheese("resources/textures/cheese.png", GL_NEAREST)
     , sausage("resources/textures/sausage.png", GL_NEAREST)
@@ -40,22 +41,58 @@ UISystem::UISystem()
     , rice("resources/textures/rice.png", GL_NEAREST)
     , parsnip("resources/textures/parsnip.png", GL_NEAREST)
     , carrot("resources/textures/carrot.png", GL_NEAREST)
+
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
     , cheeseOffscreenUp("resources/textures/cheeseOffscreenUp.png", GL_NEAREST)
     , cheeseOffscreenDown("resources/textures/cheeseOffscreenDown.png", GL_NEAREST)
+
     , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
     , tomatoOffscreenUp("resources/textures/tomatoOffscreenUp.png", GL_NEAREST)
     , tomatoOffscreenDown("resources/textures/tomatoOffscreenDown.png", GL_NEAREST)
+
     , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
     , doughOffscreenUp("resources/textures/doughOffscreenUp.png", GL_NEAREST)
     , doughOffscreenDown("resources/textures/doughOffscreenDown.png", GL_NEAREST)
+
     , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
     , sausageOffscreenUp("resources/textures/sausageOffscreenUp.png", GL_NEAREST)
     , sausageOffscreenDown("resources/textures/sausageOffscreenDown.png", GL_NEAREST)
+
+    , eggOffscreen("resources/textures/eggOffscreen.png", GL_NEAREST)
+    , eggOffscreenUp("resources/textures/eggOffscreenUp.png", GL_NEAREST)
+    , eggOffscreenDown("resources/textures/eggOffscreenDown.png", GL_NEAREST)
+
+    , peasOffscreen("resources/textures/peasOffscreen.png", GL_NEAREST)
+    , peasOffscreenUp("resources/textures/peasOffscreenUp.png", GL_NEAREST)
+    , peasOffscreenDown("resources/textures/peasOffscreenDown.png", GL_NEAREST)
+
+    , lettuceOffscreen("resources/textures/lettuceOffscreen.png", GL_NEAREST)
+    , lettuceOffscreenUp("resources/textures/lettuceOffscreenUp.png", GL_NEAREST)
+    , lettuceOffscreenDown("resources/textures/lettuceOffscreenDown.png", GL_NEAREST)
+
+    , chickenOffscreen("resources/textures/chickenOffscreen.png", GL_NEAREST)
+    , chickenOffscreenUp("resources/textures/chickenOffscreenUp.png", GL_NEAREST)
+    , chickenOffscreenDown("resources/textures/chickenOffscreenDown.png", GL_NEAREST)
+
+    , riceOffscreen("resources/textures/riceOffscreen.png", GL_NEAREST)
+    , riceOffscreenUp("resources/textures/riceOffscreenUp.png", GL_NEAREST)
+    , riceOffscreenDown("resources/textures/riceOffscreenDown.png", GL_NEAREST)
+
+    , parsnipOffscreen("resources/textures/parsnipOffscreen.png", GL_NEAREST)
+    , parsnipOffscreenUp("resources/textures/parsnipOffscreenUp.png", GL_NEAREST)
+    , parsnipOffscreenDown("resources/textures/parsnipOffscreenDown.png", GL_NEAREST)
+
+    , carrotOffscreen("resources/textures/carrotOffscreen.png", GL_NEAREST)
+    , carrotOffscreenUp("resources/textures/carrotOffscreenUp.png", GL_NEAREST)
+    , carrotOffscreenDown("resources/textures/carrotOffscreenDown.png", GL_NEAREST)
+
     , unflip3("resources/textures/unflip3.png", GL_NEAREST)
     , unflip2("resources/textures/unflip2.png", GL_NEAREST)
     , unflip1("resources/textures/unflip1.png", GL_NEAREST)
     , pizza("resources/textures/pizza.png", GL_NEAREST)
+    , salad("resources/textures/salad.png", GL_NEAREST)
+    , omelette("resources/textures/salad.png", GL_NEAREST)
+    , wrap("resources/textures/salad.png", GL_NEAREST)
     , p1Icon("resources/textures/p1Icon.png", GL_NEAREST)
     , p2Icon("resources/textures/p2Icon.png", GL_NEAREST)
     , p3Icon("resources/textures/p3Icon.png", GL_NEAREST)
@@ -88,9 +125,13 @@ UISystem::UISystem()
     , gameOverPlayer1_2("resources/textures/game_over_screen_player_1_2.png", GL_NEAREST)
     , gameOverPlayer1_3("resources/textures/game_over_screen_player_1_3.png", GL_NEAREST)
     , gameOverPlayer1_4("resources/textures/game_over_screen_player_1_4.png", GL_NEAREST)
+    , gameOverPlayer1_5("resources/textures/game_over_screen_player_1_5.png", GL_NEAREST)
     , gameOverPlayer2("resources/textures/game_over_screen_player_2.png", GL_NEAREST)
+    , gameOverPlayer2_2("resources/textures/game_over_screen_player_2_2.png", GL_NEAREST)
     , gameOverPlayer3("resources/textures/game_over_screen_player_3.png", GL_NEAREST)
+    , gameOverPlayer3_2("resources/textures/game_over_screen_player_3_2.png", GL_NEAREST)
     , gameOverPlayer4("resources/textures/game_over_screen_player_4.png", GL_NEAREST)
+    , gameOverPlayer4_2("resources/textures/game_over_screen_player_4_2.png", GL_NEAREST)
     , backToMainMenuButton("resources/textures/button_back_to_main_menu.png", GL_NEAREST)
     , backToMainMenuButtonPressed("resources/textures/button_back_to_main_menu_selected.png", GL_NEAREST)
     , map_x(0.126)
@@ -101,6 +142,10 @@ UISystem::UISystem()
     , controlsMenu("resources/textures/controls_screen_3.png", GL_NEAREST)
     , semiTransparent("resources/textures/semi-transparent-block.png", GL_NEAREST)
     , backToBaseBanner("resources/textures/return_to_base.png", GL_NEAREST)
+    , backToBaseBanner1("resources/textures/return_to_base_1.png", GL_NEAREST)
+    , backToBaseBanner2("resources/textures/return_to_base_2.png", GL_NEAREST)
+    , backToBaseBanner3("resources/textures/return_to_base_3.png", GL_NEAREST)
+    , backToBaseBanner4("resources/textures/return_to_base_4.png", GL_NEAREST)
     , countdown3("resources/textures/countdown_3.png", GL_NEAREST)
     , countdown2("resources/textures/countdown_2.png", GL_NEAREST)
     , countdown1("resources/textures/countdown_1.png", GL_NEAREST)
@@ -242,9 +287,8 @@ void UISystem::updateMainMenu(int itemSelected, int gameStage, int numController
 void UISystem::updateEndGame(int endScreenValue) {
     int winner = g_systems.loop->checkForWin();
     std::string winText = "Player " + std::to_string(winner) + " Wins!";
-    //renderText(textShader, winText, scX(0.4f), scY(0.48), 1.0f, glm::vec3(0.5, 0.5f, 0.5f));
     renderImage(imageShader, backToMainMenuButtonPressed, scX(0.5f), scY(0.4f), scX(0.2f), scY(0.1f), 0, 1.f);
-    if (winner == 1) {
+    if (winner == 1 && g_scene.numPlayers == 1) {
         if (endScreenValue == 0) {
             renderImage(imageShader, gameOverPlayer1_1, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
         }
@@ -258,12 +302,20 @@ void UISystem::updateEndGame(int endScreenValue) {
             renderImage(imageShader, gameOverPlayer1_4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
         }
     }
-    else if (winner == 2)
+    else if (winner == 1 && g_scene.numPlayers > 1)
+        renderImage(imageShader, gameOverPlayer1_5, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 2 && g_scene.numPlayers >= 2)
+        renderImage(imageShader, gameOverPlayer2_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 2 && g_scene.numPlayers == 1)
         renderImage(imageShader, gameOverPlayer2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
-    else if (winner == 3)
+    else if (winner == 3 && g_scene.numPlayers <= 2)
         renderImage(imageShader, gameOverPlayer3, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
-    else if (winner == 4)
+    else if (winner == 3 && g_scene.numPlayers >= 3)
+        renderImage(imageShader, gameOverPlayer3_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 4 && g_scene.numPlayers <= 3)
         renderImage(imageShader, gameOverPlayer4, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
+    else if (winner == 4 && g_scene.numPlayers == 4)
+        renderImage(imageShader, gameOverPlayer4_2, scX(0.5f), scY(0.53f), scX(0.4f), scY(0.7f), 0, 1.f);
 }
 
 void UISystem::showPauseMenu(int itemSelected) {
@@ -401,16 +453,17 @@ void UISystem::updateRecipeList()
 // Helper function that renders the passed ImageTexture at the passed Transform
 void UISystem::drawIndicator(int playerNum, Transform trans, ImageTexture& image, ImageTexture& imageUp, ImageTexture& imageDown)
 {
+    #define SCALING 2.f
     int indicatorY;
 
     glm::vec3 IngLocation = offscreenBubbleLocation(playerNum, trans.position, indicatorY);
 
     if (indicatorY == 0)
-        renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        renderImage(imageShader, image, IngLocation.x, IngLocation.y, IngLocation.z * SCALING, IngLocation.z * SCALING, 0, 1.f);
     else if (indicatorY == 1)
-        renderImage(imageShader, imageUp, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        renderImage(imageShader, imageUp, IngLocation.x, IngLocation.y, IngLocation.z * SCALING, IngLocation.z * SCALING, 0, 1.f);
     else
-        renderImage(imageShader, imageDown, IngLocation.x, IngLocation.y, IngLocation.z, IngLocation.z, 0, 1.f);
+        renderImage(imageShader, imageDown, IngLocation.x, IngLocation.y, IngLocation.z * SCALING, IngLocation.z * SCALING, 0, 1.f);
 }
 
 // TODO need to update image references for players 2-3 when we have the new icons
@@ -440,13 +493,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player2")->getInventory();
 
         if (!inventory->egg)
-            drawIndicator(playerNum, tracker->getEggLocation(), egg, egg, egg);
+            drawIndicator(playerNum, tracker->getEggLocation(), eggOffscreen, eggOffscreenUp, eggOffscreenDown);
         if (!inventory->cheese)
             drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen, cheeseOffscreenUp, cheeseOffscreenDown); 
         if (!inventory->peas)
-            drawIndicator(playerNum, tracker->getPeasLocation(), peas, peas, peas);
+            drawIndicator(playerNum, tracker->getPeasLocation(), peasOffscreen, peasOffscreenUp, peasOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuceOffscreen, lettuceOffscreenUp, lettuceOffscreenDown);
         break;
 
     case 3: // chicken, dough, rice, lettuce
@@ -454,13 +507,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player3")->getInventory();
 
         if (!inventory->chicken)
-            drawIndicator(playerNum, tracker->getChickenLocation(), chicken, chicken, chicken);
+            drawIndicator(playerNum, tracker->getChickenLocation(), chickenOffscreen, chickenOffscreenUp, chickenOffscreenDown);
         if (!inventory->dough)
             drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen, doughOffscreenUp, doughOffscreenDown);
         if (!inventory->rice)
-            drawIndicator(playerNum, tracker->getRiceLocation(), rice, rice, rice);
+            drawIndicator(playerNum, tracker->getRiceLocation(), riceOffscreen, riceOffscreenUp, riceOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuceOffscreen, lettuceOffscreenUp, lettuceOffscreenDown);
         break;
 
     case 4: // parsnip, carrot, tomato, lettuce
@@ -468,13 +521,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player4")->getInventory();
 
         if (!inventory->parsnip)
-            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnip, parsnip, parsnip);
+            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnipOffscreen, parsnipOffscreenUp, parsnipOffscreenDown);
         if (!inventory->carrot)
-            drawIndicator(playerNum, tracker->getCarrotLocation(), carrot, carrot, carrot);
+            drawIndicator(playerNum, tracker->getCarrotLocation(), carrotOffscreen, carrotOffscreenUp, carrotOffscreenDown);
         if (!inventory->tomato)
             drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen, tomatoOffscreenUp, tomatoOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuceOffscreen, lettuceOffscreenUp, lettuceOffscreenDown);
         break;
 
     default:
@@ -540,7 +593,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->egg && playerInv->cheese && playerInv->peas && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, cheese, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, omelette, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -554,7 +607,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->chicken && playerInv->dough && playerInv->rice && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, dough, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, wrap, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -568,7 +621,7 @@ void UISystem::updateInventory(int playerNum)
         drawInventoryIcon(playerInv->lettuce, lettuce, 3);
 
         alpha = (playerInv->parsnip && playerInv->carrot && playerInv->tomato && playerInv->lettuce) ? opaque : faded;
-        renderImage(imageShader, tomato, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
+        renderImage(imageShader, salad, invXOffset, recipeYOffset, scX(0.06), scY(0.09), 0, alpha);
 
         break;
 
@@ -601,11 +654,11 @@ void UISystem::updateUnflip(int playerNum)
     }
     if (player->unflipTimer > 0)
     {
-        if (player->unflipTimer > 2 * (2.f / 3.f))
+        if (player->unflipTimer > 1.5 * (2.f / 3.f))
         {
             renderImage(imageShader, unflip1, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
         }
-        else if (player->unflipTimer > 1 * (2.f / 3.f))
+        else if (player->unflipTimer > 0.75 * (2.f / 3.f))
         {
             renderImage(imageShader, unflip2, scX(0.5), scY(0.5), scX(0.1), scY(0.1), 0, 1.f);
         }
@@ -636,7 +689,14 @@ void UISystem::updateReturnToBaseBanner(unsigned int playerNum) {
         break;
     }
     if (drawBanner && g_systems.loop->checkForWin() == 0) {
-        renderImage(imageShader, backToBaseBanner, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 1)
+            renderImage(imageShader, backToBaseBanner1, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 2)
+            renderImage(imageShader, backToBaseBanner2, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 3)
+            renderImage(imageShader, backToBaseBanner3, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
+        if (playerNum == 4)
+            renderImage(imageShader, backToBaseBanner4, scX(0.5f), scY(0.85f), scX(0.6f), scY(0.3f), 0, 1.f);
     }
 }
 
@@ -655,15 +715,17 @@ void UISystem::updateCountdown(int countdownStage) {
 
 void UISystem::updatePlayer(unsigned int playerNum, int gameStage)
 {
-    updateVacuum(playerNum);
-    updateSpeedometer(playerNum);
-    updateRecipeList();
-    updateMiniMap();
-    if (gameStage != GameLoopMode::START_COUNTDOWN)
+    // Draw UI only when in game
+    if (gameStage == GameLoopMode::MAIN_GAME_PLAY) {
         updateOffscreenIndicators(playerNum);
-    updateInventory(playerNum);
-    updateUnflip(playerNum);
-    updateReturnToBaseBanner(playerNum);
+        updateVacuum(playerNum);
+        updateSpeedometer(playerNum);
+        updateRecipeList();
+        updateMiniMap();
+        updateInventory(playerNum);
+        updateUnflip(playerNum);
+        updateReturnToBaseBanner(playerNum);
+    }
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
@@ -929,7 +991,10 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     {
         location.z = scX(0.04);
     }
-
+    if (g_scene.numPlayers == 2) { // screen is stretched so return it scaled
+        location.x = (3.f*location.x/5.f) + (g_systems.width/(5.f));
+    }
+    //std::cout << location.x << std::endl;
     return glm::vec3(location.x, location.y, location.z);
 }
 

@@ -97,27 +97,58 @@ private:
 	ImageTexture parsnip;
 	ImageTexture carrot;
 
+	ImageTexture tomatoOffscreen;
+	ImageTexture tomatoOffscreenUp;
+	ImageTexture tomatoOffscreenDown;
+
 	ImageTexture cheeseOffscreen;
 	ImageTexture cheeseOffscreenUp;
 	ImageTexture cheeseOffscreenDown;
 
-	ImageTexture tomatoOffscreen;
-	ImageTexture tomatoOffscreenUp;
-	ImageTexture tomatoOffscreenDown;
+	ImageTexture sausageOffscreen;
+	ImageTexture sausageOffscreenUp;
+	ImageTexture sausageOffscreenDown;
 
 	ImageTexture doughOffscreen;
 	ImageTexture doughOffscreenUp;
 	ImageTexture doughOffscreenDown;
 
-	ImageTexture sausageOffscreen;
-	ImageTexture sausageOffscreenUp;
-	ImageTexture sausageOffscreenDown;
+	ImageTexture eggOffscreen;
+	ImageTexture eggOffscreenUp;
+	ImageTexture eggOffscreenDown;
+
+	ImageTexture peasOffscreen;
+	ImageTexture peasOffscreenUp;
+	ImageTexture peasOffscreenDown;
+
+	ImageTexture lettuceOffscreen;
+	ImageTexture lettuceOffscreenUp;
+	ImageTexture lettuceOffscreenDown;
+
+	ImageTexture chickenOffscreen;
+	ImageTexture chickenOffscreenUp;
+	ImageTexture chickenOffscreenDown;
+
+	ImageTexture riceOffscreen;
+	ImageTexture riceOffscreenUp;
+	ImageTexture riceOffscreenDown;
+
+	ImageTexture parsnipOffscreen;
+	ImageTexture parsnipOffscreenUp;
+	ImageTexture parsnipOffscreenDown;
+
+	ImageTexture carrotOffscreen;
+	ImageTexture carrotOffscreenUp;
+	ImageTexture carrotOffscreenDown;
 
 	ImageTexture unflip3;
 	ImageTexture unflip2;
 	ImageTexture unflip1;
 
 	ImageTexture pizza;
+	ImageTexture salad;
+	ImageTexture wrap;
+	ImageTexture omelette;
 
 	ImageTexture p1Icon;
 	ImageTexture p2Icon;
@@ -164,12 +195,20 @@ private:
 	ImageTexture gameOverPlayer1_2;
 	ImageTexture gameOverPlayer1_3;
 	ImageTexture gameOverPlayer1_4;
+	ImageTexture gameOverPlayer1_5;
 	ImageTexture gameOverPlayer2;
+	ImageTexture gameOverPlayer2_2;
 	ImageTexture gameOverPlayer3;
+	ImageTexture gameOverPlayer3_2;
 	ImageTexture gameOverPlayer4;
+	ImageTexture gameOverPlayer4_2;
 	ImageTexture backToMainMenuButton;
 	ImageTexture backToMainMenuButtonPressed;
 	ImageTexture backToBaseBanner;
+	ImageTexture backToBaseBanner1;
+	ImageTexture backToBaseBanner2;
+	ImageTexture backToBaseBanner3;
+	ImageTexture backToBaseBanner4;
 
 	//Constants needed to render
 	std::map<char, Character> Characters;
