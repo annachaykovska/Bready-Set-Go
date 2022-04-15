@@ -823,7 +823,7 @@ void RenderingSystem::update()
 	// Animate ingredients
 	for (unsigned int i = 6; i <= 16; i++)
 	{
-		if (g_systems.loop->gameStage == GameLoopMode::MAIN_GAME_PLAY)
+		if (g_systems.loop->gameStage == GameLoopMode::MAIN_GAME_PLAY && !g_systems.loop->isPaused)
 			models[i].owner->getTransform()->translate(glm::vec3(0.0f, glm::abs(glm::cos(glfwGetTime())) * 2.0f, 0.0f));
 	}
 
