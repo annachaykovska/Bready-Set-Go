@@ -177,6 +177,10 @@ private:
 	ImageTexture backToMainMenuButton;
 	ImageTexture backToMainMenuButtonPressed;
 	ImageTexture backToBaseBanner;
+	ImageTexture backToBaseBanner1;
+	ImageTexture backToBaseBanner2;
+	ImageTexture backToBaseBanner3;
+	ImageTexture backToBaseBanner4;
 
 	//Constants needed to render
 	std::map<char, Character> Characters;
