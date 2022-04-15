@@ -655,15 +655,17 @@ void UISystem::updateCountdown(int countdownStage) {
 
 void UISystem::updatePlayer(unsigned int playerNum, int gameStage)
 {
-    updateVacuum(playerNum);
-    updateSpeedometer(playerNum);
-    updateRecipeList();
-    updateMiniMap();
-    if (gameStage != GameLoopMode::START_COUNTDOWN)
+    // Draw UI only when in game
+    if (gameStage == GameLoopMode::MAIN_GAME_PLAY) {
         updateOffscreenIndicators(playerNum);
-    updateInventory(playerNum);
-    updateUnflip(playerNum);
-    updateReturnToBaseBanner(playerNum);
+        updateVacuum(playerNum);
+        updateSpeedometer(playerNum);
+        updateRecipeList();
+        updateMiniMap();
+        updateInventory(playerNum);
+        updateUnflip(playerNum);
+        updateReturnToBaseBanner(playerNum);
+    }
 }
 
 void UISystem::initIngredientTracking(IngredientTracker* offscreenTracker)
@@ -929,7 +931,10 @@ glm::vec3 UISystem::offscreenBubbleLocation(int playerNum, glm::vec3 entityPos, 
     {
         location.z = scX(0.04);
     }
-
+    if (g_scene.numPlayers == 2) { // screen is stretched so return it scaled
+        location.x = location.x/2.f + g_systems.width/4.f;
+    }
+    //std::cout << location.x << std::endl;
     return glm::vec3(location.x, location.y, location.z);
 }
 
