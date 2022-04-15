@@ -32,6 +32,7 @@ void NavigationSystem::pause()
 
 void NavigationSystem::update()
 {
+	vehicle_.ingredientCollectDistanceSquared = 150;
 	if (magnetCooldown_ > 0)
 	{
 		magnetCooldown_--;
@@ -51,7 +52,6 @@ void NavigationSystem::update()
 		{
 			if (steering_.locked())
 			{
-				std::cout << "Respawning tipped player" << std::endl;
 				physics_.respawnPlayer(id_);
 			}
 			else
