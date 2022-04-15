@@ -251,7 +251,7 @@ void XboxController::setButtonStateFromControllerDriving(int controllerId, bool 
 	if (B_button_pressed) {
 		if (*b_held && *useFlip) {
 			player->unflipTimer = currentTime - *b_buttonTimeStart;
-			if (currentTime - *b_buttonTimeStart > 2) {
+			if (currentTime - *b_buttonTimeStart > 1.5) {
 				*useFlip = false;
 				*b_held = false;
 				player->unflipTimer = 0;
