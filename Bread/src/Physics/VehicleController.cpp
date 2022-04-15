@@ -479,7 +479,7 @@ int XboxController::getNumberConnectedControllers() {
 void XboxController::vibrateController(int controllerId, bool vibrate, int pattern) {
 	XINPUT_VIBRATION vibration;
 	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
-	if (vibrate) {
+	if (vibrate && gameLoop->gameStage != GameLoopMode::END_GAME) {
 		if (pattern == 1) {
 			vibration.wLeftMotorSpeed = 14000; // use any value between 0-65535 here
 			vibration.wRightMotorSpeed = 15000; // use any value between 0-65535 here
