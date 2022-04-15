@@ -14,15 +14,6 @@ Double click the file in the Bread/ directory called "BreadySetGo!!!.exe"
 - **Y**: Vacuum ability
 - **START**: Pause
 
-## Controls (Keyboard - *Currently unsupported*)
-- **W**: Drive forwards
-- **A**: Drive left
-- **S**: Drive backwards
-- **D**: Drive right
-- **R**: Reset position to spawn
-
-Note: Keyboard controls were sorta broken sometime during the merge-fest of the previous milestones. The functionnality is not important as it was meant for debug purposes for the most part, so we ignored the issue.
-
 ## New Features and Changes Included
 - **Level Design and Gameplay:**
   - Multiplayer-friendly item indicators.
