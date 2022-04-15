@@ -16,6 +16,7 @@ Double click the file in the Bread/ directory called "BreadySetGo!!!.exe"
 
 ## New Features and Changes Included
 - **Level Design and Gameplay:**
+  - <ins>NOW WITH 4 PLAYER LOCAL MULTIPLAYER (please try it out, we worked very hard on this)</ins>
   - Multiplayer-friendly item indicators.
   - Cannot collect or interact with ingredients that are not yours.
   - Return to base to win.
