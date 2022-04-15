@@ -185,6 +185,9 @@ private:
 	ImageTexture countdown3;
 	ImageTexture countdown2;
 	ImageTexture countdown1;
+	ImageTexture rat1;
+	ImageTexture rat2;
+	ImageTexture rat3;
 
 	// Pause Menu
 	ImageTexture pauseMenu;
