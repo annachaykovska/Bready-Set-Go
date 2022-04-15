@@ -657,11 +657,11 @@ void UISystem::updatePlayer(unsigned int playerNum, int gameStage)
 {
     // Draw UI only when in game
     if (gameStage == GameLoopMode::MAIN_GAME_PLAY) {
+        updateOffscreenIndicators(playerNum);
         updateVacuum(playerNum);
         updateSpeedometer(playerNum);
         updateRecipeList();
         updateMiniMap();
-        updateOffscreenIndicators(playerNum);
         updateInventory(playerNum);
         updateUnflip(playerNum);
         updateReturnToBaseBanner(playerNum);
