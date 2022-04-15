@@ -345,7 +345,7 @@ void UISystem::updateVacuum(int playerNum)
     // Play sound effect if vacuum power has reset
     if ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown > 0.99f && powerReady == false)
     {
-        g_systems.audio->powerReady(player->getAudioSource());
+        g_systems.audio->powerReady((AudioSource*)player->getComponent("vacuumAudio"));
         powerReady = true;
     }
     else if ((glfwGetTime() - player->lastMagnetUse) / player->magnetCooldown < 0.99f && powerReady == true)

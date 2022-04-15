@@ -1328,11 +1328,11 @@ void PhysicsSystem::magnet(int stealer_id)
 		break;
 	}
 
+	AudioSource* vacuumAudio = (AudioSource*)stealer->getComponent("vacuumAudio");
+
 	// See if the stealer can steal (cooldown)
 	float currentTime = glfwGetTime();
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) return;
-
-
 
 	PxVec3 stealer_pos = stealer_vehicle->getRigidDynamicActor()->getGlobalPose().p;
 	auto stealer_recipe = (Recipe*)stealer->getComponent("recipe");
@@ -1461,11 +1461,11 @@ void PhysicsSystem::magnet(int stealer_id)
 						playBanner = true;
 						stealer->bannerSoundPlayed = true;
 					}
-					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
+					g_systems.audio->endSlurp(vacuumAudio, playBanner, true);
 				}
 				if (victims[i] == g_scene.getEntity("player1")) // TODO: This needs to change for multiplayer
 				{
-					g_systems.audio->ingredientSuck(stealer->getAudioSource());
+					g_systems.audio->ingredientSuck(vacuumAudio);
 				}
 				return;
 			}
@@ -1482,13 +1482,14 @@ void PhysicsSystem::magnet(int stealer_id)
 			playBanner = true;
 			stealer->bannerSoundPlayed = true;
 		}
-		g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
+		g_systems.audio->endSlurp(vacuumAudio, playBanner, false);
 	}
 }
 
 void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, bool steal_button_just_pressed) {
 	// setting up the stealer entity (see if this can be passed in instead)
 	Entity* stealer;
+	
 	bool playBanner = false;
 	switch (stealer_id) {
 	case 1:
@@ -1507,6 +1508,8 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 		return; // Id passed in does not correspond to a car
 	}
 
+	AudioSource* vacuumAudio = (AudioSource*)stealer->getComponent("vacuumAudio");
+
 	// Check if in Cooldown
 	float currentTime = glfwGetTime();
 	if (currentTime - stealer->lastMagnetUse < stealer->magnetCooldown) { // in Cooldown
@@ -1521,7 +1524,7 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 			makeVictimsList(stealer_id, stealer->tethered_victims); // TODO: THIS MIGHT NOT HAVE TO BE A FUNCTION
 			checkVictims(stealer, stealer->tethered_victims, currentTime);
 			if (!stealer->tethered_victims.empty()) { // Check if stealer has victims
-				g_systems.audio->playSlurp(stealer->getAudioSource());
+				g_systems.audio->playSlurp(vacuumAudio);
 				stealer->magnetStartTime = currentTime;
 				stealer->tethered = true;
 				stealer->magnetStatus = 3;
@@ -1532,7 +1535,7 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 					playBanner = true;
 					stealer->bannerSoundPlayed = true;
 				}
-				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
+				g_systems.audio->endSlurp(vacuumAudio, playBanner, false);
 				stealer->lastMagnetUse = currentTime;
 				stealer->magnetStatus = 0;
 			}
@@ -1654,7 +1657,7 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 							playBanner = true;
 							stealer->bannerSoundPlayed = true;
 						}
-						g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, true);
+						g_systems.audio->endSlurp(vacuumAudio, playBanner, true);
 
 						// Update stealer/victim variables
 						stealer->lastGracePeriodStart = currentTime;
@@ -1676,7 +1679,7 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 						playBanner = true;
 						stealer->bannerSoundPlayed = true;
 					}
-					g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
+					g_systems.audio->endSlurp(vacuumAudio, playBanner, false);
 					stealer->tethered = false;
 					stealer->lastMagnetUse = currentTime;
 					stealer->magnetStatus = 0;
@@ -1689,7 +1692,7 @@ void PhysicsSystem::magnetCheckStealing(int stealer_id, bool steal_button_held, 
 					playBanner = true;
 					stealer->bannerSoundPlayed = true;
 				}
-				g_systems.audio->endSlurp(stealer->getAudioSource(), playBanner, false);
+				g_systems.audio->endSlurp(vacuumAudio, playBanner, false);
 				stealer->tethered = false;
 				stealer->tethered_victims.clear();
 				stealer->lastMagnetUse = currentTime;
