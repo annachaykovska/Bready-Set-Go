@@ -24,6 +24,8 @@ public:
 	void initVehicleSDK();
 	void initializeActors();
 	void randomizeIngredientLocations();
+	void reRandomizeIngredientLocations();
+	void resetIngredientDynamics();
 
 	PxRigidDynamic* createFoodBlock(const PxTransform& t, float x, float y, float z, std::string name);
 	PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity);
