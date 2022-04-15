@@ -102,6 +102,11 @@ void AudioSource::update()
 	alSource3f(this->source, AL_POSITION, pos.x, pos.y, pos.z);
 }
 
+void AudioSource::update(glm::vec3 pos)
+{
+	alSource3f(this->source, AL_POSITION, pos.x, pos.y, pos.z);
+}
+
 bool AudioSource::isPlaying()
 {
 	ALint value;
