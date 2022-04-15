@@ -29,6 +29,7 @@ UISystem::UISystem()
     , vacuum_yellow("resources/textures/vacuum_yellow.png", GL_NEAREST)
     , miniMap("resources/textures/map.png", GL_NEAREST)
     , inventory("resources/textures/inventory.png", GL_NEAREST)
+
     , tomato("resources/textures/tomato.png", GL_NEAREST)
     , cheese("resources/textures/cheese.png", GL_NEAREST)
     , sausage("resources/textures/sausage.png", GL_NEAREST)
@@ -40,18 +41,51 @@ UISystem::UISystem()
     , rice("resources/textures/rice.png", GL_NEAREST)
     , parsnip("resources/textures/parsnip.png", GL_NEAREST)
     , carrot("resources/textures/carrot.png", GL_NEAREST)
+
     , cheeseOffscreen("resources/textures/cheeseOffscreen.png", GL_NEAREST)
     , cheeseOffscreenUp("resources/textures/cheeseOffscreenUp.png", GL_NEAREST)
     , cheeseOffscreenDown("resources/textures/cheeseOffscreenDown.png", GL_NEAREST)
+
     , tomatoOffscreen("resources/textures/tomatoOffscreen.png", GL_NEAREST)
     , tomatoOffscreenUp("resources/textures/tomatoOffscreenUp.png", GL_NEAREST)
     , tomatoOffscreenDown("resources/textures/tomatoOffscreenDown.png", GL_NEAREST)
+
     , doughOffscreen("resources/textures/doughOffscreen.png", GL_NEAREST)
     , doughOffscreenUp("resources/textures/doughOffscreenUp.png", GL_NEAREST)
     , doughOffscreenDown("resources/textures/doughOffscreenDown.png", GL_NEAREST)
+
     , sausageOffscreen("resources/textures/sausageOffscreen.png", GL_NEAREST)
     , sausageOffscreenUp("resources/textures/sausageOffscreenUp.png", GL_NEAREST)
     , sausageOffscreenDown("resources/textures/sausageOffscreenDown.png", GL_NEAREST)
+
+    , eggOffscreen("resources/textures/eggOffscreen.png", GL_NEAREST)
+    , eggOffscreenUp("resources/textures/eggOffscreenUp.png", GL_NEAREST)
+    , eggOffscreenDown("resources/textures/eggOffscreenDown.png", GL_NEAREST)
+
+    , peasOffscreen("resources/textures/peasOffscreen.png", GL_NEAREST)
+    , peasOffscreenUp("resources/textures/peasOffscreenUp.png", GL_NEAREST)
+    , peasOffscreenDown("resources/textures/peasOffscreenDown.png", GL_NEAREST)
+
+    , lettuceOffscreen("resources/textures/lettuceOffscreen.png", GL_NEAREST)
+    , lettuceOffscreenUp("resources/textures/lettuceOffscreenUp.png", GL_NEAREST)
+    , lettuceOffscreenDown("resources/textures/lettuceOffscreenDown.png", GL_NEAREST)
+
+    , chickenOffscreen("resources/textures/chickenOffscreen.png", GL_NEAREST)
+    , chickenOffscreenUp("resources/textures/chickenOffscreenUp.png", GL_NEAREST)
+    , chickenOffscreenDown("resources/textures/chickenOffscreenDown.png", GL_NEAREST)
+
+    , riceOffscreen("resources/textures/riceOffscreen.png", GL_NEAREST)
+    , riceOffscreenUp("resources/textures/riceOffscreenUp.png", GL_NEAREST)
+    , riceOffscreenDown("resources/textures/riceOffscreenDown.png", GL_NEAREST)
+
+    , parsnipOffscreen("resources/textures/parsnipOffscreen.png", GL_NEAREST)
+    , parsnipOffscreenUp("resources/textures/parsnipOffscreenUp.png", GL_NEAREST)
+    , parsnipOffscreenDown("resources/textures/parsnipOffscreenDown.png", GL_NEAREST)
+
+    , carrotOffscreen("resources/textures/carrotOffscreen.png", GL_NEAREST)
+    , carrotOffscreenUp("resources/textures/carrotOffscreenUp.png", GL_NEAREST)
+    , carrotOffscreenDown("resources/textures/carrotOffscreenDown.png", GL_NEAREST)
+
     , unflip3("resources/textures/unflip3.png", GL_NEAREST)
     , unflip2("resources/textures/unflip2.png", GL_NEAREST)
     , unflip1("resources/textures/unflip1.png", GL_NEAREST)
@@ -454,13 +488,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player2")->getInventory();
 
         if (!inventory->egg)
-            drawIndicator(playerNum, tracker->getEggLocation(), egg, egg, egg);
+            drawIndicator(playerNum, tracker->getEggLocation(), eggOffscreen, eggOffscreenUp, eggOffscreenDown);
         if (!inventory->cheese)
             drawIndicator(playerNum, tracker->getCheeseLocation(), cheeseOffscreen, cheeseOffscreenUp, cheeseOffscreenDown); 
         if (!inventory->peas)
-            drawIndicator(playerNum, tracker->getPeasLocation(), peas, peas, peas);
+            drawIndicator(playerNum, tracker->getPeasLocation(), peasOffscreen, peasOffscreenUp, peasOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuceOffscreen, lettuceOffscreenUp, lettuceOffscreenDown);
         break;
 
     case 3: // chicken, dough, rice, lettuce
@@ -468,13 +502,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player3")->getInventory();
 
         if (!inventory->chicken)
-            drawIndicator(playerNum, tracker->getChickenLocation(), chicken, chicken, chicken);
+            drawIndicator(playerNum, tracker->getChickenLocation(), chickenOffscreen, chickenOffscreenUp, chickenOffscreenDown);
         if (!inventory->dough)
             drawIndicator(playerNum, tracker->getDoughLocation(), doughOffscreen, doughOffscreenUp, doughOffscreenDown);
         if (!inventory->rice)
-            drawIndicator(playerNum, tracker->getRiceLocation(), rice, rice, rice);
+            drawIndicator(playerNum, tracker->getRiceLocation(), riceOffscreen, riceOffscreenUp, riceOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuceOffscreen, lettuceOffscreenUp, lettuceOffscreenDown);
         break;
 
     case 4: // parsnip, carrot, tomato, lettuce
@@ -482,13 +516,13 @@ void UISystem::updateOffscreenIndicators(int playerNum)
         inventory = g_scene.getEntity("player4")->getInventory();
 
         if (!inventory->parsnip)
-            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnip, parsnip, parsnip);
+            drawIndicator(playerNum, tracker->getParsnipLocation(), parsnipOffscreen, parsnipOffscreenUp, parsnipOffscreenDown);
         if (!inventory->carrot)
-            drawIndicator(playerNum, tracker->getCarrotLocation(), carrot, carrot, carrot);
+            drawIndicator(playerNum, tracker->getCarrotLocation(), carrotOffscreen, carrotOffscreenUp, carrotOffscreenDown);
         if (!inventory->tomato)
             drawIndicator(playerNum, tracker->getTomatoLocation(), tomatoOffscreen, tomatoOffscreenUp, tomatoOffscreenDown);
         if (!inventory->lettuce)
-            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuce, lettuce, lettuce);
+            drawIndicator(playerNum, tracker->getLettuceLocation(), lettuceOffscreen, lettuceOffscreenUp, lettuceOffscreenDown);
         break;
 
     default:
